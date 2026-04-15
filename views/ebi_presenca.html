@@ -1,4 +1,4 @@
-﻿<div class="row wrapper border-bottom white-bg page-heading">
+<div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
         <h2>Histórico de Atividades - EBI</h2>
         <ol class="breadcrumb">
@@ -35,7 +35,7 @@
     .ebi-status-ok { background: #dff5ef; color: #17997d; }
     .ebi-status-today { background: #fff4dd; color: #d18a15; }
     .ebi-status-warn { background: #ffe7cf; color: #dd7b1e; }
-    .ebi-status-danger { background: #ffd7dd; color: #d63d58; }
+    .ebi-status-danger { background: #ed5565; color: #fff; }
     .ebi-status-muted { background: #eef2f5; color: #73808c; }
     .ebi-metric-intro { color: #7f8c8d; line-height: 1.55; margin-bottom: 18px; }
     .ebi-metric-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
@@ -272,7 +272,7 @@
                                                             <td class="text-center">{{ item.dataEsperadaLabel || '-' }}</td>
                                                             <td class="text-center">
                                                                 <span class="ebi-status-badge"
-                                                                      ng-class="{'ebi-status-ok': formatEbiStatusLabel(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusLabel(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusLabel(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusLabel(item.status) === 'CRITICO', 'ebi-status-muted': formatEbiStatusLabel(item.status) === 'SEM HISTÓRICO'}">
+                                                                        ng-class="{'ebi-status-ok': formatEbiStatusLabel(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusLabel(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusLabel(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusLabel(item.status) === 'CRÍTICO', 'ebi-status-muted': formatEbiStatusLabel(item.status) === 'SEM HISTÓRICO'}">
                                                                     {{ formatEbiStatusLabel(item.status) }}
                                                                 </span>
                                                                 <div><small class="text-muted">{{ item.statusDetail }}</small></div>
@@ -337,7 +337,7 @@
                                                     <td class="text-center">{{ group.mediaCriancas }}</td>
                                                     <td class="text-center">{{ group.comunsAtivos }} / {{ group.totalComunsMapeados || 0 }}</td>
                                                     <td class="text-center"><strong>{{ group.cobertura }}%</strong><div class="progress progress-mini m-t-xs" style="margin-bottom:0;"><div class="progress-bar" ng-class="{'progress-bar-danger': group.cobertura < 45, 'progress-bar-warning': group.cobertura >= 45 && group.cobertura < 75}" style="width: {{ group.cobertura }}%;"></div></div></td>
-                                                    <td class="text-center"><span class="label" ng-class="{'label-primary': group.status === 'EXCELENTE', 'label-warning': group.status === 'ATENCAO', 'label-danger': group.status === 'CRITICO'}">{{ group.status }}</span></td>
+                                                    <td class="text-center"><span class="label" ng-class="{'label-primary': group.status === 'EXCELENTE', 'label-warning': group.status === 'ATENCAO', 'label-danger': group.status === 'CRITICO' || group.status === 'CRÍTICO'}">{{ group.status }}</span></td>
                                                     <td class="text-right"><button class="btn btn-xs btn-primary" ng-click="filterEbiByMunicipio(group.municipio)"><i class="fa fa-filter"></i> Filtrar</button></td>
                                                 </tr>
                                                 <tr ng-if="!ebiMunicipioGroups.length"><td colspan="8" class="text-center text-muted">Nenhum município encontrado para os filtros atuais.</td></tr>
@@ -388,7 +388,7 @@
                                             <td class="text-center">{{ item.weekdayLabel }}</td>
                                             <td class="text-center">
                                                 <span class="ebi-status-badge"
-                                                      ng-class="{'ebi-status-ok': formatEbiStatusLabel(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusLabel(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusLabel(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusLabel(item.status) === 'CRITICO', 'ebi-status-muted': formatEbiStatusLabel(item.status) === 'SEM HISTÓRICO'}">
+                                                        ng-class="{'ebi-status-ok': formatEbiStatusLabel(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusLabel(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusLabel(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusLabel(item.status) === 'CRÍTICO', 'ebi-status-muted': formatEbiStatusLabel(item.status) === 'SEM HISTÓRICO'}">
                                                     {{ formatEbiStatusLabel(item.status) }}
                                                 </span>
                                             </td>
