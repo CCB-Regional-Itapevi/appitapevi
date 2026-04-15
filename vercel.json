@@ -3,7 +3,7 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/((?!js/|css/|img/|fonts/|font-awesome/|views/).*)",
       "destination": "/index.html"
     }
   ]
