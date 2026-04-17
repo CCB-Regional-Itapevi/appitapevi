@@ -4,9 +4,9 @@
     angular.module('inspinia')
         .factory('AuthService', AuthService);
 
-    AuthService.$inject = ['$q', '$rootScope', '$state'];
+    AuthService.$inject = ['$q', '$rootScope', '$state', '$timeout', '$window'];
 
-    function AuthService($q, $rootScope, $state) {
+    function AuthService($q, $rootScope, $state, $timeout, $window) {
         // Supabase configuration
         var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
@@ -15,6 +15,17 @@
         var supabase = window.__appSupabaseClient
             || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
         var ministerioRegionalCache = null;
+        var SESSION_STORAGE_KEY = 'sb-sqamxlhfazulrisiptud-auth-token';
+        var INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+        var LAST_ACTIVITY_STORAGE_KEY = 'app_global_last_activity_at';
+        var LOGOUT_REASON_STORAGE_KEY = 'app_global_logout_reason';
+        var ACCESS_SESSION_STORAGE_KEY = 'app_global_access_session_id';
+        var ACCESS_SESSION_SYNC_STORAGE_KEY = 'app_global_access_session_sync_at';
+        var ACCESS_LOGIN_AUDIT_STORAGE_KEY = 'app_global_login_audit_key';
+        var PENDING_AUDIT_QUEUE_STORAGE_KEY = 'app_global_pending_audit_queue';
+        var ACCESS_SESSION_ACTIVITY_SYNC_INTERVAL_MS = 60 * 1000;
+        var inactivityTimerPromise = null;
+        var inactivityLogoutPromise = null;
 
         var service = {
             login: login,
@@ -26,6 +37,9 @@
             updateUserProfile: updateUserProfile,
             listPendingUsers: listPendingUsers,
             listManagedUsers: listManagedUsers,
+            listAuditLogs: listAuditLogs,
+            listAccessSessionSummary: listAccessSessionSummary,
+            listAuditProfileCounters: listAuditProfileCounters,
             listMinisterioRegional: listMinisterioRegional,
             listComunsCatalog: listComunsCatalog,
             searchComunsCatalog: searchComunsCatalog,
@@ -45,7 +59,12 @@
             logAudit: logAudit,
             trackPageAccess: trackPageAccess,
             countPendingUsers: countPendingUsers,
-            handleLoginRedirect: handleLoginRedirect
+            handleLoginRedirect: handleLoginRedirect,
+            touchActivity: touchActivity,
+            enforceInactivityTimeout: enforceInactivityTimeout,
+            syncInactivityTimer: syncInactivityTimer,
+            consumeLogoutReason: consumeLogoutReason,
+            getInactivityTimeoutMs: getInactivityTimeoutMs
         };
 
         return service;
@@ -373,6 +392,8 @@
             normalizedProfile.role = normalizeRoleLabel(normalizedProfile.role_id, normalizedProfile.role);
             normalizedProfile.sector = normalizeSector(normalizedProfile.sector, normalizedProfile.role_id, normalizedProfile.role);
             normalizedProfile.status = normalizeStatus(normalizedProfile.status);
+            normalizedProfile.contador_logins = parseInt(normalizedProfile.contador_logins, 10) || 0;
+            normalizedProfile.contador_logouts = parseInt(normalizedProfile.contador_logouts, 10) || 0;
 
             return normalizedProfile;
         }
@@ -401,6 +422,510 @@
             }
 
             return normalizedProfile;
+        }
+
+        function generateClientUuid() {
+            if ($window.crypto && typeof $window.crypto.randomUUID === 'function') {
+                return $window.crypto.randomUUID();
+            }
+
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (character) {
+                var random = Math.random() * 16 | 0;
+                var value = character === 'x' ? random : ((random & 0x3) | 0x8);
+                return value.toString(16);
+            });
+        }
+
+        function hasPersistedSession() {
+            return !!$window.localStorage.getItem(SESSION_STORAGE_KEY) ||
+                !!$window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+        }
+
+        function getInactivityTimeoutMs() {
+            return INACTIVITY_TIMEOUT_MS;
+        }
+
+        function getStoredLastActivityAt() {
+            var rawValue = $window.localStorage.getItem(LAST_ACTIVITY_STORAGE_KEY);
+            var parsedValue = parseInt(rawValue, 10);
+
+            if (isNaN(parsedValue) || parsedValue <= 0) {
+                return null;
+            }
+
+            return parsedValue;
+        }
+
+        function setStoredLastActivityAt(timestamp) {
+            $window.localStorage.setItem(LAST_ACTIVITY_STORAGE_KEY, String(timestamp));
+        }
+
+        function clearStoredLastActivityAt() {
+            $window.localStorage.removeItem(LAST_ACTIVITY_STORAGE_KEY);
+        }
+
+        function getStoredAccessSessionId() {
+            return $window.sessionStorage.getItem(ACCESS_SESSION_STORAGE_KEY) ||
+                $window.localStorage.getItem(ACCESS_SESSION_STORAGE_KEY);
+        }
+
+        function getStoredLoginAuditKey() {
+            return $window.sessionStorage.getItem(ACCESS_LOGIN_AUDIT_STORAGE_KEY) ||
+                $window.localStorage.getItem(ACCESS_LOGIN_AUDIT_STORAGE_KEY);
+        }
+
+        function setStoredLoginAuditKey(auditKey) {
+            if (!auditKey) {
+                return;
+            }
+
+            $window.sessionStorage.setItem(ACCESS_LOGIN_AUDIT_STORAGE_KEY, auditKey);
+            $window.localStorage.setItem(ACCESS_LOGIN_AUDIT_STORAGE_KEY, auditKey);
+        }
+
+        function clearStoredLoginAuditKey() {
+            $window.sessionStorage.removeItem(ACCESS_LOGIN_AUDIT_STORAGE_KEY);
+            $window.localStorage.removeItem(ACCESS_LOGIN_AUDIT_STORAGE_KEY);
+        }
+
+        function setStoredAccessSessionId(sessionId) {
+            if (!sessionId) {
+                return;
+            }
+
+            $window.sessionStorage.setItem(ACCESS_SESSION_STORAGE_KEY, sessionId);
+            $window.localStorage.setItem(ACCESS_SESSION_STORAGE_KEY, sessionId);
+        }
+
+        function clearStoredAccessSessionId() {
+            $window.sessionStorage.removeItem(ACCESS_SESSION_STORAGE_KEY);
+            $window.localStorage.removeItem(ACCESS_SESSION_STORAGE_KEY);
+            $window.localStorage.removeItem(ACCESS_SESSION_SYNC_STORAGE_KEY);
+        }
+
+        function buildSessionAuditKey(session, profile) {
+            var currentProfile = profile || {};
+            var userId = currentProfile.user_id || (session && session.user && session.user.id) || 'anonymous';
+            var sessionId = session && session.session_id ? session.session_id : '';
+            var refreshToken = session && session.refresh_token ? session.refresh_token : '';
+            var expiresAt = session && session.expires_at ? String(session.expires_at) : '';
+
+            return [userId, sessionId || refreshToken || expiresAt].join(':');
+        }
+
+        function getStoredAccessSessionSyncAt() {
+            var rawValue = $window.localStorage.getItem(ACCESS_SESSION_SYNC_STORAGE_KEY);
+            var parsedValue = parseInt(rawValue, 10);
+            return isNaN(parsedValue) ? null : parsedValue;
+        }
+
+        function setStoredAccessSessionSyncAt(timestamp) {
+            $window.localStorage.setItem(ACCESS_SESSION_SYNC_STORAGE_KEY, String(timestamp || Date.now()));
+        }
+
+        function buildAccessSessionDetails(profile, extraDetails) {
+            var currentProfile = profile || $rootScope.currentUser || {};
+            return angular.extend({
+                actor_name: currentProfile.full_name || currentProfile.username || currentProfile.email || 'Sistema',
+                email: currentProfile.email || null,
+                role_id: currentProfile.role_id || null,
+                role: currentProfile.role || null,
+                sector: currentProfile.sector || null,
+                source: 'web-app',
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+                language: window.navigator.language || null,
+                current_path: window.location.pathname || '/',
+                current_hash: window.location.hash || '',
+                screen_size: (window.screen && window.screen.width && window.screen.height)
+                    ? [window.screen.width, window.screen.height].join('x')
+                    : null
+            }, extraDetails || {});
+        }
+
+        function startAccessSession(userId, profile, session) {
+            var deferred = $q.defer();
+            var existingSessionId = getStoredAccessSessionId();
+            var accessSessionId;
+            var payload;
+
+            if (!userId) {
+                deferred.resolve(null);
+                return deferred.promise;
+            }
+
+            if (existingSessionId) {
+                deferred.resolve(existingSessionId);
+                return deferred.promise;
+            }
+
+            accessSessionId = generateClientUuid();
+            payload = {
+                id: accessSessionId,
+                user_id: userId,
+                started_at: new Date().toISOString(),
+                last_activity_at: new Date().toISOString(),
+                status: 'active',
+                details: buildAccessSessionDetails(profile, {
+                    auth_session_id: session && session.session_id ? session.session_id : null,
+                    login_method: 'password'
+                })
+            };
+
+            supabase
+                .from('audit_access_sessions')
+                .insert(payload)
+                .then(function (response) {
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    setStoredAccessSessionId(accessSessionId);
+                    setStoredAccessSessionSyncAt(Date.now());
+                    deferred.resolve(accessSessionId);
+                })
+                .catch(function (error) {
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
+
+        function registerSuccessfulLogin(profile) {
+            var deferred = $q.defer();
+            var currentProfile = normalizeProfile(profile || {});
+            var userId = currentProfile.user_id || null;
+            var payload;
+
+            if (!userId) {
+                deferred.resolve(currentProfile);
+                return deferred.promise;
+            }
+
+            payload = {
+                contador_logins: (parseInt(currentProfile.contador_logins, 10) || 0) + 1,
+                data_ultimo_login: new Date().toISOString()
+            };
+
+            supabase
+                .from('profiles')
+                .update(payload)
+                .eq('user_id', userId)
+                .select('*')
+                .single()
+                .then(function (response) {
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    deferred.resolve(normalizeProfile(response.data || angular.extend({}, currentProfile, payload)));
+                })
+                .catch(function (error) {
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
+
+        function syncAccessSessionActivity(forceSync) {
+            var deferred = $q.defer();
+            var accessSessionId = getStoredAccessSessionId();
+            var lastSyncedAt = getStoredAccessSessionSyncAt();
+            var now = Date.now();
+
+            if (!accessSessionId || !$rootScope.currentUser || !$rootScope.currentUser.user_id) {
+                deferred.resolve(null);
+                return deferred.promise;
+            }
+
+            if (!forceSync && lastSyncedAt && (now - lastSyncedAt) < ACCESS_SESSION_ACTIVITY_SYNC_INTERVAL_MS) {
+                deferred.resolve(accessSessionId);
+                return deferred.promise;
+            }
+
+            supabase
+                .from('audit_access_sessions')
+                .update({
+                    last_activity_at: new Date(now).toISOString()
+                })
+                .eq('id', accessSessionId)
+                .eq('user_id', $rootScope.currentUser.user_id)
+                .then(function (response) {
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    setStoredAccessSessionSyncAt(now);
+                    deferred.resolve(accessSessionId);
+                })
+                .catch(function (error) {
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
+
+        function finishAccessSession(status, logoutReason) {
+            var deferred = $q.defer();
+            var accessSessionId = getStoredAccessSessionId();
+            var currentUserId = $rootScope.currentUser ? $rootScope.currentUser.user_id : null;
+            var finishedAt = new Date().toISOString();
+
+            if (!accessSessionId || !currentUserId) {
+                clearStoredAccessSessionId();
+                deferred.resolve(null);
+                return deferred.promise;
+            }
+
+            supabase
+                .from('audit_access_sessions')
+                .update({
+                    ended_at: finishedAt,
+                    last_activity_at: finishedAt,
+                    status: status || 'logged_out',
+                    logout_reason: logoutReason || null
+                })
+                .eq('id', accessSessionId)
+                .eq('user_id', currentUserId)
+                .then(function (response) {
+                    clearStoredAccessSessionId();
+
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    deferred.resolve(accessSessionId);
+                })
+                .catch(function (error) {
+                    clearStoredAccessSessionId();
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
+
+        function registerSuccessfulLogout(userId) {
+            var deferred = $q.defer();
+
+            if (!userId) {
+                deferred.resolve(null);
+                return deferred.promise;
+            }
+
+            supabase
+                .from('profiles')
+                .select('contador_logouts')
+                .eq('user_id', userId)
+                .single()
+                .then(function (profileResponse) {
+                    var currentCount;
+
+                    if (profileResponse.error) {
+                        deferred.reject(profileResponse.error);
+                        return;
+                    }
+
+                    currentCount = parseInt(profileResponse.data && profileResponse.data.contador_logouts, 10) || 0;
+
+                    return supabase
+                        .from('profiles')
+                        .update({
+                            contador_logouts: currentCount + 1,
+                            data_ultimo_logout: new Date().toISOString()
+                        })
+                        .eq('user_id', userId);
+                })
+                .then(function (response) {
+                    if (response && response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    deferred.resolve(true);
+                })
+                .catch(function (error) {
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
+
+        function ensureLoginRegisteredForSession(profile, session) {
+            var deferred = $q.defer();
+            var currentProfile = normalizeProfile(profile || {});
+            var userId = currentProfile.user_id || null;
+            var auditKey;
+
+            if (!userId || !session) {
+                deferred.resolve(currentProfile);
+                return deferred.promise;
+            }
+
+            auditKey = buildSessionAuditKey(session, currentProfile);
+
+            if (auditKey && getStoredLoginAuditKey() === auditKey) {
+                deferred.resolve(currentProfile);
+                return deferred.promise;
+            }
+
+            registerSuccessfulLogin(currentProfile).catch(function () {
+                return currentProfile;
+            }).then(function (updatedProfile) {
+                return ensureAuditInsert(userId, 'LOGIN', 'AUTH', {
+                    email: updatedProfile.email || (session.user && session.user.email) || null,
+                    resolved_role_id: updatedProfile.role_id,
+                    resolved_role: updatedProfile.role,
+                    resolved_sector: updatedProfile.sector,
+                    resolved_status: updatedProfile.status,
+                    actor_name: updatedProfile.full_name || updatedProfile.username || updatedProfile.email || null,
+                    login_counter: updatedProfile.contador_logins || 0,
+                    auth_session_id: session.session_id || null
+                }).catch(function () {
+                    return null;
+                }).then(function () {
+                    if (auditKey) {
+                        setStoredLoginAuditKey(auditKey);
+                    }
+                    return updatedProfile;
+                });
+            }).then(function (updatedProfile) {
+                deferred.resolve(updatedProfile);
+            }).catch(function (error) {
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        }
+
+        function cancelInactivityTimer() {
+            if (inactivityTimerPromise) {
+                $timeout.cancel(inactivityTimerPromise);
+                inactivityTimerPromise = null;
+            }
+        }
+
+        function clearClientSession(reason) {
+            cancelInactivityTimer();
+            clearStoredLastActivityAt();
+            clearStoredAccessSessionId();
+            clearStoredLoginAuditKey();
+            $window.localStorage.removeItem(SESSION_STORAGE_KEY);
+            $window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
+
+            if (reason) {
+                $window.sessionStorage.setItem(LOGOUT_REASON_STORAGE_KEY, reason);
+            } else {
+                $window.sessionStorage.removeItem(LOGOUT_REASON_STORAGE_KEY);
+            }
+
+            $rootScope.currentUser = null;
+            $rootScope.currentUserResolved = true;
+        }
+
+        function consumeLogoutReason() {
+            var reason = $window.sessionStorage.getItem(LOGOUT_REASON_STORAGE_KEY);
+            $window.sessionStorage.removeItem(LOGOUT_REASON_STORAGE_KEY);
+            return reason;
+        }
+
+        function isInactivityTimeoutExpired() {
+            var lastActivityAt = getStoredLastActivityAt();
+
+            if (!lastActivityAt) {
+                return false;
+            }
+
+            return (Date.now() - lastActivityAt) >= INACTIVITY_TIMEOUT_MS;
+        }
+
+        function finalizeInactivityLogout() {
+            clearClientSession('inactive');
+
+            if ($state.current && $state.current.name !== 'login') {
+                $state.go('login');
+            }
+        }
+
+        function forceLogoutForInactivity() {
+            if (inactivityLogoutPromise) {
+                return inactivityLogoutPromise;
+            }
+
+            inactivityLogoutPromise = logAudit($rootScope.currentUser ? $rootScope.currentUser.user_id : null, 'AUTH_FORCE_LOGOUT_INACTIVE', 'AUTH', {
+                reason: 'inactive_timeout',
+                inactivity_timeout_minutes: INACTIVITY_TIMEOUT_MS / 60000
+            }).catch(angular.noop).then(function () {
+                return finishAccessSession('inactive_timeout', 'inactive_timeout');
+            }).catch(angular.noop).then(function () {
+                return supabase.auth.signOut();
+            })
+                .catch(angular.noop)
+                .then(function () {
+                    finalizeInactivityLogout();
+                })
+                .finally(function () {
+                    inactivityLogoutPromise = null;
+                });
+
+            return inactivityLogoutPromise;
+        }
+
+        function syncInactivityTimer() {
+            var lastActivityAt;
+            var remainingMs;
+
+            cancelInactivityTimer();
+
+            if (!hasPersistedSession()) {
+                return;
+            }
+
+            lastActivityAt = getStoredLastActivityAt();
+
+            if (!lastActivityAt) {
+                lastActivityAt = Date.now();
+                setStoredLastActivityAt(lastActivityAt);
+            }
+
+            remainingMs = INACTIVITY_TIMEOUT_MS - (Date.now() - lastActivityAt);
+
+            if (remainingMs <= 0) {
+                forceLogoutForInactivity();
+                return;
+            }
+
+            inactivityTimerPromise = $timeout(function () {
+                forceLogoutForInactivity();
+            }, remainingMs, false);
+        }
+
+        function touchActivity() {
+            if (!hasPersistedSession()) {
+                return;
+            }
+
+            setStoredLastActivityAt(Date.now());
+            syncInactivityTimer();
+            syncAccessSessionActivity(false).catch(angular.noop);
+        }
+
+        function enforceInactivityTimeout() {
+            if (!hasPersistedSession()) {
+                cancelInactivityTimer();
+                return $q.when(false);
+            }
+
+            if (isInactivityTimeoutExpired()) {
+                return forceLogoutForInactivity().then(function () {
+                    return true;
+                });
+            }
+
+            syncInactivityTimer();
+            return $q.when(false);
         }
 
         /**
@@ -555,14 +1080,21 @@
             };
         }
 
-        function logAudit(userId, action, module, details) {
+        function buildAuditPayload(userId, action, module, details) {
             var mergedDetails = angular.extend({
                 timestamp_client: new Date().toISOString(),
                 current_path: window.location.pathname || '/',
                 current_hash: window.location.hash || '',
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+                language: window.navigator.language || null,
+                referrer: document.referrer || null,
+                source: 'web-app',
+                screen_size: (window.screen && window.screen.width && window.screen.height)
+                    ? [window.screen.width, window.screen.height].join('x')
+                    : null
             }, getCurrentAuditActor(), details || {});
-            var payload = {
+
+            return {
                 user_id: userId || null,
                 action: action,
                 module: module || 'GLOBAL',
@@ -570,7 +1102,197 @@
                 user_agent: window.navigator.userAgent,
                 created_at: new Date().toISOString()
             };
+        }
+
+        function getPendingAuditQueue() {
+            try {
+                return JSON.parse($window.localStorage.getItem(PENDING_AUDIT_QUEUE_STORAGE_KEY) || '[]');
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function setPendingAuditQueue(queue) {
+            $window.localStorage.setItem(PENDING_AUDIT_QUEUE_STORAGE_KEY, JSON.stringify(queue || []));
+        }
+
+        function enqueuePendingAudit(payload) {
+            var queue = getPendingAuditQueue();
+            queue.push(payload);
+            setPendingAuditQueue(queue.slice(-100));
+        }
+
+        function insertAuditPayload(payload) {
             return supabase.from('audit_logs').insert(payload);
+        }
+
+        function flushPendingAuditQueue() {
+            var queue = getPendingAuditQueue();
+            var remaining = [];
+
+            if (!queue.length) {
+                return $q.when([]);
+            }
+
+            return queue.reduce(function (chain, payload) {
+                return chain.then(function () {
+                    return insertAuditPayload(payload).then(function (response) {
+                        if (response && response.error) {
+                            remaining.push(payload);
+                        }
+                    }).catch(function () {
+                        remaining.push(payload);
+                    });
+                });
+            }, $q.when()).finally(function () {
+                setPendingAuditQueue(remaining);
+            });
+        }
+
+        function logAudit(userId, action, module, details) {
+            return insertAuditPayload(buildAuditPayload(userId, action, module, details));
+        }
+
+        function ensureAuditInsert(userId, action, module, details) {
+            var deferred = $q.defer();
+            var payload = buildAuditPayload(userId, action, module, details);
+
+            insertAuditPayload(payload)
+                .then(function (response) {
+                    if (response && response.error) {
+                        enqueuePendingAudit(payload);
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    deferred.resolve(response ? response.data || null : null);
+                })
+                .catch(function (error) {
+                    enqueuePendingAudit(payload);
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
+
+        function listAuditLogs(filters) {
+            var deferred = $q.defer();
+            var options = filters || {};
+            var limit = Math.max(1, Math.min(parseInt(options.limit, 10) || 1000, 5000));
+            var fromDate = options.fromDate ? new Date(options.fromDate) : null;
+            var toDate = options.toDate ? new Date(options.toDate) : null;
+            flushPendingAuditQueue().catch(angular.noop).then(function () {
+                var query = supabase
+                    .from('audit_logs')
+                    .select('id,user_id,action,module,details,ip_address,user_agent,created_at', { count: 'exact' })
+                    .order('created_at', { ascending: false })
+                    .limit(limit);
+
+                if (fromDate && !isNaN(fromDate.getTime())) {
+                    fromDate.setHours(0, 0, 0, 0);
+                    query = query.gte('created_at', fromDate.toISOString());
+                }
+
+                if (toDate && !isNaN(toDate.getTime())) {
+                    toDate.setHours(23, 59, 59, 999);
+                    query = query.lte('created_at', toDate.toISOString());
+                }
+
+                if (options.action) {
+                    query = query.eq('action', options.action);
+                }
+
+                if (options.module) {
+                    query = query.eq('module', options.module);
+                }
+
+                if (options.userId) {
+                    query = query.eq('user_id', options.userId);
+                }
+
+                query.then(function (response) {
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    deferred.resolve({
+                        records: response.data || [],
+                        totalCount: typeof response.count === 'number' ? response.count : (response.data || []).length,
+                        limit: limit
+                    });
+                }).catch(function (error) {
+                    deferred.reject(error);
+                });
+            });
+
+            return deferred.promise;
+        }
+
+        function listAccessSessionSummary(filters) {
+            var deferred = $q.defer();
+            var options = filters || {};
+            var fromDate = options.fromDate ? new Date(options.fromDate) : null;
+            var toDate = options.toDate ? new Date(options.toDate) : null;
+            var params = {
+                p_from_date: null,
+                p_to_date: null,
+                p_user_id: options.userId || null
+            };
+
+            if (fromDate && !isNaN(fromDate.getTime())) {
+                fromDate.setHours(0, 0, 0, 0);
+                params.p_from_date = fromDate.toISOString();
+            }
+
+            if (toDate && !isNaN(toDate.getTime())) {
+                toDate.setHours(23, 59, 59, 999);
+                params.p_to_date = toDate.toISOString();
+            }
+
+            supabase
+                .rpc('get_audit_access_summary', params)
+                .then(function (response) {
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    deferred.resolve({
+                        records: response.data || []
+                    });
+                })
+                .catch(function (error) {
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
+
+        function listAuditProfileCounters() {
+            var deferred = $q.defer();
+
+            supabase
+                .from('profiles')
+                .select('user_id,full_name,username,email,contador_logins,data_ultimo_login,contador_logouts,data_ultimo_logout')
+                .order('contador_logins', { ascending: false })
+                .then(function (response) {
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    deferred.resolve({
+                        records: (response.data || []).map(function (profile) {
+                            return normalizeProfile(profile);
+                        })
+                    });
+                })
+                .catch(function (error) {
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
         }
 
         function trackPageAccess(stateName, pageTitle) {
@@ -611,21 +1333,32 @@
                 password: credentials.password
             }).then(function (response) {
                 if (response.error) {
+                    logAudit(null, 'LOGIN_FAILED', 'AUTH', {
+                        attempted_email: credentials.email,
+                        failure_reason: response.error.message || 'unknown'
+                    }).catch(angular.noop);
                     deferred.reject(normalizeAuthError(response.error));
                 } else {
                     getUserProfile(response.data.user.id).then(function (profile) {
-                        syncCurrentUserProfile(profile);
-                        logAudit(response.data.user.id, 'LOGIN', 'AUTH', {
-                            email: credentials.email,
-                            resolved_role_id: profile.role_id,
-                            resolved_role: profile.role,
-                            resolved_sector: profile.sector,
-                            resolved_status: profile.status
-                        });
+                        var normalizedProfile = normalizeProfile(profile);
+                        syncCurrentUserProfile(normalizedProfile);
+                        startAccessSession(response.data.user.id, normalizedProfile, response.data.session).catch(angular.noop);
+                        touchActivity();
+                        getSession()
+                            .then(function (currentSession) {
+                                return ensureLoginRegisteredForSession(normalizedProfile, currentSession || response.data.session);
+                            })
+                            .then(function (finalProfile) {
+                                if (finalProfile) {
+                                    syncCurrentUserProfile(finalProfile);
+                                }
+                            })
+                            .catch(angular.noop);
+
                         deferred.resolve({
                             user: response.data.user,
                             session: response.data.session,
-                            profile: profile
+                            profile: normalizedProfile
                         });
                     }).catch(function (err) {
                         deferred.reject(err);
@@ -981,47 +1714,41 @@
 
         function listComunsCatalog() {
             var deferred = $q.defer();
-            var allRows = [];
-            var pageSize = 1000;
+            supabase
+                .from('comum')
+                .select('id, comum, cidade')
+                .order('comum', { ascending: true })
+                .then(function (response) {
+                    var rows;
 
-            function fetchPage(fromIndex) {
-                supabase
-                    .from('comum')
-                    .select('*')
-                    .range(fromIndex, fromIndex + pageSize - 1)
-                    .then(function (response) {
-                        var batch;
-                        var rows;
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
 
-                        if (response.error) {
-                            deferred.reject(response.error);
-                            return;
+                    rows = (response.data || []).map(function (row) {
+                        var nome = repairCatalogText(row && row.comum ? String(row.comum).trim() : '');
+                        var cidade = normalizeMunicipioCatalogLabel(row && row.cidade ? String(row.cidade).trim() : '');
+                        var codigoMatch = nome.match(/^(BR-\d+-\d+)/i);
+
+                        if (!nome) {
+                            return null;
                         }
 
-                        batch = response.data || [];
-                        allRows = allRows.concat(batch);
-
-                        if (batch.length === pageSize) {
-                            fetchPage(fromIndex + pageSize);
-                            return;
-                        }
-
-                        rows = allRows
-                            .map(function (row) {
-                                return normalizeComumCatalogRow(row);
-                            })
-                            .filter(function (item) { return !!item; })
-                            .sort(function (a, b) {
-                                return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
-                            });
-
-                        deferred.resolve(rows);
-                    }).catch(function (error) {
-                        deferred.reject(error);
+                        return {
+                            id: row && row.id ? row.id : null,
+                            codigo: codigoMatch && codigoMatch[1] ? codigoMatch[1].toUpperCase() : null,
+                            nome: nome,
+                            cidade: cidade
+                        };
+                    }).filter(function (item) {
+                        return !!item;
                     });
-            }
 
-            fetchPage(0);
+                    deferred.resolve(rows);
+                }).catch(function (error) {
+                    deferred.reject(error);
+                });
 
             return deferred.promise;
         }
@@ -1038,18 +1765,9 @@
 
             supabase
                 .from('comum')
-                .select('*')
-                .or([
-                    'comum.ilike.*' + normalizedQuery + '*',
-                    'nome_comum.ilike.*' + normalizedQuery + '*',
-                    'nome.ilike.*' + normalizedQuery + '*',
-                    'name.ilike.*' + normalizedQuery + '*',
-                    'descricao.ilike.*' + normalizedQuery + '*',
-                    'description.ilike.*' + normalizedQuery + '*',
-                    'titulo.ilike.*' + normalizedQuery + '*',
-                    'title.ilike.*' + normalizedQuery + '*',
-                    'label.ilike.*' + normalizedQuery + '*'
-                ].join(','))
+                .select('id, comum, cidade')
+                .ilike('comum', '%' + normalizedQuery + '%')
+                .order('comum', { ascending: true })
                 .limit(size)
                 .then(function (response) {
                     var rows;
@@ -1059,14 +1777,24 @@
                         return;
                     }
 
-                    rows = (response.data || [])
-                        .map(function (row) {
-                            return normalizeComumCatalogRow(row, normalizedQuery);
-                        })
-                        .filter(function (item) { return !!item; })
-                        .sort(function (a, b) {
-                            return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
-                        });
+                    rows = (response.data || []).map(function (row) {
+                        var nome = repairCatalogText(row && row.comum ? String(row.comum).trim() : '');
+                        var cidade = normalizeMunicipioCatalogLabel(row && row.cidade ? String(row.cidade).trim() : '');
+                        var codigoMatch = nome.match(/^(BR-\d+-\d+)/i);
+
+                        if (!nome) {
+                            return null;
+                        }
+
+                        return {
+                            id: row && row.id ? row.id : null,
+                            codigo: codigoMatch && codigoMatch[1] ? codigoMatch[1].toUpperCase() : null,
+                            nome: nome,
+                            cidade: cidade
+                        };
+                    }).filter(function (item) {
+                        return !!item;
+                    });
 
                     deferred.resolve(rows);
                 }).catch(function (error) {
@@ -1228,7 +1956,7 @@
                             return;
                         }
 
-                        logAudit($rootScope.currentUser ? $rootScope.currentUser.user_id : null, 'USER_REVIEW', 'ADMIN', {
+                        ensureAuditInsert($rootScope.currentUser ? $rootScope.currentUser.user_id : null, targetStatus === 'approved' ? 'USER_APPROVAL_APPROVED' : (targetStatus === 'rejected' ? 'USER_APPROVAL_REJECTED' : 'USER_REVIEW'), 'ADMIN', {
                             reviewed_user_id: userId,
                             reviewed_user_name: updatedRecord.full_name || null,
                             status: targetStatus,
@@ -1237,8 +1965,12 @@
                             sector: normalizedSector,
                             cargo: payload.cargo,
                             comum: payload.comum
+                        }).catch(function (auditError) {
+                            console.warn('Falha ao registrar auditoria de revisao de usuario.', auditError);
+                            return null;
+                        }).then(function () {
+                            deferred.resolve(normalizeProfile(updatedRecord));
                         });
-                        deferred.resolve(normalizeProfile(updatedRecord));
                     }
                 });
 
@@ -1317,7 +2049,7 @@
                             return;
                         }
 
-                        logAudit($rootScope.currentUser ? $rootScope.currentUser.user_id : null, 'USER_REVIEW', 'ADMIN', {
+                        ensureAuditInsert($rootScope.currentUser ? $rootScope.currentUser.user_id : null, targetStatus === 'approved' ? 'USER_APPROVAL_APPROVED' : (targetStatus === 'rejected' ? 'USER_APPROVAL_REJECTED' : 'USER_REVIEW'), 'ADMIN', {
                             reviewed_user_id: userId,
                             reviewed_username: username,
                             reviewed_full_name: fullName,
@@ -1327,8 +2059,12 @@
                             sector: normalizedSector,
                             cargo: payload.cargo,
                             comum: payload.comum
+                        }).catch(function (auditError) {
+                            console.warn('Falha ao registrar auditoria de aprovacao/revisao legada.', auditError);
+                            return null;
+                        }).then(function () {
+                            deferred.resolve(normalizeProfile(updatedRecord));
                         });
-                        deferred.resolve(normalizeProfile(updatedRecord));
                     }
                 });
 
@@ -1339,15 +2075,17 @@
             var deferred = $q.defer();
             var userId = $rootScope.currentUser ? $rootScope.currentUser.user_id : null;
 
-            supabase.auth.signOut().then(function (response) {
+            ensureAuditInsert(userId, 'LOGOUT', 'AUTH', {}).catch(angular.noop).then(function () {
+                return finishAccessSession('logged_out', 'manual_logout').catch(angular.noop);
+            }).then(function () {
+                return registerSuccessfulLogout(userId).catch(angular.noop);
+            }).then(function () {
+                return supabase.auth.signOut();
+            }).then(function (response) {
                 if (response.error) {
                     deferred.reject(response.error);
                 } else {
-                    if (userId) {
-                        logAudit(userId, 'LOGOUT', 'AUTH', {});
-                    }
-                    $rootScope.currentUser = null;
-                    $rootScope.currentUserResolved = true;
+                    clearClientSession(null);
                     deferred.resolve(response);
                 }
             });
@@ -1406,6 +2144,19 @@
                         profile.email = session.user.email;
                     }
 
+                    syncInactivityTimer();
+                    ensureLoginRegisteredForSession(profile, session)
+                        .then(function (finalProfile) {
+                            if (finalProfile) {
+                                syncCurrentUserProfile(finalProfile);
+                            }
+                        })
+                        .catch(angular.noop);
+                    startAccessSession(session.user.id, profile, session)
+                        .catch(function () {
+                            return syncAccessSessionActivity(false);
+                        })
+                        .catch(angular.noop);
                     deferred.resolve(syncCurrentUserProfile(profile, options || {}));
                 }).catch(function (error) {
                     deferred.reject(error);
@@ -1436,6 +2187,12 @@
                     if (response.error) {
                         deferred.reject(normalizeProfileSaveError(response.error));
                     } else {
+                        logAudit(userId, 'USER_PROFILE_UPDATE', 'PROFILE', {
+                            updated_fields: Object.keys(profileData || {}),
+                            full_name: payload.full_name || null,
+                            sector: payload.sector || null,
+                            role_id: payload.role_id || null
+                        }).catch(angular.noop);
                         deferred.resolve(syncCurrentUserProfile(response.data));
                     }
                 });
@@ -1482,22 +2239,25 @@
                         return;
                     }
 
-                    logAudit($rootScope.currentUser ? $rootScope.currentUser.user_id : null, 'USER_MANAGEMENT_UPDATE', 'ADMIN', {
+                    ensureAuditInsert($rootScope.currentUser ? $rootScope.currentUser.user_id : null, 'USER_MANAGEMENT_UPDATE', 'ADMIN', {
                         managed_user_id: userId,
                         managed_user_name: payload.full_name,
                         role_id: normalizedRoleId,
                         role: normalizedRole,
                         sector: normalizedSector,
                         status: payload.status
+                    }).catch(function (auditError) {
+                        console.warn('Falha ao registrar auditoria de atualizacao de usuario.', auditError);
+                        return null;
+                    }).then(function () {
+                        deferred.resolve(normalizeProfile(response.data));
                     });
-
-                    deferred.resolve(normalizeProfile(response.data));
                 });
 
             return deferred.promise;
         }
 
-        function deleteManagedUser(userId) {
+        function deleteManagedUser(userId, userDisplayName) {
             var deferred = $q.defer();
 
             if (!userId) {
@@ -1515,11 +2275,15 @@
                         return;
                     }
 
-                    logAudit($rootScope.currentUser ? $rootScope.currentUser.user_id : null, 'USER_MANAGEMENT_DELETE', 'ADMIN', {
-                        deleted_user_id: userId
+                    ensureAuditInsert($rootScope.currentUser ? $rootScope.currentUser.user_id : null, 'USER_MANAGEMENT_DELETE', 'ADMIN', {
+                        deleted_user_id: userId,
+                        deleted_user_name: userDisplayName || null
+                    }).catch(function (auditError) {
+                        console.warn('Falha ao registrar auditoria de exclusao de usuario.', auditError);
+                        return null;
+                    }).then(function () {
+                        deferred.resolve(true);
                     });
-
-                    deferred.resolve(true);
                 });
 
             return deferred.promise;

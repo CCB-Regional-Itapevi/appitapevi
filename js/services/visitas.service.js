@@ -4,9 +4,9 @@
     angular.module('inspinia')
         .factory('VisitasService', VisitasService);
 
-    VisitasService.$inject = ['$q'];
+    VisitasService.$inject = ['$q', 'AuthService'];
 
-    function VisitasService($q) {
+    function VisitasService($q, AuthService) {
         var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
         var supabase = window.__appSupabaseClient
@@ -166,6 +166,16 @@
             };
         }
 
+        function auditVisitas(action, details) {
+            if (!AuthService || typeof AuthService.logAudit !== 'function') {
+                return;
+            }
+
+            AuthService.logAudit(null, action, 'VISITAS', angular.extend({
+                entity: 'visitas_lancamentos'
+            }, details || {})).catch(angular.noop);
+        }
+
         function getLancamentos() {
             var deferred = $q.defer();
 
@@ -205,6 +215,14 @@
                         return;
                     }
 
+                    auditVisitas('VISITAS_LANCAMENTO_CREATE', {
+                        record_id: response.data && response.data.id,
+                        comum: payload.comum,
+                        municipio: payload.municipio,
+                        referencia_ano: payload.referencia_ano,
+                        referencia_mes: payload.referencia_mes,
+                        total_visitas: payload.gvi + payload.gvm + payload.gvmu + payload.rf + payload.re
+                    });
                     deferred.resolve(normalizeRecord(response.data));
                 }).catch(function (error) {
                     deferred.reject(buildFriendlyError(error, 'Erro ao salvar lançamento.'));
@@ -235,6 +253,14 @@
                         return;
                     }
 
+                    auditVisitas('VISITAS_LANCAMENTO_UPDATE', {
+                        record_id: id,
+                        comum: payload.comum,
+                        municipio: payload.municipio,
+                        referencia_ano: payload.referencia_ano,
+                        referencia_mes: payload.referencia_mes,
+                        total_visitas: payload.gvi + payload.gvm + payload.gvmu + payload.rf + payload.re
+                    });
                     deferred.resolve(normalizeRecord(response.data));
                 }).catch(function (error) {
                     deferred.reject(buildFriendlyError(error, 'Erro ao atualizar lançamento.'));
@@ -256,6 +282,9 @@
                         return;
                     }
 
+                    auditVisitas('VISITAS_LANCAMENTO_DELETE', {
+                        record_id: id
+                    });
                     deferred.resolve(response.data);
                 }).catch(function (error) {
                     deferred.reject(buildFriendlyError(error, 'Erro ao excluir lançamento.'));

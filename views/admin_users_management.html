@@ -53,7 +53,115 @@
         text-align: center;
     }
 
+    .usuarios-toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .usuarios-group-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .usuarios-group-card {
+        border: 1px solid #e7eaec;
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .usuarios-group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 18px;
+        background: #f8fafc;
+        cursor: pointer;
+    }
+
+    .usuarios-group-title {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .usuarios-group-title strong {
+        font-size: 16px;
+        color: #2f4050;
+    }
+
+    .usuarios-group-meta,
+    .usuarios-user-meta {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .usuarios-group-body {
+        padding: 0;
+    }
+
+    .usuarios-user-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px 18px;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .usuarios-user-main {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .usuarios-user-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+    }
+
+    .usuarios-user-name a {
+        font-weight: 600;
+        color: #2f4050;
+    }
+
+    .usuarios-user-subline {
+        display: block;
+        color: #7f8c8d;
+        line-height: 1.45;
+        font-size: 12px;
+    }
+
+    .usuarios-user-actions {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
     @media (max-width: 991px) {
+        .usuarios-toolbar {
+            justify-content: flex-start;
+        }
+
+        .usuarios-user-row {
+            flex-direction: column;
+        }
+
+        .usuarios-user-actions {
+            justify-content: flex-start;
+        }
+
         #modalUserManagement .modal-dialog {
             width: calc(100vw - 20px) !important;
             margin: 10px auto !important;
@@ -161,10 +269,23 @@
                                 <option value="suspended">Suspenso</option>
                             </select>
                         </div>
-                        <div class="col-md-2 text-right">
-                            <a ui-sref="register" class="btn btn-primary btn-sm" ng-if="isMaster">
-                                <i class="fa fa-user-plus"></i> Adicionar usuário
-                            </a>
+                        <div class="col-md-2">
+                            <select class="input-sm form-control" ng-model="groupBy">
+                                <option value="comum">Agrupar: comum</option>
+                                <option value="status">Agrupar: status</option>
+                                <option value="sector">Agrupar: setor</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="usuarios-toolbar">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-white" ng-class="{ active: viewMode === 'grouped' }" ng-click="viewMode = 'grouped'">Agrupado</button>
+                                    <button type="button" class="btn btn-white" ng-class="{ active: viewMode === 'list' }" ng-click="viewMode = 'list'">Lista</button>
+                                </div>
+                                <a ui-sref="register" class="btn btn-primary btn-sm" ng-if="isMaster">
+                                    <i class="fa fa-user-plus"></i> Adicionar
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -231,15 +352,66 @@
                         </div>
                     </div>
 
-                    <div class="project-list" ng-if="!loading && filteredUsers.length > 0">
+                    <div class="usuarios-group-list" ng-if="!loading && filteredUsers.length > 0 && viewMode === 'grouped'">
+                        <div class="usuarios-group-card" ng-repeat="group in groupedUsers track by group.key">
+                            <div class="usuarios-group-header" ng-click="toggleUserGroup(group.key)">
+                                <div class="usuarios-group-title">
+                                    <strong ng-bind="group.label"></strong>
+                                    <div class="usuarios-group-meta">
+                                        <span class="label label-default">{{group.total}} usu&aacute;rios</span>
+                                        <span class="label label-primary" ng-if="group.active">{{group.active}} ativos</span>
+                                        <span class="label label-warning" ng-if="group.inactive">{{group.inactive}} inativos</span>
+                                        <span class="label label-danger" ng-if="group.suspended">{{group.suspended}} suspensos</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-white btn-xs">
+                                    <i class="fa" ng-class="isUserGroupCollapsed(group.key) ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+                                </button>
+                            </div>
+                            <div class="usuarios-group-body" ng-if="!isUserGroupCollapsed(group.key)">
+                                <div class="usuarios-user-row" ng-repeat="user in group.users track by user.user_id">
+                                    <div class="usuarios-user-main">
+                                        <div class="usuarios-user-name">
+                                            <a href="" ng-click="openView(user)">{{user.full_name || 'Sem nome'}}</a>
+                                            <span class="label"
+                                                  ng-class="{
+                                                      'label-primary': user.uiStatus === 'active',
+                                                      'label-warning': user.uiStatus === 'inactive',
+                                                      'label-danger': user.uiStatus === 'suspended'
+                                                  }">{{formatStatus(user.uiStatus)}}</span>
+                                            <span class="label" ng-class="getRoleLabelClass(user.role_id)">{{user.role || '-'}}</span>
+                                        </div>
+                                        <div class="usuarios-user-meta">
+                                            <span class="label label-default">{{user.comum || 'Sem comum'}}</span>
+                                            <span class="label label-default">{{formatSectorLabel(user.sector)}}</span>
+                                        </div>
+                                        <small class="usuarios-user-subline">Cargo: {{user.cargo || 'Sem cargo'}} | Cadastro: {{formatDate(user.created_at)}} | ID: {{user.user_id | limitTo:8}}</small>
+                                    </div>
+                                    <div class="usuarios-user-actions">
+                                        <button class="btn btn-primary btn-xs" ng-click="openView(user)" title="Ver">
+                                            <i class="fa fa-eye"></i> Ver
+                                        </button>
+                                        <button class="btn btn-warning btn-xs" ng-click="openEdit(user)" title="Editar">
+                                            <i class="fa fa-pencil-square-o"></i> Editar
+                                        </button>
+                                        <button class="btn btn-danger btn-xs" ng-click="confirmDelete(user)" title="Excluir">
+                                            <i class="fa fa-trash-o"></i> Excluir
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-list" ng-if="!loading && filteredUsers.length > 0 && viewMode === 'list'">
                         <table class="table table-hover usuarios-table">
                             <thead>
                                 <tr>
                                     <th style="width: 140px;">Status</th>
                                     <th>Usuário</th>
-                                    <th style="min-width: 220px;">Permissão</th>
+                                    <th style="min-width: 180px;">Permissão</th>
                                     <th style="min-width: 220px;">Comum / Setor</th>
-                                    <th style="min-width: 220px;">Cargo / Cadastro</th>
+                                    <th style="min-width: 220px;">Resumo</th>
                                     <th class="usuarios-coluna-acoes" style="width: 250px;">Ações</th>
                                 </tr>
                             </thead>
@@ -260,16 +432,7 @@
                                         <small class="text-muted usuarios-linha-secundaria" ng-bind="'ID: ' + (user.user_id | limitTo:8)"></small>
                                     </td>
                                     <td class="project-completion usuarios-celula">
-                                        <small ng-bind="user.role || '-'"></small>
-                                        <div class="progress progress-mini">
-                                            <div class="progress-bar"
-                                                 ng-class="{
-                                                    'progress-bar-primary': user.role_id === 1,
-                                                    'progress-bar-info': user.role_id === 2,
-                                                    'progress-bar-success': user.role_id >= 3
-                                                 }"
-                                                 ng-style="{ width: getRoleProgress(user.role_id) + '%' }"></div>
-                                        </div>
+                                        <span class="label" ng-class="getRoleLabelClass(user.role_id)">{{user.role || '-'}}</span>
                                     </td>
                                     <td class="project-people usuarios-celula">
                                         <span class="usuarios-linha-principal" ng-bind="user.comum || 'Sem comum'"></span>
@@ -277,7 +440,7 @@
                                     </td>
                                     <td class="project-people usuarios-celula">
                                         <span class="usuarios-linha-principal" ng-bind="user.cargo || 'Sem cargo'"></span>
-                                        <small class="text-muted usuarios-linha-secundaria" ng-bind="'Criado em ' + formatDate(user.created_at)"></small>
+                                        <small class="text-muted usuarios-linha-secundaria">Cadastro: {{formatDate(user.created_at)}} | ID: {{user.user_id | limitTo:8}}</small>
                                     </td>
                                     <td class="project-actions usuarios-celula-acoes">
                                         <div>

@@ -9,8 +9,8 @@
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdleProvider, KeepaliveProvider) {
 
     // Configure Idle settings
-    IdleProvider.idle(1200); // 20 minutos de inatividade (era muito baixo: 5s)
-    IdleProvider.timeout(300); // 5 minutos de aviso antes do logout (era 120s)
+    IdleProvider.idle(1800); // 30 minutos de inatividade
+    IdleProvider.timeout(1); // timeout imediato após entrar em idle
 
     $urlRouterProvider.otherwise("/login");
 
@@ -1788,6 +1788,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
                 }
             }
         })
+        .state('admin.audit_logs', {
+            url: "/audit_logs",
+            templateUrl: "views/admin_audit_logs.html?v=1.0.4",
+            controller: 'auditLogsAdminCtrl',
+            data: { pageTitle: 'Auditoria' }
+        })
 
 
 
@@ -1810,6 +1816,8 @@ angular
     .run(function ($rootScope, $state, AuthService, $window, $document) {
         $rootScope.$state = $state;
         $rootScope.currentUserResolved = false;
+        var sessionKey = 'sb-sqamxlhfazulrisiptud-auth-token';
+        var activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
 
         // Restaura a sessÃ£o do Supabase ao carregar a pÃ¡gina
         function normalizeAccessKey(value) {
@@ -1939,6 +1947,11 @@ angular
         function canAccessState(stateName) {
             var requiredSector = resolveProtectedSectorByState(stateName);
             var currentSector = normalizeAccessKey(($rootScope.currentUser && $rootScope.currentUser.sector) || AuthService.getCurrentUserSector());
+            var currentRoleId = resolveRouteAccessRoleId($rootScope.currentUser);
+
+            if (stateName === 'admin.audit_logs') {
+                return currentRoleId === 1 || hasFullSystemAccess();
+            }
 
             if (!requiredSector) {
                 return true;
@@ -1978,27 +1991,85 @@ angular
             return true;
         }
 
-        AuthService.refreshCurrentUserProfile({
-            redirectOnAccessChange: false
-        }).then(function () {
-            enforceStateAccess($state.current && $state.current.name);
-        }).catch(function () {
-            $rootScope.currentUserResolved = true;
-        });
-
         function refreshAccessProfileOnResume() {
-            AuthService.refreshCurrentUserProfile({
-                redirectOnAccessChange: true
-            }).then(function () {
-                enforceStateAccess($state.current && $state.current.name);
+            AuthService.enforceInactivityTimeout().then(function (sessionExpired) {
+                if (sessionExpired) {
+                    return;
+                }
+
+                AuthService.refreshCurrentUserProfile({
+                    redirectOnAccessChange: true
+                }).then(function () {
+                    enforceStateAccess($state.current && $state.current.name);
+                }).catch(angular.noop);
             }).catch(angular.noop);
         }
+
+        function registerUserActivity() {
+            var stateName = $state.current && $state.current.name;
+            var isPublicState = stateName === 'login' ||
+                                stateName === 'register' ||
+                                stateName === 'forgot_password' ||
+                                stateName === 'landing';
+
+            if (isPublicState) {
+                return;
+            }
+
+            AuthService.touchActivity();
+        }
+
+        function hasExpiredLocalSession() {
+            var lastActivityAt = parseInt($window.localStorage.getItem('app_global_last_activity_at'), 10);
+
+            if (isNaN(lastActivityAt) || lastActivityAt <= 0) {
+                return false;
+            }
+
+            return (Date.now() - lastActivityAt) >= AuthService.getInactivityTimeoutMs();
+        }
+
+        activityEvents.forEach(function (eventName) {
+            $document[0].addEventListener(eventName, registerUserActivity, true);
+        });
+
+        $window.addEventListener('storage', function (event) {
+            if (event.key === 'app_global_last_activity_at') {
+                AuthService.syncInactivityTimer();
+                return;
+            }
+
+            if (event.key === sessionKey && !event.newValue) {
+                $rootScope.$evalAsync(function () {
+                    if ($state.current && $state.current.name !== 'login') {
+                        $state.go('login');
+                    }
+                });
+            }
+        });
 
         $window.addEventListener('focus', refreshAccessProfileOnResume);
         $document[0].addEventListener('visibilitychange', function () {
             if ($document[0].visibilityState === 'visible') {
                 refreshAccessProfileOnResume();
             }
+        });
+
+        AuthService.enforceInactivityTimeout().then(function (sessionExpired) {
+            if (sessionExpired) {
+                return;
+            }
+
+            AuthService.refreshCurrentUserProfile({
+                redirectOnAccessChange: false
+            }).then(function () {
+                enforceStateAccess($state.current && $state.current.name);
+                AuthService.syncInactivityTimer();
+            }).catch(function () {
+                $rootScope.currentUserResolved = true;
+            });
+        }).catch(function () {
+            $rootScope.currentUserResolved = true;
         });
 
         // Protege as rotas - verificaÃ§Ã£o SOMENTE sÃ­ncrona (localStorage)
@@ -2015,10 +2086,15 @@ angular
 
             if (isPublicState) return; // Sempre permite pÃ¡ginas pÃºblicas
 
-            var sessionKey = 'sb-sqamxlhfazulrisiptud-auth-token';
             var hasCurrentUser = !!$rootScope.currentUser;
             var hasLocalSession = !!localStorage.getItem(sessionKey);
             var hasSessionStorageSession = !!sessionStorage.getItem(sessionKey);
+
+            if ((hasLocalSession || hasSessionStorageSession) && hasExpiredLocalSession()) {
+                event.preventDefault();
+                AuthService.enforceInactivityTimeout().catch(angular.noop);
+                return;
+            }
 
             if (!hasCurrentUser && !hasLocalSession && !hasSessionStorageSession) {
                 event.preventDefault();
@@ -2045,6 +2121,7 @@ angular
                 return;
             }
 
+            AuthService.touchActivity();
             AuthService.trackPageAccess(
                 toState.name,
                 toState.data && toState.data.pageTitle ? toState.data.pageTitle : null

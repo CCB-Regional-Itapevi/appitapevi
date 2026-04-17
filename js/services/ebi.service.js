@@ -88,6 +88,14 @@
 
         return service;
 
+        function auditEbi(action, details) {
+            if (!AuthService || typeof AuthService.logAudit !== 'function') {
+                return;
+            }
+
+            AuthService.logAudit(null, action, 'EBI', details || {}).catch(angular.noop);
+        }
+
         function normalizeDateOnly(value) {
             var year;
             var month;
@@ -163,6 +171,16 @@
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_atividades').insert([currentPayload]);
             }, payload, deferred);
+            deferred.promise.then(function (result) {
+                var record = angular.isArray(result) ? result[0] : result;
+                auditEbi('EBI_ATIVIDADE_CREATE', {
+                    entity: 'ebi_atividades',
+                    record_id: record && record.id,
+                    data_reuniao: payload.data_reuniao,
+                    instrutora: payload.instrutora,
+                    localidade: payload.localidade
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -172,6 +190,15 @@
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_atividades').update(currentPayload).eq('id', data.id);
             }, updateData, deferred);
+            deferred.promise.then(function () {
+                auditEbi('EBI_ATIVIDADE_UPDATE', {
+                    entity: 'ebi_atividades',
+                    record_id: data.id,
+                    data_reuniao: updateData.data_reuniao,
+                    instrutora: updateData.instrutora,
+                    localidade: updateData.localidade
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -180,7 +207,13 @@
             supabase.from('ebi_atividades').delete().eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditEbi('EBI_ATIVIDADE_DELETE', {
+                            entity: 'ebi_atividades',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -202,6 +235,16 @@
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_criancas').insert([currentPayload]);
             }, payload, deferred);
+            deferred.promise.then(function (result) {
+                var record = angular.isArray(result) ? result[0] : result;
+                auditEbi('EBI_ALUNO_CREATE', {
+                    entity: 'ebi_criancas',
+                    record_id: record && record.id,
+                    nome_crianca: payload.nome_crianca,
+                    localidade: payload.localidade,
+                    comum_congregacao: payload.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -211,6 +254,15 @@
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_criancas').update(currentPayload).eq('id', data.id);
             }, updateData, deferred);
+            deferred.promise.then(function () {
+                auditEbi('EBI_ALUNO_UPDATE', {
+                    entity: 'ebi_criancas',
+                    record_id: data.id,
+                    nome_crianca: updateData.nome_crianca,
+                    localidade: updateData.localidade,
+                    comum_congregacao: updateData.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -219,7 +271,13 @@
             supabase.from('ebi_criancas').delete().eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditEbi('EBI_ALUNO_DELETE', {
+                            entity: 'ebi_criancas',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -241,6 +299,16 @@
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_monitores').insert([currentPayload]);
             }, payload, deferred);
+            deferred.promise.then(function (result) {
+                var record = angular.isArray(result) ? result[0] : result;
+                auditEbi('EBI_INSTRUTOR_CREATE', {
+                    entity: 'ebi_monitores',
+                    record_id: record && record.id,
+                    nome_completo: payload.nome_completo,
+                    localidade: payload.localidade,
+                    comum_congregacao: payload.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -250,6 +318,15 @@
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_monitores').update(currentPayload).eq('id', data.id);
             }, updateData, deferred);
+            deferred.promise.then(function () {
+                auditEbi('EBI_INSTRUTOR_UPDATE', {
+                    entity: 'ebi_monitores',
+                    record_id: data.id,
+                    nome_completo: updateData.nome_completo,
+                    localidade: updateData.localidade,
+                    comum_congregacao: updateData.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -258,7 +335,13 @@
             supabase.from('ebi_monitores').delete().eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditEbi('EBI_INSTRUTOR_DELETE', {
+                            entity: 'ebi_monitores',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }

@@ -1,0 +1,567 @@
+<style>
+    .audit-kpi-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .audit-kpi-col {
+        padding-left: 10px;
+        padding-right: 10px;
+        margin-bottom: 20px;
+    }
+
+    .audit-kpi-card {
+        margin-bottom: 0;
+        padding: 18px 26px 18px 10px;
+    }
+
+    .audit-kpi-card .row.vertical-align {
+        margin: 0;
+    }
+
+    .audit-kpi-card .col-xs-4.text-center {
+        text-align: left;
+        padding-left: 0;
+        padding-right: 8px;
+    }
+
+    .audit-kpi-card .col-xs-8.text-right {
+        padding-left: 0;
+    }
+
+    .audit-kpi-card span {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .audit-kpi-card h2.font-bold {
+        margin: 0;
+        font-size: 46px;
+        line-height: 1;
+    }
+
+    @media (max-width: 767px) {
+        .audit-kpi-card {
+            margin-bottom: 15px;
+            padding: 16px 18px 16px 8px;
+        }
+
+        .audit-kpi-card h2.font-bold {
+            font-size: 40px;
+        }
+    }
+
+    .audit-table > thead > tr > th,
+    .audit-table > tbody > tr > td {
+        vertical-align: top !important;
+    }
+
+    .audit-table > thead > tr > th {
+        white-space: nowrap;
+    }
+
+    .audit-log-summary {
+        display: block;
+        line-height: 1.45;
+        margin-bottom: 6px;
+    }
+
+    .audit-operation-title {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 1.35;
+        font-weight: 600;
+        color: #5e6b78;
+    }
+
+    .audit-log-meta {
+        display: block;
+        line-height: 1.4;
+    }
+
+    .audit-log-date {
+        display: block;
+        font-weight: 600;
+        color: #2f4050;
+    }
+
+    .audit-log-time {
+        display: block;
+        margin-top: 2px;
+        color: #7f8c8d;
+        font-size: 12px;
+    }
+
+    .audit-table .label {
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+
+    .audit-inline-badge {
+        margin-right: 6px;
+    }
+
+    .audit-json-preview {
+        max-height: 380px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #f7f9fc;
+        border: 1px solid #e5eaf1;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .audit-ranking-table td,
+    .audit-ranking-table th {
+        vertical-align: middle !important;
+    }
+
+    .audit-table {
+        table-layout: fixed;
+    }
+
+    .audit-table td,
+    .audit-table th {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+    }
+
+    .audit-chip-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .audit-side-panel {
+        position: sticky;
+        top: 20px;
+    }
+
+    .audit-users-list {
+        max-height: 540px;
+        overflow: auto;
+    }
+
+    .audit-user-item {
+        border-bottom: 1px solid #edf2f7;
+        padding: 12px 15px;
+        cursor: pointer;
+    }
+
+    .audit-user-item:last-child {
+        border-bottom: 0;
+    }
+
+    .audit-user-item.active {
+        background: #f3f8fb;
+        border-left: 3px solid #1ab394;
+        padding-left: 12px;
+    }
+
+    .audit-user-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 4px;
+    }
+
+    .audit-user-metrics {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .audit-user-metrics .label {
+        font-size: 11px;
+    }
+
+    .audit-current-user-box {
+        background: #f8fafc;
+        border: 1px solid #e7eaec;
+        border-radius: 6px;
+        padding: 12px 15px;
+        margin-bottom: 12px;
+    }
+
+    .audit-current-user-box h4 {
+        margin-top: 0;
+        margin-bottom: 6px;
+    }
+
+    .audit-current-user-box .audit-log-meta {
+        margin-top: 8px;
+    }
+
+    .audit-compact-note {
+        margin-top: 12px;
+        color: #7f8c8d;
+        font-size: 12px;
+    }
+
+    .audit-summary-strip {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Auditoria</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="admin.user_approvals">Administra&ccedil;&atilde;o</a></li>
+            <li class="active"><strong>Auditoria</strong></li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="auditLogsAdminCtrl">
+    <div class="row" ng-if="isMaster || !error">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Trilha de auditoria do sistema</h5>
+                    <div class="ibox-tools">
+                        <button class="btn btn-primary btn-xs" type="button" ng-click="loadLogs()" ng-disabled="loading">
+                            <i class="fa fa-refresh"></i> Atualizar
+                        </button>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-3">
+                            <label>Buscar</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                <input type="text"
+                                       class="form-control input-sm"
+                                       ng-model="filters.searchText"
+                                       placeholder="Usu&aacute;rio, a&ccedil;&atilde;o, resumo, rota...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Usu&aacute;rio</label>
+                            <select class="form-control input-sm" ng-model="filters.userKey">
+                                <option value="">Todos</option>
+                                <option ng-repeat="user in availableUsers track by user.key" value="{{user.key}}">{{user.name}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>A&ccedil;&atilde;o</label>
+                            <select class="form-control input-sm" ng-model="filters.action">
+                                <option value="">Todas</option>
+                                <option ng-repeat="action in availableActions track by action" value="{{action}}">{{getActionDisplayLabel(action)}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>M&oacute;dulo</label>
+                            <select class="form-control input-sm" ng-model="filters.module">
+                                <option value="">Todos</option>
+                                <option ng-repeat="module in availableModules track by module" value="{{module}}">{{getModuleDisplayLabel(module)}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label>De</label>
+                            <input type="date" class="form-control input-sm" ng-model="filters.fromDate">
+                        </div>
+                        <div class="col-md-1">
+                            <label>At&eacute;</label>
+                            <input type="date" class="form-control input-sm" ng-model="filters.toDate">
+                        </div>
+                        <div class="col-md-1" style="padding-top: 24px;">
+                            <button class="btn btn-sm btn-primary btn-block" type="button" ng-click="loadLogs()" ng-disabled="loading">
+                                Filtrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" ng-if="loading">
+                        Carregando trilha de auditoria...
+                    </div>
+
+                    <div class="alert alert-danger" ng-if="error">
+                        {{error}}
+                    </div>
+
+                    <div class="audit-kpi-row" ng-if="!loading && !error">
+                        <div class="col-sm-6 col-lg-3 audit-kpi-col">
+                            <div class="widget style1 navy-bg audit-kpi-card">
+                                <div class="row vertical-align">
+                                    <div class="col-xs-4 text-center">
+                                        <i class="fa fa-sign-in fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>Acessos ao sistema</span>
+                                        <h2 class="font-bold">{{systemAccessCount}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3 audit-kpi-col">
+                            <div class="widget style1 lazur-bg audit-kpi-card">
+                                <div class="row vertical-align">
+                                    <div class="col-xs-4 text-center">
+                                        <i class="fa fa-unlock-alt fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>Logins</span>
+                                        <h2 class="font-bold">{{loginCount}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3 audit-kpi-col">
+                            <div class="widget style1 yellow-bg audit-kpi-card">
+                                <div class="row vertical-align">
+                                    <div class="col-xs-4 text-center">
+                                        <i class="fa fa-eye fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>P&aacute;ginas vistas</span>
+                                        <h2 class="font-bold">{{pageAccessCount}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3 audit-kpi-col">
+                            <div class="widget style1 red-bg audit-kpi-card">
+                                <div class="row vertical-align">
+                                    <div class="col-xs-4 text-center">
+                                        <i class="fa fa-shield fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>A&ccedil;&otilde;es sens&iacute;veis</span>
+                                        <h2 class="font-bold">{{criticalActionCount}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="!loading && !error">
+                        <div class="col-lg-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <strong>Usu&aacute;rios do filtro</strong>
+                                    <span class="pull-right text-muted">{{uniqueUsersCount}} usu&aacute;rios</span>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="audit-current-user-box">
+                                        <h4>{{getSelectedUserName()}}</h4>
+                                        <div class="audit-user-metrics" ng-if="selectedUserSummary">
+                                            <span class="label label-primary">{{selectedUserSummary.total}} eventos</span>
+                                            <span class="label label-info">{{selectedUserSummary.accessCount || selectedUserSummary.logins}} acessos</span>
+                                            <span class="label label-success">{{selectedUserSummary.logins}} logins</span>
+                                            <span class="label label-warning">{{selectedUserSummary.accesses}} p&aacute;ginas</span>
+                                            <span class="label label-primary" ng-if="selectedUserSummary.creates">{{selectedUserSummary.creates}} cria&ccedil;&otilde;es</span>
+                                            <span class="label label-warning" ng-if="selectedUserSummary.updates">{{selectedUserSummary.updates}} atualiza&ccedil;&otilde;es</span>
+                                            <span class="label label-danger" ng-if="selectedUserSummary.critical">{{selectedUserSummary.critical}} sens&iacute;veis</span>
+                                            <span class="label label-danger" ng-if="selectedUserSummary.deletes">{{selectedUserSummary.deletes}} exclus&otilde;es</span>
+                                        </div>
+                                        <div class="audit-user-metrics" ng-if="!selectedUserSummary">
+                                            <span class="label label-primary">{{totalLogs}} eventos</span>
+                                            <span class="label label-info">{{systemAccessCount}} acessos</span>
+                                            <span class="label label-success">{{loginCount}} logins</span>
+                                            <span class="label label-warning">{{pageAccessCount}} p&aacute;ginas</span>
+                                            <span class="label label-primary">{{createCount}} cria&ccedil;&otilde;es</span>
+                                            <span class="label label-warning">{{updateCount}} atualiza&ccedil;&otilde;es</span>
+                                            <span class="label label-danger">{{deleteCount}} exclus&otilde;es</span>
+                                        </div>
+                                        <small class="text-muted audit-log-meta" ng-if="selectedUserSummary && selectedUserSummary.lastEventLabel">
+                                            &Uacute;ltima atividade: {{selectedUserSummary.lastEventLabel}}
+                                        </small>
+                                    </div>
+
+                                    <div class="audit-chip-row">
+                                        <button type="button" class="btn btn-xs btn-default" ng-click="clearUserFilter()">Todos os usu&aacute;rios</button>
+                                        <button type="button" class="btn btn-xs btn-link" ng-click="showAllActions()">Limpar filtros r&aacute;pidos</button>
+                                        <button type="button" class="btn btn-xs btn-warning" ng-click="markAuditBaselineNow()">Marcar novo in&iacute;cio para este usu&aacute;rio</button>
+                                        <button type="button" class="btn btn-xs btn-default" ng-if="hasActiveBaseline()" ng-click="clearAuditBaseline()">Restaurar hist&oacute;rico completo</button>
+                                    </div>
+                                    <div class="audit-compact-note" ng-if="hasActiveBaseline()">
+                                        Marco ativo para este usu&aacute;rio desde {{getActiveBaselineLabel()}}. Eventos anteriores est&atilde;o sendo ignorados nesta leitura.
+                                    </div>
+                                </div>
+                                <div class="audit-users-list" ng-if="topUsers.length">
+                                    <div class="audit-user-item"
+                                         ng-repeat="user in topUsers track by user.key"
+                                        ng-class="{ active: filters.userKey === user.key }"
+                                         ng-click="selectUser(user.key)">
+                                        <div class="audit-user-title">
+                                            <strong ng-bind="user.name"></strong>
+                                            <span class="label label-info">{{user.accessCount || user.logins}} acessos</span>
+                                        </div>
+                                        <div class="audit-user-metrics">
+                                            <span class="label label-primary">{{user.total}} eventos</span>
+                                            <span class="label label-success">{{user.logins}} logins</span>
+                                            <span class="label label-warning">{{user.accesses}} p&aacute;ginas</span>
+                                            <span class="label label-warning" ng-if="user.updates">{{user.updates}} atualiza&ccedil;&otilde;es</span>
+                                            <span class="label label-danger" ng-if="user.deletes">{{user.deletes}} exclus&otilde;es</span>
+                                            <span class="label label-danger" ng-if="user.critical">{{user.critical}} sens&iacute;veis</span>
+                                        </div>
+                                        <small class="text-muted audit-log-meta" ng-if="user.lastEventLabel">&Uacute;ltimo evento: {{user.lastEventLabel}}</small>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info" style="margin: 15px;" ng-if="!topUsers.length">
+                                    Nenhum usu&aacute;rio encontrado para o filtro atual.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8">
+                            <div class="audit-side-panel">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <strong>Eventos registrados</strong>
+                                    <span class="pull-right text-muted">{{visibleLogs.length}} de {{totalLogs}}</span>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="audit-summary-strip">
+                                        <span class="label label-primary">{{createCount}} cria&ccedil;&otilde;es</span>
+                                        <span class="label label-warning">{{updateCount}} atualiza&ccedil;&otilde;es</span>
+                                        <span class="label label-danger">{{deleteCount}} exclus&otilde;es</span>
+                                        <span class="label label-info">{{navigationCount}} navega&ccedil;&otilde;es</span>
+                                    </div>
+                                    <div class="audit-chip-row">
+                                        <button type="button" class="btn btn-xs btn-default" ng-click="showAllActions()">Todas as a&ccedil;&otilde;es</button>
+                                        <button type="button" class="btn btn-xs btn-success" ng-click="showOnlyLogins()">Somente logins</button>
+                                        <button type="button" class="btn btn-xs btn-primary" ng-click="filterByOperation('Criação')">Somente cria&ccedil;&otilde;es</button>
+                                        <button type="button" class="btn btn-xs btn-warning" ng-click="filterByOperation('Atualização')">Somente atualiza&ccedil;&otilde;es</button>
+                                        <button type="button" class="btn btn-xs btn-danger" ng-click="filterByOperation('Exclusão')">Somente exclus&otilde;es</button>
+                                        <button type="button" class="btn btn-xs btn-info" ng-click="filterByOperation('Navegação')">Somente navega&ccedil;&atilde;o</button>
+                                        <button type="button" class="btn btn-xs btn-default" ng-click="exportAuditCsv()"><i class="fa fa-file-excel-o"></i> CSV</button>
+                                        <button type="button" class="btn btn-xs btn-danger" ng-click="exportAuditPdf()"><i class="fa fa-file-pdf-o"></i> PDF</button>
+                                        <span class="label label-info">Carga inicial compacta: 20 linhas</span>
+                                    </div>
+                                    <div class="audit-compact-note">
+                                        A lista abre reduzida para facilitar leitura. Atualiza&ccedil;&otilde;es aparecem em laranja, exclus&otilde;es em vermelho, cria&ccedil;&otilde;es em azul e cada evento mostra a data e a hora completas.
+                                    </div>
+                                </div>
+                                <div class="panel-body" style="padding: 0; border-top: 1px solid #e7eaec;">
+                                    <div class="table-responsive" ng-if="filteredLogs.length">
+                                        <table class="table table-hover audit-table" style="margin-bottom: 0;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 125px;">Data</th>
+                                                    <th style="width: 95px;">Status</th>
+                                                    <th style="width: 150px;">Opera&ccedil;&atilde;o</th>
+                                                    <th style="width: 130px;">M&oacute;dulo</th>
+                                                    <th style="width: 190px;">Usu&aacute;rio</th>
+                                                    <th>Resumo</th>
+                                                    <th style="width: 75px;">Detalhes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="log in visibleLogs track by log.id">
+                                                    <td>
+                                                        <span class="audit-log-date">{{log.createdAtDateLabel}}</span>
+                                                        <span class="audit-log-time">{{log.createdAtTimeLabel}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="label" ng-class="getSeverityLabelClass(log)">{{log.statusLabel}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="label audit-inline-badge" ng-class="getOperationLabelClass(log)">{{log.operationLabel}}</span>
+                                                        <span class="audit-operation-title" ng-bind="log.actionLabel"></span>
+                                                    </td>
+                                                    <td><span ng-bind="log.moduleLabel"></span></td>
+                                                    <td>
+                                                        <span class="audit-log-meta"><strong>{{log.actorName}}</strong></span>
+                                                        <small class="text-muted audit-log-meta" ng-if="log.affectedUser && log.affectedUser !== log.actorName">{{log.affectedUser}}</small>
+                                                    </td>
+                                                    <td>
+                                                        <span class="audit-log-summary" ng-bind="log.summary"></span>
+                                                        <small class="text-muted audit-log-meta" ng-if="log.details.page_title || log.details.state_name">
+                                                            {{log.details.page_title || log.details.state_name}}
+                                                        </small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-white btn-sm" type="button" ng-click="openLogDetails(log)">
+                                                            <i class="fa fa-search-plus"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="text-center" style="padding: 15px;" ng-if="filteredLogs.length > visibleLogs.length">
+                                        <button type="button" class="btn btn-white" ng-click="loadMoreLogs()">
+                                            Carregar mais 20 registros
+                                        </button>
+                                    </div>
+
+                                    <div class="alert alert-warning" style="margin: 15px;" ng-if="!filteredLogs.length">
+                                        Nenhum log encontrado para os filtros selecionados.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <strong>Leitura r&aacute;pida</strong>
+                                </div>
+                                <div class="panel-body">
+                                    <p class="m-b-sm">Os cards superiores agora separam navega&ccedil;&atilde;o, cria&ccedil;&otilde;es, atualiza&ccedil;&otilde;es e exclus&otilde;es para facilitar auditoria operacional.</p>
+                                    <p class="m-b-sm">O ranking lateral mostra a &uacute;ltima atividade de cada usu&aacute;rio no recorte atual, ajudando a localizar rapidamente quem alterou cadastro e quando.</p>
+                                    <p class="m-b-0">Use os atalhos de filtro para investigar apenas exclus&otilde;es, atualiza&ccedil;&otilde;es, cria&ccedil;&otilde;es ou eventos de navega&ccedil;&atilde;o.</p>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal inmodal fade" id="modalAuditLogDetail" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content animated fadeIn">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Fechar</span></button>
+                    <h4 class="modal-title">Detalhes do log</h4>
+                    <small class="font-bold">Inspe&ccedil;&atilde;o completa do evento selecionado.</small>
+                </div>
+                <div class="modal-body" ng-if="selectedLog">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Data:</strong> {{selectedLog.createdAtLabel}}</p>
+                            <p><strong>Status:</strong> {{selectedLog.statusLabel}}</p>
+                            <p><strong>Opera&ccedil;&atilde;o:</strong> {{selectedLog.operationLabel}} - {{selectedLog.actionLabel}}</p>
+                            <p><strong>M&oacute;dulo:</strong> {{selectedLog.moduleLabel}}</p>
+                            <p><strong>Ator:</strong> {{selectedLog.actorName}}</p>
+                            <p><strong>Usu&aacute;rio afetado:</strong> {{selectedLog.affectedUser}}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>ID do usu&aacute;rio:</strong> {{selectedLog.user_id || '-'}}</p>
+                            <p><strong>Identifica&ccedil;&atilde;o do navegador:</strong> {{selectedLog.user_agent || '-'}}</p>
+                            <p><strong>Fuso hor&aacute;rio:</strong> {{selectedLog.details.timezone || '-'}}</p>
+                            <p><strong>Idioma:</strong> {{selectedLog.details.language || '-'}}</p>
+                            <p><strong>Tela:</strong> {{selectedLog.details.screen_size || '-'}}</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <p><strong>Resumo:</strong> {{selectedLog.summary}}</p>
+                    <pre class="audit-json-preview">{{formatDetailsJson(selectedLog.details)}}</pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -4,9 +4,9 @@
     angular.module('inspinia')
         .factory('RjmService', RjmService);
 
-    RjmService.$inject = ['$q'];
+    RjmService.$inject = ['$q', 'AuthService'];
 
-    function RjmService($q) {
+    function RjmService($q, AuthService) {
         var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
 
@@ -142,6 +142,14 @@
             };
         }
 
+        function auditRjm(action, details) {
+            if (!AuthService || typeof AuthService.logAudit !== 'function') {
+                return;
+            }
+
+            AuthService.logAudit(null, action, 'RJM', details || {}).catch(angular.noop);
+        }
+
         function getRecitativos() {
             return createDeferredQuery(
                 function () {
@@ -155,7 +163,16 @@
             var deferred = $q.defer();
             supabase.from('rjm_recitativos').update(normalizeRecitativoPayload(data)).eq('id', data.id).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_RECITATIVO_UPDATE', {
+                        entity: 'rjm_recitativos',
+                        record_id: data.id,
+                        comum: data.comum,
+                        municipio: data.municipio,
+                        data_reuniao: data.data_reuniao
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }
@@ -164,7 +181,13 @@
             var deferred = $q.defer();
             supabase.from('rjm_recitativos').delete().eq('id', id).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_RECITATIVO_DELETE', {
+                        entity: 'rjm_recitativos',
+                        record_id: id
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }
@@ -183,7 +206,14 @@
             var deferred = $q.defer();
             supabase.from('rjm_comuns').insert([normalizeComumPayload(data)]).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_COMUM_CREATE', {
+                        entity: 'rjm_comuns',
+                        comum: data.comum,
+                        cidade: data.cidade
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }
@@ -192,7 +222,15 @@
             var deferred = $q.defer();
             supabase.from('rjm_comuns').update(normalizeComumPayload(data)).eq('id', data.id).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_COMUM_UPDATE', {
+                        entity: 'rjm_comuns',
+                        record_id: data.id,
+                        comum: data.comum,
+                        cidade: data.cidade
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }
@@ -201,7 +239,13 @@
             var deferred = $q.defer();
             supabase.from('rjm_comuns').delete().eq('id', id).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_COMUM_DELETE', {
+                        entity: 'rjm_comuns',
+                        record_id: id
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }
@@ -227,7 +271,17 @@
 
             supabase.from('rjm_auxiliares').insert([payload]).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_AUXILIAR_CREATE', {
+                        entity: 'rjm_auxiliares',
+                        record_id: payload.id,
+                        full_name: payload.full_name,
+                        email: payload.email,
+                        comum: payload.comum,
+                        cidade: payload.cidade
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }
@@ -248,7 +302,17 @@
                 cidade: payload.cidade
             }).eq('id', payload.id).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_AUXILIAR_UPDATE', {
+                        entity: 'rjm_auxiliares',
+                        record_id: payload.id,
+                        full_name: payload.full_name,
+                        email: payload.email,
+                        comum: payload.comum,
+                        cidade: payload.cidade
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }
@@ -257,7 +321,13 @@
             var deferred = $q.defer();
             supabase.from('rjm_auxiliares').delete().eq('id', id).then(function (response) {
                 if (response.error) deferred.reject(response.error);
-                else deferred.resolve(response.data);
+                else {
+                    auditRjm('RJM_AUXILIAR_DELETE', {
+                        entity: 'rjm_auxiliares',
+                        record_id: id
+                    });
+                    deferred.resolve(response.data);
+                }
             });
             return deferred.promise;
         }

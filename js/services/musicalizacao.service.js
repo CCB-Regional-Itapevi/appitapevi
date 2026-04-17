@@ -109,6 +109,14 @@
 
         return service;
 
+        function auditMusicalizacao(action, details) {
+            if (!AuthService || typeof AuthService.logAudit !== 'function') {
+                return;
+            }
+
+            AuthService.logAudit(null, action, 'MUSICALIZACAO', details || {}).catch(angular.noop);
+        }
+
         function getPresenca(aulaId) {
             var deferred = $q.defer();
             supabase.from('musicalizacao_presenca').select('*').eq('aula_id', aulaId)
@@ -188,6 +196,11 @@
             var deferred = $q.defer();
             var payload = angular.copy(presencaData || []);
             savePresencaOneByOne(payload).then(function (data) {
+                auditMusicalizacao('MUSICALIZACAO_PRESENCA_SAVE', {
+                    entity: 'musicalizacao_presenca',
+                    total_registros: payload.length,
+                    aula_id: payload.length ? payload[0].aula_id : null
+                });
                 deferred.resolve(data);
             }).catch(function (error) {
                 deferred.reject(error);
@@ -204,6 +217,15 @@
             runWithAlunoSchemaFallback(function (payload) {
                 return supabase.from('musicalizacao_criancas').update(payload).eq('id', id);
             }, data, legacyData, deferred);
+            deferred.promise.then(function () {
+                auditMusicalizacao('MUSICALIZACAO_ALUNO_UPDATE', {
+                    entity: 'musicalizacao_criancas',
+                    record_id: id,
+                    nome_crianca: data.nome_crianca,
+                    polo_participacao: data.polo_participacao,
+                    comum_congregacao: data.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -215,6 +237,16 @@
             runWithAlunoSchemaFallback(function (payload) {
                 return supabase.from('musicalizacao_criancas').insert([payload]);
             }, data, legacyData, deferred);
+            deferred.promise.then(function (result) {
+                var record = angular.isArray(result) ? result[0] : result;
+                auditMusicalizacao('MUSICALIZACAO_ALUNO_CREATE', {
+                    entity: 'musicalizacao_criancas',
+                    record_id: record && record.id,
+                    nome_crianca: data.nome_crianca,
+                    polo_participacao: data.polo_participacao,
+                    comum_congregacao: data.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -226,6 +258,15 @@
             runWithMissingColumnRetry(function (payload) {
                 return supabase.from('musicalizacao_monitores').update(payload).eq('id', id);
             }, data, deferred);
+            deferred.promise.then(function () {
+                auditMusicalizacao('MUSICALIZACAO_INSTRUTOR_UPDATE', {
+                    entity: 'musicalizacao_monitores',
+                    record_id: id,
+                    nome_completo: data.nome_completo,
+                    polo_auxilio: data.polo_auxilio,
+                    comum_congregacao: data.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -236,6 +277,16 @@
             runWithMissingColumnRetry(function (payload) {
                 return supabase.from('musicalizacao_monitores').insert([payload]);
             }, data, deferred);
+            deferred.promise.then(function (result) {
+                var record = angular.isArray(result) ? result[0] : result;
+                auditMusicalizacao('MUSICALIZACAO_INSTRUTOR_CREATE', {
+                    entity: 'musicalizacao_monitores',
+                    record_id: record && record.id,
+                    nome_completo: data.nome_completo,
+                    polo_auxilio: data.polo_auxilio,
+                    comum_congregacao: data.comum_congregacao
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -246,6 +297,17 @@
             runWithMissingColumnRetry(function (payload) {
                 return supabase.from('musicalizacao_aulas').insert([payload]);
             }, data, deferred);
+            deferred.promise.then(function (result) {
+                var record = angular.isArray(result) ? result[0] : result;
+                auditMusicalizacao('MUSICALIZACAO_AULA_CREATE', {
+                    entity: 'musicalizacao_aulas',
+                    record_id: record && record.id,
+                    data_aula: data.data_aula,
+                    cidade: data.cidade,
+                    polo: data.polo,
+                    ciclo: data.ciclo
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -257,6 +319,16 @@
             runWithMissingColumnRetry(function (payload) {
                 return supabase.from('musicalizacao_aulas').update(payload).eq('id', id);
             }, data, deferred);
+            deferred.promise.then(function () {
+                auditMusicalizacao('MUSICALIZACAO_AULA_UPDATE', {
+                    entity: 'musicalizacao_aulas',
+                    record_id: id,
+                    data_aula: data.data_aula,
+                    cidade: data.cidade,
+                    polo: data.polo,
+                    ciclo: data.ciclo
+                });
+            }, angular.noop);
             return deferred.promise;
         }
 
@@ -265,7 +337,13 @@
             supabase.from('musicalizacao_aulas').delete().eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditMusicalizacao('MUSICALIZACAO_AULA_DELETE', {
+                            entity: 'musicalizacao_aulas',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -275,7 +353,14 @@
             supabase.from('musicalizacao_polos').insert([poloData])
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditMusicalizacao('MUSICALIZACAO_POLO_CREATE', {
+                            entity: 'musicalizacao_polos',
+                            nome_polo: poloData && (poloData.nome_polo || poloData.polo || poloData.localidade),
+                            localidade: poloData && poloData.localidade
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -290,7 +375,15 @@
             supabase.from('musicalizacao_polos').update(data).eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditMusicalizacao('MUSICALIZACAO_POLO_UPDATE', {
+                            entity: 'musicalizacao_polos',
+                            record_id: id,
+                            nome_polo: data.nome_polo || data.polo || data.localidade,
+                            localidade: data.localidade
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -300,7 +393,13 @@
             supabase.from('musicalizacao_polos').delete().eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditMusicalizacao('MUSICALIZACAO_POLO_DELETE', {
+                            entity: 'musicalizacao_polos',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -309,7 +408,13 @@
             supabase.from('musicalizacao_criancas').delete().eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditMusicalizacao('MUSICALIZACAO_ALUNO_DELETE', {
+                            entity: 'musicalizacao_criancas',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -319,7 +424,13 @@
             supabase.from('musicalizacao_monitores').delete().eq('id', id)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditMusicalizacao('MUSICALIZACAO_INSTRUTOR_DELETE', {
+                            entity: 'musicalizacao_monitores',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }

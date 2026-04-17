@@ -3888,6 +3888,13 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
     $scope.loading = false;
     $scope.showPassword = false;
 
+    var logoutReason = AuthService.consumeLogoutReason();
+    if (logoutReason === 'inactive') {
+        $timeout(function () {
+            notify('warning', 'Sessão expirada', 'Você ficou mais de 30 minutos inativo. Faça login novamente para continuar.');
+        }, 0);
+    }
+
     /**
      * Valida formulário de login
      */

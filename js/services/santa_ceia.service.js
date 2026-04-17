@@ -26,6 +26,14 @@
 
         return service;
 
+        function auditSantaCeia(action, details) {
+            if (!AuthService || typeof AuthService.logAudit !== 'function') {
+                return;
+            }
+
+            AuthService.logAudit(null, action, 'SANTA_CEIA', details || {}).catch(angular.noop);
+        }
+
         function normalizeDateOnly(value) {
             if (!value) return null;
             var date = new Date(value);
@@ -86,7 +94,16 @@
                             supabase.from('santa_ceia_contagem').insert(rounds)
                                 .then(function (insertRes) {
                                     if (insertRes.error) deferred.reject(insertRes.error);
-                                    else deferred.resolve(insertRes.data);
+                                    else {
+                                        auditSantaCeia('SANTA_CEIA_ROUNDS_SAVE', {
+                                            entity: 'santa_ceia_contagem',
+                                            data_evento: first.data_evento,
+                                            municipio: first.municipio,
+                                            comum: first.comum,
+                                            total_rodadas: rounds.length
+                                        });
+                                        deferred.resolve(insertRes.data);
+                                    }
                                 });
                         }
                     });
@@ -119,7 +136,15 @@
                 .upsert([metadata], { onConflict: 'data_evento, municipio, comum' })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else {
+                        auditSantaCeia('SANTA_CEIA_EVENT_METADATA_SAVE', {
+                            entity: 'santa_ceia_eventos',
+                            data_evento: metadata && metadata.data_evento,
+                            municipio: metadata && metadata.municipio,
+                            comum: metadata && metadata.comum
+                        });
+                        deferred.resolve(response.data);
+                    }
                 });
             return deferred.promise;
         }
@@ -155,6 +180,11 @@
                             return;
                         }
 
+                        auditSantaCeia('SANTA_CEIA_EVENT_SEED_IMPORT', {
+                            entity: 'santa_ceia_eventos',
+                            source_url: seedUrl,
+                            imported_records: records.length
+                        });
                         deferred.resolve({
                             imported: records.length,
                             records: upsertResponse.data || records

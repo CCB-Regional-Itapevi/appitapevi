@@ -1,4 +1,4 @@
-<style>
+﻿<style>
     .congregacoes-table > thead > tr > th,
     .congregacoes-table > tbody > tr > td {
         vertical-align: middle !important;
@@ -47,6 +47,140 @@
 
     .congregacoes-table .congregacoes-celula-acoes .btn:first-child {
         margin-left: 0;
+    }
+
+    .congregacoes-toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .congregacoes-filtros-linha + .congregacoes-filtros-linha {
+        margin-top: 10px;
+    }
+
+    .congregacoes-kpis .widget {
+        min-height: 104px;
+        margin-bottom: 14px;
+    }
+
+    .congregacoes-kpis .vertical-align {
+        display: flex;
+        align-items: center;
+        min-height: 72px;
+    }
+
+    .congregacoes-kpis .kpi-icon {
+        font-size: 56px;
+        line-height: 1;
+        display: inline-block;
+        margin-left: 4px;
+    }
+
+    .congregacoes-kpis .kpi-content {
+        padding-right: 6px;
+    }
+
+    .congregacoes-kpis .kpi-content span {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .congregacoes-kpis .kpi-content h2 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1;
+    }
+
+    .congregacoes-group-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .congregacoes-group-card {
+        border: 1px solid #e7eaec;
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .congregacoes-group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 18px;
+        background: #f8fafc;
+        cursor: pointer;
+    }
+
+    .congregacoes-group-title {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .congregacoes-group-title strong {
+        font-size: 16px;
+        color: #2f4050;
+    }
+
+    .congregacoes-group-meta,
+    .congregacoes-record-meta {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .congregacoes-group-body {
+        padding: 0;
+    }
+
+    .congregacoes-record-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px 18px;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .congregacoes-record-main {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .congregacoes-record-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+    }
+
+    .congregacoes-record-name a {
+        font-weight: 600;
+        color: #2f4050;
+    }
+
+    .congregacoes-record-subline {
+        display: block;
+        color: #7f8c8d;
+        line-height: 1.45;
+        font-size: 12px;
+    }
+
+    .congregacoes-record-actions {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 
     #modalCongregacao .modal-dialog {
@@ -171,6 +305,18 @@
     }
 
     @media (max-width: 767px) {
+        .congregacoes-toolbar {
+            justify-content: flex-start;
+        }
+
+        .congregacoes-record-row {
+            flex-direction: column;
+        }
+
+        .congregacoes-record-actions {
+            justify-content: flex-start;
+        }
+
         #modalCongregacao .modal-dialog {
             width: auto;
         }
@@ -193,11 +339,11 @@
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
-        <h2>Congregações</h2>
+        <h2>CongregaÃ§Ãµes</h2>
         <ol class="breadcrumb">
             <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
-            <li><a ui-sref="admin.user_approvals">Administração</a></li>
-            <li class="active"><strong>Congregações</strong></li>
+            <li><a ui-sref="admin.user_approvals">AdministraÃ§Ã£o</a></li>
+            <li class="active"><strong>CongregaÃ§Ãµes</strong></li>
         </ol>
     </div>
 </div>
@@ -207,7 +353,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Congregações cadastradas</h5>
+                    <h5>CongregaÃ§Ãµes cadastradas</h5>
                     <div class="ibox-tools">
                         <button class="btn btn-primary btn-xs" type="button" ng-click="loadCongregacoes()" ng-disabled="loading">
                             <i class="fa fa-refresh"></i> Atualizar
@@ -215,7 +361,7 @@
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <div class="row m-b-sm m-t-sm">
+                    <div class="row m-b-sm m-t-sm congregacoes-filtros-linha">
                         <div class="col-md-4">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
@@ -234,6 +380,30 @@
                                 <option ng-repeat="municipio in municipios track by municipio" value="{{municipio}}">{{formatCongregacaoLabel(municipio, municipio)}}</option>
                             </select>
                         </div>
+                        <div class="col-md-3">
+                            <div class="congregacoes-toolbar">
+                                <div class="btn-group btn-group-xs">
+                                    <button type="button"
+                                            class="btn"
+                                            ng-class="viewMode === 'grouped' ? 'btn-primary' : 'btn-white'"
+                                            ng-click="viewMode = 'grouped'">
+                                        Agrupado
+                                    </button>
+                                    <button type="button"
+                                            class="btn"
+                                            ng-class="viewMode === 'list' ? 'btn-primary' : 'btn-white'"
+                                            ng-click="viewMode = 'list'">
+                                        Lista
+                                    </button>
+                                </div>
+                                <button class="btn btn-primary btn-sm" type="button" ng-click="exportToExcel()" style="background:#19bb9b;border-color:#19bb9b;">
+                                    <i class="fa fa-file-excel-o"></i> Excel
+                                </button>
+                                <button class="btn btn-danger btn-sm" type="button" ng-click="exportToPDF()" style="background:#ed5565;border-color:#ed5565;">
+                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="alert alert-info" ng-if="loading">
@@ -244,16 +414,16 @@
                         {{error}}
                     </div>
 
-                    <div class="row" ng-if="!loading">
+                    <div class="row congregacoes-kpis" ng-if="!loading">
                         <div class="col-sm-3">
                             <div class="widget style1 navy-bg">
                                 <div class="row vertical-align">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-building fa-2x"></i>
+                                        <i class="fa fa-building kpi-icon"></i>
                                     </div>
-                                    <div class="col-xs-9 text-right">
-                                        <span>Total</span>
-                                        <h2 class="font-bold">{{filteredRegistros.length}}</h2>
+                                    <div class="col-xs-9 text-right kpi-content">
+                                        <span>Total de comuns</span>
+                                        <h2 class="font-bold">{{totalRegistros}}</h2>
                                     </div>
                                 </div>
                             </div>
@@ -262,9 +432,9 @@
                             <div class="widget style1 lazur-bg">
                                 <div class="row vertical-align">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-map-marker fa-2x"></i>
+                                        <i class="fa fa-map-marker kpi-icon"></i>
                                     </div>
-                                    <div class="col-xs-9 text-right">
+                                    <div class="col-xs-9 text-right kpi-content">
                                         <span>Municípios</span>
                                         <h2 class="font-bold">{{totalMunicipios}}</h2>
                                     </div>
@@ -275,11 +445,11 @@
                             <div class="widget style1 yellow-bg">
                                 <div class="row vertical-align">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-tag fa-2x"></i>
+                                        <i class="fa fa-sitemap kpi-icon"></i>
                                     </div>
-                                    <div class="col-xs-9 text-right">
-                                        <span>Com código</span>
-                                        <h2 class="font-bold">{{comCodigoCount}}</h2>
+                                    <div class="col-xs-9 text-right kpi-content">
+                                        <span>Servos vinculados</span>
+                                        <h2 class="font-bold">{{totalServosCount}}</h2>
                                     </div>
                                 </div>
                             </div>
@@ -288,18 +458,64 @@
                             <div class="widget style1 red-bg">
                                 <div class="row vertical-align">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-users fa-2x"></i>
+                                        <i class="fa fa-user-plus kpi-icon"></i>
                                     </div>
-                                    <div class="col-xs-9 text-right">
-                                        <span>Sem código</span>
-                                        <h2 class="font-bold">{{semCodigoCount}}</h2>
+                                    <div class="col-xs-9 text-right kpi-content">
+                                        <span>Com ministério</span>
+                                        <h2 class="font-bold">{{congregacoesComServosCount}}</h2>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="project-list" ng-if="!loading && filteredRegistros.length > 0">
+                    <div class="congregacoes-group-list" ng-if="!loading && filteredRegistros.length > 0 && viewMode === 'grouped'">
+                        <div class="congregacoes-group-card" ng-repeat="group in groupedRegistros track by group.key">
+                            <div class="congregacoes-group-header" ng-click="toggleCongregacaoGroup(group.key)">
+                                <div class="congregacoes-group-title">
+                                    <strong ng-bind="group.label"></strong>
+                                    <div class="congregacoes-group-meta">
+                                        <span class="label label-default" ng-bind="group.total + ' congregações'"></span>
+                                        <span class="label label-info" ng-bind="group.totalServos + ' servos'"></span>
+                                        <span class="label label-success" ng-if="group.comMinisterio" ng-bind="group.comMinisterio + ' com ministério'"></span>
+                                        <span class="label label-warning" ng-if="group.semMinisterio" ng-bind="group.semMinisterio + ' sem ministério'"></span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-white btn-xs">
+                                    <i class="fa" ng-class="isCongregacaoGroupCollapsed(group.key) ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+                                </button>
+                            </div>
+                            <div class="congregacoes-group-body" ng-if="!isCongregacaoGroupCollapsed(group.key)">
+                                <div class="congregacoes-record-row" ng-repeat="record in group.records track by (record.id || (record.nome + record.cidade))">
+                                    <div class="congregacoes-record-main">
+                                        <div class="congregacoes-record-name">
+                                            <a href="" ng-click="openView(record)" ng-bind="formatCongregacaoLabel(record.nome, 'SEM NOME')"></a>
+                                            <span class="label label-primary" ng-bind="formatCongregacaoLabel(record.cidade, 'SEM MUNICÍPIO')"></span>
+                                            <span class="label" ng-class="(record.quantidade_servos || 0) > 0 ? 'label-success' : 'label-warning'" ng-bind="(record.quantidade_servos || 0) > 0 ? 'COM MINISTÉRIO' : 'SEM MINISTÉRIO'"></span>
+                                        </div>
+                                        <div class="congregacoes-record-meta">
+                                            <span class="label label-default" ng-bind="'Servos: ' + (record.quantidade_servos || 0)"></span>
+                                            <span class="label label-default" ng-if="record.administracao" ng-bind="formatCongregacaoLabel(record.administracao, '-')"></span>
+                                        </div>
+                                        <small class="congregacoes-record-subline" ng-bind="'ID: ' + ((record.id || '-') | limitTo:8)"></small>
+                                    </div>
+                                    <div class="congregacoes-record-actions">
+                                        <button class="btn btn-primary btn-xs" ng-click="openView(record)" title="Ver">
+                                            <i class="fa fa-eye"></i> Ver
+                                        </button>
+                                        <button class="btn btn-warning btn-xs" ng-click="openEdit(record)" title="Editar" ng-if="canManageCongregacoes">
+                                            <i class="fa fa-pencil-square-o"></i> Editar
+                                        </button>
+                                        <button class="btn btn-danger btn-xs" ng-click="confirmDelete(record)" title="Excluir" ng-if="canManageCongregacoes">
+                                            <i class="fa fa-trash-o"></i> Excluir
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-list" ng-if="!loading && filteredRegistros.length > 0 && viewMode === 'list'">
                         <table class="table table-hover congregacoes-table">
                             <thead>
                                 <tr>
@@ -312,14 +528,14 @@
                             <tbody>
                                 <tr ng-repeat="record in filteredRegistros track by (record.id || (record.nome + record.cidade))">
                                     <td class="project-status congregacoes-celula">
-                                        <span class="label label-primary" ng-bind="formatCongregacaoLabel(record.cidade, 'SEM MUNICÍPIO')"></span>
+                                        <span class="label label-primary" ng-bind="formatCongregacaoLabel(record.cidade, 'SEM MUNICÃPIO')"></span>
                                     </td>
                                     <td class="project-title congregacoes-celula">
                                         <a href="" ng-click="openView(record)" ng-bind="formatCongregacaoLabel(record.nome, 'SEM NOME')"></a>
                                         <small class="text-muted congregacoes-linha-secundaria" ng-bind="'ID: ' + ((record.id || '-') | limitTo:8)"></small>
                                     </td>
                                     <td class="project-completion congregacoes-celula">
-                                        <small ng-bind="formatCongregacaoLabel(record.codigo, 'SEM CÓDIGO')"></small>
+                                        <small ng-bind="formatCongregacaoLabel(record.codigo, 'SEM CÃ“DIGO')"></small>
                                         <div class="progress progress-mini">
                                             <div class="progress-bar progress-bar-info"
                                                  ng-style="{ width: getCongregacaoProgress(record) + '%' }"></div>
@@ -374,11 +590,11 @@
                         <input type="text" class="form-control" ng-model="selectedCongregacao.cidade" ng-readonly="viewOnlyCongregacao">
                     </div>
                     <div class="form-group">
-                        <label>Código</label>
-                        <input type="text" class="form-control" ng-value="formatCongregacaoLabel(selectedCongregacao.codigo, 'SEM CÓDIGO')" readonly>
+                        <label>CÃ³digo</label>
+                        <input type="text" class="form-control" ng-value="formatCongregacaoLabel(selectedCongregacao.codigo, 'SEM CÃ“DIGO')" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Administração</label>
+                        <label>AdministraÃ§Ã£o</label>
                         <input type="text" class="form-control" ng-model="selectedCongregacao.administracao" ng-readonly="viewOnlyCongregacao">
                     </div>
                     <div class="form-group">
@@ -393,7 +609,7 @@
                                     Visualize abaixo quem faz parte desta comum.
                                 </p>
                                 <p class="text-muted" ng-if="!selectedCongregacao || !selectedCongregacao.servos || !selectedCongregacao.servos.length">
-                                    Ainda não há servos vinculados a esta comum.
+                                    Ainda nÃ£o hÃ¡ servos vinculados a esta comum.
                                 </p>
                             </div>
                         </div>
@@ -439,10 +655,12 @@
                     <button type="button" class="btn btn-white" data-dismiss="modal">Fechar</button>
                     <button type="button" class="btn btn-primary" style="background:#1ab394; border-color:#1ab394;"
                             ng-if="!viewOnlyCongregacao" ng-click="saveCongregacao()" ng-disabled="savingCongregacao || !canManageCongregacoes">
-                        <i class="fa fa-save"></i> Salvar alterações
+                        <i class="fa fa-save"></i> Salvar alteraÃ§Ãµes
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
