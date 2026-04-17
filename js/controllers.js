@@ -3957,7 +3957,7 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
                 }, 2000);
             })
             .catch(function (error) {
-                $scope.loading = true; // Mantém loading visual para feedback
+                $scope.loading = false;
 
                 // Mapeamento de erros comuns do Supabase para Português
                 var errorMap = {
@@ -3976,7 +3976,6 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
                     confirmButtonColor: "#033d60"
                 });
 
-                $scope.loading = false;
                 $scope.errors.general = errorMessage;
             });
     };

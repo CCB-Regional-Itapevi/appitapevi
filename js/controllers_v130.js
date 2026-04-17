@@ -4619,7 +4619,7 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
                 AuthService.handleLoginRedirect(response.profile);
             })
             .catch(function (error) {
-                $scope.loading = true; // MantÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©m loading visual para feedback
+                $scope.loading = false;
 
                 // Mapeamento de erros comuns do Supabase para PortuguÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªs
                 var errorMap = {
@@ -4638,7 +4638,6 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
                     confirmButtonColor: "#033d60"
                 });
 
-                $scope.loading = false;
                 $scope.errors.general = errorMessage;
             });
     };

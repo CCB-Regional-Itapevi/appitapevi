@@ -1123,7 +1123,7 @@
         }
 
         function insertAuditPayload(payload) {
-            return supabase.from('audit_logs').insert(payload);
+            return $q.when(supabase.from('audit_logs').insert(payload));
         }
 
         function flushPendingAuditQueue() {
@@ -1364,6 +1364,12 @@
                         deferred.reject(err);
                     });
                 }
+            }).catch(function (error) {
+                logAudit(null, 'LOGIN_FAILED', 'AUTH', {
+                    attempted_email: credentials.email,
+                    failure_reason: (error && error.message) || 'unexpected_error'
+                }).catch(angular.noop);
+                deferred.reject(normalizeAuthError(error));
             });
 
             return deferred.promise;
