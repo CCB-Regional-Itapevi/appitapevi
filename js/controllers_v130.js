@@ -14506,6 +14506,8 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     $scope.expandedPendingMunicipio = '';
     $scope.operationalMunicipioGroups = [];
     $scope.expandedOperationalMunicipio = '';
+    $scope.consolidadoMunicipioGroups = [];
+    $scope.expandedConsolidadoMunicipio = '';
     $scope.lastDashboardUpdateLabel = '';
     $scope.pendingOperationalItems = [];
     $scope.pendingHealthSummary = {
@@ -15095,6 +15097,51 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         });
     }
 
+    function buildVisitasConsolidadoMunicipioGroups(items) {
+        var grouped = {};
+
+        angular.forEach(items || [], function (item) {
+            var municipio = repairVisitasModuleText(item && item.cidade || 'Sem município');
+
+            if (!grouped[municipio]) {
+                grouped[municipio] = {
+                    municipio: municipio,
+                    totalComuns: 0,
+                    totalVisitas: 0,
+                    gvi: 0,
+                    gvm: 0,
+                    musicos: 0,
+                    rf: 0,
+                    re: 0,
+                    items: []
+                };
+            }
+
+            grouped[municipio].items.push(item);
+            grouped[municipio].totalComuns += 1;
+            grouped[municipio].totalVisitas += parseInt(item && item.total, 10) || 0;
+            grouped[municipio].gvi += parseInt(item && item.gvi, 10) || 0;
+            grouped[municipio].gvm += parseInt(item && item.gvm, 10) || 0;
+            grouped[municipio].musicos += parseInt(item && item.musicos, 10) || 0;
+            grouped[municipio].rf += parseInt(item && item.rf, 10) || 0;
+            grouped[municipio].re += parseInt(item && item.re, 10) || 0;
+        });
+
+        return Object.keys(grouped).sort(function (a, b) {
+            return a.localeCompare(b, 'pt-BR');
+        }).map(function (municipio) {
+            grouped[municipio].items = grouped[municipio].items.slice().sort(function (a, b) {
+                if (String(a.data || '') !== String(b.data || '')) {
+                    return String(b.data || '').localeCompare(String(a.data || ''));
+                }
+
+                return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
+            });
+
+            return grouped[municipio];
+        });
+    }
+
     function notify(title, message, type) {
         if (window.toastr && typeof window.toastr[type || 'info'] === 'function') {
             window.toastr[type || 'info'](message, title);
@@ -15654,11 +15701,12 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         $scope.pendingLancamentos = healthInsights.items;
         $scope.pendingHealthSummary = healthInsights.summary;
         $scope.operationalMunicipioGroups = buildVisitasOperationalMunicipioGroups($scope.pendingOperationalItems);
+        $scope.consolidadoMunicipioGroups = buildVisitasConsolidadoMunicipioGroups($scope.lancamentosConsolidados);
         if ($scope.expandedOperationalMunicipio && !$scope.operationalMunicipioGroups.some(function (item) { return item.municipio === $scope.expandedOperationalMunicipio; })) {
             $scope.expandedOperationalMunicipio = '';
         }
-        if (!$scope.expandedOperationalMunicipio && $scope.operationalMunicipioGroups.length) {
-            $scope.expandedOperationalMunicipio = $scope.operationalMunicipioGroups[0].municipio;
+        if ($scope.expandedConsolidadoMunicipio && !$scope.consolidadoMunicipioGroups.some(function (item) { return item.municipio === $scope.expandedConsolidadoMunicipio; })) {
+            $scope.expandedConsolidadoMunicipio = '';
         }
         refreshPendingLancamentosView();
         $scope.pendingMunicipioGroups = buildPendingMunicipioGroups(expectedByCity, launchedByCity, $scope.pendingLancamentos);
@@ -15839,6 +15887,14 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
     $scope.isOperationalMunicipioExpanded = function (municipio) {
         return $scope.expandedOperationalMunicipio === municipio;
+    };
+
+    $scope.toggleConsolidadoMunicipio = function (municipio) {
+        $scope.expandedConsolidadoMunicipio = $scope.expandedConsolidadoMunicipio === municipio ? '' : municipio;
+    };
+
+    $scope.isConsolidadoMunicipioExpanded = function (municipio) {
+        return $scope.expandedConsolidadoMunicipio === municipio;
     };
 
     $scope.openPendingLaunch = function (item) {

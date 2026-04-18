@@ -98,8 +98,13 @@
     .visitas-operational-table th {
         vertical-align: middle !important;
     }
-    .visitas-operational-table .badge {
+    .visitas-operational-table .label {
+        display: inline-block;
         min-width: 24px;
+        text-align: center;
+    }
+    .visitas-operational-table .actions-cell {
+        text-align: center !important;
     }
     .visitas-operational-subtext {
         display: block;
@@ -827,7 +832,7 @@
                                     <th class="text-center">Em dia</th>
                                     <th class="text-center">Pendentes</th>
                                     <th class="text-center">Sem histórico</th>
-                                    <th class="text-right">Ações</th>
+                                    <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -836,11 +841,11 @@
                                         <strong>{{ group.municipio }}</strong>
                                         <small class="visitas-operational-subtext">Acompanhamento consolidado do município</small>
                                     </td>
-                                    <td class="text-center"><span class="badge badge-info">{{ group.total }}</span></td>
-                                    <td class="text-center"><span class="badge badge-success">{{ group.emDia }}</span></td>
-                                    <td class="text-center"><span class="badge badge-warning">{{ group.pendentes + group.hoje + group.criticos }}</span></td>
-                                    <td class="text-center"><span class="badge badge-default">{{ group.semHistorico }}</span></td>
-                                    <td class="text-right">
+                                    <td class="text-center"><span class="label label-info">{{ group.total }}</span></td>
+                                    <td class="text-center"><span class="label label-success">{{ group.emDia }}</span></td>
+                                    <td class="text-center"><span class="label label-warning">{{ group.pendentes + group.hoje + group.criticos }}</span></td>
+                                    <td class="text-center"><span class="label label-default">{{ group.semHistorico }}</span></td>
+                                    <td class="actions-cell">
                                         <button class="btn btn-xs btn-white" ng-click="toggleOperationalMunicipio(group.municipio)">
                                             <i class="fa" ng-class="isOperationalMunicipioExpanded(group.municipio) ? 'fa-angle-up' : 'fa-angle-down'"></i>
                                             {{ isOperationalMunicipioExpanded(group.municipio) ? 'Ocultar comuns' : 'Ver comuns' }}
@@ -867,7 +872,7 @@
                                                         <span class="visitas-operational-subtext" ng-if="item.codigo">{{ item.codigo }}</span>
                                                     </td>
                                                     <td class="text-center">
-                                                        <span class="badge badge-primary">{{ item.historyCount || 0 }}</span>
+                                                        <span class="label label-primary">{{ item.historyCount || 0 }}</span>
                                                     </td>
                                                     <td class="text-center">{{ item.latestDateLabel || '-' }}</td>
                                                     <td class="text-center">{{ item.nextExpectedLabel || '-' }}</td>
@@ -987,41 +992,90 @@
                 <div class="ibox-title">
                     <h5>Lançamentos Consolidados</h5>
                     <div class="ibox-tools">
-                        <span class="label label-primary">{{ lancamentosConsolidados.length }} comuns com lançamento</span>
+                        <span class="label label-primary">{{ consolidadoMunicipioGroups.length }} municípios com lançamento</span>
                     </div>
                 </div>
                 <div class="ibox-content">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover table-bordered visitas-operational-table">
                             <thead>
                                 <tr>
-                                    <th>Data / Município</th>
-                                    <th>Comum</th>
-                                    <th class="text-center">GVI</th>
-                                    <th class="text-center">GVM</th>
-                                    <th class="text-center">Músicos</th>
-                                    <th class="text-center">RF</th>
-                                    <th class="text-center">RE</th>
-                                    <th class="text-center">Total</th>
+                                    <th>Município</th>
+                                    <th class="text-center">Comuns</th>
+                                    <th class="text-center">Total de visitas</th>
+                                    <th class="text-center">Perfis consolidados</th>
+                                    <th class="text-right">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="item in lancamentosConsolidados">
+                                <tr ng-repeat-start="group in consolidadoMunicipioGroups">
                                     <td>
-                                        <strong>{{ item.cidade }}</strong>
-                                        <br />
-                                        <small class="text-muted">{{ item.data | date:'dd/MM/yyyy' }}</small>
+                                        <strong>{{ group.municipio }}</strong>
+                                        <span class="visitas-operational-subtext">{{ group.totalComuns }} comuns com lançamento reconhecido</span>
                                     </td>
-                                    <td>{{ item.nome }}</td>
-                                    <td class="text-center"><span class="label label-primary">{{ item.gvi }}</span></td>
-                                    <td class="text-center"><span class="label label-info">{{ item.gvm }}</span></td>
-                                    <td class="text-center"><span class="label label-warning">{{ item.musicos }}</span></td>
-                                    <td class="text-center"><span class="label label-success" style="background-color: #1c84c6; border-color: #1c84c6;">{{ item.rf }}</span></td>
-                                    <td class="text-center"><span class="label label-danger">{{ item.re }}</span></td>
-                                    <td class="text-center"><strong>{{ item.total }}</strong></td>
+                                    <td class="text-center">
+                                        <span class="label label-primary">{{ group.totalComuns }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong>{{ group.totalVisitas }}</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="label label-primary">GVI {{ group.gvi }}</span>
+                                        <span class="label label-info">GVM {{ group.gvm }}</span>
+                                        <span class="label label-warning">GVMu {{ group.musicos }}</span>
+                                        <span class="label label-success" style="background-color: #1c84c6; border-color: #1c84c6;">RF {{ group.rf }}</span>
+                                        <span class="label label-danger">RE {{ group.re }}</span>
+                                    </td>
+                                    <td class="text-right">
+                                        <button class="btn btn-xs btn-white" ng-click="toggleConsolidadoMunicipio(group.municipio)">
+                                            <i class="fa" ng-class="isConsolidadoMunicipioExpanded(group.municipio) ? 'fa-angle-up' : 'fa-angle-down'"></i>
+                                            {{ isConsolidadoMunicipioExpanded(group.municipio) ? 'Ocultar comuns' : 'Ver comuns' }}
+                                        </button>
+                                        <button class="btn btn-xs btn-success" ng-click="openMunicipioLancamentos(group)">
+                                            <i class="fa fa-eye"></i> Ver lançamentos
+                                        </button>
+                                    </td>
                                 </tr>
-                                <tr ng-if="!lancamentosConsolidados.length">
-                                    <td colspan="8" class="text-center text-muted">Nenhum lançamento encontrado para os filtros atuais.</td>
+                                <tr ng-repeat-end ng-if="isConsolidadoMunicipioExpanded(group.municipio)">
+                                    <td colspan="5" style="padding: 0;">
+                                        <table class="table table-condensed table-bordered" style="margin-bottom: 0;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Data</th>
+                                                    <th>Comum</th>
+                                                    <th class="text-center">GVI</th>
+                                                    <th class="text-center">GVM</th>
+                                                    <th class="text-center">Músicos</th>
+                                                    <th class="text-center">RF</th>
+                                                    <th class="text-center">RE</th>
+                                                    <th class="text-center">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in group.items">
+                                                    <td class="text-center">
+                                                        {{ item.data | date:'dd/MM/yyyy' }}
+                                                    </td>
+                                                    <td>
+                                                        <strong>{{ item.nome }}</strong>
+                                                        <span class="visitas-operational-subtext">{{ item.cidade }}</span>
+                                                    </td>
+                                                    <td class="text-center"><span class="label label-primary">{{ item.gvi }}</span></td>
+                                                    <td class="text-center"><span class="label label-info">{{ item.gvm }}</span></td>
+                                                    <td class="text-center"><span class="label label-warning">{{ item.musicos }}</span></td>
+                                                    <td class="text-center"><span class="label label-success" style="background-color: #1c84c6; border-color: #1c84c6;">{{ item.rf }}</span></td>
+                                                    <td class="text-center"><span class="label label-danger">{{ item.re }}</span></td>
+                                                    <td class="text-center"><strong>{{ item.total }}</strong></td>
+                                                </tr>
+                                                <tr ng-if="!group.items.length">
+                                                    <td colspan="8" class="text-center text-muted">Nenhum lançamento consolidado neste município.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr ng-if="!consolidadoMunicipioGroups.length">
+                                    <td colspan="5" class="text-center text-muted">Nenhum lançamento encontrado para os filtros atuais.</td>
                                 </tr>
                             </tbody>
                         </table>
