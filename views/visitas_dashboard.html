@@ -31,6 +31,82 @@
         margin-right: 8px;
         margin-bottom: 4px;
     }
+    .visitas-health-summary-card {
+        border: 1px solid #e5edf2;
+        border-radius: 14px;
+        padding: 14px 18px;
+        background: #fff;
+        min-height: 118px;
+    }
+    .visitas-health-summary-card .eyebrow {
+        display: block;
+        background: #d7e4ec;
+        border-radius: 4px;
+        color: #7d8e9b;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .4px;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 2px 8px;
+        margin-bottom: 10px;
+    }
+    .visitas-health-summary-card .value {
+        font-size: 42px;
+        line-height: 1;
+        font-weight: 700;
+        color: #294661;
+        margin-bottom: 6px;
+    }
+    .visitas-health-summary-card .description {
+        color: #7f8c8d;
+        line-height: 1.4;
+    }
+    .visitas-operational-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 110px;
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+    }
+    .visitas-operational-status.is-ok {
+        background: #daf3ee;
+        color: #19aa8d;
+    }
+    .visitas-operational-status.is-today {
+        background: #fff1d7;
+        color: #f8ac59;
+    }
+    .visitas-operational-status.is-warn {
+        background: #fff1d7;
+        color: #f39c12;
+    }
+    .visitas-operational-status.is-danger {
+        background: #f65f73;
+        color: #fff;
+    }
+    .visitas-operational-status.is-muted {
+        background: #edf2f5;
+        color: #7f8c8d;
+    }
+    .visitas-operational-table td,
+    .visitas-operational-table th {
+        vertical-align: middle !important;
+    }
+    .visitas-operational-table .badge {
+        min-width: 24px;
+    }
+    .visitas-operational-subtext {
+        display: block;
+        margin-top: 5px;
+        color: #7f8c8d;
+        line-height: 1.45;
+    }
     .visitas-care-card {
         min-height: 96px;
     }
@@ -51,6 +127,195 @@
     .visitas-care-table td,
     .visitas-care-table th {
         vertical-align: middle !important;
+    }
+    .visitas-care-panel {
+        border: 1px solid #e7eaec;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #ffffff 0%, #f7fbfd 100%);
+        padding: 18px 20px 16px;
+        min-height: 100%;
+    }
+    .visitas-care-panel-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .visitas-care-panel-title h6 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #2f4050;
+    }
+    .visitas-care-panel-subtitle {
+        margin: 0 0 14px;
+        color: #7f8c8d;
+        line-height: 1.5;
+        font-size: 12px;
+    }
+    .visitas-care-kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .visitas-care-kpi {
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: #fff;
+        min-height: 88px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 24px rgba(47, 64, 80, 0.10);
+    }
+    .visitas-care-kpi.is-total { background: linear-gradient(135deg, #1ab394 0%, #17a689 100%); }
+    .visitas-care-kpi.is-risk { background: linear-gradient(135deg, #f65f73 0%, #ef5362 100%); }
+    .visitas-care-kpi.is-schedule { background: linear-gradient(135deg, #1c84c6 0%, #23c6c8 100%); }
+    .visitas-care-kpi.is-profile { background: linear-gradient(135deg, #f8ac59 0%, #f7b267 100%); }
+    .visitas-care-kpi-icon {
+        width: 54px;
+        text-align: center;
+        flex: 0 0 54px;
+    }
+    .visitas-care-kpi-icon i {
+        font-size: 34px;
+        line-height: 1;
+    }
+    .visitas-care-kpi-metric {
+        flex: 1 1 auto;
+        text-align: right;
+    }
+    .visitas-care-kpi-metric .label-text {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        opacity: .92;
+        margin-bottom: 4px;
+    }
+    .visitas-care-kpi-metric .value {
+        display: block;
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1;
+    }
+    .visitas-care-profile-list {
+        margin: 14px 0 0;
+        padding: 0;
+        list-style: none;
+    }
+    .visitas-care-profile-item {
+        border-top: 1px solid #eef2f5;
+        padding: 12px 0;
+    }
+    .visitas-care-profile-item:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+    .visitas-care-profile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    .visitas-care-profile-header strong {
+        color: #2f4050;
+    }
+    .visitas-care-profile-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .visitas-care-profile-bar {
+        height: 8px;
+        border-radius: 999px;
+        background: #edf2f7;
+        overflow: hidden;
+    }
+    .visitas-care-profile-bar span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #23c6c8 0%, #1ab394 100%);
+    }
+    .visitas-care-attention-table {
+        margin-bottom: 0;
+    }
+    .visitas-care-attention-table td,
+    .visitas-care-attention-table th {
+        vertical-align: middle !important;
+    }
+    .visitas-care-person {
+        min-width: 220px;
+    }
+    .visitas-care-person strong {
+        color: #2f4050;
+    }
+    .visitas-care-reason {
+        color: #6c7a89;
+        line-height: 1.45;
+    }
+    .visitas-care-empty {
+        padding: 28px 16px;
+        text-align: center;
+        color: #7f8c8d;
+    }
+    .visitas-status-cell {
+        min-width: 320px;
+    }
+    .visitas-status-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .visitas-status-progress {
+        margin-bottom: 8px;
+        height: 10px;
+        background: #edf2f5;
+        border-radius: 999px;
+        overflow: hidden;
+        box-shadow: none;
+    }
+    .visitas-status-progress .progress-bar {
+        min-width: 12px;
+        border-radius: 999px;
+    }
+    .visitas-status-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        margin-top: 6px;
+    }
+    .visitas-status-footer .badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 10px;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        line-height: 1;
+        border-radius: 4px;
+        color: #fff;
+    }
+    .visitas-status-footer .badge.badge-success {
+        background-color: #1ab394;
+    }
+    .visitas-status-footer .badge.badge-warning {
+        background-color: #f8ac59;
+    }
+    .visitas-status-footer .badge.badge-danger {
+        background-color: #ed5565;
+    }
+    @media (max-width: 991px) {
+        .visitas-care-kpi-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -217,174 +482,111 @@
                 </div>
                 <div class="ibox-content">
                     <div class="row">
-                        <div class="col-lg-2 col-sm-4">
-                            <div class="widget style1 navy-bg visitas-care-card">
-                                <div class="row">
-                                    <div class="col-xs-4 care-icon">
-                                        <i class="fa fa-address-book-o"></i>
-                                    </div>
-                                    <div class="col-xs-8 care-metric">
-                                        <span>Carteira ativa</span>
-                                        <h2 class="font-bold">{{ communityCareSummary.total || 0 }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-4">
-                            <div class="widget style1 red-bg visitas-care-card">
-                                <div class="row">
-                                    <div class="col-xs-4 care-icon">
-                                        <i class="fa fa-heartbeat"></i>
-                                    </div>
-                                    <div class="col-xs-8 care-metric">
-                                        <span>Enfermos</span>
-                                        <h2 class="font-bold">{{ communityCareSummary.enfermos || 0 }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-4">
-                            <div class="widget style1 lazur-bg visitas-care-card">
-                                <div class="row">
-                                    <div class="col-xs-4 care-icon">
-                                        <i class="fa fa-users"></i>
-                                    </div>
-                                    <div class="col-xs-8 care-metric">
-                                        <span>Mocidade</span>
-                                        <h2 class="font-bold">{{ communityCareSummary.mocidade || 0 }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-4">
-                            <div class="widget style1 yellow-bg visitas-care-card">
-                                <div class="row">
-                                    <div class="col-xs-4 care-icon">
-                                        <i class="fa fa-music"></i>
-                                    </div>
-                                    <div class="col-xs-8 care-metric">
-                                        <span>Músicos</span>
-                                        <h2 class="font-bold">{{ communityCareSummary.musicos || 0 }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-4">
-                            <div class="widget style1 bg-danger visitas-care-card">
-                                <div class="row">
-                                    <div class="col-xs-4 care-icon">
-                                        <i class="fa fa-exclamation-triangle"></i>
-                                    </div>
-                                    <div class="col-xs-8 care-metric">
-                                        <span>30+ dias sem visita</span>
-                                        <h2 class="font-bold">{{ communityCareSummary.semVisita30 || 0 }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-4">
-                            <div class="widget style1 bg-primary visitas-care-card">
-                                <div class="row">
-                                    <div class="col-xs-4 care-icon">
-                                        <i class="fa fa-calendar-times-o"></i>
-                                    </div>
-                                    <div class="col-xs-8 care-metric">
-                                        <span>Sem agenda futura</span>
-                                        <h2 class="font-bold">{{ communityCareSummary.semAgendaFutura || 0 }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row m-t-md">
                         <div class="col-lg-5">
-                            <div class="ibox">
-                                <div class="ibox-title">
-                                    <h5>Perfis Prioritários</h5>
+                            <div class="visitas-care-panel">
+                                <div class="visitas-care-panel-title">
+                                    <h6>Panorama do acompanhamento</h6>
+                                    <span class="label label-success">{{ communityCareSummary.total || 0 }} acompanhados</span>
                                 </div>
-                                <div class="ibox-content" style="padding-top:0;">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover table-bordered visitas-care-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Perfil</th>
-                                                    <th class="text-center">Total</th>
-                                                    <th class="text-center">Ativos</th>
-                                                    <th class="text-center">30+ dias</th>
-                                                    <th class="text-center">Sem agenda</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="item in communityProfiles">
-                                                    <td><strong>{{ item.label }}</strong></td>
-                                                    <td class="text-center"><span class="label label-info">{{ item.total }}</span></td>
-                                                    <td class="text-center"><span class="label label-success">{{ item.ativos }}</span></td>
-                                                    <td class="text-center"><span class="label label-warning">{{ item.semVisita30 }}</span></td>
-                                                    <td class="text-center"><span class="label label-danger">{{ item.semAgenda }}</span></td>
-                                                </tr>
-                                                <tr ng-if="!communityProfiles.length">
-                                                    <td colspan="5" class="text-center text-muted">Sem perfis mapeados para os filtros atuais.</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                <p class="visitas-care-panel-subtitle">
+                                    Leitura r&aacute;pida da base acompanhada, com foco em risco, agenda e perfis que exigem maior cobertura.
+                                </p>
+                                <div class="visitas-care-kpi-grid">
+                                    <div class="visitas-care-kpi is-total">
+                                        <div class="visitas-care-kpi-icon"><i class="fa fa-address-book-o"></i></div>
+                                        <div class="visitas-care-kpi-metric">
+                                            <span class="label-text">Pessoas acompanhadas</span>
+                                            <span class="value">{{ communityCareSummary.total || 0 }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="visitas-care-kpi is-risk">
+                                        <div class="visitas-care-kpi-icon"><i class="fa fa-exclamation-triangle"></i></div>
+                                        <div class="visitas-care-kpi-metric">
+                                            <span class="label-text">30+ dias sem visita</span>
+                                            <span class="value">{{ communityCareSummary.semVisita30 || 0 }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="visitas-care-kpi is-schedule">
+                                        <div class="visitas-care-kpi-icon"><i class="fa fa-calendar-times-o"></i></div>
+                                        <div class="visitas-care-kpi-metric">
+                                            <span class="label-text">Sem agenda futura</span>
+                                            <span class="value">{{ communityCareSummary.semAgendaFutura || 0 }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="visitas-care-kpi is-profile">
+                                        <div class="visitas-care-kpi-icon"><i class="fa fa-heartbeat"></i></div>
+                                        <div class="visitas-care-kpi-metric">
+                                            <span class="label-text">Enfermos</span>
+                                            <span class="value">{{ communityCareSummary.enfermos || 0 }}</span>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <ul class="visitas-care-profile-list">
+                                    <li class="visitas-care-profile-item" ng-repeat="item in communityProfiles | limitTo: 4">
+                                        <div class="visitas-care-profile-header">
+                                            <strong>{{ item.label }}</strong>
+                                            <span class="label label-info">{{ item.total || 0 }} total</span>
+                                        </div>
+                                        <div class="visitas-care-profile-meta">
+                                            <span class="label label-success">{{ item.ativos || 0 }} ativos</span>
+                                            <span class="label label-warning">{{ item.semVisita30 || 0 }} com 30+ dias</span>
+                                            <span class="label label-danger">{{ item.semAgenda || 0 }} sem agenda</span>
+                                        </div>
+                                        <div class="visitas-care-profile-bar m-t-sm">
+                                            <span ng-style="{ width: ((item.total || 0) ? (((item.ativos || 0) / item.total) * 100) : 0) + '%' }"></span>
+                                        </div>
+                                    </li>
+                                    <li class="visitas-care-empty" ng-if="!communityProfiles.length">
+                                        Sem perfis mapeados para os filtros atuais.
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                         <div class="col-lg-7">
-                            <div class="ibox">
-                                <div class="ibox-title">
-                                    <h5>Pessoas que Exigem Atenção Imediata</h5>
-                                    <div class="ibox-tools">
-                                        <span class="label label-warning">{{ communityAttentionList.length || 0 }} em destaque</span>
-                                    </div>
+                            <div class="visitas-care-panel">
+                                <div class="visitas-care-panel-title">
+                                    <h6>Pessoas que Exigem Aten&ccedil;&atilde;o Imediata</h6>
+                                    <span class="label label-warning">{{ communityAttentionList.length || 0 }} em destaque</span>
                                 </div>
-                                <div class="ibox-content" style="padding-top:0;">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover table-bordered visitas-care-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nome</th>
-                                                    <th>Perfil</th>
-                                                    <th class="text-center">Dias sem visita</th>
-                                                    <th class="text-center">Agendas futuras</th>
-                                                    <th>Motivos</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="item in communityAttentionList">
-                                                    <td>
-                                                        <strong>{{ item.nome }}</strong><br>
-                                                        <small class="text-muted">{{ item.municipio }} <span ng-if="item.comum">| {{ item.comum }}</span></small>
-                                                    </td>
-                                                    <td>{{ item.perfil || 'Irmandade' }}</td>
-                                                    <td class="text-center">{{ item.diasSemVisita === null ? '-' : item.diasSemVisita }}</td>
-                                                    <td class="text-center"><span class="label label-primary">{{ item.proximaAgenda || 0 }}</span></td>
-                                                    <td>{{ item.motivos }}</td>
-                                                </tr>
-                                                <tr ng-if="!communityAttentionList.length">
-                                                    <td colspan="5" class="text-center text-muted">Nenhuma pessoa crítica encontrada para os filtros atuais.</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <p class="visitas-care-panel-subtitle">
+                                    Prioridade operacional para visitas sem registro recente ou sem agenda futura definida.
+                                </p>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered visitas-care-table visitas-care-attention-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>Perfil</th>
+                                                <th class="text-center">Dias sem visita</th>
+                                                <th class="text-center">Agendas futuras</th>
+                                                <th>Motivos</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in communityAttentionList | limitTo: 6">
+                                                <td class="visitas-care-person">
+                                                    <strong>{{ item.nome }}</strong><br>
+                                                    <small class="text-muted">{{ item.municipio }} <span ng-if="item.comum">| {{ item.comum }}</span></small>
+                                                </td>
+                                                <td>{{ item.perfil || 'Irmandade' }}</td>
+                                                <td class="text-center">{{ item.diasSemVisita === null ? '-' : item.diasSemVisita }}</td>
+                                                <td class="text-center"><span class="label label-primary">{{ item.proximaAgenda || 0 }}</span></td>
+                                                <td class="visitas-care-reason">{{ item.motivos }}</td>
+                                            </tr>
+                                            <tr ng-if="!communityAttentionList.length">
+                                                <td colspan="5" class="visitas-care-empty">Nenhuma pessoa cr&iacute;tica encontrada para os filtros atuais.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="text-right m-t-sm" ng-if="communityAttentionList.length > 6">
+                                    <span class="text-muted">Exibindo 6 de {{ communityAttentionList.length }} registros priorizados.</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row m-t-sm">
-                        <div class="col-lg-12">
-                            <div class="alert alert-info" style="margin-bottom:0;">
-                                <strong>Agenda pastoral:</strong>
-                                hoje {{ communityAgendaSummary.hoje || 0 }},
-                                próximos 7 dias {{ communityAgendaSummary.proximos7 || 0 }},
-                                futuras {{ communityAgendaSummary.futuras || 0 }},
-                                concluídas no mês {{ communityAgendaSummary.concluidasMes || 0 }}.
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -482,17 +684,20 @@
                                 <td class="text-center">
                                     <span class="badge badge-plain">{{ item.igrejas }}</span>
                                 </td>
-                                <td style="vertical-align: middle;">
-                                    <div class="stat-percent">{{ item.taxa }}% <i class="fa"
-                                            ng-class="{'fa-level-up text-success': item.taxa >= 50, 'fa-level-down text-danger': item.taxa < 50}"></i>
+                                <td class="visitas-status-cell" style="vertical-align: middle;">
+                                    <div class="visitas-status-header">
+                                        <div class="stat-percent">{{ item.taxa }}% <i class="fa"
+                                                ng-class="{'fa-level-up text-success': item.taxa >= 80, 'fa-exclamation text-warning': item.taxa >= 50 && item.taxa < 80, 'fa-level-down text-danger': item.taxa < 50}"></i>
+                                        </div>
                                     </div>
-                                    <div class="progress progress-mini" style="margin-bottom: 8px;">
+                                    <div class="progress progress-striped active visitas-status-progress">
                                         <div ng-style="{width: item.taxa + '%'}" class="progress-bar"
-                                            ng-class="{'progress-bar-danger': item.taxa < 50}"></div>
+                                            ng-class="{'progress-bar-success': item.taxa >= 80, 'progress-bar-warning': item.taxa >= 50 && item.taxa < 80, 'progress-bar-danger': item.taxa < 50}"></div>
                                     </div>
-                                    <span class="label" style="display: inline-block; margin-top: 2px;"
-                                        ng-class="{'label-primary': formatVisitasStatusKey(item.status) === 'EXCELENTE', 'label-success': formatVisitasStatusKey(item.status) === 'BOM', 'label-danger': formatVisitasStatusKey(item.status) === 'CRITICO'}">{{
-                                        formatVisitasStatusLabel(item.status) }}</span>
+                                    <div class="visitas-status-footer">
+                                        <span class="badge"
+                                            ng-class="{'badge-success': item.taxa >= 80, 'badge-warning': item.taxa >= 50 && item.taxa < 80, 'badge-danger': item.taxa < 50}">{{ item.taxa >= 80 ? 'EXCELENTE' : (item.taxa >= 50 ? 'ALERTA' : 'CRÍTICO') }}</span>
+                                    </div>
                                 </td>
                                 <td class="text-center" style="vertical-align: middle;">
                                     <button class="btn btn-white btn-sm" ng-click="filterVisitasByMunicipio(item.municipio)">
@@ -576,10 +781,119 @@
                         A base prevista considera o cadastro oficial de comuns consolidado com os lançamentos reconhecidos no período filtrado.
                     </div>
 
+                    <div class="row m-t-md">
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="visitas-health-summary-card">
+                                <span class="eyebrow">Comuns previstos no ciclo</span>
+                                <div class="value">{{ pendingHealthSummary.previstos || 0 }}</div>
+                                <div class="description">Base ativa de comuns considerada para acompanhamento mensal.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="visitas-health-summary-card">
+                                <span class="eyebrow">Já lançaram</span>
+                                <div class="value">{{ pendingHealthSummary.jaLancaram || 0 }}</div>
+                                <div class="description">Comuns com pelo menos um lançamento identificado no histórico.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="visitas-health-summary-card">
+                                <span class="eyebrow">Pendentes</span>
+                                <div class="value">{{ (pendingHealthSummary.pendentes || 0) + (pendingHealthSummary.vencemHoje || 0) }}</div>
+                                <div class="description">Comuns com ciclo vencendo hoje ou já fora do prazo esperado.</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="visitas-health-summary-card">
+                                <span class="eyebrow">Sem histórico</span>
+                                <div class="value">{{ pendingHealthSummary.semHistorico || 0 }}</div>
+                                <div class="description">Comuns sem base suficiente de lançamentos para acompanhamento.</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row m-b-sm">
                         <div class="col-sm-8 text-muted">
                             {{ pendingCount || 0 }} pendências distribuídas em {{ pendingMunicipioGroups.length }} municípios.
                         </div>
+                    </div>
+
+                    <div class="table-responsive m-t-md">
+                        <table class="table table-hover table-bordered visitas-operational-table">
+                            <thead>
+                                <tr>
+                                    <th>Município</th>
+                                    <th class="text-center">Monitorados</th>
+                                    <th class="text-center">Em dia</th>
+                                    <th class="text-center">Pendentes</th>
+                                    <th class="text-center">Sem histórico</th>
+                                    <th class="text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat-start="group in operationalMunicipioGroups">
+                                    <td>
+                                        <strong>{{ group.municipio }}</strong>
+                                        <small class="visitas-operational-subtext">Acompanhamento consolidado do município</small>
+                                    </td>
+                                    <td class="text-center"><span class="badge badge-info">{{ group.total }}</span></td>
+                                    <td class="text-center"><span class="badge badge-success">{{ group.emDia }}</span></td>
+                                    <td class="text-center"><span class="badge badge-warning">{{ group.pendentes + group.hoje + group.criticos }}</span></td>
+                                    <td class="text-center"><span class="badge badge-default">{{ group.semHistorico }}</span></td>
+                                    <td class="text-right">
+                                        <button class="btn btn-xs btn-white" ng-click="toggleOperationalMunicipio(group.municipio)">
+                                            <i class="fa" ng-class="isOperationalMunicipioExpanded(group.municipio) ? 'fa-angle-up' : 'fa-angle-down'"></i>
+                                            {{ isOperationalMunicipioExpanded(group.municipio) ? 'Ocultar comuns' : 'Ver comuns' }}
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat-end ng-if="isOperationalMunicipioExpanded(group.municipio)">
+                                    <td colspan="6" style="padding: 0;">
+                                        <table class="table table-condensed table-bordered" style="margin-bottom:0;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Comum</th>
+                                                    <th class="text-center">Lançamentos vinculados</th>
+                                                    <th class="text-center">Último lançamento</th>
+                                                    <th class="text-center">Próximo previsto</th>
+                                                    <th class="text-center">Status</th>
+                                                    <th class="text-center">Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in group.items">
+                                                    <td>
+                                                        <strong>{{ item.nome }}</strong>
+                                                        <span class="visitas-operational-subtext" ng-if="item.codigo">{{ item.codigo }}</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge badge-primary">{{ item.historyCount || 0 }}</span>
+                                                    </td>
+                                                    <td class="text-center">{{ item.latestDateLabel || '-' }}</td>
+                                                    <td class="text-center">{{ item.nextExpectedLabel || '-' }}</td>
+                                                    <td class="text-center">
+                                                        <span class="visitas-operational-status"
+                                                            ng-class="{'is-ok': item.pendingStatusTone === 'ok', 'is-today': item.pendingStatusTone === 'today', 'is-warn': item.pendingStatusTone === 'warn', 'is-danger': item.pendingStatusTone === 'danger', 'is-muted': item.pendingStatusTone === 'muted'}">{{ item.pendingStatusLabel }}</span>
+                                                        <small class="visitas-operational-subtext">{{ item.pendingStatusDetail }}</small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-xs btn-success" ng-click="openPendingLaunch(item)">
+                                                            <i class="fa" ng-class="item.historyCount > 0 ? 'fa-search' : 'fa-plus-circle'"></i> {{ item.historyCount > 0 ? 'Ver lançamentos' : 'Abrir' }}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-if="!group.items.length">
+                                                    <td colspan="6" class="text-center text-muted">Nenhum comum encontrado neste município.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr ng-if="!operationalMunicipioGroups.length">
+                                    <td colspan="6" class="text-center text-muted">Nenhum município encontrado para o recorte atual.</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="table-responsive m-t-md">

@@ -14431,7 +14431,7 @@ function formatVisitasStatusLabel(value) {
     var raw = formatVisitasStatusKey(value);
 
     if (raw.indexOf('EXCELENTE') !== -1) return 'EXCELENTE';
-    if (raw.indexOf('BOM') !== -1) return 'BOM';
+    if (raw.indexOf('ALERTA') !== -1 || raw.indexOf('BOM') !== -1) return 'ALERTA';
     if (raw.indexOf('CRITICO') !== -1) return 'CRÍTICO';
     if (raw.indexOf('PENDENTE') !== -1) return 'PENDENTE';
     if (raw.indexOf('SEM HISTORICO') !== -1) return 'SEM HISTÓRICO';
@@ -14457,15 +14457,17 @@ function extractVisitaCodigoLocal(value) {
 
 function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $rootScope, $state, $q) {
     var visitasText = {
-        institution: 'CONGREGAÇÃO CRISTàNO BRASIL',
+        institution: 'CONGREGAÇÃO CRISTÃ NO BRASIL',
         region: 'Regional Itapevi - São Paulo',
         moduleName: 'DEPARTAMENTO DE VISITAS',
         reportTitle: 'Relatório Geral de Visitas',
         issueDateLabel: 'Emissão',
         periodLabel: 'Período',
+        extractedByLabel: 'Extraído por',
         pageLabel: 'Página',
         allRecordsLabel: 'Todos os registros'
     };
+    var visitasLogoBase64 = 'data:image/png;base64,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';
     var monthLabels = getVisitasMonthLabels();
     var fallbackComumCatalogState = getFallbackComumCatalogState();
     var comumCatalogState = fallbackComumCatalogState;
@@ -14502,10 +14504,16 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     $scope.hasMorePendingLancamentos = false;
     $scope.pendingMunicipioGroups = [];
     $scope.expandedPendingMunicipio = '';
+    $scope.operationalMunicipioGroups = [];
+    $scope.expandedOperationalMunicipio = '';
     $scope.lastDashboardUpdateLabel = '';
+    $scope.pendingOperationalItems = [];
     $scope.pendingHealthSummary = {
         previstos: 0,
+        jaLancaram: 0,
         emDia: 0,
+        vencemHoje: 0,
+        pendentes: 0,
         mesAberto: 0,
         atraso30: 0,
         atraso60: 0,
@@ -14743,26 +14751,36 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         return Math.floor((end.getTime() - start.getTime()) / 86400000);
     }
 
+    function addVisitasDays(dateValue, days) {
+        var date = parseVisitasDateOnlyAsLocal(dateValue);
+        var result;
+
+        if (!date) {
+            return null;
+        }
+
+        result = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        result.setDate(result.getDate() + (parseInt(days, 10) || 0));
+        return result;
+    }
+
     function getVisitasPendingStatusMeta(item) {
         var status = String((item && item.pendingStatus) || '').toUpperCase();
 
-        if (status === '90+ DIAS') {
-            return { order: 1, tone: 'danger', label: '90+ DIAS' };
+        if (status === 'CRÍTICO' || status === 'CRITICO' || status === '90+ DIAS' || status === '61-90 DIAS') {
+            return { order: 1, tone: 'danger', label: 'CRÍTICO' };
         }
-        if (status === '61-90 DIAS') {
-            return { order: 2, tone: 'danger', label: '61-90 DIAS' };
+        if (status === 'PENDENTE' || status === '31-60 DIAS') {
+            return { order: 2, tone: 'warn', label: 'PENDENTE' };
         }
-        if (status === '31-60 DIAS') {
-            return { order: 3, tone: 'warn', label: '31-60 DIAS' };
-        }
-        if (status === 'MÊS EM ABERTO') {
-            return { order: 4, tone: 'today', label: 'MÊS EM ABERTO' };
+        if (status === 'HOJE' || status === 'MÊS EM ABERTO') {
+            return { order: 3, tone: 'today', label: 'HOJE' };
         }
         if (status === 'SEM HISTÓRICO') {
-            return { order: 5, tone: 'muted', label: 'SEM HISTÓRICO' };
+            return { order: 4, tone: 'muted', label: 'SEM HISTÓRICO' };
         }
 
-        return { order: 6, tone: 'ok', label: status || 'EM DIA' };
+        return { order: 5, tone: 'ok', label: 'EM DIA' };
     }
 
     function getVisitasPendingStatusClass(item) {
@@ -14824,7 +14842,10 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         var emDiaByCity = {};
         var summary = {
             previstos: expectedEntries.length,
+            jaLancaram: 0,
             emDia: 0,
+            vencemHoje: 0,
+            pendentes: 0,
             mesAberto: 0,
             atraso30: 0,
             atraso60: 0,
@@ -14867,10 +14888,17 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             var health = launchesByKey[entry.key];
             var latestDate = health && health.latestDate ? health.latestDate : null;
             var latestDateLabel = latestDate ? formatVisitasDateBRLocal(latestDate) : '-';
+            var nextExpectedDate = latestDate ? addVisitasDays(latestDate, 30) : null;
+            var nextExpectedLabel = nextExpectedDate ? formatVisitasDateBRLocal(nextExpectedDate) : '-';
             var daysWithoutLaunch = latestDate ? getVisitasDayDiff(latestDate, today) : null;
+            var daysLate = nextExpectedDate ? getVisitasDayDiff(nextExpectedDate, today) : null;
             var pendingStatus = 'EM DIA';
-            var pendingStatusDetail = 'Lançamento mensal registrado no mês atual.';
+            var pendingStatusDetail = 'Lançamento cobre o ciclo atual.';
             var statusMeta;
+
+            if (health && latestDate) {
+                summary.jaLancaram += 1;
+            }
 
             if (!health || !latestDate) {
                 pendingStatus = 'SEM HISTÓRICO';
@@ -14882,26 +14910,30 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 if ($scope.cidades.indexOf(entry.cidade) !== -1) {
                     emDiaByCity[entry.cidade] = (emDiaByCity[entry.cidade] || 0) + 1;
                 }
-            } else if (daysWithoutLaunch > 90) {
-                pendingStatus = '90+ DIAS';
-                pendingStatusDetail = 'Último lançamento há mais de 90 dias.';
-                summary.atraso90 += 1;
-                summary.totalPendentes += 1;
-            } else if (daysWithoutLaunch > 60) {
-                pendingStatus = '61-90 DIAS';
-                pendingStatusDetail = 'Último lançamento entre 61 e 90 dias.';
-                summary.atraso60 += 1;
-                summary.totalPendentes += 1;
-            } else if (daysWithoutLaunch > 30) {
-                pendingStatus = '31-60 DIAS';
-                pendingStatusDetail = 'Último lançamento entre 31 e 60 dias.';
-                summary.atraso30 += 1;
-                summary.totalPendentes += 1;
-            } else {
-                pendingStatus = 'MÊS EM ABERTO';
-                pendingStatusDetail = 'Ainda falta o lançamento do mês atual.';
+            } else if (daysLate === 0) {
+                pendingStatus = 'HOJE';
+                pendingStatusDetail = 'O lançamento previsto vence hoje.';
+                summary.vencemHoje += 1;
                 summary.mesAberto += 1;
                 summary.totalPendentes += 1;
+            } else if (daysLate > 0) {
+                pendingStatus = daysLate >= 8 ? 'CRÍTICO' : 'PENDENTE';
+                pendingStatusDetail = daysLate + ' dia(s) de atraso no ciclo mensal.';
+                summary.pendentes += 1;
+                summary.totalPendentes += 1;
+                if (daysLate > 90) {
+                    summary.atraso90 += 1;
+                } else if (daysLate > 60) {
+                    summary.atraso60 += 1;
+                } else if (daysLate > 30) {
+                    summary.atraso30 += 1;
+                } else {
+                    summary.mesAberto += 1;
+                }
+            } else {
+                pendingStatus = 'EM DIA';
+                pendingStatusDetail = 'Próximo lançamento ainda dentro do prazo esperado.';
+                summary.emDia += 1;
             }
 
             statusMeta = getVisitasPendingStatusMeta({ pendingStatus: pendingStatus });
@@ -14913,7 +14945,10 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 cidade: entry.cidade,
                 latestDate: latestDate,
                 latestDateLabel: latestDateLabel,
+                nextExpectedDate: nextExpectedDate,
+                nextExpectedLabel: nextExpectedLabel,
                 daysWithoutLaunch: daysWithoutLaunch,
+                daysLate: daysLate,
                 pendingStatus: pendingStatus,
                 pendingStatusLabel: statusMeta.label,
                 pendingStatusTone: statusMeta.tone,
@@ -15007,6 +15042,55 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 return b.pendentes - a.pendentes;
             }
 
+            return String(a.municipio || '').localeCompare(String(b.municipio || ''), 'pt-BR');
+        });
+    }
+
+    function buildVisitasOperationalMunicipioGroups(items) {
+        var grouped = {};
+
+        angular.forEach(items || [], function (item) {
+            var municipio = item && item.cidade ? item.cidade : 'Sem município';
+
+            if (!grouped[municipio]) {
+                grouped[municipio] = {
+                    municipio: municipio,
+                    total: 0,
+                    emDia: 0,
+                    hoje: 0,
+                    pendentes: 0,
+                    criticos: 0,
+                    semHistorico: 0,
+                    items: []
+                };
+            }
+
+            grouped[municipio].total += 1;
+
+            if (item.pendingStatusLabel === 'EM DIA') grouped[municipio].emDia += 1;
+            else if (item.pendingStatusLabel === 'HOJE') grouped[municipio].hoje += 1;
+            else if (item.pendingStatusLabel === 'PENDENTE') grouped[municipio].pendentes += 1;
+            else if (item.pendingStatusLabel === 'CRÍTICO') grouped[municipio].criticos += 1;
+            else if (item.pendingStatusLabel === 'SEM HISTÓRICO') grouped[municipio].semHistorico += 1;
+
+            grouped[municipio].items.push(item);
+        });
+
+        return Object.keys(grouped).map(function (key) {
+            grouped[key].items = grouped[key].items.sort(function (a, b) {
+                if ((a.pendingStatusOrder || 0) !== (b.pendingStatusOrder || 0)) {
+                    return (a.pendingStatusOrder || 0) - (b.pendingStatusOrder || 0);
+                }
+                if (String(a.codigo || '') !== String(b.codigo || '')) {
+                    return String(a.codigo || '').localeCompare(String(b.codigo || ''), 'pt-BR');
+                }
+                return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
+            });
+            return grouped[key];
+        }).sort(function (a, b) {
+            if (b.total !== a.total) {
+                return b.total - a.total;
+            }
             return String(a.municipio || '').localeCompare(String(b.municipio || ''), 'pt-BR');
         });
     }
@@ -15149,6 +15233,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     function refreshCommunityCareData() {
         var search = String($scope.filters.searchText || '').trim().toLowerCase();
         var cityFilter = normalizeMunicipioRegionalLabel($scope.filters.cidade || '');
+        var hasTemporalFilter = !!($scope.filters.mes || $scope.filters.dataInicio || $scope.filters.dataFim);
         var today = getVisitasTodayLocalDate();
         var currentMonth = today.getMonth();
         var currentYear = today.getFullYear();
@@ -15156,16 +15241,73 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         var profileMap = {};
         var attentionList = [];
         var agendaByVisitado = {};
+        var lancamentosByCodigo = {};
+        var lancamentosByComum = {};
+        var lancamentosByMunicipio = {};
         var agendaHoje = 0;
         var agendaProximos7 = 0;
         var agendaFuturas = 0;
         var agendaConcluidasMes = 0;
 
+        ($scope.filteredLancamentos || []).forEach(function (item) {
+            var codigo = String((item && item.codigo) || '').trim().toUpperCase();
+            var comum = String((item && item.comum) || '').trim().toUpperCase();
+            var municipio = normalizeMunicipioRegionalLabel(item && item.municipio || '');
+
+            if (codigo) lancamentosByCodigo[codigo] = true;
+            if (comum) lancamentosByComum[comum] = true;
+            if (municipio) lancamentosByMunicipio[municipio] = true;
+        });
+
         ($scope.visitados || []).forEach(function (item) {
             visitadosById[item.id] = item;
         });
 
-        ($scope.agendaVisitas || []).forEach(function (agenda) {
+        $scope.filteredAgendaVisitas = ($scope.agendaVisitas || []).filter(function (agenda) {
+            var visitado = agenda && agenda.irmandade_id ? visitadosById[agenda.irmandade_id] : null;
+            var matchText = true;
+            var matchCity = true;
+            var matchTemporalScope = true;
+            var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
+            var normalizedStatus = normalizeVisitasStatusLookup(agenda && agenda.status);
+            var isCanceled = normalizedStatus.indexOf('cancel') !== -1;
+            var textSource;
+            var itemMonth;
+
+            if (search) {
+                textSource = [
+                    agenda.titulo,
+                    agenda.categoria,
+                    agenda.equipe_responsavel,
+                    visitado && visitado.nome,
+                    visitado && visitado.comum
+                ].join(' ').toLowerCase();
+                matchText = textSource.indexOf(search) !== -1;
+            }
+
+            if (cityFilter) {
+                matchCity = !!visitado && normalizeMunicipioRegionalLabel(visitado.municipio) === cityFilter;
+            }
+
+            if (hasTemporalFilter) {
+                if (!visitado) {
+                    matchTemporalScope = false;
+                } else if ($scope.filters.mes && agendaDate && !isNaN(agendaDate.getTime())) {
+                    itemMonth = getVisitasMonthLabels()[agendaDate.getMonth()];
+                    matchTemporalScope = itemMonth === $scope.filters.mes;
+                }
+
+                if (matchTemporalScope && $scope.filters.dataInicio && agendaDate && !isNaN(agendaDate.getTime()) && agendaDate < new Date($scope.filters.dataInicio)) {
+                    matchTemporalScope = false;
+                }
+                if (matchTemporalScope && $scope.filters.dataFim && agendaDate && !isNaN(agendaDate.getTime()) && agendaDate > new Date($scope.filters.dataFim)) {
+                    matchTemporalScope = false;
+                }
+            }
+            return matchText && matchCity && matchTemporalScope;
+        });
+
+        ($scope.filteredAgendaVisitas || []).forEach(function (agenda) {
             var visitado = agenda && agenda.irmandade_id ? visitadosById[agenda.irmandade_id] : null;
             var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
             var normalizedStatus = normalizeVisitasStatusLookup(agenda && agenda.status);
@@ -15194,7 +15336,11 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         $scope.filteredVisitadosDashboard = ($scope.visitados || []).filter(function (item) {
             var matchText = true;
             var matchCity = true;
+            var matchTemporalScope = true;
             var textSource;
+            var codigoComum = String((item && item.codigo_comum) || '').trim().toUpperCase();
+            var comum = String((item && item.comum) || '').trim().toUpperCase();
+            var municipio = normalizeMunicipioRegionalLabel(item && item.municipio || '');
 
             if (search) {
                 textSource = [item.nome, item.comum, item.familia, item.telefone, item.categoria].join(' ').toLowerCase();
@@ -15202,34 +15348,18 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             }
 
             if (cityFilter) {
-                matchCity = normalizeMunicipioRegionalLabel(item.municipio) === cityFilter;
+                matchCity = municipio === cityFilter;
             }
 
-            return matchText && matchCity;
-        });
-
-        $scope.filteredAgendaVisitas = ($scope.agendaVisitas || []).filter(function (agenda) {
-            var visitado = agenda && agenda.irmandade_id ? visitadosById[agenda.irmandade_id] : null;
-            var matchText = true;
-            var matchCity = true;
-            var textSource;
-
-            if (search) {
-                textSource = [
-                    agenda.titulo,
-                    agenda.categoria,
-                    agenda.equipe_responsavel,
-                    visitado && visitado.nome,
-                    visitado && visitado.comum
-                ].join(' ').toLowerCase();
-                matchText = textSource.indexOf(search) !== -1;
+            if (hasTemporalFilter) {
+                matchTemporalScope =
+                    !!agendaByVisitado[item.id] ||
+                    (!!codigoComum && !!lancamentosByCodigo[codigoComum]) ||
+                    (!!comum && !!lancamentosByComum[comum]) ||
+                    (!!municipio && !!lancamentosByMunicipio[municipio]);
             }
 
-            if (cityFilter) {
-                matchCity = !!visitado && normalizeMunicipioRegionalLabel(visitado.municipio) === cityFilter;
-            }
-
-            return matchText && matchCity;
+            return matchText && matchCity && matchTemporalScope;
         });
 
         $scope.filteredVisitadosDashboard.forEach(function (item) {
@@ -15348,6 +15478,11 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         }
 
         return visitasText.allRecordsLabel;
+    }
+
+    function getVisitasReportActorName() {
+        var currentUser = $rootScope.currentUser || {};
+        return String(currentUser.full_name || currentUser.username || currentUser.email || 'Usuário do sistema').trim();
     }
 
     function getGroupsByMunicipio() {
@@ -15514,28 +15649,17 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             }
             return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
         });
-        $scope.pendingLancamentos = expectedEntries.filter(function (entry) {
-            return !launchedByKey[entry.key];
-        }).map(function (entry) {
-            return angular.extend({}, entry, {
-                pendingStatus: 'SEM HISTÓRICO',
-                pendingStatusKey: 'sem_historico',
-                pendingStatusLabel: 'SEM HISTÓRICO',
-                pendingStatusDetail: 'Ainda não existe lançamento reconhecido para esta comum no período filtrado.',
-                latestDateLabel: '-',
-                daysWithoutLaunch: null
-            });
-        });
-        $scope.pendingHealthSummary = {
-            previstos: expectedEntries.length,
-            emDia: 0,
-            mesAberto: 0,
-            atraso30: 0,
-            atraso60: 0,
-            atraso90: 0,
-            semHistorico: $scope.pendingLancamentos.length,
-            totalPendentes: $scope.pendingLancamentos.length
-        };
+        healthInsights = buildVisitasPendingHealth(expectedEntries, expectedByKey, expectedByUniqueCode);
+        $scope.pendingOperationalItems = healthInsights.allItems;
+        $scope.pendingLancamentos = healthInsights.items;
+        $scope.pendingHealthSummary = healthInsights.summary;
+        $scope.operationalMunicipioGroups = buildVisitasOperationalMunicipioGroups($scope.pendingOperationalItems);
+        if ($scope.expandedOperationalMunicipio && !$scope.operationalMunicipioGroups.some(function (item) { return item.municipio === $scope.expandedOperationalMunicipio; })) {
+            $scope.expandedOperationalMunicipio = '';
+        }
+        if (!$scope.expandedOperationalMunicipio && $scope.operationalMunicipioGroups.length) {
+            $scope.expandedOperationalMunicipio = $scope.operationalMunicipioGroups[0].municipio;
+        }
         refreshPendingLancamentosView();
         $scope.pendingMunicipioGroups = buildPendingMunicipioGroups(expectedByCity, launchedByCity, $scope.pendingLancamentos);
         if ($scope.expandedPendingMunicipio && !$scope.pendingMunicipioGroups.some(function (item) { return item.municipio === $scope.expandedPendingMunicipio; })) {
@@ -15555,7 +15679,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 lancamentos: lancamentos,
                 igrejas: igrejas,
                 taxa: taxa,
-                status: taxaNumero >= 80 ? 'EXCELENTE' : (taxaNumero >= 50 ? 'BOM' : 'CRÍTICO')
+                status: taxaNumero >= 80 ? 'EXCELENTE' : (taxaNumero >= 50 ? 'ALERTA' : 'CRÍTICO')
             };
         }).filter(function (item) {
             return item.igrejas > 0 || item.lancamentos > 0;
@@ -15709,6 +15833,14 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         return $scope.expandedPendingMunicipio === municipio;
     };
 
+    $scope.toggleOperationalMunicipio = function (municipio) {
+        $scope.expandedOperationalMunicipio = $scope.expandedOperationalMunicipio === municipio ? '' : municipio;
+    };
+
+    $scope.isOperationalMunicipioExpanded = function (municipio) {
+        return $scope.expandedOperationalMunicipio === municipio;
+    };
+
     $scope.openPendingLaunch = function (item) {
         var draft = {
             comum: item && item.nome ? item.nome : '',
@@ -15838,6 +15970,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
     $scope.exportToPDF = function () {
         var grupos = getGroupsByMunicipio();
+        var extractedBy = getVisitasReportActorName();
         var body = [[
             { text: 'DATA', style: 'tableHeader' },
             { text: 'MUNICÍPIO', style: 'tableHeader' },
@@ -15887,7 +16020,14 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 return {
                     margin: [30, 20, 30, 0],
                     columns: [
-                        { text: '', width: 60 },
+                        {
+                            width: 135,
+                            stack: [
+                                { image: visitasLogoBase64, width: 52, margin: [0, 0, 0, 6] },
+                                { text: visitasText.extractedByLabel + ':', fontSize: 8, bold: true, color: '#666' },
+                                { text: extractedBy, fontSize: 8, color: '#444' }
+                            ]
+                        },
                         {
                             stack: [
                                 { text: visitasText.institution, style: 'entityName' },
@@ -15895,7 +16035,8 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                                 { text: visitasText.moduleName, style: 'moduleName' },
                                 { text: visitasText.reportTitle, style: 'reportTitle' }
                             ],
-                            alignment: 'center'
+                            alignment: 'center',
+                            margin: [0, 5, 0, 0]
                         },
                         {
                             stack: [
@@ -15971,6 +16112,8 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.filteredComunsDisponiveis = comumCatalogState.items.slice();
     $scope.lancamentos = [];
     $scope.filteredLancamentos = [];
+    $scope.groupedLancamentosByMunicipio = [];
+    $scope.expandedLancamentoMunicipio = '';
     $scope.filters = {
         searchText: '',
         cidade: '',
@@ -16083,6 +16226,50 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         };
     }
 
+    function refreshLancamentosGroupedData() {
+        var grouped = {};
+
+        ($scope.filteredLancamentos || []).forEach(function (item) {
+            var municipio = item && item.municipio ? item.municipio : 'Sem município';
+
+            if (!grouped[municipio]) {
+                grouped[municipio] = {
+                    municipio: municipio,
+                    totalLancamentos: 0,
+                    totalVisitas: 0,
+                    items: []
+                };
+            }
+
+            grouped[municipio].totalLancamentos += 1;
+            grouped[municipio].totalVisitas += Number(item && item.total || 0);
+            grouped[municipio].items.push(item);
+        });
+
+        $scope.groupedLancamentosByMunicipio = Object.keys(grouped).map(function (key) {
+            grouped[key].items = grouped[key].items.sort(function (a, b) {
+                if (String(b.data || '') !== String(a.data || '')) {
+                    return String(b.data || '').localeCompare(String(a.data || ''));
+                }
+                return String(a.comum || '').localeCompare(String(b.comum || ''), 'pt-BR');
+            });
+            return grouped[key];
+        }).sort(function (a, b) {
+            if (b.totalLancamentos !== a.totalLancamentos) {
+                return b.totalLancamentos - a.totalLancamentos;
+            }
+            return String(a.municipio || '').localeCompare(String(b.municipio || ''), 'pt-BR');
+        });
+
+        if ($scope.expandedLancamentoMunicipio && !$scope.groupedLancamentosByMunicipio.some(function (item) { return item.municipio === $scope.expandedLancamentoMunicipio; })) {
+            $scope.expandedLancamentoMunicipio = '';
+        }
+
+        if (!$scope.expandedLancamentoMunicipio && $scope.groupedLancamentosByMunicipio.length) {
+            $scope.expandedLancamentoMunicipio = $scope.groupedLancamentosByMunicipio[0].municipio;
+        }
+    }
+
     function consumePendingDraft() {
         var rawValue;
         var draft;
@@ -16184,6 +16371,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
             return matchText && matchCity && matchMonth;
         });
         updateSummary();
+        refreshLancamentosGroupedData();
     };
 
     $scope.loadLancamentos = function () {
@@ -16305,6 +16493,14 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
 
     $scope.getDataDisplay = function (item) {
         return formatVisitasDateBRLocal(item.data || item.data_lancamento);
+    };
+
+    $scope.toggleLancamentoMunicipio = function (municipio) {
+        $scope.expandedLancamentoMunicipio = $scope.expandedLancamentoMunicipio === municipio ? '' : municipio;
+    };
+
+    $scope.isLancamentoMunicipioExpanded = function (municipio) {
+        return $scope.expandedLancamentoMunicipio === municipio;
     };
 
     updateManagementPermission();
@@ -16922,7 +17118,7 @@ function visitasVisitadosCtrl($scope, VisitasService, AuthService, $rootScope, $
         ].filter(Boolean).join('\n');
 
         if (typeof swal === 'function') {
-            swal('Resumo pastoral', resumo, 'info');
+            swal('Resumo da agenda', resumo, 'info');
             return;
         }
 

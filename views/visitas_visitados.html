@@ -1,4 +1,4 @@
-<div class="row wrapper border-bottom white-bg page-heading">
+﻿<div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-sm-6">
         <h2>Cadastro de Visitados</h2>
         <ol class="breadcrumb">
@@ -156,7 +156,7 @@
                         <i class="fa fa-unlink"></i>
                     </div>
                     <div class="col-xs-8 summary-metric kpi-metric">
-                        <span>Sem última visita</span>
+                        <span>Sem Ãºltima visita</span>
                         <h2 class="font-bold">{{ summary.semUltimaVisita || 0 }}</h2>
                     </div>
                 </div>
@@ -348,6 +348,14 @@
                         <i class="fa fa-spinner fa-spin"></i> Carregando cadastros...
                     </div>
 
+                    <div class="alert alert-info m-b-md" ng-if="!loading" style="margin-bottom:20px;">
+                        <strong>Resumo da agenda:</strong>
+                        hoje {{ summary.agendaHoje || 0 }},
+                        pr&oacute;ximos 7 dias {{ summary.proximos7 || 0 }},
+                        sem agenda futura {{ summary.semAgenda || 0 }},
+                        risco alto {{ summary.riscoAlto || 0 }}.
+                    </div>
+
                     <div class="row" ng-if="!loading">
                         <div class="col-sm-5">
                             <div class="form-group">
@@ -383,10 +391,10 @@
                             <thead>
                                 <tr>
                                     <th>Visitado</th>
-                                    <th>Familia / referencia</th>
-                                    <th class="text-center">Última visita</th>
+                                    <th>Fam&iacute;lia / refer&ecirc;ncia</th>
+                                    <th class="text-center">&Uacute;ltima visita</th>
                                     <th class="text-center">Status</th>
-                                    <th width="130" class="text-center">Ações</th>
+                                    <th width="130" class="text-center">A&ccedil;&otilde;es</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -397,7 +405,7 @@
                                     </td>
                                     <td>
                                         <span ng-if="item.familia">{{ item.familia }}</span>
-                                        <span class="text-muted" ng-if="!item.familia">Sem familia informada</span><br>
+                                        <span class="text-muted" ng-if="!item.familia">Sem fam&iacute;lia informada</span><br>
                                         <small class="text-muted" ng-if="item.referencia_geografica">{{ item.referencia_geografica }}</small><br ng-if="item.referencia_geografica">
                                         <small class="text-muted" ng-if="item.telefone">{{ item.telefone }}</small>
                                     </td>
@@ -409,6 +417,7 @@
                                         <span class="label label-default" ng-if="item.status === 'Inativo'">{{ item.status }}</span>
                                     </td>
                                     <td class="text-center">
+                                        <button type="button" class="btn btn-xs btn-info" ng-click="showAgendaResumo(item)" title="Resumo da agenda"><i class="fa fa-calendar"></i></button>
                                         <button type="button" class="btn btn-xs btn-white" ng-click="editVisitado(item)">
                                             <i class="fa fa-pencil"></i>
                                         </button>
@@ -432,7 +441,7 @@
         <div class="col-lg-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Perfis Prioritários</h5>
+                    <h5>Perfis Priorit&aacute;rios</h5>
                 </div>
                 <div class="ibox-content" style="padding-top:0;">
                     <div class="table-responsive">
@@ -465,14 +474,14 @@
         <div class="col-lg-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Municípios em Atenção</h5>
+                    <h5>Munic&iacute;pios em Aten&ccedil;&atilde;o</h5>
                 </div>
                 <div class="ibox-content" style="padding-top:0;">
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Município</th>
+                                    <th>Munic&iacute;pio</th>
                                     <th class="text-center">Pessoas</th>
                                     <th class="text-center">Atrasados</th>
                                     <th class="text-center">Sem agenda</th>
@@ -486,7 +495,7 @@
                                     <td class="text-center"><span class="label label-danger">{{ item.semAgenda }}</span></td>
                                 </tr>
                                 <tr ng-if="!municipioInsights.length">
-                                    <td colspan="4" class="text-center text-muted">Sem municípios críticos para os filtros atuais.</td>
+                                    <td colspan="4" class="text-center text-muted">Sem munic&iacute;pios cr&iacute;ticos para os filtros atuais.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -498,7 +507,7 @@
         <div class="col-lg-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Fila de Atenção Imediata</h5>
+                    <h5>Resumo da agenda</h5>
                 </div>
                 <div class="ibox-content" style="padding-top:0;">
                     <div class="table-responsive">
@@ -506,7 +515,7 @@
                             <thead>
                                 <tr>
                                     <th>Pessoa</th>
-                                    <th class="text-center">Dias</th>
+                                    <th class="text-center">Pr&oacute;xima agenda</th>
                                     <th>Motivos</th>
                                 </tr>
                             </thead>
@@ -517,12 +526,12 @@
                                         <small class="text-muted">{{ item.perfil }}</small>
                                     </td>
                                     <td class="text-center">
-                                        <span class="label label-warning">{{ item.diasSemVisita === null ? '-' : item.diasSemVisita }}</span>
+                                        <span class="label" ng-class="item.hasNextAgenda ? 'label-info' : 'label-warning'">{{ item.nextAgendaLabel || '-' }}</span>
                                     </td>
                                     <td>{{ item.motivos }}</td>
                                 </tr>
                                 <tr ng-if="!priorityList.length">
-                                    <td colspan="3" class="text-center text-muted">Nenhuma pessoa em risco imediato para os filtros atuais.</td>
+                                    <td colspan="3" class="text-center text-muted">Nenhum resumo de agenda dispon&iacute;vel para os filtros atuais.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -532,3 +541,5 @@
         </div>
     </div>
 </div>
+
+
