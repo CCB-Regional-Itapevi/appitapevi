@@ -324,8 +324,8 @@
     function buildDeleteAlertHtml(text) {
         var targetName = extractDeleteTargetName(text);
         var supportText = extractDeleteSupportText(text);
-        var emphasisStyle = 'display:inline-block;margin-top:8px;font-size:14px;line-height:1.55;font-weight:600;color:#3f4a5a;letter-spacing:0.1px;max-width:360px;';
-        var helperStyle = 'display:inline-block;margin-top:10px;font-size:12px;line-height:1.6;color:#6b7788;max-width:360px;';
+        var emphasisStyle = 'display:inline-block;margin-top:10px;font-size:22px;line-height:1.2;font-weight:700;color:#2f4050;letter-spacing:-0.2px;max-width:360px;';
+        var helperStyle = 'display:inline-block;margin-top:12px;font-size:12px;line-height:1.6;color:#6b7788;max-width:360px;';
         var fallbackTarget = 'este registro';
 
         if (!targetName) {

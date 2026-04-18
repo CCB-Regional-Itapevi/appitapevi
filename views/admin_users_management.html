@@ -61,6 +61,20 @@
         justify-content: flex-end;
     }
 
+    .usuarios-filtros-linha + .usuarios-filtros-linha {
+        margin-top: 12px;
+    }
+
+    .usuarios-toolbar .btn-group {
+        display: inline-flex;
+    }
+
+    .usuarios-filtro-label {
+        padding-top: 7px;
+        color: #6b7c93;
+        text-align: right;
+    }
+
     .usuarios-group-list {
         display: flex;
         flex-direction: column;
@@ -236,8 +250,8 @@
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <div class="row m-b-sm m-t-sm">
-                        <div class="col-md-4">
+                    <div class="row m-b-sm m-t-sm usuarios-filtros-linha">
+                        <div class="col-md-6">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                 <input type="text"
@@ -246,10 +260,27 @@
                                        ng-model="searchText">
                             </div>
                         </div>
-                        <div class="col-md-2 text-right" style="padding-top: 7px; color: #6b7c93;">
-                            <strong>Filtrar por:</strong>
+                        <div class="col-md-6">
+                            <div class="usuarios-toolbar">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-white" ng-class="{ active: viewMode === 'grouped' }" ng-click="viewMode = 'grouped'">Agrupado</button>
+                                    <button type="button" class="btn btn-white" ng-class="{ active: viewMode === 'list' }" ng-click="viewMode = 'list'">Lista</button>
+                                </div>
+                                <button class="btn btn-primary btn-sm" type="button" ng-click="exportToExcel()" style="background:#19bb9b;border-color:#19bb9b;">
+                                    <i class="fa fa-file-excel-o"></i> Excel
+                                </button>
+                                <button class="btn btn-danger btn-sm" type="button" ng-click="exportToPDF()" style="background:#ed5565;border-color:#ed5565;">
+                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                </button>
+                                <a ui-sref="register" class="btn btn-primary btn-sm" ng-if="isMaster">
+                                    <i class="fa fa-user-plus"></i> Adicionar
+                                </a>
+                            </div>
                         </div>
-                        <div class="col-md-2">
+                    </div>
+
+                    <div class="row m-b-sm usuarios-filtros-linha">
+                        <div class="col-md-3">
                             <select class="input-sm form-control" ng-model="roleFilter">
                                 <option value="">Permissão</option>
                                 <option value="Master">Master</option>
@@ -261,7 +292,7 @@
                                 <option value="Membro">Membro</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <select class="input-sm form-control" ng-model="statusFilter">
                                 <option value="">Status</option>
                                 <option value="active">Ativo</option>
@@ -269,23 +300,19 @@
                                 <option value="suspended">Suspenso</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
+                            <select class="input-sm form-control" ng-model="comumFilter">
+                                <option value="">Comum</option>
+                                <option value="__SEM_COMUM__">Sem comum</option>
+                                <option ng-repeat="comum in commonOptions track by comum" value="{{comum}}">{{comum}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
                             <select class="input-sm form-control" ng-model="groupBy">
                                 <option value="comum">Agrupar: comum</option>
                                 <option value="status">Agrupar: status</option>
                                 <option value="sector">Agrupar: setor</option>
                             </select>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="usuarios-toolbar">
-                                <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-white" ng-class="{ active: viewMode === 'grouped' }" ng-click="viewMode = 'grouped'">Agrupado</button>
-                                    <button type="button" class="btn btn-white" ng-class="{ active: viewMode === 'list' }" ng-click="viewMode = 'list'">Lista</button>
-                                </div>
-                                <a ui-sref="register" class="btn btn-primary btn-sm" ng-if="isMaster">
-                                    <i class="fa fa-user-plus"></i> Adicionar
-                                </a>
-                            </div>
                         </div>
                     </div>
 

@@ -36,6 +36,7 @@
             refreshCurrentUserProfile: refreshCurrentUserProfile,
             updateUserProfile: updateUserProfile,
             listPendingUsers: listPendingUsers,
+            getPendingUsersReviewSummary: getPendingUsersReviewSummary,
             listManagedUsers: listManagedUsers,
             listAuditLogs: listAuditLogs,
             listAccessSessionSummary: listAccessSessionSummary,
@@ -1700,6 +1701,30 @@
             return deferred.promise;
         }
 
+        function getPendingUsersReviewSummary() {
+            var deferred = $q.defer();
+
+            $q.all({
+                pending: supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                approved: supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+                rejected: supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'rejected')
+            }).then(function (results) {
+                deferred.resolve({
+                    pending: results.pending && typeof results.pending.count === 'number' ? results.pending.count : 0,
+                    approved: results.approved && typeof results.approved.count === 'number' ? results.approved.count : 0,
+                    rejected: results.rejected && typeof results.rejected.count === 'number' ? results.rejected.count : 0
+                });
+            }).catch(function () {
+                deferred.resolve({
+                    pending: 0,
+                    approved: 0,
+                    rejected: 0
+                });
+            });
+
+            return deferred.promise;
+        }
+
         function listManagedUsers() {
             var deferred = $q.defer();
 
@@ -1821,7 +1846,14 @@
                     if (response.error) {
                         deferred.reject(response.error);
                     } else {
-                        deferred.resolve(response.data || []);
+                        deferred.resolve((response.data || []).map(function (level) {
+                            return {
+                                id: level.id,
+                                name: repairCatalogText(level.name || ''),
+                                description: repairCatalogText(level.description || ''),
+                                level_order: level.level_order
+                            };
+                        }));
                     }
                 });
 

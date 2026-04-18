@@ -5618,20 +5618,42 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
     }
 }
 
-function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert) {
+function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $filter) {
     $scope.loading = false;
     $scope.error = null;
     $scope.pendingUsers = [];
+    $scope.pendingUserGroups = [];
+    $scope.pendingMunicipioGroups = [];
+    $scope.pendingSummary = {
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+        municipios: 0
+    };
+    $scope.viewMode = 'grouped';
+    $scope.pendingFilters = {
+        comum: '',
+        search: ''
+    };
+    $scope.filteredPendingUsers = [];
+    $scope.pendingCommonOptions = [];
+    $scope.pendingFilterOptions = [
+        { value: '', label: 'Comum' },
+        { value: '__SEM_COMUM__', label: 'Sem comum' }
+    ];
+    $scope.collapsedPendingMunicipioGroups = {};
+    $scope.collapsedPendingComumGroups = {};
     $scope.accessLevels = [];
     $scope.sectors = [];
+    $scope.comunsCatalog = [];
     var defaultAccessLevels = [
         { id: 1, name: 'Master', description: 'Acesso total ao sistema - administradores gerais', level_order: 1 },
         { id: 2, name: 'Admin', description: 'Administradores regionais', level_order: 2 },
-        { id: 3, name: 'Coordenador', description: 'Coordenadores - acesso a exportaÃƒÂ§ÃƒÂ£o', level_order: 3 },
-        { id: 4, name: 'Instrutor', description: 'Instrutores - lanÃƒÂ§amentos e cadastros', level_order: 4 },
-        { id: 5, name: 'MÃƒÂºsico', description: 'MÃƒÂºsicos - leitura bÃƒÂ¡sica', level_order: 5 },
-        { id: 6, name: 'Candidato', description: 'Candidatos / InscriÃƒÂ§ÃƒÂ£o', level_order: 6 },
-        { id: 7, name: 'Membro', description: 'Membro padrÃƒÂ£o (legado)', level_order: 7 }
+        { id: 3, name: 'Coordenador', description: 'Coordenadores - acesso a exportação', level_order: 3 },
+        { id: 4, name: 'Instrutor', description: 'Instrutores - lançamentos e cadastros', level_order: 4 },
+        { id: 5, name: 'Músico', description: 'Músicos - leitura básica', level_order: 5 },
+        { id: 6, name: 'Candidato', description: 'Candidatos / Inscrição', level_order: 6 },
+        { id: 7, name: 'Membro', description: 'Membro padrão (legado)', level_order: 7 }
     ];
     var defaultSectors = [
         { name: 'Global' },
@@ -5655,6 +5677,218 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert) {
             return 'Administrativo';
         }
         return fallbackSector || 'InscriÃƒÂ§ÃƒÂ£o';
+    }
+
+    function normalizePendingText(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function resolvePendingComum(user) {
+        return user && user.review && user.review.comum
+            ? user.review.comum
+            : (user && user.comum ? user.comum : 'Sem comum informado');
+    }
+
+    function extractPendingComumCode(value) {
+        var match = String(value || '').toUpperCase().match(/(BR-\d{2}-\d{3,4})/);
+        return match && match[1] ? match[1] : '';
+    }
+
+    function resolvePendingMunicipio(user) {
+        var comum = resolvePendingComum(user);
+        var normalizedComum = normalizePendingText(comum);
+        var comumCode = extractPendingComumCode(comum);
+        var catalogEntry = null;
+
+        if (comumCode) {
+            catalogEntry = ($scope.comunsCatalog || []).find(function (item) {
+                return String(item && item.codigo || '').toUpperCase() === comumCode;
+            });
+        }
+
+        if (!catalogEntry && normalizedComum) {
+            catalogEntry = ($scope.comunsCatalog || []).find(function (item) {
+                return normalizePendingText(item.nome) === normalizedComum;
+            });
+        }
+
+        return (catalogEntry && catalogEntry.cidade) || 'Sem município';
+    }
+
+    function refreshPendingCommonOptions() {
+        var options = {};
+
+        angular.forEach($scope.pendingUsers || [], function (user) {
+            var comum = String(resolvePendingComum(user) || '').trim();
+
+            if (comum && normalizePendingText(comum) !== 'sem comum informado') {
+                options[comum] = true;
+            }
+        });
+
+        $scope.pendingCommonOptions = Object.keys(options).sort(function (a, b) {
+            return String(a || '').localeCompare(String(b || ''), 'pt-BR');
+        });
+        $scope.pendingFilterOptions = [{ value: '', label: 'Comum' }, { value: '__SEM_COMUM__', label: 'Sem comum' }]
+            .concat($scope.pendingCommonOptions.map(function (item) {
+                return { value: item, label: item };
+            }));
+    }
+
+    function getPendingRoleName(roleId) {
+        var match = ($scope.accessLevels || []).find(function (level) {
+            return Number(level.id) === Number(roleId);
+        });
+
+        return match ? match.name : 'Candidato';
+    }
+
+    function getPendingGroupLabel(user) {
+        return resolvePendingComum(user);
+    }
+
+    function sortPendingUsers(users) {
+        return (users || []).slice().sort(function (a, b) {
+            var municipioA = resolvePendingMunicipio(a);
+            var municipioB = resolvePendingMunicipio(b);
+            var comumA = getPendingGroupLabel(a);
+            var comumB = getPendingGroupLabel(b);
+            var compareMunicipio = String(municipioA || '').localeCompare(String(municipioB || ''), 'pt-BR');
+            if (compareMunicipio !== 0) {
+                return compareMunicipio;
+            }
+            var compareComum = String(comumA || '').localeCompare(String(comumB || ''), 'pt-BR');
+
+            if (compareComum !== 0) {
+                return compareComum;
+            }
+
+            return String(a.full_name || a.username || '').localeCompare(String(b.full_name || b.username || ''), 'pt-BR');
+        });
+    }
+
+    $scope.sortedPendingUsersByLatest = function () {
+        return ($scope.pendingUsers || []).slice().sort(function (a, b) {
+            var dateA = a && a.created_at ? new Date(a.created_at).getTime() : 0;
+            var dateB = b && b.created_at ? new Date(b.created_at).getTime() : 0;
+
+            if (dateB !== dateA) {
+                return dateB - dateA;
+            }
+
+            return String(a.full_name || a.username || '').localeCompare(String(b.full_name || b.username || ''), 'pt-BR');
+        });
+    };
+
+    function buildFilteredPendingUsers() {
+        var term = normalizePendingText(($scope.pendingFilters || {}).search);
+
+        return $scope.sortedPendingUsersByLatest().filter(function (user) {
+            var comum = resolvePendingComum(user);
+            var normalizedComum = normalizePendingText(comum);
+            var municipio = resolvePendingMunicipio(user);
+
+            if (($scope.pendingFilters || {}).comum === '__SEM_COMUM__' && normalizedComum !== 'sem comum informado') {
+                return false;
+            }
+
+            if (($scope.pendingFilters || {}).comum && ($scope.pendingFilters || {}).comum !== '__SEM_COMUM__' && comum !== ($scope.pendingFilters || {}).comum) {
+                return false;
+            }
+
+            if (!term) {
+                return true;
+            }
+
+            return normalizePendingText([
+                user.full_name,
+                user.username,
+                comum,
+                municipio,
+                user.review && user.review.cargo,
+                user.review && user.review.sector,
+                getPendingRoleName(user.review && user.review.role_id)
+            ].join(' ')).indexOf(term) !== -1;
+        });
+    }
+
+    function refreshFilteredPendingUsers() {
+        $scope.filteredPendingUsers = buildFilteredPendingUsers();
+        refreshPendingGroups();
+    }
+
+    $scope.getFilteredPendingUsers = function () {
+        return $scope.filteredPendingUsers || [];
+    };
+
+    function refreshPendingGroups() {
+        var municipioMap = {};
+        var municipioGroups = [];
+        var uniqueMunicipios = {};
+
+        angular.forEach(sortPendingUsers($scope.filteredPendingUsers), function (user) {
+            var municipioLabel = resolvePendingMunicipio(user);
+            var municipioKey = normalizePendingText(municipioLabel) || 'sem-municipio';
+            var groupLabel = getPendingGroupLabel(user);
+            var groupKey = normalizePendingText(groupLabel) || 'sem-comum';
+            var municipioGroup;
+
+            if (!municipioMap[municipioKey]) {
+                municipioMap[municipioKey] = {
+                    key: municipioKey,
+                    label: municipioLabel,
+                    comuns: [],
+                    comumMap: {},
+                    total: 0
+                };
+                municipioGroups.push(municipioMap[municipioKey]);
+                if (typeof $scope.collapsedPendingMunicipioGroups[municipioKey] === 'undefined') {
+                    $scope.collapsedPendingMunicipioGroups[municipioKey] = true;
+                }
+            }
+
+            municipioGroup = municipioMap[municipioKey];
+
+            if (!municipioGroup.comumMap[groupKey]) {
+                municipioGroup.comumMap[groupKey] = {
+                    key: groupKey,
+                    label: groupLabel,
+                    users: [],
+                    total: 0
+                };
+                municipioGroup.comuns.push(municipioGroup.comumMap[groupKey]);
+                if (typeof $scope.collapsedPendingComumGroups[groupKey] === 'undefined') {
+                    $scope.collapsedPendingComumGroups[groupKey] = true;
+                }
+            }
+
+            municipioGroup.comumMap[groupKey].users.push(user);
+            municipioGroup.comumMap[groupKey].total += 1;
+            municipioGroup.total += 1;
+            uniqueMunicipios[municipioKey] = true;
+        });
+
+        municipioGroups.forEach(function (municipioGroup) {
+            municipioGroup.comuns.sort(function (a, b) {
+                return String(a.label || '').localeCompare(String(b.label || ''), 'pt-BR');
+            });
+            delete municipioGroup.comumMap;
+        });
+
+        municipioGroups.sort(function (a, b) {
+            return String(a.label || '').localeCompare(String(b.label || ''), 'pt-BR');
+        });
+
+        $scope.pendingMunicipioGroups = municipioGroups;
+        $scope.pendingUserGroups = [].concat.apply([], municipioGroups.map(function (municipioGroup) {
+            return municipioGroup.comuns;
+        }));
+        $scope.pendingSummary.pending = ($scope.pendingUsers || []).length;
+        $scope.pendingSummary.municipios = Object.keys(uniqueMunicipios).length;
     }
 
     function prepareReview(user) {
@@ -5682,13 +5916,65 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert) {
         }
     };
 
+    $scope.formatPendingDisplayName = function (value) {
+        return String(value || 'Sem nome').toUpperCase();
+    };
+
+    $scope.getPendingMunicipioLabel = function (user) {
+        return resolvePendingMunicipio(user);
+    };
+
+    $scope.getPendingRoleName = function (roleId) {
+        return getPendingRoleName(roleId);
+    };
+
+    $scope.getPendingStatusLabelClass = function (user) {
+        var status = normalizePendingText(user && user.status);
+
+        if (status === 'approved' || status === 'liberado') {
+            return 'label-primary';
+        }
+
+        if (status === 'rejected' || status === 'recusado') {
+            return 'label-danger';
+        }
+
+        return 'label-warning';
+    };
+
+    $scope.setPendingViewMode = function (mode) {
+        $scope.viewMode = mode === 'list' ? 'list' : 'grouped';
+    };
+
+    $scope.togglePendingComumGroup = function (groupKey) {
+        $scope.collapsedPendingComumGroups[groupKey] = !$scope.collapsedPendingComumGroups[groupKey];
+    };
+
+    $scope.isPendingComumGroupCollapsed = function (groupKey) {
+        return !!$scope.collapsedPendingComumGroups[groupKey];
+    };
+
+    $scope.togglePendingMunicipioGroup = function (groupKey) {
+        $scope.collapsedPendingMunicipioGroups[groupKey] = !$scope.collapsedPendingMunicipioGroups[groupKey];
+    };
+
+    $scope.isPendingMunicipioGroupCollapsed = function (groupKey) {
+        return !!$scope.collapsedPendingMunicipioGroups[groupKey];
+    };
+
+    $scope.refreshPendingGroups = function () {
+        refreshFilteredPendingUsers();
+    };
+
     $scope.loadPendingUsers = function () {
         $scope.loading = true;
         $scope.error = null;
 
         AuthService.listPendingUsers()
             .then(function (users) {
-                $scope.pendingUsers = (users || []).map(prepareReview);
+                $scope.pendingUsers = sortPendingUsers((users || []).map(prepareReview));
+                refreshPendingCommonOptions();
+                refreshFilteredPendingUsers();
             })
             .catch(function (error) {
                 $scope.error = 'NÃƒÂ£o foi possÃƒÂ­vel carregar os usuÃƒÂ¡rios pendentes: ' + (error.message || error);
@@ -5710,6 +5996,23 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert) {
         }).catch(function () {
             $scope.sectors = angular.copy(defaultSectors);
         });
+
+        if (AuthService && typeof AuthService.listComunsCatalog === 'function') {
+            AuthService.listComunsCatalog().then(function (catalog) {
+                $scope.comunsCatalog = catalog || [];
+                refreshFilteredPendingUsers();
+            }).catch(function () {
+                $scope.comunsCatalog = [];
+            });
+        }
+
+        if (AuthService && typeof AuthService.getPendingUsersReviewSummary === 'function') {
+            AuthService.getPendingUsersReviewSummary().then(function (summary) {
+                $scope.pendingSummary.pending = summary.pending || 0;
+                $scope.pendingSummary.approved = summary.approved || 0;
+                $scope.pendingSummary.rejected = summary.rejected || 0;
+            });
+        }
     };
 
     function isSamePendingUser(item, target) {
@@ -5732,6 +6035,8 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert) {
         $scope.pendingUsers = ($scope.pendingUsers || []).filter(function (item) {
             return !isSamePendingUser(item, user);
         });
+        refreshPendingCommonOptions();
+        refreshFilteredPendingUsers();
         $rootScope.$broadcast('pendingUsersChanged');
     }
 
@@ -5796,6 +6101,118 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert) {
         });
     };
 
+    $scope.exportPendingToExcel = function () {
+        var data = ($scope.filteredPendingUsers || []).slice();
+        var rows = [[
+            'Nome',
+            'Usuário',
+            'Comum',
+            'Município',
+            'Permissão',
+            'Setor',
+            'Cargo',
+            'Cadastro',
+            'Status'
+        ]];
+        var ws;
+        var wb;
+
+        if (!window.XLSX || !window.XLSX.utils) {
+            SweetAlert.swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
+            return;
+        }
+
+        if (!data.length) {
+            SweetAlert.swal('Excel', 'Nenhum cadastro pendente foi encontrado para exportação com os filtros atuais.', 'warning');
+            return;
+        }
+
+        data.forEach(function (user) {
+            rows.push([
+                user.full_name || '-',
+                user.username || '-',
+                resolvePendingComum(user),
+                resolvePendingMunicipio(user),
+                getPendingRoleName(user.review && user.review.role_id),
+                (user.review && user.review.sector) || '-',
+                (user.review && user.review.cargo) || 'Sem cargo',
+                user.created_at ? $filter('date')(user.created_at, 'dd/MM/yyyy HH:mm') : '-',
+                user.status || 'pending'
+            ]);
+        });
+
+        ws = window.XLSX.utils.aoa_to_sheet(rows);
+        wb = window.XLSX.utils.book_new();
+        window.XLSX.utils.book_append_sheet(wb, ws, 'LiberacaoUsuarios');
+        window.XLSX.writeFile(wb, 'Liberacao_Usuarios_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    };
+
+    $scope.exportPendingToPDF = function () {
+        var data = ($scope.filteredPendingUsers || []).slice();
+        var generatedAt = new Date();
+        var body = [[
+            { text: 'Nome', style: 'tableHeader' },
+            { text: 'Comum', style: 'tableHeader' },
+            { text: 'Município', style: 'tableHeader' },
+            { text: 'Permissão', style: 'tableHeader' },
+            { text: 'Setor', style: 'tableHeader' },
+            { text: 'Cadastro', style: 'tableHeader' }
+        ]];
+
+        if (!window.pdfMake || typeof window.pdfMake.createPdf !== 'function') {
+            SweetAlert.swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
+            return;
+        }
+
+        if (!data.length) {
+            SweetAlert.swal('PDF', 'Nenhum cadastro pendente foi encontrado para exportação com os filtros atuais.', 'warning');
+            return;
+        }
+
+        data.forEach(function (user) {
+            body.push([
+                user.full_name || 'Sem nome',
+                resolvePendingComum(user),
+                resolvePendingMunicipio(user),
+                getPendingRoleName(user.review && user.review.role_id),
+                (user.review && user.review.sector) || '-',
+                user.created_at ? $filter('date')(user.created_at, 'dd/MM/yyyy HH:mm') : '-'
+            ]);
+        });
+
+        window.pdfMake.createPdf({
+            pageOrientation: 'landscape',
+            pageMargins: [24, 32, 24, 28],
+            content: [
+                { text: 'Liberação de Usuários', style: 'title' },
+                { text: 'Exportação conforme filtros aplicados na tela', style: 'subtitle' },
+                { text: 'Emitido em ' + $filter('date')(generatedAt, 'dd/MM/yyyy HH:mm'), style: 'metaInfo' },
+                {
+                    margin: [0, 12, 0, 0],
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', 110, 90, 90, 95],
+                        body: body
+                    },
+                    layout: 'lightHorizontalLines'
+                }
+            ],
+            styles: {
+                title: { fontSize: 18, bold: true, color: '#2f4050' },
+                subtitle: { fontSize: 10, color: '#6b7c93', margin: [0, 4, 0, 0] },
+                metaInfo: { fontSize: 9, color: '#8f9aa5', margin: [0, 4, 0, 0] },
+                tableHeader: { fillColor: '#1ab394', color: '#ffffff', bold: true, fontSize: 9 }
+            },
+            defaultStyle: {
+                fontSize: 9
+            }
+        }).download('Liberacao_Usuarios_' + $filter('date')(generatedAt, 'yyyy-MM-dd_HHmm') + '.pdf');
+    };
+
+    $scope.$watchGroup(['pendingFilters.comum', 'pendingFilters.search'], function () {
+        refreshFilteredPendingUsers();
+    });
+
 $scope.loadReferenceData();
 $scope.loadPendingUsers();
 }
@@ -5833,9 +6250,11 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
     $scope.searchText = '';
     $scope.roleFilter = '';
     $scope.statusFilter = '';
+    $scope.comumFilter = '';
     $scope.viewMode = 'grouped';
     $scope.groupBy = 'comum';
     $scope.collapsedUserGroups = {};
+    $scope.commonOptions = [];
     $scope.accessLevels = angular.copy(defaultAccessLevels);
     $scope.sectors = angular.copy(defaultSectors);
     $scope.selectedUserForm = null;
@@ -5949,6 +6368,22 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         refreshGroupedUsers();
     }
 
+    function refreshCommonOptions() {
+        var options = {};
+
+        angular.forEach($scope.users || [], function (user) {
+            var comum = String(user && user.comum || '').trim();
+
+            if (comum) {
+                options[comum] = true;
+            }
+        });
+
+        $scope.commonOptions = Object.keys(options).sort(function (a, b) {
+            return String(a || '').localeCompare(String(b || ''), 'pt-BR');
+        });
+    }
+
     function getUserGroupKey(user) {
         if ($scope.groupBy === 'status') {
             return user.uiStatus || 'inactive';
@@ -6020,6 +6455,11 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             return String(a.label || '').localeCompare(String(b.label || ''));
         });
 
+        $scope.collapsedUserGroups = {};
+        groups.forEach(function (group) {
+            $scope.collapsedUserGroups[group.key] = true;
+        });
+
         $scope.groupedUsers = groups;
     }
 
@@ -6056,6 +6496,14 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             return false;
         }
 
+        if ($scope.comumFilter === '__SEM_COMUM__') {
+            if (normalizeSearchValue(user.comum)) {
+                return false;
+            }
+        } else if ($scope.comumFilter && String(user.comum || '').trim() !== $scope.comumFilter) {
+            return false;
+        }
+
         if (!term) {
             return true;
         }
@@ -6064,7 +6512,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             user.full_name,
             user.username,
             user.email,
-            user.comum,
+            user.comum || 'sem comum',
             user.sector,
             user.cargo,
             user.role,
@@ -6108,6 +6556,139 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             return 'label-success';
         }
         return 'label-default';
+    };
+
+    function buildUserExportRows() {
+        return ($scope.filteredUsers || []).slice().sort(function (a, b) {
+            return String(a.full_name || a.username || '').localeCompare(String(b.full_name || b.username || ''), 'pt-BR');
+        });
+    }
+
+    $scope.exportToExcel = function () {
+        var data = buildUserExportRows();
+        var rows = [[
+            'Nome',
+            'Usuário',
+            'Permissão',
+            'Status',
+            'Setor',
+            'Comum',
+            'Cargo',
+            'Cadastro'
+        ]];
+        var ws;
+        var wb;
+
+        if (!window.XLSX || !window.XLSX.utils) {
+            SweetAlert.swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
+            return;
+        }
+
+        if (!data.length) {
+            SweetAlert.swal('Excel', 'Nenhum usuário foi encontrado para exportação com os filtros atuais.', 'warning');
+            return;
+        }
+
+        data.forEach(function (user) {
+            rows.push([
+                user.full_name || '-',
+                user.username || user.email || '-',
+                user.role || '-',
+                $scope.formatStatus(user.uiStatus || mapBackendStatusToUi(user.status)),
+                $scope.formatSectorLabel(user.sector),
+                user.comum || 'Sem comum',
+                user.cargo || 'Sem cargo',
+                user.created_at ? $filter('date')(user.created_at, 'dd/MM/yyyy HH:mm') : '-'
+            ]);
+        });
+
+        ws = window.XLSX.utils.aoa_to_sheet(rows);
+        wb = window.XLSX.utils.book_new();
+        window.XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
+        window.XLSX.writeFile(wb, 'Relatorio_Usuarios_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    };
+
+    $scope.exportToPDF = function () {
+        var rows = buildUserExportRows();
+        var generatedAt = new Date();
+        var body;
+
+        if (!window.pdfMake || typeof window.pdfMake.createPdf !== 'function') {
+            SweetAlert.swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
+            return;
+        }
+
+        if (!rows.length) {
+            SweetAlert.swal('PDF', 'Nenhum usuário foi encontrado para exportação com os filtros atuais.', 'warning');
+            return;
+        }
+
+        body = [[
+            { text: 'Nome', style: 'tableHeader' },
+            { text: 'Usuário', style: 'tableHeader' },
+            { text: 'Permissão', style: 'tableHeader' },
+            { text: 'Status', style: 'tableHeader' },
+            { text: 'Setor', style: 'tableHeader' },
+            { text: 'Comum', style: 'tableHeader' },
+            { text: 'Cadastro', style: 'tableHeader' }
+        ]];
+
+        rows.forEach(function (user) {
+            body.push([
+                user.full_name || 'Sem nome',
+                user.username || user.email || '-',
+                user.role || '-',
+                $scope.formatStatus(user.uiStatus || mapBackendStatusToUi(user.status)),
+                $scope.formatSectorLabel(user.sector),
+                user.comum || 'Sem comum',
+                user.created_at ? $filter('date')(user.created_at, 'dd/MM/yyyy HH:mm') : '-'
+            ]);
+        });
+
+        window.pdfMake.createPdf({
+            pageOrientation: 'landscape',
+            pageMargins: [24, 32, 24, 28],
+            content: [
+                { text: 'Usuários cadastrados no sistema', style: 'title' },
+                { text: 'Exportação conforme filtros aplicados na tela', style: 'subtitle' },
+                { text: 'Emitido em ' + $filter('date')(generatedAt, 'dd/MM/yyyy HH:mm'), style: 'metaInfo' },
+                {
+                    margin: [0, 12, 0, 0],
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', 88, 62, 72, '*', 82],
+                        body: body
+                    },
+                    layout: 'lightHorizontalLines'
+                }
+            ],
+            styles: {
+                title: {
+                    fontSize: 18,
+                    bold: true,
+                    color: '#2f4050'
+                },
+                subtitle: {
+                    fontSize: 10,
+                    color: '#6b7c93',
+                    margin: [0, 4, 0, 0]
+                },
+                metaInfo: {
+                    fontSize: 9,
+                    color: '#8f9aa5',
+                    margin: [0, 4, 0, 0]
+                },
+                tableHeader: {
+                    fillColor: '#1ab394',
+                    color: '#ffffff',
+                    bold: true,
+                    fontSize: 9
+                }
+            },
+            defaultStyle: {
+                fontSize: 9
+            }
+        }).download('Relatorio_Usuarios_' + $filter('date')(generatedAt, 'yyyy-MM-dd_HHmm') + '.pdf');
     };
 
     $scope.formatDate = function (value) {
@@ -6162,6 +6743,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         AuthService.listManagedUsers().then(function (users) {
             $scope.users = users || [];
             recalculateCounts();
+            refreshCommonOptions();
             refreshFilteredUsers();
         }).catch(function (error) {
             $scope.error = 'NÃ£o foi possÃ­vel carregar os usuÃ¡rios: ' + (error.message || error);
@@ -6239,6 +6821,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         }).then(function (users) {
             $scope.users = users || [];
             recalculateCounts();
+            refreshCommonOptions();
             refreshFilteredUsers();
             angular.element('#modalUserManagement').modal('hide');
             SweetAlert.swal('Sucesso', 'UsuÃ¡rio atualizado com sucesso.', 'success');
@@ -6279,6 +6862,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
                         return item.user_id !== user.user_id;
                     });
                     recalculateCounts();
+                    refreshCommonOptions();
                     refreshFilteredUsers();
                     SweetAlert.swal('ExcluÃ­do', 'O perfil do usuÃ¡rio foi removido.', 'success');
                 }).catch(function (error) {
@@ -6296,7 +6880,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         return !!$scope.collapsedUserGroups[groupKey];
     };
 
-    $scope.$watchGroup(['searchText', 'roleFilter', 'statusFilter', 'groupBy'], refreshFilteredUsers);
+    $scope.$watchGroup(['searchText', 'roleFilter', 'statusFilter', 'comumFilter', 'groupBy'], refreshFilteredUsers);
 
 $scope.loadReferenceData();
 syncMasterAccess();
@@ -6381,21 +6965,33 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
     function updateReferenceFilters() {
         var municipios = {};
         var ministerios = {};
+        var municipioKey;
+        var ministerioKey;
 
         angular.forEach($scope.registros, function (record) {
             if (record.municipio) {
-                municipios[record.municipio] = true;
+                municipioKey = normalizeMinisterioSearch(record.municipio);
+                if (municipioKey && !municipios[municipioKey]) {
+                    municipios[municipioKey] = record.municipio;
+                }
             }
 
             if (record.ministerio) {
-                ministerios[record.ministerio] = true;
+                ministerioKey = normalizeMinisterioSearch(record.ministerio);
+                if (ministerioKey && !ministerios[ministerioKey]) {
+                    ministerios[ministerioKey] = record.ministerio;
+                }
             }
         });
 
-        $scope.municipios = Object.keys(municipios).sort(function (a, b) {
+        $scope.municipios = Object.keys(municipios).map(function (key) {
+            return municipios[key];
+        }).sort(function (a, b) {
             return String(a).localeCompare(String(b), 'pt-BR');
         });
-        $scope.ministerios = Object.keys(ministerios).sort(function (a, b) {
+        $scope.ministerios = Object.keys(ministerios).map(function (key) {
+            return ministerios[key];
+        }).sort(function (a, b) {
             return String(a).localeCompare(String(b), 'pt-BR');
         });
     }
@@ -6508,6 +7104,11 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             }
 
             return String(a.label || '').localeCompare(String(b.label || ''), 'pt-BR');
+        });
+
+        $scope.collapsedMinisterioGroups = {};
+        groups.forEach(function (group) {
+            $scope.collapsedMinisterioGroups[group.key] = true;
         });
 
         $scope.groupedRegistros = groups;
@@ -6856,7 +7457,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
 
         SweetAlert.swal({
             title: 'Excluir registro?',
-            text: 'Esta aÃ§Ã£o remove o registro do ministÃ©rio regional selecionado.',
+            text: 'Excluir o cadastro de ' + (record.nome || record.comum || 'registro do minist\u00e9rio') + '? Esta a\u00e7\u00e3o remove o registro do minist\u00e9rio regional selecionado.',
             type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ed5565',

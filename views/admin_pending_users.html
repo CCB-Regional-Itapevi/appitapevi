@@ -1,3 +1,263 @@
+<style>
+    .pending-kpis .widget {
+        min-height: 104px;
+    }
+
+    .pending-kpis .vertical-align {
+        display: flex;
+        align-items: center;
+        min-height: 72px;
+    }
+
+    .pending-kpis .kpi-icon {
+        font-size: 48px;
+        line-height: 1;
+        margin-left: 4px;
+    }
+
+    .pending-group-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .pending-municipio-card {
+        border: 1px solid #e7eaec;
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .pending-municipio-header {
+        padding: 14px 18px;
+        background: #f3f6f9;
+        border-bottom: 1px solid #e7eaec;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .pending-toggle-btn {
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 30px;
+        align-self: center;
+    }
+
+    .pending-municipio-header-main {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .pending-municipio-header strong {
+        display: block;
+        font-size: 15px;
+        color: #2f4050;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+
+    .pending-header-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .pending-header-meta .label {
+        display: inline-block;
+        padding: 5px 9px;
+        font-size: 11px;
+        border-radius: 3px;
+    }
+
+    .pending-group-card {
+        border-top: 1px solid #eef2f6;
+    }
+
+    .pending-group-header {
+        padding: 14px 18px;
+        background: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .pending-group-header-main {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .pending-group-header strong {
+        display: block;
+        font-size: 16px;
+        color: #2f4050;
+        margin-bottom: 6px;
+    }
+
+    .pending-group-body {
+        padding: 0;
+    }
+
+    .pending-user-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 18px;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .pending-user-row:first-child {
+        border-top: 0;
+    }
+
+    .pending-user-main {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .pending-user-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2f4050;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 4px;
+    }
+
+    .pending-user-subline {
+        display: block;
+        color: #7f8c8d;
+        line-height: 1.45;
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    .pending-user-fields {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 10px 14px;
+    }
+
+    .pending-user-field .form-control,
+    .pending-user-field .label {
+        width: 100%;
+    }
+
+    .pending-user-field .label {
+        display: inline-block;
+        text-align: center;
+        padding: 6px 10px;
+        text-transform: uppercase;
+    }
+
+    .pending-user-field-label {
+        display: block;
+        font-size: 11px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 5px;
+    }
+
+    .pending-user-actions {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        min-width: 160px;
+    }
+
+    .pending-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin: 6px 0 14px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .pending-toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .pending-filter-row {
+        margin: 0 0 14px;
+    }
+
+    .pending-filter-row .form-control {
+        height: 34px;
+    }
+
+    .pending-list-table > thead > tr > th,
+    .pending-list-table > tbody > tr > td {
+        vertical-align: middle !important;
+    }
+
+    .pending-list-name {
+        font-weight: 700;
+        color: #2f4050;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .pending-list-secondary {
+        display: block;
+        color: #7f8c8d;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .pending-list-badges {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+    }
+
+    .pending-list-badges .label {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+    @media (max-width: 1199px) {
+        .pending-user-fields {
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+        }
+    }
+
+    @media (max-width: 991px) {
+        .pending-user-row {
+            flex-direction: column;
+        }
+
+        .pending-user-actions {
+            justify-content: flex-start;
+            min-width: 0;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .pending-user-fields {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
         <h2>Liberação de Usuários</h2>
@@ -30,16 +290,55 @@
                         {{error}}
                     </div>
 
-                    <div class="row" ng-if="!loading">
+                    <div class="row pending-kpis" ng-if="!loading">
                         <div class="col-sm-3">
                             <div class="widget style1 navy-bg">
                                 <div class="row vertical-align">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-user-plus fa-2x"></i>
+                                        <i class="fa fa-user-plus kpi-icon"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <span>Pendentes</span>
-                                        <h2 class="font-bold">{{pendingUsers.length}}</h2>
+                                        <h2 class="font-bold">{{pendingSummary.pending}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="widget style1 lazur-bg">
+                                <div class="row vertical-align">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-check-circle kpi-icon"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <span>Liberados</span>
+                                        <h2 class="font-bold">{{pendingSummary.approved}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="widget style1 yellow-bg">
+                                <div class="row vertical-align">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-times-circle kpi-icon"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <span>Recusados</span>
+                                        <h2 class="font-bold">{{pendingSummary.rejected}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="widget style1 red-bg">
+                                <div class="row vertical-align">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-map-marker kpi-icon"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <span>Municípios</span>
+                                        <h2 class="font-bold">{{pendingSummary.municipios}}</h2>
                                     </div>
                                 </div>
                             </div>
@@ -50,29 +349,165 @@
                         Não há usuários aguardando liberação neste momento.
                     </div>
 
-                    <div class="table-responsive" ng-if="!loading && pendingUsers.length">
-                        <table class="table table-striped table-hover">
+                    <div class="pending-toolbar" ng-if="!loading && pendingUsers.length">
+                        <div class="pending-toolbar-actions">
+                            <div class="btn-group btn-group-xs">
+                                <button type="button"
+                                        class="btn"
+                                        ng-class="viewMode === 'grouped' ? 'btn-primary' : 'btn-white'"
+                                        ng-click="setPendingViewMode('grouped')">
+                                    Agrupado
+                                </button>
+                                <button type="button"
+                                        class="btn"
+                                        ng-class="viewMode === 'list' ? 'btn-primary' : 'btn-white'"
+                                        ng-click="setPendingViewMode('list')">
+                                    Lista
+                                </button>
+                            </div>
+                            <button class="btn btn-primary btn-sm" type="button" ng-click="exportPendingToExcel()" style="background:#19bb9b;border-color:#19bb9b;">
+                                <i class="fa fa-file-excel-o"></i> Excel
+                            </button>
+                            <button class="btn btn-danger btn-sm" type="button" ng-click="exportPendingToPDF()" style="background:#ed5565;border-color:#ed5565;">
+                                <i class="fa fa-file-pdf-o"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row pending-filter-row" ng-if="!loading && pendingUsers.length">
+                        <div class="col-md-4 col-sm-6">
+                            <select class="form-control input-sm"
+                                    ng-model="pendingFilters.comum"
+                                    ng-options="option.value as option.label for option in pendingFilterOptions">
+                            </select>
+                        </div>
+                        <div class="col-md-4 col-sm-6" ng-if="viewMode === 'list'">
+                            <input type="text" class="form-control input-sm" ng-model="pendingFilters.search" placeholder="Buscar nome, usuário, comum ou município...">
+                        </div>
+                    </div>
+
+                    <div class="pending-group-list" ng-show="!loading && pendingUsers.length && viewMode !== 'list'">
+                        <div class="pending-municipio-card" ng-repeat="municipio in pendingMunicipioGroups track by municipio.key">
+                            <div class="pending-municipio-header" ng-click="togglePendingMunicipioGroup(municipio.key)">
+                                <div class="pending-municipio-header-main">
+                                    <strong>{{municipio.label}}</strong>
+                                    <div class="pending-header-meta">
+                                        <span class="label label-default">{{municipio.comuns.length}} comuns</span>
+                                        <span class="label label-info">{{municipio.total}} usuários</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-white btn-xs pending-toggle-btn">
+                                    <i class="fa" ng-class="isPendingMunicipioGroupCollapsed(municipio.key) ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+                                </button>
+                            </div>
+                            <div class="pending-municipio-body" ng-if="!isPendingMunicipioGroupCollapsed(municipio.key)">
+                                <div class="pending-group-card" ng-repeat="group in municipio.comuns track by group.key">
+                                    <div class="pending-group-header" ng-click="togglePendingComumGroup(group.key)">
+                                        <div class="pending-group-header-main">
+                                            <strong>{{group.label}}</strong>
+                                            <div class="pending-header-meta">
+                                            <span class="label label-default">{{group.total}} usuários</span>
+                                            <span class="label label-warning">{{group.total}} pendentes</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-white btn-xs pending-toggle-btn">
+                                            <i class="fa" ng-class="isPendingComumGroupCollapsed(group.key) ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+                                        </button>
+                                    </div>
+                                    <div class="pending-group-body" ng-if="!isPendingComumGroupCollapsed(group.key)">
+                                        <div class="pending-user-row" ng-repeat="user in group.users track by user.user_id">
+                                            <div class="pending-user-main">
+                                                <div class="pending-user-name">{{formatPendingDisplayName(user.full_name || 'Sem nome')}}</div>
+                                                <small class="pending-user-subline">
+                                                    {{user.username || '-'}}
+                                                    <span ng-if="user.created_at"> | Cadastro: {{user.created_at | date:'dd/MM/yyyy HH:mm'}}</span>
+                                                </small>
+
+                                                <div class="pending-user-fields">
+                                                    <div class="pending-user-field">
+                                                        <span class="pending-user-field-label">Comum</span>
+                                                        <input type="text" class="form-control input-sm" ng-model="user.review.comum" ng-change="refreshPendingGroups()" placeholder="Comum do usuário">
+                                                    </div>
+                                                    <div class="pending-user-field">
+                                                        <span class="pending-user-field-label">Permissão</span>
+                                                        <select class="form-control input-sm"
+                                                                ng-model="user.review.role_id"
+                                                                ng-options="level.id as level.name for level in accessLevels"
+                                                                ng-change="syncReviewByRole(user)">
+                                                            <option value="">Selecione a permissão</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="pending-user-field">
+                                                        <span class="pending-user-field-label">Setor</span>
+                                                        <select class="form-control input-sm"
+                                                                ng-model="user.review.sector"
+                                                                ng-options="sector.name as sector.name for sector in sectors"
+                                                                ng-disabled="user.review.role_id === 1 || user.review.role_id === 2">
+                                                        </select>
+                                                    </div>
+                                                    <div class="pending-user-field">
+                                                        <span class="pending-user-field-label">Cargo</span>
+                                                        <input type="text" class="form-control input-sm" ng-model="user.review.cargo" placeholder="Cargo exibido">
+                                                    </div>
+                                                    <div class="pending-user-field">
+                                                        <span class="pending-user-field-label">Status</span>
+                                                        <span class="label label-warning">{{user.status || 'pending'}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="pending-user-actions">
+                                                <button type="button"
+                                                        class="btn btn-primary btn-xs"
+                                                        ng-click="approveUser(user)"
+                                                        ng-disabled="user.processing">
+                                                    <i class="fa fa-check"></i> Liberar
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-danger btn-xs"
+                                                        ng-click="rejectUser(user)"
+                                                        ng-disabled="user.processing">
+                                                    <i class="fa fa-times"></i> Recusar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" ng-show="!loading && pendingUsers.length && viewMode === 'list'">
+                        <table class="table table-hover pending-list-table">
                             <thead>
                                 <tr>
-                                    <th>Usuário</th>
-                                    <th>Comum</th>
-                                    <th>Permissão</th>
-                                    <th>Setor</th>
-                                    <th>Cargo</th>
-                                    <th>Status</th>
-                                    <th class="text-center">Ações</th>
+                                    <th style="min-width: 260px;">Usuário</th>
+                                    <th style="min-width: 220px;">Comum</th>
+                                    <th style="min-width: 180px;">Município</th>
+                                    <th style="min-width: 170px;">Permissão</th>
+                                    <th style="min-width: 150px;">Setor</th>
+                                    <th style="min-width: 180px;">Cadastro</th>
+                                    <th style="width: 180px;" class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="user in pendingUsers track by user.user_id">
-                                    <td style="min-width: 260px;">
-                                        <strong>{{user.full_name || 'Sem nome'}}</strong><br>
-                                        <small class="text-muted">{{user.username || '-'}}</small>
+                                <tr ng-repeat="user in getFilteredPendingUsers() track by user.user_id">
+                                    <td>
+                                        <span class="pending-list-name">{{formatPendingDisplayName(user.full_name || 'Sem nome')}}</span>
+                                        <small class="pending-list-secondary">{{user.username || '-'}}</small>
+                                        <div class="pending-list-badges">
+                                            <span class="label" ng-class="getPendingStatusLabelClass(user)">{{user.status || 'pending'}}</span>
+                                            <span class="label label-info">{{getPendingRoleName(user.review.role_id)}}</span>
+                                            <span class="label label-default">{{user.review.comum || 'Sem comum informado'}}</span>
+                                        </div>
                                     </td>
-                                    <td style="min-width: 220px;">
-                                        <input type="text" class="form-control input-sm" ng-model="user.review.comum" placeholder="Comum do usuário">
+                                    <td>
+                                        <span class="label label-default">{{user.review.comum || 'Sem comum informado'}}</span>
                                     </td>
-                                    <td style="min-width: 180px;">
+                                    <td>
+                                        <span class="label label-info">{{getPendingMunicipioLabel(user)}}</span>
+                                    </td>
+                                    <td>
                                         <select class="form-control input-sm"
                                                 ng-model="user.review.role_id"
                                                 ng-options="level.id as level.name for level in accessLevels"
@@ -80,20 +515,18 @@
                                             <option value="">Selecione a permissão</option>
                                         </select>
                                     </td>
-                                    <td style="min-width: 180px;">
+                                    <td>
                                         <select class="form-control input-sm"
                                                 ng-model="user.review.sector"
                                                 ng-options="sector.name as sector.name for sector in sectors"
                                                 ng-disabled="user.review.role_id === 1 || user.review.role_id === 2">
                                         </select>
                                     </td>
-                                    <td style="min-width: 220px;">
-                                        <input type="text" class="form-control input-sm" ng-model="user.review.cargo" placeholder="Cargo exibido">
-                                    </td>
                                     <td>
-                                        <span class="label label-warning">{{user.status || 'pending'}}</span>
+                                        <span class="pending-list-name" style="font-size:13px; margin-bottom:2px; text-transform:none;">{{user.created_at | date:'dd/MM/yyyy'}}</span>
+                                        <small class="pending-list-secondary">{{user.created_at | date:'HH:mm:ss'}}</small>
                                     </td>
-                                    <td class="text-center" style="white-space: nowrap;">
+                                    <td class="text-center">
                                         <button type="button"
                                                 class="btn btn-primary btn-xs"
                                                 ng-click="approveUser(user)"
