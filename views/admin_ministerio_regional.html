@@ -418,12 +418,12 @@
                                             <span class="label"
                                                   ng-class="getRegistroStatusClass(record.status)"
                                                   ng-bind="formatRegistroStatus(record.status)"></span>
-                                            <span class="label label-info" ng-bind="formatMinisterioLabel(record.ministerio, 'Sem ministÃ©rio')"></span>
+                                            <span class="label label-info" ng-bind="formatMinisterioLabel(record.ministerio, 'Sem ministério')"></span>
                                         </div>
                                         <div class="ministerio-record-meta">
                                             <span class="label label-default" ng-bind="formatMinisterioLabel(record.comum, 'Sem comum')"></span>
-                                            <span class="label label-default" ng-bind="formatMinisterioLabel(record.municipio, 'Sem municÃ­pio')"></span>
-                                            <span class="label label-default" ng-bind="formatMinisterioLabel(record.administracao, 'Sem administraÃ§Ã£o')"></span>
+                                            <span class="label label-default" ng-bind="formatMinisterioLabel(record.municipio, 'Sem município')"></span>
+                                            <span class="label label-default" ng-bind="formatMinisterioLabel(record.administracao, 'Sem administração')"></span>
                                         </div>
                                         <small class="ministerio-record-subline" ng-bind="'RRM: ' + formatMinisterioLabel(record.rrm, 'Sem RRM')"></small>
                                         <small class="ministerio-record-subline" ng-bind="formatApresentacaoOrdenacao(record)"></small>
@@ -454,7 +454,7 @@
                                     <th style="min-width: 220px;">Ministério</th>
                                     <th style="min-width: 260px;">Comum / Administração</th>
                                     <th style="min-width: 240px;">RRM / Cadastro</th>
-                                    <th class="ministerio-coluna-acoes" style="width: 250px;">AÃ§Ãµes</th>
+                                    <th class="ministerio-coluna-acoes" style="width: 250px;">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -482,11 +482,11 @@
                                     </td>
                                     <td class="project-people ministerio-celula">
                                         <span class="ministerio-linha-principal" ng-bind="formatMinisterioLabel(record.comum, 'Sem comum')"></span>
-                                        <small class="text-muted ministerio-linha-secundaria" ng-bind="formatMinisterioLabel(record.municipio, 'Sem municÃ­pio') + ' / ' + formatMinisterioLabel(record.administracao, 'Sem administraÃ§Ã£o')"></small>
+                                        <small class="text-muted ministerio-linha-secundaria" ng-bind="formatMinisterioLabel(record.municipio, 'Sem município') + ' / ' + formatMinisterioLabel(record.administracao, 'Sem administração')"></small>
                                     </td>
                                     <td class="project-people ministerio-celula">
                                         <span class="ministerio-linha-principal" ng-bind="formatMinisterioLabel(record.rrm, 'Sem RRM')"></span>
-                                        <small class="text-muted ministerio-linha-secundaria" ng-bind="'ApresentaÃ§Ã£o: ' + formatMinisterioDate(record.data_apresentacao) + ' | Cadastro completo: ' + formatBooleanLabel(record.cadastro_completo)"></small>
+                                        <small class="text-muted ministerio-linha-secundaria" ng-bind="'Apresentação: ' + formatMinisterioDate(record.data_apresentacao) + ' | Cadastro completo: ' + formatBooleanLabel(record.cadastro_completo)"></small>
                                     </td>
                                     <td class="project-actions ministerio-celula-acoes">
                                         <div>
@@ -553,11 +553,11 @@
                             </div>
 
                             <div class="col-sm-4 form-group">
-                                <label>Data de ApresentaÃ§Ã£o</label>
+                                <label>Data de Apresentação</label>
                                 <input type="date" ng-model="selectedRegistroForm.data_apresentacao" class="form-control">
                             </div>
                             <div class="col-sm-4 form-group">
-                                <label>Data de OrdenaÃ§Ã£o</label>
+                                <label>Data de Ordenação</label>
                                 <input type="date" ng-model="selectedRegistroForm.data_ordenacao" class="form-control">
                             </div>
                             <div class="col-sm-4 form-group">
@@ -591,18 +591,18 @@
                                 <label>Cadastro Completo</label>
                                 <select class="form-control" ng-model="selectedRegistroForm.cadastro_completo">
                                     <option ng-value="true">Sim</option>
-                                    <option ng-value="false">NÃ£o</option>
+                                    <option ng-value="false">Não</option>
                                 </select>
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Possui Foto</label>
                                 <select class="form-control" ng-model="selectedRegistroForm.possui_foto">
                                     <option ng-value="true">Sim</option>
-                                    <option ng-value="false">NÃ£o</option>
+                                    <option ng-value="false">Não</option>
                                 </select>
                             </div>
                             <div class="col-sm-12 form-group">
-                                <label>ObservaÃ§Ãµes</label>
+                                <label>Observações</label>
                                 <textarea class="form-control" rows="4" ng-model="selectedRegistroForm.observacoes"></textarea>
                             </div>
                         </div>
@@ -612,7 +612,7 @@
                     <button type="button" class="btn btn-white" data-dismiss="modal">{{viewOnlyRegistro ? 'Voltar' : 'Fechar'}}</button>
                     <button type="button" class="btn btn-primary" style="background:#1ab394; border-color:#1ab394;"
                             ng-if="!viewOnlyRegistro" ng-click="saveRegistro()" ng-disabled="savingRegistro || !canManageMinisterio">
-                        <i class="fa fa-save"></i> Salvar alteraÃ§Ãµes
+                        <i class="fa fa-save"></i> Salvar alterações
                     </button>
                 </div>
             </div>

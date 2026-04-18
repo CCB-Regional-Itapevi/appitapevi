@@ -558,6 +558,18 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             data: { pageTitle: 'Lançamentos de Visitas' },
             controller: 'visitasLancamentosCtrl'
         })
+        .state('visitas.visitados', {
+            url: "/visitados",
+            templateUrl: "views/visitas_visitados.html?v=1.0.0",
+            data: { pageTitle: 'Cadastro de Visitados' },
+            controller: 'visitasVisitadosCtrl'
+        })
+        .state('visitas.grupos', {
+            url: "/grupos",
+            templateUrl: "views/visitas_grupos.html?v=1.0.0",
+            data: { pageTitle: 'Grupos de Visita' },
+            controller: 'visitasGruposCtrl'
+        })
         .state('visitas.irmandade', {
             url: "/irmandade",
             templateUrl: "views/visitas_dashboard.html?v=1.1.12",
@@ -1819,7 +1831,7 @@ angular
         var sessionKey = 'sb-sqamxlhfazulrisiptud-auth-token';
         var activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
 
-        // Restaura a sessÃ£o do Supabase ao carregar a pÃ¡gina
+        // Restaura a sessão do Supabase ao carregar a página
         function normalizeAccessKey(value) {
             return String(value || '')
                 .normalize('NFD')
@@ -2072,8 +2084,8 @@ angular
             $rootScope.currentUserResolved = true;
         });
 
-        // Protege as rotas - verificaÃ§Ã£o SOMENTE sÃ­ncrona (localStorage)
-        // para evitar loop de navegaÃ§Ã£o causado por chamadas async dentro de $stateChangeStart
+        // Protege as rotas - verificação SOMENTE síncrona (localStorage)
+        // para evitar loop de navegação causado por chamadas async dentro de $stateChangeStart
         $rootScope.$on('$stateChangeStart', function (event, toState) {
             if (typeof $window.cleanupBootstrapModalState === 'function') {
                 $window.cleanupBootstrapModalState();
@@ -2084,7 +2096,7 @@ angular
                                 toState.name === 'forgot_password' ||
                                 toState.name === 'landing';
 
-            if (isPublicState) return; // Sempre permite pÃ¡ginas pÃºblicas
+            if (isPublicState) return; // Sempre permite páginas públicas
 
             var hasCurrentUser = !!$rootScope.currentUser;
             var hasLocalSession = !!localStorage.getItem(sessionKey);

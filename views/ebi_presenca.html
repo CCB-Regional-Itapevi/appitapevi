@@ -272,7 +272,7 @@
                                                             <td class="text-center">{{ item.dataEsperadaLabel || '-' }}</td>
                                                             <td class="text-center">
                                                                 <span class="ebi-status-badge"
-                                                                        ng-class="{'ebi-status-ok': formatEbiStatusLabel(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusLabel(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusLabel(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusLabel(item.status) === 'CRÍTICO', 'ebi-status-muted': formatEbiStatusLabel(item.status) === 'SEM HISTÓRICO'}">
+                                                                        ng-class="{'ebi-status-ok': formatEbiStatusKey(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusKey(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusKey(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusKey(item.status) === 'CRITICO', 'ebi-status-muted': formatEbiStatusKey(item.status) === 'SEM HISTORICO'}">
                                                                     {{ formatEbiStatusLabel(item.status) }}
                                                                 </span>
                                                                 <div><small class="text-muted">{{ item.statusDetail }}</small></div>
@@ -388,7 +388,7 @@
                                             <td class="text-center">{{ item.weekdayLabel }}</td>
                                             <td class="text-center">
                                                 <span class="ebi-status-badge"
-                                                        ng-class="{'ebi-status-ok': formatEbiStatusLabel(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusLabel(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusLabel(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusLabel(item.status) === 'CRÍTICO', 'ebi-status-muted': formatEbiStatusLabel(item.status) === 'SEM HISTÓRICO'}">
+                                                        ng-class="{'ebi-status-ok': formatEbiStatusKey(item.status) === 'EM DIA', 'ebi-status-today': formatEbiStatusKey(item.status) === 'HOJE', 'ebi-status-warn': formatEbiStatusKey(item.status) === 'PENDENTE', 'ebi-status-danger': formatEbiStatusKey(item.status) === 'CRITICO', 'ebi-status-muted': formatEbiStatusKey(item.status) === 'SEM HISTORICO'}">
                                                     {{ formatEbiStatusLabel(item.status) }}
                                                 </span>
                                             </td>

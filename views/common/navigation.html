@@ -79,6 +79,8 @@
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('visitas')}">
                     <li ui-sref-active="active"><a ui-sref="visitas.dashboard">Dashboard Visitas</a></li>
                     <li ui-sref-active="active"><a ui-sref="visitas.lancamentos">Lan&ccedil;amentos</a></li>
+                    <li ui-sref-active="active"><a ui-sref="visitas.visitados">Visitados</a></li>
+                    <li ui-sref-active="active"><a ui-sref="visitas.grupos">Grupos de Visita</a></li>
                 </ul>
             </li>
 
@@ -100,9 +102,9 @@
                 <a href="" data-mobile-sref="darpe.musicos"><i class="fa fa-medkit"></i> <span class="nav-label">{{ 'D.A.R.P.E' | translate }}
                     </span><span class="label label-info pull-right">NOVO</span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('darpe')}">
-                    <li ui-sref-active="active"><a ui-sref="darpe.musicos">MÃºsicos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="darpe.clinicas">ClÃ­nicas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="darpe.ministerio">MinistÃ©rio</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.musicos">Músicos</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.clinicas">Clínicas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.ministerio">Ministério</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.atendimentos">Atendimentos</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.membros">Membros</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.batismos">Batismos</a></li>
@@ -113,9 +115,9 @@
                 <a href="" data-mobile-sref="depac.musicos"><i class="fa-solid fa-hands"></i> <span class="nav-label">{{ 'D.E.P.A.C' | translate }}
                     </span><span class="label label-info pull-right">NOVO</span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('depac')}">
-                    <li ui-sref-active="active"><a ui-sref="depac.musicos">MÃºsicos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.clinicas">ClÃ­nicas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.ministerio">MinistÃ©rio</a></li>
+                    <li ui-sref-active="active"><a ui-sref="depac.musicos">Músicos</a></li>
+                    <li ui-sref-active="active"><a ui-sref="depac.clinicas">Clínicas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="depac.ministerio">Ministério</a></li>
                     <li ui-sref-active="active"><a ui-sref="depac.atendimentos">Atendimentos</a></li>
                     <li ui-sref-active="active"><a ui-sref="depac.membros">Membros</a></li>
                     <li ui-sref-active="active"><a ui-sref="depac.batismos">Batismos</a></li>
@@ -127,7 +129,7 @@
                         class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('forms')}">
                     <li ui-sref-active="active"><a ui-sref="forms.basic_form">Alunos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="forms.advanced_plugins">HistÃ³rico de Aulas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="forms.advanced_plugins">Histórico de Aulas</a></li>
                     <li ui-sref-active="active"><a ui-sref="forms.wizard.step_one">Planos de Aula</a></li>
                     <li ui-sref-active="active"><a ui-sref="forms.file_upload">Turmas</a></li>
                 </ul>
@@ -149,7 +151,7 @@
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('music')}">
                     <li ui-sref-active="active"><a ui-sref="music.static_table">Ensaios Regionais</a></li>
                     <li ui-sref-active="active"><a ui-sref="music.data_tables">Exames / Testes</a></li>
-                    <li ui-sref-active="active"><a ui-sref="music.foo_table">MÃºsicos</a></li>
+                    <li ui-sref-active="active"><a ui-sref="music.foo_table">Músicos</a></li>
                     <li ui-sref-active="active"><a ui-sref="music.nggrid">Organistas</a></li>
                     <li ui-sref-active="active"><a ui-sref="music.nggrid">Candidatos</a></li>
                 </ul>
@@ -171,11 +173,11 @@
                         }}</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('tables')}">
                     <li ui-sref-active="active"><a ui-sref="tables.static_table">Entrada</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de ServiÃ§os</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de Serviços</a></li>
                     <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de Compra</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">InventÃ¡rio</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">ManutenÃ§Ã£o</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.data_tables">SaÃ­da</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Inventário</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Manutenção</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.data_tables">Saída</a></li>
                 </ul>
             </li>
 

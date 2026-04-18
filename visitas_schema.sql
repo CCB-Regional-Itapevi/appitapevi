@@ -212,11 +212,127 @@ begin
 end;
 $$;
 
+create table if not exists public.visitas_grupos (
+    id uuid primary key default gen_random_uuid(),
+    nome text not null,
+    municipio text not null,
+    comum_base text null,
+    codigo_comum text null,
+    lider_nome text null,
+    lider_telefone text null,
+    dia_visita text null,
+    periodicidade text not null default 'Semanal',
+    capacidade int not null default 0 check (capacidade >= 0),
+    status text not null default 'Ativo',
+    observacoes text null,
+    created_at timestamptz not null default timezone('utc', now()),
+    updated_at timestamptz not null default timezone('utc', now()),
+    created_by uuid null,
+    updated_by uuid null
+);
+
+create index if not exists idx_visitas_grupos_municipio
+    on public.visitas_grupos (municipio);
+
+create index if not exists idx_visitas_grupos_status
+    on public.visitas_grupos (status);
+
+create index if not exists idx_visitas_grupos_nome
+    on public.visitas_grupos (nome);
+
+create table if not exists public.visitas_visitados (
+    id uuid primary key default gen_random_uuid(),
+    nome text not null,
+    sexo text null,
+    municipio text not null,
+    comum text null,
+    codigo_comum text null,
+    bairro text null,
+    endereco text null,
+    telefone text null,
+    grupo_id uuid null references public.visitas_grupos(id) on delete set null,
+    grupo_nome text null,
+    status text not null default 'Ativo',
+    data_inicio_acompanhamento date null,
+    ultima_visita date null,
+    observacoes text null,
+    created_at timestamptz not null default timezone('utc', now()),
+    updated_at timestamptz not null default timezone('utc', now()),
+    created_by uuid null,
+    updated_by uuid null
+);
+
+create index if not exists idx_visitas_visitados_municipio
+    on public.visitas_visitados (municipio);
+
+create index if not exists idx_visitas_visitados_status
+    on public.visitas_visitados (status);
+
+create index if not exists idx_visitas_visitados_nome
+    on public.visitas_visitados (nome);
+
+create index if not exists idx_visitas_visitados_grupo_id
+    on public.visitas_visitados (grupo_id);
+
+create or replace function public.set_visitas_grupos_audit_fields()
+returns trigger
+language plpgsql
+as $$
+begin
+    if tg_op = 'INSERT' then
+        new.created_at = coalesce(new.created_at, timezone('utc', now()));
+        new.created_by = coalesce(new.created_by, auth.uid());
+    end if;
+
+    new.nome = nullif(btrim(coalesce(new.nome, '')), '');
+    new.municipio = nullif(btrim(coalesce(new.municipio, '')), '');
+    new.comum_base = nullif(btrim(coalesce(new.comum_base, '')), '');
+    new.codigo_comum = nullif(btrim(coalesce(new.codigo_comum, '')), '');
+    new.lider_nome = nullif(btrim(coalesce(new.lider_nome, '')), '');
+    new.lider_telefone = nullif(btrim(coalesce(new.lider_telefone, '')), '');
+    new.dia_visita = nullif(btrim(coalesce(new.dia_visita, '')), '');
+    new.periodicidade = coalesce(nullif(btrim(coalesce(new.periodicidade, '')), ''), 'Semanal');
+    new.status = coalesce(nullif(btrim(coalesce(new.status, '')), ''), 'Ativo');
+    new.capacidade = greatest(coalesce(new.capacidade, 0), 0);
+    new.updated_at = timezone('utc', now());
+    new.updated_by = auth.uid();
+
+    return new;
+end;
+$$;
+
+create or replace function public.set_visitas_visitados_audit_fields()
+returns trigger
+language plpgsql
+as $$
+begin
+    if tg_op = 'INSERT' then
+        new.created_at = coalesce(new.created_at, timezone('utc', now()));
+        new.created_by = coalesce(new.created_by, auth.uid());
+    end if;
+
+    new.nome = nullif(btrim(coalesce(new.nome, '')), '');
+    new.sexo = nullif(btrim(coalesce(new.sexo, '')), '');
+    new.municipio = nullif(btrim(coalesce(new.municipio, '')), '');
+    new.comum = nullif(btrim(coalesce(new.comum, '')), '');
+    new.codigo_comum = nullif(btrim(coalesce(new.codigo_comum, '')), '');
+    new.bairro = nullif(btrim(coalesce(new.bairro, '')), '');
+    new.endereco = nullif(btrim(coalesce(new.endereco, '')), '');
+    new.telefone = nullif(btrim(coalesce(new.telefone, '')), '');
+    new.grupo_nome = nullif(btrim(coalesce(new.grupo_nome, '')), '');
+    new.status = coalesce(nullif(btrim(coalesce(new.status, '')), ''), 'Ativo');
+    new.updated_at = timezone('utc', now());
+    new.updated_by = auth.uid();
+
+    return new;
+end;
+$$;
+
 do $$
 declare
-    visitas_comuns_kind "char";
+    visitas_comuns_kind text;
 begin
-    select c.relkind
+    select c.relkind::text
     into visitas_comuns_kind
     from pg_class c
     join pg_namespace n on n.oid = c.relnamespace
@@ -288,6 +404,18 @@ before insert or update on public.visitas_lancamentos
 for each row
 execute function public.set_visitas_lancamentos_audit_fields();
 
+drop trigger if exists trg_visitas_grupos_audit_fields on public.visitas_grupos;
+create trigger trg_visitas_grupos_audit_fields
+before insert or update on public.visitas_grupos
+for each row
+execute function public.set_visitas_grupos_audit_fields();
+
+drop trigger if exists trg_visitas_visitados_audit_fields on public.visitas_visitados;
+create trigger trg_visitas_visitados_audit_fields
+before insert or update on public.visitas_visitados
+for each row
+execute function public.set_visitas_visitados_audit_fields();
+
 update public.visitas_lancamentos
 set
     data_lancamento = coalesce(data_lancamento, current_date),
@@ -321,10 +449,16 @@ where translate(lower(unaccent(coalesce(sector, ''))), 's', '') = 'viita';
 
 grant all on table public.visitas_lancamentos to authenticated;
 grant all on table public.visitas_lancamentos to service_role;
+grant all on table public.visitas_grupos to authenticated;
+grant all on table public.visitas_grupos to service_role;
+grant all on table public.visitas_visitados to authenticated;
+grant all on table public.visitas_visitados to service_role;
 grant select on public.visitas_comuns to authenticated;
 grant select on public.visitas_comuns to service_role;
 
 alter table public.visitas_lancamentos enable row level security;
+alter table public.visitas_grupos enable row level security;
+alter table public.visitas_visitados enable row level security;
 
 drop policy if exists visitas_lancamentos_select_authenticated on public.visitas_lancamentos;
 create policy visitas_lancamentos_select_authenticated
@@ -351,6 +485,64 @@ with check (public.can_manage_visitas());
 drop policy if exists visitas_lancamentos_delete_authenticated on public.visitas_lancamentos;
 create policy visitas_lancamentos_delete_authenticated
 on public.visitas_lancamentos
+for delete
+to authenticated
+using (public.can_manage_visitas());
+
+drop policy if exists visitas_grupos_select_authenticated on public.visitas_grupos;
+create policy visitas_grupos_select_authenticated
+on public.visitas_grupos
+for select
+to authenticated
+using (true);
+
+drop policy if exists visitas_grupos_insert_authenticated on public.visitas_grupos;
+create policy visitas_grupos_insert_authenticated
+on public.visitas_grupos
+for insert
+to authenticated
+with check (public.can_manage_visitas());
+
+drop policy if exists visitas_grupos_update_authenticated on public.visitas_grupos;
+create policy visitas_grupos_update_authenticated
+on public.visitas_grupos
+for update
+to authenticated
+using (public.can_manage_visitas())
+with check (public.can_manage_visitas());
+
+drop policy if exists visitas_grupos_delete_authenticated on public.visitas_grupos;
+create policy visitas_grupos_delete_authenticated
+on public.visitas_grupos
+for delete
+to authenticated
+using (public.can_manage_visitas());
+
+drop policy if exists visitas_visitados_select_authenticated on public.visitas_visitados;
+create policy visitas_visitados_select_authenticated
+on public.visitas_visitados
+for select
+to authenticated
+using (true);
+
+drop policy if exists visitas_visitados_insert_authenticated on public.visitas_visitados;
+create policy visitas_visitados_insert_authenticated
+on public.visitas_visitados
+for insert
+to authenticated
+with check (public.can_manage_visitas());
+
+drop policy if exists visitas_visitados_update_authenticated on public.visitas_visitados;
+create policy visitas_visitados_update_authenticated
+on public.visitas_visitados
+for update
+to authenticated
+using (public.can_manage_visitas())
+with check (public.can_manage_visitas());
+
+drop policy if exists visitas_visitados_delete_authenticated on public.visitas_visitados;
+create policy visitas_visitados_delete_authenticated
+on public.visitas_visitados
 for delete
 to authenticated
 using (public.can_manage_visitas());

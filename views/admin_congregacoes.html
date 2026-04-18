@@ -339,11 +339,11 @@
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
-        <h2>CongregaÃ§Ãµes</h2>
+        <h2>Congregações</h2>
         <ol class="breadcrumb">
             <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
-            <li><a ui-sref="admin.user_approvals">AdministraÃ§Ã£o</a></li>
-            <li class="active"><strong>CongregaÃ§Ãµes</strong></li>
+            <li><a ui-sref="admin.user_approvals">Administração</a></li>
+            <li class="active"><strong>Congregações</strong></li>
         </ol>
     </div>
 </div>
@@ -353,7 +353,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>CongregaÃ§Ãµes cadastradas</h5>
+                    <h5>Congregações cadastradas</h5>
                     <div class="ibox-tools">
                         <button class="btn btn-primary btn-xs" type="button" ng-click="loadCongregacoes()" ng-disabled="loading">
                             <i class="fa fa-refresh"></i> Atualizar
@@ -528,14 +528,14 @@
                             <tbody>
                                 <tr ng-repeat="record in filteredRegistros track by (record.id || (record.nome + record.cidade))">
                                     <td class="project-status congregacoes-celula">
-                                        <span class="label label-primary" ng-bind="formatCongregacaoLabel(record.cidade, 'SEM MUNICÃPIO')"></span>
+                                        <span class="label label-primary" ng-bind="formatCongregacaoLabel(record.cidade, 'SEM MUNICÍPIO')"></span>
                                     </td>
                                     <td class="project-title congregacoes-celula">
                                         <a href="" ng-click="openView(record)" ng-bind="formatCongregacaoLabel(record.nome, 'SEM NOME')"></a>
                                         <small class="text-muted congregacoes-linha-secundaria" ng-bind="'ID: ' + ((record.id || '-') | limitTo:8)"></small>
                                     </td>
                                     <td class="project-completion congregacoes-celula">
-                                        <small ng-bind="formatCongregacaoLabel(record.codigo, 'SEM CÃ“DIGO')"></small>
+                                        <small ng-bind="formatCongregacaoLabel(record.codigo, 'SEM CÓDIGO')"></small>
                                         <div class="progress progress-mini">
                                             <div class="progress-bar progress-bar-info"
                                                  ng-style="{ width: getCongregacaoProgress(record) + '%' }"></div>
@@ -590,11 +590,11 @@
                         <input type="text" class="form-control" ng-model="selectedCongregacao.cidade" ng-readonly="viewOnlyCongregacao">
                     </div>
                     <div class="form-group">
-                        <label>CÃ³digo</label>
-                        <input type="text" class="form-control" ng-value="formatCongregacaoLabel(selectedCongregacao.codigo, 'SEM CÃ“DIGO')" readonly>
+                        <label>Código</label>
+                        <input type="text" class="form-control" ng-value="formatCongregacaoLabel(selectedCongregacao.codigo, 'SEM CÓDIGO')" readonly>
                     </div>
                     <div class="form-group">
-                        <label>AdministraÃ§Ã£o</label>
+                        <label>Administração</label>
                         <input type="text" class="form-control" ng-model="selectedCongregacao.administracao" ng-readonly="viewOnlyCongregacao">
                     </div>
                     <div class="form-group">
@@ -609,7 +609,7 @@
                                     Visualize abaixo quem faz parte desta comum.
                                 </p>
                                 <p class="text-muted" ng-if="!selectedCongregacao || !selectedCongregacao.servos || !selectedCongregacao.servos.length">
-                                    Ainda nÃ£o hÃ¡ servos vinculados a esta comum.
+                                    Ainda não há servos vinculados a esta comum.
                                 </p>
                             </div>
                         </div>
@@ -655,7 +655,7 @@
                     <button type="button" class="btn btn-white" data-dismiss="modal">Fechar</button>
                     <button type="button" class="btn btn-primary" style="background:#1ab394; border-color:#1ab394;"
                             ng-if="!viewOnlyCongregacao" ng-click="saveCongregacao()" ng-disabled="savingCongregacao || !canManageCongregacoes">
-                        <i class="fa fa-save"></i> Salvar alteraÃ§Ãµes
+                        <i class="fa fa-save"></i> Salvar alterações
                     </button>
                 </div>
             </div>

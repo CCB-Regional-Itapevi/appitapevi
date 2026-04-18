@@ -218,14 +218,14 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
         var labels = {
             global: 'Acesso Global',
             administrativo: 'Administrativo',
-            musicalizacao: 'SecretÃ¡rio(a) da MusicalizaÃ§Ã£o',
-            musica: 'SecretÃ¡rio(a) da MÃºsica',
-            ebi: 'SecretÃ¡rio(a) da EBI',
-            rjm: 'SecretÃ¡rio(a) da RJM',
-            visitas: 'SecretÃ¡rio(a) de Visitas',
-            darpe: 'SecretÃ¡rio(a) da D.A.R.P.E',
-            depac: 'SecretÃ¡rio(a) da D.E.P.A.C',
-            gem: 'SecretÃ¡rio(a) da G.E.M',
+            musicalizacao: 'Secretário(a) da Musicalização',
+            musica: 'Secretário(a) da Música',
+            ebi: 'Secretário(a) da EBI',
+            rjm: 'Secretário(a) da RJM',
+            visitas: 'Secretário(a) de Visitas',
+            darpe: 'Secretário(a) da D.A.R.P.E',
+            depac: 'Secretário(a) da D.E.P.A.C',
+            gem: 'Secretário(a) da G.E.M',
             master: 'Master',
             admin: 'Admin',
             manager: 'Gestor(a) do Sistema',
@@ -234,11 +234,11 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
             member: 'Membro'
         };
 
-        return labels[normalized] || value || 'UsuÃ¡rio do Sistema';
+        return labels[normalized] || value || 'Usuário do Sistema';
     }
 
     function resolveUserDisplayName(user) {
-        return getTrimmedValue(user.full_name, user.email, 'UsuÃ¡rio');
+        return getTrimmedValue(user.full_name, user.email, 'Usuário');
     }
 
     function resolveCanonicalRole(user) {
@@ -249,7 +249,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
             2: 'Admin',
             3: 'Coordenador',
             4: 'Instrutor',
-            5: 'MÃºsico',
+            5: 'Músico',
             6: 'Candidato',
             7: 'Membro'
         };
@@ -259,7 +259,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
             coordenador: 'Coordenador',
             coordinator: 'Coordenador',
             instrutor: 'Instrutor',
-            musico: 'MÃºsico',
+            musico: 'Músico',
             candidato: 'Candidato',
             membro: 'Membro',
             member: 'Membro'
@@ -328,7 +328,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
         }
 
         if (parsedRoleId === 1 || parsedRoleId === 2) {
-            return canonicalRole || 'UsuÃ¡rio do Sistema';
+            return canonicalRole || 'Usuário do Sistema';
         }
 
         if (canonicalRole) {
@@ -350,7 +350,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
         var resolved = !!$rootScope.currentUserResolved;
         main.currentUser = user;
         main.userDisplayName = resolved ? resolveUserDisplayName(user) : '';
-        main.userFirstName = String(main.userDisplayName).split(/\s+/)[0] || 'UsuÃ¡rio';
+        main.userFirstName = String(main.userDisplayName).split(/\s+/)[0] || 'Usuário';
         main.userRoleLabel = resolved ? resolveUserRoleLabel(user) : '';
         main.currentUserReady = resolved;
         main.userAvatar = resolved ? resolveUserAvatar(user) : DEFAULT_AVATAR_URL;
@@ -367,7 +367,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
         if (!main.currentUserReady) {
             return '';
         }
-        return main.userFirstName || String(this.getUserDisplayName()).split(/\s+/)[0] || 'UsuÃ¡rio';
+        return main.userFirstName || String(this.getUserDisplayName()).split(/\s+/)[0] || 'Usuário';
     };
 
     this.getUserRoleLabel = function () {
@@ -448,7 +448,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
         var role = AuthService.getCurrentUserRole();
         var currentUserId = currentUser.user_id || null;
 
-        // Apenas MASTER (1) e ADMIN (2) enxergam pendÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âªncias globais
+        // Apenas MASTER (1) e ADMIN (2) enxergam pendÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šªncias globais
         if (role !== null && role <= 2) {
             AuthService.countPendingUsers().then(function (res) {
                 $scope.$applyAsync(function () {
@@ -920,21 +920,21 @@ function profileCtrl($scope, $rootScope, AuthService) {
         var sector = String($scope.profile.sector || '').trim().toLowerCase();
         var role = String($scope.profile.role || '').trim().toLowerCase();
         var labels = {
-            musicalizacao: 'SecretÃ¡rio(a) da MusicalizaÃ§Ã£o',
-            musica: 'SecretÃ¡rio(a) da MÃºsica',
-            ebi: 'SecretÃ¡rio(a) da EBI',
-            rjm: 'SecretÃ¡rio(a) da RJM',
-            visitas: 'SecretÃ¡rio(a) de Visitas',
-            darpe: 'SecretÃ¡rio(a) da D.A.R.P.E',
-            depac: 'SecretÃ¡rio(a) da D.E.P.A.C',
-            gem: 'SecretÃ¡rio(a) da G.E.M',
+            musicalizacao: 'Secretário(a) da Musicalização',
+            musica: 'Secretário(a) da Música',
+            ebi: 'Secretário(a) da EBI',
+            rjm: 'Secretário(a) da RJM',
+            visitas: 'Secretário(a) de Visitas',
+            darpe: 'Secretário(a) da D.A.R.P.E',
+            depac: 'Secretário(a) da D.E.P.A.C',
+            gem: 'Secretário(a) da G.E.M',
             manager: 'Gestor(a) do Sistema',
             coordinator: 'Coordenador(a)',
             coordenador: 'Coordenador(a)',
             member: 'Membro'
         };
 
-        return labels[sector] || labels[role] || 'UsuÃ¡rio do Sistema';
+        return labels[sector] || labels[role] || 'Usuário do Sistema';
     };
 
     $scope.loadProfile = function () {
@@ -951,9 +951,9 @@ function profileCtrl($scope, $rootScope, AuthService) {
                 });
             }
 
-            throw { message: 'SessÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o encontrada.' };
+            throw { message: 'SessÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o nÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o encontrada.' };
         }).catch(function (error) {
-            swal("Erro", "NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­vel carregar seu perfil: " + (error.message || error), "error");
+            swal("Erro", "NÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o foi possÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­vel carregar seu perfil: " + (error.message || error), "error");
         }).finally(function () {
             $scope.profileLoading = false;
         });
@@ -969,12 +969,12 @@ function profileCtrl($scope, $rootScope, AuthService) {
         }
 
         if ((file.type || '').indexOf('image/') !== 0) {
-            swal("Arquivo invÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lido", "Selecione uma imagem vÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lida para o avatar.", "warning");
+            swal("Arquivo invÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¡lido", "Selecione uma imagem vÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¡lida para o avatar.", "warning");
             return;
         }
 
         if (file.size > (2 * 1024 * 1024)) {
-            swal("Arquivo muito grande", "Envie uma imagem com atÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© 2MB.", "warning");
+            swal("Arquivo muito grande", "Envie uma imagem com atÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š© 2MB.", "warning");
             return;
         }
 
@@ -1026,7 +1026,7 @@ function profileCtrl($scope, $rootScope, AuthService) {
         var payload;
 
         if (!$scope.profile.full_name || !$scope.profile.full_name.trim()) {
-            swal("Nome obrigatÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³rio", "Informe seu nome para salvar o perfil.", "warning");
+            swal("Nome obrigatÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š³rio", "Informe seu nome para salvar o perfil.", "warning");
             return;
         }
 
@@ -1047,7 +1047,7 @@ function profileCtrl($scope, $rootScope, AuthService) {
             $scope.avatarPreview = $scope.profile.avatar_url || DEFAULT_AVATAR_URL;
             swal("Sucesso", "Perfil atualizado com sucesso!", "success");
         }).catch(function (error) {
-            swal("Erro", "NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­vel salvar seu perfil: " + (error.message || error), "error");
+            swal("Erro", "NÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o foi possÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­vel salvar seu perfil: " + (error.message || error), "error");
         }).finally(function () {
             $scope.profileSaving = false;
         });
@@ -1069,7 +1069,7 @@ function pendingAccessDashboardCtrl($scope, AuthService) {
             'Itapevi',
             'Jandira',
             'Pirapora do Bom Jesus',
-            'Santana de ParnaÃ­ba',
+            'Santana de Parnaíba',
             'Vargem Grande Paulista'
         ],
         musicosCount: 4724,
@@ -1164,7 +1164,7 @@ function dashboardFlotTwo() {
 
     var dataset = [
         {
-            label: "MÃºsicos e organistas",
+            label: "Músicos e organistas",
             grow: { stepMode: "linear" },
             data: data2,
             color: "#1ab394",
@@ -1589,7 +1589,7 @@ function flotChartCtrl() {
     var exchangerates = [[1167606000000, 0.7580], [1167692400000, 0.7580], [1167778800000, 0.75470], [1167865200000, 0.75490], [1167951600000, 0.76130], [1168038000000, 0.76550], [1168124400000, 0.76930], [1168210800000, 0.76940], [1168297200000, 0.76880], [1168383600000, 0.76780], [1168470000000, 0.77080], [1168556400000, 0.77270], [1168642800000, 0.77490], [1168729200000, 0.77410], [1168815600000, 0.77410], [1168902000000, 0.77320], [1168988400000, 0.77270], [1169074800000, 0.77370], [1169161200000, 0.77240], [1169247600000, 0.77120], [1169334000000, 0.7720], [1169420400000, 0.77210], [1169506800000, 0.77170], [1169593200000, 0.77040], [1169679600000, 0.7690], [1169766000000, 0.77110], [1169852400000, 0.7740], [1169938800000, 0.77450], [1170025200000, 0.77450], [1170111600000, 0.7740], [1170198000000, 0.77160], [1170284400000, 0.77130], [1170370800000, 0.76780], [1170457200000, 0.76880], [1170543600000, 0.77180], [1170630000000, 0.77180], [1170716400000, 0.77280], [1170802800000, 0.77290], [1170889200000, 0.76980], [1170975600000, 0.76850], [1171062000000, 0.76810], [1171148400000, 0.7690], [1171234800000, 0.7690], [1171321200000, 0.76980], [1171407600000, 0.76990], [1171494000000, 0.76510], [1171580400000, 0.76130], [1171666800000, 0.76160], [1171753200000, 0.76140], [1171839600000, 0.76140], [1171926000000, 0.76070], [1172012400000, 0.76020], [1172098800000, 0.76110], [1172185200000, 0.76220], [1172271600000, 0.76150], [1172358000000, 0.75980], [1172444400000, 0.75980], [1172530800000, 0.75920], [1172617200000, 0.75730], [1172703600000, 0.75660], [1172790000000, 0.75670], [1172876400000, 0.75910], [1172962800000, 0.75820], [1173049200000, 0.75850], [1173135600000, 0.76130], [1173222000000, 0.76310], [1173308400000, 0.76150], [1173394800000, 0.760], [1173481200000, 0.76130], [1173567600000, 0.76270], [1173654000000, 0.76270], [1173740400000, 0.76080], [1173826800000, 0.75830], [1173913200000, 0.75750], [1173999600000, 0.75620], [1174086000000, 0.7520], [1174172400000, 0.75120], [1174258800000, 0.75120], [1174345200000, 0.75170], [1174431600000, 0.7520], [1174518000000, 0.75110], [1174604400000, 0.7480], [1174690800000, 0.75090], [1174777200000, 0.75310], [1174860000000, 0.75310], [1174946400000, 0.75270], [1175032800000, 0.74980], [1175119200000, 0.74930], [1175205600000, 0.75040], [1175292000000, 0.750], [1175378400000, 0.74910], [1175464800000, 0.74910], [1175551200000, 0.74850], [1175637600000, 0.74840], [1175724000000, 0.74920], [1175810400000, 0.74710], [1175896800000, 0.74590], [1175983200000, 0.74770], [1176069600000, 0.74770], [1176156000000, 0.74830], [1176242400000, 0.74580], [1176328800000, 0.74480], [1176415200000, 0.7430], [1176501600000, 0.73990], [1176588000000, 0.73950], [1176674400000, 0.73950], [1176760800000, 0.73780], [1176847200000, 0.73820], [1176933600000, 0.73620], [1177020000000, 0.73550], [1177106400000, 0.73480], [1177192800000, 0.73610], [1177279200000, 0.73610], [1177365600000, 0.73650], [1177452000000, 0.73620], [1177538400000, 0.73310], [1177624800000, 0.73390], [1177711200000, 0.73440], [1177797600000, 0.73270], [1177884000000, 0.73270], [1177970400000, 0.73360], [1178056800000, 0.73330], [1178143200000, 0.73590], [1178229600000, 0.73590], [1178316000000, 0.73720], [1178402400000, 0.7360], [1178488800000, 0.7360], [1178575200000, 0.7350], [1178661600000, 0.73650], [1178748000000, 0.73840], [1178834400000, 0.73950], [1178920800000, 0.74130], [1179007200000, 0.73970], [1179093600000, 0.73960], [1179180000000, 0.73850], [1179266400000, 0.73780], [1179352800000, 0.73660], [1179439200000, 0.740], [1179525600000, 0.74110], [1179612000000, 0.74060], [1179698400000, 0.74050], [1179784800000, 0.74140], [1179871200000, 0.74310], [1179957600000, 0.74310], [1180044000000, 0.74380], [1180130400000, 0.74430], [1180216800000, 0.74430], [1180303200000, 0.74430], [1180389600000, 0.74340], [1180476000000, 0.74290], [1180562400000, 0.74420], [1180648800000, 0.7440], [1180735200000, 0.74390], [1180821600000, 0.74370], [1180908000000, 0.74370], [1180994400000, 0.74290], [1181080800000, 0.74030], [1181167200000, 0.73990], [1181253600000, 0.74180], [1181340000000, 0.74680], [1181426400000, 0.7480], [1181512800000, 0.7480], [1181599200000, 0.7490], [1181685600000, 0.74940], [1181772000000, 0.75220], [1181858400000, 0.75150], [1181944800000, 0.75020], [1182031200000, 0.74720], [1182117600000, 0.74720], [1182204000000, 0.74620], [1182290400000, 0.74550], [1182376800000, 0.74490], [1182463200000, 0.74670], [1182549600000, 0.74580], [1182636000000, 0.74270], [1182722400000, 0.74270], [1182808800000, 0.7430], [1182895200000, 0.74290], [1182981600000, 0.7440], [1183068000000, 0.7430], [1183154400000, 0.74220], [1183240800000, 0.73880], [1183327200000, 0.73880], [1183413600000, 0.73690], [1183500000000, 0.73450], [1183586400000, 0.73450], [1183672800000, 0.73450], [1183759200000, 0.73520], [1183845600000, 0.73410], [1183932000000, 0.73410], [1184018400000, 0.7340], [1184104800000, 0.73240], [1184191200000, 0.72720], [1184277600000, 0.72640], [1184364000000, 0.72550], [1184450400000, 0.72580], [1184536800000, 0.72580], [1184623200000, 0.72560], [1184709600000, 0.72570], [1184796000000, 0.72470], [1184882400000, 0.72430], [1184968800000, 0.72440], [1185055200000, 0.72350], [1185141600000, 0.72350], [1185228000000, 0.72350], [1185314400000, 0.72350], [1185400800000, 0.72620], [1185487200000, 0.72880], [1185573600000, 0.73010], [1185660000000, 0.73370], [1185746400000, 0.73370], [1185832800000, 0.73240], [1185919200000, 0.72970], [1186005600000, 0.73170], [1186092000000, 0.73150], [1186178400000, 0.72880], [1186264800000, 0.72630], [1186351200000, 0.72630], [1186437600000, 0.72420], [1186524000000, 0.72530], [1186610400000, 0.72640], [1186696800000, 0.7270], [1186783200000, 0.73120], [1186869600000, 0.73050], [1186956000000, 0.73050], [1187042400000, 0.73180], [1187128800000, 0.73580], [1187215200000, 0.74090], [1187301600000, 0.74540], [1187388000000, 0.74370], [1187474400000, 0.74240], [1187560800000, 0.74240], [1187647200000, 0.74150], [1187733600000, 0.74190], [1187820000000, 0.74140], [1187906400000, 0.73770], [1187992800000, 0.73550], [1188079200000, 0.73150], [1188165600000, 0.73150], [1188252000000, 0.7320], [1188338400000, 0.73320], [1188424800000, 0.73460], [1188511200000, 0.73280], [1188597600000, 0.73230], [1188684000000, 0.7340], [1188770400000, 0.7340], [1188856800000, 0.73360], [1188943200000, 0.73510], [1189029600000, 0.73460], [1189116000000, 0.73210], [1189202400000, 0.72940], [1189288800000, 0.72660], [1189375200000, 0.72660], [1189461600000, 0.72540], [1189548000000, 0.72420], [1189634400000, 0.72130], [1189720800000, 0.71970], [1189807200000, 0.72090], [1189893600000, 0.7210], [1189980000000, 0.7210], [1190066400000, 0.7210], [1190152800000, 0.72090], [1190239200000, 0.71590], [1190325600000, 0.71330], [1190412000000, 0.71050], [1190498400000, 0.70990], [1190584800000, 0.70990], [1190671200000, 0.70930], [1190757600000, 0.70930], [1190844000000, 0.70760], [1190930400000, 0.7070], [1191016800000, 0.70490], [1191103200000, 0.70120], [1191189600000, 0.70110], [1191276000000, 0.70190], [1191362400000, 0.70460], [1191448800000, 0.70630], [1191535200000, 0.70890], [1191621600000, 0.70770], [1191708000000, 0.70770], [1191794400000, 0.70770], [1191880800000, 0.70910], [1191967200000, 0.71180], [1192053600000, 0.70790], [1192140000000, 0.70530], [1192226400000, 0.7050], [1192312800000, 0.70550], [1192399200000, 0.70550], [1192485600000, 0.70450], [1192572000000, 0.70510], [1192658400000, 0.70510], [1192744800000, 0.70170], [1192831200000, 0.70], [1192917600000, 0.69950], [1193004000000, 0.69940], [1193090400000, 0.70140], [1193176800000, 0.70360], [1193263200000, 0.70210], [1193349600000, 0.70020], [1193436000000, 0.69670], [1193522400000, 0.6950], [1193612400000, 0.6950], [1193698800000, 0.69390], [1193785200000, 0.6940], [1193871600000, 0.69220], [1193958000000, 0.69190], [1194044400000, 0.69140], [1194130800000, 0.68940], [1194217200000, 0.68910], [1194303600000, 0.69040], [1194390000000, 0.6890], [1194476400000, 0.68340], [1194562800000, 0.68230], [1194649200000, 0.68070], [1194735600000, 0.68150], [1194822000000, 0.68150], [1194908400000, 0.68470], [1194994800000, 0.68590], [1195081200000, 0.68220], [1195167600000, 0.68270], [1195254000000, 0.68370], [1195340400000, 0.68230], [1195426800000, 0.68220], [1195513200000, 0.68220], [1195599600000, 0.67920], [1195686000000, 0.67460], [1195772400000, 0.67350], [1195858800000, 0.67310], [1195945200000, 0.67420], [1196031600000, 0.67440], [1196118000000, 0.67390], [1196204400000, 0.67310], [1196290800000, 0.67610], [1196377200000, 0.67610], [1196463600000, 0.67850], [1196550000000, 0.68180], [1196636400000, 0.68360], [1196722800000, 0.68230], [1196809200000, 0.68050], [1196895600000, 0.67930], [1196982000000, 0.68490], [1197068400000, 0.68330], [1197154800000, 0.68250], [1197241200000, 0.68250], [1197327600000, 0.68160], [1197414000000, 0.67990], [1197500400000, 0.68130], [1197586800000, 0.68090], [1197673200000, 0.68680], [1197759600000, 0.69330], [1197846000000, 0.69330], [1197932400000, 0.69450], [1198018800000, 0.69440], [1198105200000, 0.69460], [1198191600000, 0.69640], [1198278000000, 0.69650], [1198364400000, 0.69560], [1198450800000, 0.69560], [1198537200000, 0.6950], [1198623600000, 0.69480], [1198710000000, 0.69280], [1198796400000, 0.68870], [1198882800000, 0.68240], [1198969200000, 0.67940], [1199055600000, 0.67940], [1199142000000, 0.68030], [1199228400000, 0.68550], [1199314800000, 0.68240], [1199401200000, 0.67910], [1199487600000, 0.67830], [1199574000000, 0.67850], [1199660400000, 0.67850], [1199746800000, 0.67970], [1199833200000, 0.680], [1199919600000, 0.68030], [1200006000000, 0.68050], [1200092400000, 0.6760], [1200178800000, 0.6770], [1200265200000, 0.6770], [1200351600000, 0.67360], [1200438000000, 0.67260], [1200524400000, 0.67640], [1200610800000, 0.68210], [1200697200000, 0.68310], [1200783600000, 0.68420], [1200870000000, 0.68420], [1200956400000, 0.68870], [1201042800000, 0.69030], [1201129200000, 0.68480], [1201215600000, 0.68240], [1201302000000, 0.67880], [1201388400000, 0.68140], [1201474800000, 0.68140], [1201561200000, 0.67970], [1201647600000, 0.67690], [1201734000000, 0.67650], [1201820400000, 0.67330], [1201906800000, 0.67290], [1201993200000, 0.67580], [1202079600000, 0.67580], [1202166000000, 0.6750], [1202252400000, 0.6780], [1202338800000, 0.68330], [1202425200000, 0.68560], [1202511600000, 0.69030], [1202598000000, 0.68960], [1202684400000, 0.68960], [1202770800000, 0.68820], [1202857200000, 0.68790], [1202943600000, 0.68620], [1203030000000, 0.68520], [1203116400000, 0.68230], [1203202800000, 0.68130], [1203289200000, 0.68130], [1203375600000, 0.68220], [1203462000000, 0.68020], [1203548400000, 0.68020], [1203634800000, 0.67840], [1203721200000, 0.67480], [1203807600000, 0.67470], [1203894000000, 0.67470], [1203980400000, 0.67480], [1204066800000, 0.67330], [1204153200000, 0.6650], [1204239600000, 0.66110], [1204326000000, 0.65830], [1204412400000, 0.6590], [1204498800000, 0.6590], [1204585200000, 0.65810], [1204671600000, 0.65780], [1204758000000, 0.65740], [1204844400000, 0.65320], [1204930800000, 0.65020], [1205017200000, 0.65140], [1205103600000, 0.65140], [1205190000000, 0.65070], [1205276400000, 0.6510], [1205362800000, 0.64890], [1205449200000, 0.64240], [1205535600000, 0.64060], [1205622000000, 0.63820], [1205708400000, 0.63820], [1205794800000, 0.63410], [1205881200000, 0.63440], [1205967600000, 0.63780], [1206054000000, 0.64390], [1206140400000, 0.64780], [1206226800000, 0.64810], [1206313200000, 0.64810], [1206399600000, 0.64940], [1206486000000, 0.64380], [1206572400000, 0.63770], [1206658800000, 0.63290], [1206745200000, 0.63360], [1206831600000, 0.63330], [1206914400000, 0.63330], [1207000800000, 0.6330], [1207087200000, 0.63710], [1207173600000, 0.64030], [1207260000000, 0.63960], [1207346400000, 0.63640], [1207432800000, 0.63560], [1207519200000, 0.63560], [1207605600000, 0.63680], [1207692000000, 0.63570], [1207778400000, 0.63540], [1207864800000, 0.6320], [1207951200000, 0.63320], [1208037600000, 0.63280], [1208124000000, 0.63310], [1208210400000, 0.63420], [1208296800000, 0.63210], [1208383200000, 0.63020], [1208469600000, 0.62780], [1208556000000, 0.63080], [1208642400000, 0.63240], [1208728800000, 0.63240], [1208815200000, 0.63070], [1208901600000, 0.62770], [1208988000000, 0.62690], [1209074400000, 0.63350], [1209160800000, 0.63920], [1209247200000, 0.640], [1209333600000, 0.64010], [1209420000000, 0.63960], [1209506400000, 0.64070], [1209592800000, 0.64230], [1209679200000, 0.64290], [1209765600000, 0.64720], [1209852000000, 0.64850], [1209938400000, 0.64860], [1210024800000, 0.64670], [1210111200000, 0.64440], [1210197600000, 0.64670], [1210284000000, 0.65090], [1210370400000, 0.64780], [1210456800000, 0.64610], [1210543200000, 0.64610], [1210629600000, 0.64680], [1210716000000, 0.64490], [1210802400000, 0.6470], [1210888800000, 0.64610], [1210975200000, 0.64520], [1211061600000, 0.64220], [1211148000000, 0.64220], [1211234400000, 0.64250], [1211320800000, 0.64140], [1211407200000, 0.63660], [1211493600000, 0.63460], [1211580000000, 0.6350], [1211666400000, 0.63460], [1211752800000, 0.63460], [1211839200000, 0.63430], [1211925600000, 0.63460], [1212012000000, 0.63790], [1212098400000, 0.64160], [1212184800000, 0.64420], [1212271200000, 0.64310], [1212357600000, 0.64310], [1212444000000, 0.64350], [1212530400000, 0.6440], [1212616800000, 0.64730], [1212703200000, 0.64690], [1212789600000, 0.63860], [1212876000000, 0.63560], [1212962400000, 0.6340], [1213048800000, 0.63460], [1213135200000, 0.6430], [1213221600000, 0.64520], [1213308000000, 0.64670], [1213394400000, 0.65060], [1213480800000, 0.65040], [1213567200000, 0.65030], [1213653600000, 0.64810], [1213740000000, 0.64510], [1213826400000, 0.6450], [1213912800000, 0.64410], [1213999200000, 0.64140], [1214085600000, 0.64090], [1214172000000, 0.64090], [1214258400000, 0.64280], [1214344800000, 0.64310], [1214431200000, 0.64180], [1214517600000, 0.63710], [1214604000000, 0.63490], [1214690400000, 0.63330], [1214776800000, 0.63340], [1214863200000, 0.63380], [1214949600000, 0.63420], [1215036000000, 0.6320], [1215122400000, 0.63180], [1215208800000, 0.6370], [1215295200000, 0.63680], [1215381600000, 0.63680], [1215468000000, 0.63830], [1215554400000, 0.63710], [1215640800000, 0.63710], [1215727200000, 0.63550], [1215813600000, 0.6320], [1215900000000, 0.62770], [1215986400000, 0.62760], [1216072800000, 0.62910], [1216159200000, 0.62740], [1216245600000, 0.62930], [1216332000000, 0.63110], [1216418400000, 0.6310], [1216504800000, 0.63120], [1216591200000, 0.63120], [1216677600000, 0.63040], [1216764000000, 0.62940], [1216850400000, 0.63480], [1216936800000, 0.63780], [1217023200000, 0.63680], [1217109600000, 0.63680], [1217196000000, 0.63680], [1217282400000, 0.6360], [1217368800000, 0.6370], [1217455200000, 0.64180], [1217541600000, 0.64110], [1217628000000, 0.64350], [1217714400000, 0.64270], [1217800800000, 0.64270], [1217887200000, 0.64190], [1217973600000, 0.64460], [1218060000000, 0.64680], [1218146400000, 0.64870], [1218232800000, 0.65940], [1218319200000, 0.66660], [1218405600000, 0.66660], [1218492000000, 0.66780], [1218578400000, 0.67120], [1218664800000, 0.67050], [1218751200000, 0.67180], [1218837600000, 0.67840], [1218924000000, 0.68110], [1219010400000, 0.68110], [1219096800000, 0.67940], [1219183200000, 0.68040], [1219269600000, 0.67810], [1219356000000, 0.67560], [1219442400000, 0.67350], [1219528800000, 0.67630], [1219615200000, 0.67620], [1219701600000, 0.67770], [1219788000000, 0.68150], [1219874400000, 0.68020], [1219960800000, 0.6780], [1220047200000, 0.67960], [1220133600000, 0.68170], [1220220000000, 0.68170], [1220306400000, 0.68320], [1220392800000, 0.68770], [1220479200000, 0.69120], [1220565600000, 0.69140], [1220652000000, 0.70090], [1220738400000, 0.70120], [1220824800000, 0.7010], [1220911200000, 0.70050]];
 
     function euroFormatter(v, axis) {
-        return v.toFixed(axis.tickDecimals) + "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬";
+        return v.toFixed(axis.tickDecimals) + "ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦Ãâ€š¡ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¬";
     }
     var position = 'right';
 
@@ -2288,7 +2288,7 @@ function ionSlider() {
         min: -50,
         max: 50,
         from: 0,
-        postfix: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°",
+        postfix: "ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š°",
         prettify: false,
         hasGrid: true
     };
@@ -2475,7 +2475,7 @@ function chartJsCtrl() {
      * Data for Line chart
      */
     this.lineData = {
-        labels: ["Janeiro", "Fevereiro", "MarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o", "Abril", "Maio", "Junho", "Julho"],
+        labels: ["Janeiro", "Fevereiro", "MarÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š§o", "Abril", "Maio", "Junho", "Julho"],
         datasets: [
             {
                 label: "Example dataset",
@@ -2501,7 +2501,7 @@ function chartJsCtrl() {
     };
 
     this.lineDataDashboard4 = {
-        labels: ["Janeiro", "Fevereiro", "MarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o", "Abril", "Maio", "Junho", "Julho"],
+        labels: ["Janeiro", "Fevereiro", "MarÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š§o", "Abril", "Maio", "Junho", "Julho"],
         datasets: [
             {
                 label: "Example dataset",
@@ -2562,7 +2562,7 @@ function chartJsCtrl() {
      * Data for Bar chart
      */
     this.barData = {
-        labels: ["Janeiro", "Fevereiro", "MarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o", "Abril", "Maio", "Junho", "Julho"],
+        labels: ["Janeiro", "Fevereiro", "MarÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š§o", "Abril", "Maio", "Junho", "Julho"],
         datasets: [
             {
                 label: "My First dataset",
@@ -3393,14 +3393,14 @@ function selectCtrl($scope) {
     $scope.people = [
         { name: 'Adam', email: 'adam@email.com', age: 12, country: 'United States' },
         { name: 'Amalie', email: 'amalie@email.com', age: 12, country: 'Argentina' },
-        { name: 'EstefanÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a', email: 'estefania@email.com', age: 21, country: 'Argentina' },
+        { name: 'EstefanÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š­a', email: 'estefania@email.com', age: 21, country: 'Argentina' },
         { name: 'Adrian', email: 'adrian@email.com', age: 21, country: 'Ecuador' },
         { name: 'Wladimir', email: 'wladimir@email.com', age: 30, country: 'Ecuador' },
         { name: 'Samantha', email: 'samantha@email.com', age: 30, country: 'United States' },
         { name: 'Nicole', email: 'nicole@email.com', age: 43, country: 'Colombia' },
         { name: 'Natasha', email: 'natasha@email.com', age: 54, country: 'Ecuador' },
         { name: 'Michael', email: 'michael@email.com', age: 15, country: 'Colombia' },
-        { name: 'NicolÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s', email: 'nicolas@email.com', age: 43, country: 'Colombia' }
+        { name: 'NicolÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¡s', email: 'nicolas@email.com', age: 43, country: 'Colombia' }
     ];
 
     $scope.option = {};
@@ -4517,7 +4517,7 @@ function registerCtrl($scope, AuthService, ValidationService, $state, $timeout, 
  * loginCtrl - Controller de Login Seguro
  */
 function loginCtrl($scope, AuthService, ValidationService, $state, $injector, SweetAlert, $timeout) {
-    // Tenta usar toaster; se nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o estiver disponÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel, usa notify ou alert
+    // Tenta usar toaster; se nÃÆ’Ã†’Ãâ€š£o estiver disponÃÆ’Ã†’Ãâ€š­vel, usa notify ou alert
     var notifyService = null;
     try {
         notifyService = $injector.get('toaster');
@@ -4529,7 +4529,7 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
         }
     }
 
-    // FunÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o auxiliar para notificaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âµes
+    // FunÃÆ’Ã†’Ãâ€š§ÃÆ’Ã†’Ãâ€š£o auxiliar para notificaÃÆ’Ã†’Ãâ€š§ÃÆ’Ã†’Ãâ€šµes
     var notify = function (type, title, message) {
         if (SweetAlert && SweetAlert.swal) {
             var swalType = type === 'error' ? 'error' : (type === 'success' ? 'success' : 'warning');
@@ -4569,7 +4569,7 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
     $scope.showPassword = false;
 
     /**
-     * Valida formulÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio de login
+     * Valida formulÃÆ’Ã†’Ãâ€š¡rio de login
      */
     $scope.validateForm = function () {
         $scope.errors = {};
@@ -4577,11 +4577,11 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
 
         if ($scope.credentials.email && $scope.credentials.email.indexOf('@') !== -1) {
             if (!ValidationService.validateEmail($scope.credentials.email)) {
-                $scope.errors.email = 'E-mail invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido';
+                $scope.errors.email = 'E-mail invÃÆ’Ã†’Ãâ€š¡lido';
                 isValid = false;
             }
         } else if (!$scope.credentials.email || $scope.credentials.email.length < 3) {
-            $scope.errors.email = 'UsuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio ou e-mail invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido';
+            $scope.errors.email = 'UsuÃÆ’Ã†’Ãâ€š¡rio ou e-mail invÃÆ’Ã†’Ãâ€š¡lido';
             isValid = false;
         }
 
@@ -4594,13 +4594,13 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
     };
 
     /**
-     * Submete formulÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio de login
+     * Submete formulÃÆ’Ã†’Ãâ€š¡rio de login
      */
     $scope.submitLogin = function () {
         $scope.errors = {};
 
         if (!$scope.validateForm()) {
-            notify('error', 'Erro', 'Por favor, corrija os erros no formulÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio');
+            notify('error', 'Erro', 'Por favor, corrija os erros no formulÃÆ’Ã†’Ãâ€š¡rio');
             return;
         }
 
@@ -4621,11 +4621,11 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
             .catch(function (error) {
                 $scope.loading = false;
 
-                // Mapeamento de erros comuns do Supabase para PortuguÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªs
+                // Mapeamento de erros comuns do Supabase para Português
                 var errorMap = {
-                    'Invalid login credentials': 'E-mail, usuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio ou senha invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lidos.',
-                    'Email not confirmed': 'E-mail ainda nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi confirmado.',
-                    'User not found': 'UsuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrado.',
+                    'Invalid login credentials': 'E-mail, usuário ou senha inválidos.',
+                    'Email not confirmed': 'E-mail ainda não foi confirmado.',
+                    'User not found': 'Usuário não encontrado.',
                     'Too many requests': 'Muitas tentativas. Tente novamente mais tarde.'
                 };
 
@@ -4761,7 +4761,7 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
             return $rootScope.currentUser.full_name;
         }
 
-        return 'meu usuÃ¡rio';
+        return 'meu usuário';
     }
 
     function resolveAuditAccessProfile() {
@@ -5149,19 +5149,19 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
                 $scope.criticalActionCount += 1;
             }
 
-            if (log.operationLabel === 'CriaÃ§Ã£o') {
+            if (log.operationLabel === 'Criação') {
                 $scope.createCount += 1;
             }
 
-            if (log.operationLabel === 'AtualizaÃ§Ã£o') {
+            if (log.operationLabel === 'Atualização') {
                 $scope.updateCount += 1;
             }
 
-            if (log.operationLabel === 'ExclusÃ£o') {
+            if (log.operationLabel === 'Exclusão') {
                 $scope.deleteCount += 1;
             }
 
-            if (log.operationLabel === 'NavegaÃ§Ã£o') {
+            if (log.operationLabel === 'Navegação') {
                 $scope.navigationCount += 1;
             }
 
@@ -5193,16 +5193,16 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
             if (log.severity === 'danger' || log.severity === 'warning') {
                 topUserIndex[actorKey || log.actorName].critical += 1;
             }
-            if (log.operationLabel === 'CriaÃ§Ã£o') {
+            if (log.operationLabel === 'Criação') {
                 topUserIndex[actorKey || log.actorName].creates += 1;
             }
-            if (log.operationLabel === 'AtualizaÃ§Ã£o') {
+            if (log.operationLabel === 'Atualização') {
                 topUserIndex[actorKey || log.actorName].updates += 1;
             }
-            if (log.operationLabel === 'ExclusÃ£o') {
+            if (log.operationLabel === 'Exclusão') {
                 topUserIndex[actorKey || log.actorName].deletes += 1;
             }
-            if (log.operationLabel === 'NavegaÃ§Ã£o') {
+            if (log.operationLabel === 'Navegação') {
                 topUserIndex[actorKey || log.actorName].navigations += 1;
             }
             if (!topUserIndex[actorKey || log.actorName].lastEventAt || new Date(log.created_at) > new Date(topUserIndex[actorKey || log.actorName].lastEventAt)) {
@@ -5384,7 +5384,7 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
         delete $scope.auditBaselines[targetKey];
         saveAuditBaselines();
         applyFilters();
-        SweetAlert.swal('HistÃ³rico restaurado', 'A auditoria voltou a exibir todo o histÃ³rico de ' + targetName + '.', 'success');
+        SweetAlert.swal('Histórico restaurado', 'A auditoria voltou a exibir todo o histórico de ' + targetName + '.', 'success');
     };
 
     $scope.getActiveBaselineLabel = function () {
@@ -5488,7 +5488,7 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
         var matchedUser = null;
 
         if (!$scope.filters.userKey) {
-            return 'Todos os usuÃ¡rios';
+            return 'Todos os usuários';
         }
 
         if ($scope.selectedUserSummary && $scope.selectedUserSummary.name) {
@@ -5666,7 +5666,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         { name: 'Darpe' },
         { name: 'Depac' },
         { name: 'Gem' },
-        { name: 'InscriÃƒÂ§ÃƒÂ£o' }
+        { name: 'Inscrição' }
     ];
 
     function getDefaultSector(roleId, fallbackSector) {
@@ -5676,7 +5676,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         if (roleId === 2) {
             return 'Administrativo';
         }
-        return fallbackSector || 'InscriÃƒÂ§ÃƒÂ£o';
+        return fallbackSector || 'Inscrição';
     }
 
     function normalizePendingText(value) {
@@ -5912,7 +5912,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         } else if (user.review.role_id === 2) {
             user.review.sector = 'Administrativo';
         } else if (!user.review.sector || user.review.sector === 'Global') {
-            user.review.sector = 'InscriÃƒÂ§ÃƒÂ£o';
+            user.review.sector = 'Inscrição';
         }
     };
 
@@ -5977,7 +5977,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                 refreshFilteredPendingUsers();
             })
             .catch(function (error) {
-                $scope.error = 'NÃƒÂ£o foi possÃƒÂ­vel carregar os usuÃƒÂ¡rios pendentes: ' + (error.message || error);
+                $scope.error = 'Não foi possível carregar os usuários pendentes: ' + (error.message || error);
             })
             .finally(function () {
                 $scope.loading = false;
@@ -6054,10 +6054,10 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             comum: user.review.comum,
             status: 'approved'
         }).then(function () {
-            SweetAlert.swal('Sucesso', 'UsuÃƒÂ¡rio liberado com sucesso.', 'success');
+            SweetAlert.swal('Sucesso', 'Usuário liberado com sucesso.', 'success');
             removePendingUser(user);
         }).catch(function (error) {
-            SweetAlert.swal('Erro', 'NÃƒÂ£o foi possÃƒÂ­vel liberar o usuÃƒÂ¡rio: ' + (error.message || error), 'error');
+            SweetAlert.swal('Erro', 'Não foi possível liberar o usuário: ' + (error.message || error), 'error');
         }).finally(function () {
             user.processing = false;
         });
@@ -6070,7 +6070,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
 
         SweetAlert.swal({
             title: 'Recusar cadastro?',
-            text: 'O usuÃƒÂ¡rio permanecerÃƒÂ¡ sem acesso atÃƒÂ© nova anÃƒÂ¡lise.',
+            text: 'O usuário permanecerá sem acesso até nova análise.',
             type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ed5565',
@@ -6090,10 +6090,10 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                     comum: user.review.comum,
                     status: 'rejected'
                 }).then(function () {
-                    SweetAlert.swal('Cadastro recusado', 'O usuÃƒÂ¡rio foi marcado como recusado.', 'success');
+                    SweetAlert.swal('Cadastro recusado', 'O usuário foi marcado como recusado.', 'success');
                     removePendingUser(user);
                 }).catch(function (error) {
-                    SweetAlert.swal('Erro', 'NÃƒÂ£o foi possÃƒÂ­vel recusar o usuÃƒÂ¡rio: ' + (error.message || error), 'error');
+                    SweetAlert.swal('Erro', 'Não foi possível recusar o usuário: ' + (error.message || error), 'error');
                 }).finally(function () {
                     user.processing = false;
                 });
@@ -6221,11 +6221,11 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
     var defaultAccessLevels = [
         { id: 1, name: 'Master', description: 'Acesso total ao sistema - administradores gerais', level_order: 1 },
         { id: 2, name: 'Admin', description: 'Administradores regionais', level_order: 2 },
-        { id: 3, name: 'Coordenador', description: 'Coordenadores - acesso a exportaÃ§Ã£o', level_order: 3 },
-        { id: 4, name: 'Instrutor', description: 'Instrutores - lanÃ§amentos e cadastros', level_order: 4 },
-        { id: 5, name: 'MÃºsico', description: 'MÃºsicos - leitura bÃ¡sica', level_order: 5 },
-        { id: 6, name: 'Candidato', description: 'Candidatos / InscriÃ§Ã£o', level_order: 6 },
-        { id: 7, name: 'Membro', description: 'Membro padrÃ£o (legado)', level_order: 7 }
+        { id: 3, name: 'Coordenador', description: 'Coordenadores - acesso a exportação', level_order: 3 },
+        { id: 4, name: 'Instrutor', description: 'Instrutores - lançamentos e cadastros', level_order: 4 },
+        { id: 5, name: 'Músico', description: 'Músicos - leitura básica', level_order: 5 },
+        { id: 6, name: 'Candidato', description: 'Candidatos / Inscrição', level_order: 6 },
+        { id: 7, name: 'Membro', description: 'Membro padrão (legado)', level_order: 7 }
     ];
     var defaultSectors = [
         { name: 'Global' },
@@ -6238,7 +6238,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         { name: 'Darpe' },
         { name: 'Depac' },
         { name: 'Gem' },
-        { name: 'InscriÃ§Ã£o' }
+        { name: 'Inscrição' }
     ];
 
     $scope.loading = false;
@@ -6336,7 +6336,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             return 'Administrativo';
         }
         if (!currentSector || currentSector === 'Global') {
-            return 'InscriÃ§Ã£o';
+            return 'Inscrição';
         }
         return currentSector;
     }
@@ -6724,7 +6724,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             $scope.selectedUserForm.role = 'Admin';
             $scope.selectedUserForm.sector = 'Administrativo';
         } else if (!$scope.selectedUserForm.sector || $scope.selectedUserForm.sector === 'Global') {
-            $scope.selectedUserForm.sector = 'InscriÃ§Ã£o';
+            $scope.selectedUserForm.sector = 'Inscrição';
         }
     };
 
@@ -6746,7 +6746,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             refreshCommonOptions();
             refreshFilteredUsers();
         }).catch(function (error) {
-            $scope.error = 'NÃ£o foi possÃ­vel carregar os usuÃ¡rios: ' + (error.message || error);
+            $scope.error = 'Não foi possível carregar os usuários: ' + (error.message || error);
             $scope.filteredUsers = [];
         }).finally(function () {
             $scope.loading = false;
@@ -6795,7 +6795,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
 
     $scope.openEdit = function (user) {
         if (!$scope.isMaster) {
-            showRestrictedAccessToast('Somente usuÃ¡rios Master podem editar cadastros.');
+            showRestrictedAccessToast('Somente usuários Master podem editar cadastros.');
             return;
         }
 
@@ -6810,7 +6810,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         }
 
         if (!$scope.isMaster) {
-            showRestrictedAccessToast('Somente usuÃ¡rios Master podem salvar alteraÃ§Ãµes de cadastro.');
+            showRestrictedAccessToast('Somente usuários Master podem salvar alterações de cadastro.');
             return;
         }
 
@@ -6824,9 +6824,9 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             refreshCommonOptions();
             refreshFilteredUsers();
             angular.element('#modalUserManagement').modal('hide');
-            SweetAlert.swal('Sucesso', 'UsuÃ¡rio atualizado com sucesso.', 'success');
+            SweetAlert.swal('Sucesso', 'Usuário atualizado com sucesso.', 'success');
         }).catch(function (error) {
-            SweetAlert.swal('Erro', 'NÃ£o foi possÃ­vel atualizar o usuÃ¡rio: ' + (error.message || error), 'error');
+            SweetAlert.swal('Erro', 'Não foi possível atualizar o usuário: ' + (error.message || error), 'error');
         }).finally(function () {
             $scope.savingUser = false;
         });
@@ -6834,18 +6834,18 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
 
     $scope.confirmDelete = function (user) {
         if (!$scope.isMaster) {
-            showRestrictedAccessToast('Somente usuÃ¡rios Master podem excluir cadastros.');
+            showRestrictedAccessToast('Somente usuários Master podem excluir cadastros.');
             return;
         }
 
         if ($rootScope.currentUser && user.user_id === $rootScope.currentUser.user_id) {
-            SweetAlert.swal('AÃ§Ã£o bloqueada', 'NÃ£o Ã© permitido excluir o prÃ³prio cadastro em uso.', 'warning');
+            SweetAlert.swal('Ação bloqueada', 'Não é permitido excluir o próprio cadastro em uso.', 'warning');
             return;
         }
 
         SweetAlert.swal({
-            title: 'Excluir usuÃ¡rio?',
-            text: 'Excluir o cadastro de ' + (user.full_name || user.username || 'usuÃ¡rio') + '? Esta aÃ§Ã£o remove o perfil do sistema. Somente Master pode executar esta operaÃ§Ã£o.',
+            title: 'Excluir usuário?',
+            text: 'Excluir o cadastro de ' + (user.full_name || user.username || 'usuário') + '? Esta ação remove o perfil do sistema. Somente Master pode executar esta operação.',
             type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ed5565',
@@ -6864,9 +6864,9 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
                     recalculateCounts();
                     refreshCommonOptions();
                     refreshFilteredUsers();
-                    SweetAlert.swal('ExcluÃ­do', 'O perfil do usuÃ¡rio foi removido.', 'success');
+                    SweetAlert.swal('Excluído', 'O perfil do usuário foi removido.', 'success');
                 }).catch(function (error) {
-                    SweetAlert.swal('Erro', 'NÃ£o foi possÃ­vel excluir o usuÃ¡rio: ' + (error.message || error), 'error');
+                    SweetAlert.swal('Erro', 'Não foi possível excluir o usuário: ' + (error.message || error), 'error');
                 });
             });
         });
@@ -7050,10 +7050,10 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
         }
 
         if ($scope.groupBy === 'ministerio') {
-            return groupKey === 'sem-ministerio' ? 'Sem ministÃ©rio' : $scope.formatMinisterioLabel(groupKey, 'Sem ministÃ©rio');
+            return groupKey === 'sem-ministerio' ? 'Sem ministério' : $scope.formatMinisterioLabel(groupKey, 'Sem ministério');
         }
 
-        return groupKey === 'sem-municipio' ? 'Sem municÃ­pio' : $scope.formatMinisterioLabel(groupKey, 'Sem municÃ­pio');
+        return groupKey === 'sem-municipio' ? 'Sem município' : $scope.formatMinisterioLabel(groupKey, 'Sem município');
     }
 
     function refreshGroupedRegistros() {
@@ -7186,14 +7186,14 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
         }
 
         if (apresentacao !== '-' && ordenacao !== '-') {
-            return 'ApresentaÃ§Ã£o: ' + apresentacao + ' / OrdenaÃ§Ã£o: ' + ordenacao;
+            return 'Apresentação: ' + apresentacao + ' / Ordenação: ' + ordenacao;
         }
 
-        return apresentacao !== '-' ? 'ApresentaÃ§Ã£o: ' + apresentacao : 'OrdenaÃ§Ã£o: ' + ordenacao;
+        return apresentacao !== '-' ? 'Apresentação: ' + apresentacao : 'Ordenação: ' + ordenacao;
     };
 
     $scope.formatBooleanLabel = function (value) {
-        return value ? 'Sim' : 'NÃ£o';
+        return value ? 'Sim' : 'Não';
     };
 
     $scope.formatMinisterioLabel = function (value, fallback) {
@@ -7373,7 +7373,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             updateReferenceFilters();
             refreshFilteredRegistros();
         }).catch(function (error) {
-            $scope.error = 'NÃ£o foi possÃ­vel carregar o ministÃ©rio regional: ' + (error.message || error);
+            $scope.error = 'Não foi possível carregar o ministério regional: ' + (error.message || error);
             $scope.filteredRegistros = [];
         }).finally(function () {
             $scope.loading = false;
@@ -7388,7 +7388,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
 
     $scope.openCreate = function () {
         if (!$scope.canManageMinisterio) {
-            showMinisterioRestrictedToast('Somente Master ou Admin podem cadastrar registros do ministÃ©rio.');
+            showMinisterioRestrictedToast('Somente Master ou Admin podem cadastrar registros do ministério.');
             return;
         }
 
@@ -7399,7 +7399,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
 
     $scope.openEdit = function (record) {
         if (!$scope.canManageMinisterio) {
-            showMinisterioRestrictedToast('Somente Master ou Admin podem editar registros do ministÃ©rio.');
+            showMinisterioRestrictedToast('Somente Master ou Admin podem editar registros do ministério.');
             return;
         }
 
@@ -7416,7 +7416,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
         }
 
         if (!$scope.canManageMinisterio) {
-            showMinisterioRestrictedToast('Somente Master ou Admin podem salvar registros do ministÃ©rio.');
+            showMinisterioRestrictedToast('Somente Master ou Admin podem salvar registros do ministério.');
             return;
         }
 
@@ -7432,7 +7432,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
                     recalculateCongregacaoStats();
                     refreshFilteredRegistros();
                     angular.element('#modalCongregacao').modal('hide');
-                    SweetAlert.swal('Sucesso', 'CongregaÃƒÂ§ÃƒÂ£o atualizada com sucesso.', 'success');
+                    SweetAlert.swal('Sucesso', 'Congregação atualizada com sucesso.', 'success');
                 });
             });
         }).then(function (records) {
@@ -7441,9 +7441,9 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             updateReferenceFilters();
             refreshFilteredRegistros();
             angular.element('#modalMinisterioRegional').modal('hide');
-            SweetAlert.swal('Sucesso', 'Registro do ministÃ©rio salvo com sucesso.', 'success');
+            SweetAlert.swal('Sucesso', 'Registro do ministério salvo com sucesso.', 'success');
         }).catch(function (error) {
-            SweetAlert.swal('Erro', 'NÃ£o foi possÃ­vel salvar o registro do ministÃ©rio: ' + (error.message || error), 'error');
+            SweetAlert.swal('Erro', 'Não foi possível salvar o registro do ministério: ' + (error.message || error), 'error');
         }).finally(function () {
             $scope.savingRegistro = false;
         });
@@ -7451,7 +7451,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
 
     $scope.confirmDelete = function (record) {
         if (!$scope.canManageMinisterio) {
-            showMinisterioRestrictedToast('Somente Master ou Admin podem excluir registros do ministÃ©rio.');
+            showMinisterioRestrictedToast('Somente Master ou Admin podem excluir registros do ministério.');
             return;
         }
 
@@ -7476,9 +7476,9 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
                     recalculateMinisterioStats();
                     updateReferenceFilters();
                     refreshFilteredRegistros();
-                    SweetAlert.swal('ExcluÃ­do', 'O registro do ministÃ©rio foi removido.', 'success');
+                    SweetAlert.swal('Excluído', 'O registro do ministério foi removido.', 'success');
                 }).catch(function (error) {
-                    SweetAlert.swal('Erro', 'NÃ£o foi possÃ­vel excluir o registro do ministÃ©rio: ' + (error.message || error), 'error');
+                    SweetAlert.swal('Erro', 'Não foi possível excluir o registro do ministério: ' + (error.message || error), 'error');
                 });
             });
         });
@@ -8250,7 +8250,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
  */
 function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     var comumCatalogState = getFallbackComumCatalogState();
-    var monthLabels = ['Janeiro', 'Fevereiro', 'MarÃ§o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    var monthLabels = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
     function getCurrentMonthLabel() {
         return repairEbiText(monthLabels[new Date().getMonth()]);
@@ -8418,7 +8418,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
             // Month filter
             var matchMonth = true;
             if ($scope.filters.mes && item.data_reuniao) {
-                var months = ['Janeiro', 'Fevereiro', 'MarÃƒÆ’Ã‚Â§o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                var months = ['Janeiro', 'Fevereiro', 'MarÃÆ’§o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 var itemMonth = months[new Date(item.data_reuniao).getMonth()];
                 matchMonth = (itemMonth === $scope.filters.mes);
             }
@@ -8674,14 +8674,14 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
             $('#modalRecitativoRjm').modal('hide');
             $scope.loadData();
         }).catch(function (error) {
-            swal('Erro', 'NÃ£o foi possÃ­vel atualizar o recitativo: ' + ((error && error.message) || error), 'error');
+            swal('Erro', 'Não foi possível atualizar o recitativo: ' + ((error && error.message) || error), 'error');
         });
     };
 
     $scope.excluirRecitativoRjm = function (item) {
         swal({
             title: 'Excluir recitativo?',
-            text: 'Deseja excluir o lanÃ§amento de ' + (item.comum || 'comum nÃ£o informada') + '?',
+            text: 'Deseja excluir o lançamento de ' + (item.comum || 'comum não informada') + '?',
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, excluir',
@@ -8690,10 +8690,10 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
             if (!confirmed) return;
             $scope.$applyAsync(function () {
                 RjmService.deleteRecitativo(item.id).then(function () {
-                    swal('ExcluÃ­do', 'Recitativo removido com sucesso.', 'success');
+                    swal('Excluído', 'Recitativo removido com sucesso.', 'success');
                     $scope.loadData();
                 }).catch(function (error) {
-                    swal('Erro', 'NÃ£o foi possÃ­vel excluir o recitativo: ' + ((error && error.message) || error), 'error');
+                    swal('Erro', 'Não foi possível excluir o recitativo: ' + ((error && error.message) || error), 'error');
                 });
             });
         });
@@ -8722,14 +8722,14 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     var orderedCidades = [];
     var totals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
     var rows = [
-        ['CONGREGAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O CRISTÃƒÆ’Ã†â€™ NO BRASIL'],
-        ['Regional Itapevi - SÃƒÆ’Ã‚Â£o Paulo'],
-        ['ESPAÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¡O BÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂBLICO INFANTIL - EBI'],
-        ['RelatÃƒÆ’Ã‚Â³rio Detalhado de Atividades e Comparecimento'],
-        ['EmissÃƒÆ’Ã‚Â£o: ' + dataEmissao],
-        ['PerÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­odo: ' + periodoInicio + ' a ' + periodoFim],
+        ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
+        ['Regional Itapevi - SÃÆ’£o Paulo'],
+        ['ESPAÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¡O BÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šBLICO INFANTIL - EBI'],
+        ['RelatÃÆ’³rio Detalhado de Atividades e Comparecimento'],
+        ['EmissÃÆ’£o: ' + dataEmissao],
+        ['PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + periodoInicio + ' a ' + periodoFim],
         [],
-        ['Data', 'MunicÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­pio', 'Localidade', 'HistÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ria Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
+        ['Data', 'MunicÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio', 'Localidade', 'HistÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š³ria Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
     ];
     rows = rows.map(function (row) {
         return row.map(function (cell) {
@@ -8768,7 +8768,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         });
 
         merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 7 } });
-        rows.push(['MUNICÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂPIO: ' + cidade]);
+        rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + cidade]);
 
         cityItems.forEach(function(item) {
             var total = $scope.calculateTotal(item);
@@ -8834,7 +8834,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
 };
 $scope.exportToPDF = function() {
         var body = [
-            ['Data', 'Comum', 'Mnna', 'Mnno', 'MoÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§a', 'MoÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§o', 'Total']
+            ['Data', 'Comum', 'Mnna', 'Mnno', 'MoÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§a', 'MoÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§o', 'Total']
         ];
 
         var totals = { meninas: 0, meninos: 0, mocas: 0, mocos: 0, geral: 0 };
@@ -8871,8 +8871,8 @@ $scope.exportToPDF = function() {
 
         var docDefinition = {
             content: [
-                { text: 'RelatÃƒÆ’Ã‚Â³rio de Recitativos - Regional Itapevi', style: 'header' },
-                { text: 'PerÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­odo: ' + ($scope.filters.dataInicio ? $scope.filters.dataInicio : 'InÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­cio') + ' atÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© ' + ($scope.filters.dataFim ? $scope.filters.dataFim : 'Fim'), margin: [0, 0, 0, 10] },
+                { text: 'RelatÃÆ’³rio de Recitativos - Regional Itapevi', style: 'header' },
+                { text: 'PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + ($scope.filters.dataInicio ? $scope.filters.dataInicio : 'InÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­cio') + ' atÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š© ' + ($scope.filters.dataFim ? $scope.filters.dataFim : 'Fim'), margin: [0, 0, 0, 10] },
                 {
                     table: {
                         headerRows: 1,
@@ -9871,11 +9871,11 @@ function rjmAnalyticsCtrl($scope, RjmService, $q, AuthService) {
             item.media = item.lancamentos ? (item.total / item.lancamentos) : 0;
             item.ultimaReuniaoLabel = item.ultimaReuniao ? formatDateOnlyPtBr(item.ultimaReuniao) : '-';
             item.historyCount = item.lancamentos || 0;
-            item.status = item.lancamentos ? 'EM DIA' : 'SEM HISTÃ“RICO';
-            item.statusDetail = item.lancamentos ? 'A comum possui lanÃ§amentos no filtro atual.' : 'Ainda nÃ£o existe lanÃ§amento reconhecido no recorte atual.';
+            item.status = item.lancamentos ? 'EM DIA' : 'SEM HISTÓRICO';
+            item.statusDetail = item.lancamentos ? 'A comum possui lançamentos no filtro atual.' : 'Ainda não existe lançamento reconhecido no recorte atual.';
             item.weekdayLabel = '-';
             item.ultimaLocalidadeLancada = item.comum;
-            item.responsavelResumo = item.lancamentos ? ((item.recitativos || 0) + ' recitativos | ' + (item.irmandade || 0) + ' irmandade') : 'Sem lancamentos reconhecidos';
+            item.responsavelResumo = item.lancamentos ? ((item.recitativos || 0) + ' recitativos | ' + (item.irmandade || 0) + ' irmandade') : 'Sem lançamentos reconhecidos';
             item.ultimaDataLabel = item.ultimaReuniaoLabel;
             item.dataEsperadaLabel = '-';
             return item;
@@ -10030,7 +10030,7 @@ function rjmAnalyticsCtrl($scope, RjmService, $q, AuthService) {
         });
         $scope.rjmPendingFlotData = [
             {
-                label: 'Sem histÃ³rico',
+                label: 'Sem histórico',
                 data: $scope.rjmPendingMunicipioGroups.slice(0, 5).map(function (item, index) {
                     return [index, item.totalAlertas];
                 }),
@@ -10238,7 +10238,7 @@ function rjmComunsCtrl($scope, RjmService, $timeout, AuthService, $rootScope) {
     $scope.groupedComuns = function () {
         var groups = {};
         $scope.filteredComuns().forEach(function (item) {
-            var cidade = item.cidade || 'SEM MUNICÃPIO';
+            var cidade = item.cidade || 'SEM MUNICÍPIO';
             groups[cidade] = groups[cidade] || [];
             groups[cidade].push(item);
         });
@@ -10286,7 +10286,7 @@ function rjmComunsCtrl($scope, RjmService, $timeout, AuthService, $rootScope) {
             $('#modalAddRjmComum').modal('hide');
             $scope.loadComuns();
         }).catch(function (error) {
-            swal('Erro', 'NÃ£o foi possÃ­vel salvar a comum: ' + ((error && error.message) || error), 'error');
+            swal('Erro', 'Não foi possível salvar a comum: ' + ((error && error.message) || error), 'error');
         });
     };
 
@@ -10306,7 +10306,7 @@ function rjmComunsCtrl($scope, RjmService, $timeout, AuthService, $rootScope) {
             if (!confirmed) return;
             $scope.$applyAsync(function () {
                 RjmService.deleteComum(item.id).then(function () {
-                    swal('ExcluÃ­do', 'A comum foi removida com sucesso.', 'success');
+                    swal('Excluído', 'A comum foi removida com sucesso.', 'success');
                     $scope.loadComuns();
                 });
             });
@@ -10369,7 +10369,7 @@ function rjmAuxiliaresCtrl($scope, RjmService, $timeout, AuthService, $rootScope
     $scope.groupedAuxiliares = function () {
         var groups = {};
         $scope.filteredAuxiliares().forEach(function (item) {
-            var cidade = item.cidade || 'SEM MUNICÃPIO';
+            var cidade = item.cidade || 'SEM MUNICÍPIO';
             groups[cidade] = groups[cidade] || [];
             groups[cidade].push(item);
         });
@@ -10425,7 +10425,7 @@ function rjmAuxiliaresCtrl($scope, RjmService, $timeout, AuthService, $rootScope
             $('#modalAddRjmAuxiliar').modal('hide');
             $scope.loadAuxiliares();
         }).catch(function (error) {
-            swal('Erro', 'NÃ£o foi possÃ­vel salvar o auxiliar: ' + ((error && error.message) || error), 'error');
+            swal('Erro', 'Não foi possível salvar o auxiliar: ' + ((error && error.message) || error), 'error');
         });
     };
 
@@ -10445,7 +10445,7 @@ function rjmAuxiliaresCtrl($scope, RjmService, $timeout, AuthService, $rootScope
             if (!confirmed) return;
             $scope.$applyAsync(function () {
                 RjmService.deleteAuxiliar(item.id).then(function () {
-                    swal('ExcluÃ­do', 'O auxiliar foi removido com sucesso.', 'success');
+                    swal('Excluído', 'O auxiliar foi removido com sucesso.', 'success');
                     $scope.loadAuxiliares();
                 });
             });
@@ -10746,7 +10746,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         var uiStandards = window.AppUiStandards || {};
         var original = String(text || '');
         var repaired = original;
-        var hasMojibake = /(?:ÃƒÆ’|ÃƒÂ¢|Ã‚|Ã†|Ã¢â‚¬|Ã¢â€š|Ã¢â€ž|\uFFFD)/.test(original);
+        var hasMojibake = /(?:ÃÆ’|â|Â|Ã†|ââ‚¬|ââ€š|ââ€ž|\uFFFD)/.test(original);
 
         if (!hasMojibake) {
             return original;
@@ -10937,10 +10937,10 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     $scope.cidades = MUNICIPIOS_REGIONAIS.slice().map(normalizeMunicipioRegionalLabel);
 
     $scope.localidadesEBI = [
-        'Ãgua Espraiada', 'Altos de Caucaia', 'Caucaia do Alto - Central', 'Jd. LavapÃ©s',
-        'Jd. Margarida', 'Jd. Miranda', 'Jd. Monte Verde', 'Jd. PetrÃ³polis', 'Morro Grande',
-        'Paisagem Casa Grande', 'Parque Miguel Mirizola', 'Pereiras', 'PortÃ£o Vermelho',
-        'SÃ£o Judas Tadeu', 'SÃ­tio Tabuleiro', 'SÃ­tio Taquaral', 'Vila BelizÃ¡rio', 'Vila Atalaia'
+        'Água Espraiada', 'Altos de Caucaia', 'Caucaia do Alto - Central', 'Jd. Lavapés',
+        'Jd. Margarida', 'Jd. Miranda', 'Jd. Monte Verde', 'Jd. Petrópolis', 'Morro Grande',
+        'Paisagem Casa Grande', 'Parque Miguel Mirizola', 'Pereiras', 'Portão Vermelho',
+        'São Judas Tadeu', 'Sítio Tabuleiro', 'Sítio Taquaral', 'Vila Belizário', 'Vila Atalaia'
     ].map(repairEbiText);
 
     var localidadesFallback = $scope.localidadesEBI.slice();
@@ -10988,62 +10988,170 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
 
     function finalizeEbiLocalidadeLabel(value) {
         return repairEbiText(value)
-            .replace(/CH[^A-Z0-9]*CARA/gi, 'CHÃCARA')
-            .replace(/AMBUIT[^A-Z0-9]*A/gi, 'AMBUITÃ')
-            .replace(/VIT[^A-Z0-9]*POLIS/gi, 'VITÃPOLIS')
-            .replace(/[^A-Z0-9]*GUA\s+ESPRAIADA/gi, 'ÃGUA ESPRAIADA')
-            .replace(/VILA\s+BELIZ[^A-Z0-9]*RIO/gi, 'VILA BELIZÃRIO')
-            .replace(/SAGRADO\s+CORA[^A-Z0-9]*O/gi, 'SAGRADO CORAÃ‡ÃƒO')
-            .replace(/S[^A-Z0-9]*TIO\s+JULINHO/gi, 'SÃTIO JULINHO')
-            .replace(/S[^A-Z0-9]*TIO\s+TABULEIRO/gi, 'SÃTIO TABULEIRO')
-            .replace(/S[^A-Z0-9]*TIO\s+TAQUARAL/gi, 'SÃTIO TAQUARAL')
-            .replace(/CH[^A-Z0-9]*CARA\s+SANTA\s+CEC[^A-Z0-9]*LIA/gi, 'CHÃCARA SANTA CECÃLIA')
-            .replace(/JARDIM\s+MAR[^A-Z0-9]*LIA/gi, 'JARDIM MARÃLIA')
-            .replace(/JARDIM\s+LAVAP[^A-Z0-9]*S\s+DAS\s+GRA[^A-Z0-9]*AS/gi, 'JARDIM LAVAPÃ‰S DAS GRAÃ‡AS')
-            .replace(/JARDIM\s+PETR[^A-Z0-9]*POLIS/gi, 'JARDIM PETRÃ“POLIS')
-            .replace(/CENTRO\s+SANTANA\s+DE\s+PARNA[^A-Z0-9]*BA/gi, 'CENTRO SANTANA DE PARNAÃBA')
-            .replace(/S[^A-Z0-9]*O\s+JUDAS\s+TADEU/gi, 'SÃƒO JUDAS TADEU')
-            .replace(/CIDADE\s+S[^A-Z0-9]*O\s+PEDRO/gi, 'CIDADE SÃƒO PEDRO')
-            .replace(/CIDADE\s+SÃƒO\s+PEDRO/gi, 'CIDADE SÃƒO PEDRO')
-            .replace(/FAZENDINHA\s*-\s*STNA\s+DE\s+PARNA[IÃ]BA/gi, 'FAZENDINHA - SANTANA DE PARNAÃBA')
-            .replace(/JARDIM\s+ITAPU[AÃƒ]\s*-\s*STNA\s+DE\s+PARNA[IÃ]BA/gi, 'JARDIM ITAPUÃƒ - SANTANA DE PARNAÃBA')
-            .replace(/BR-22-0417\s*-\s*PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORTÃƒO VERMELHO - CENTRAL DE VGP')
-            .replace(/BR-22-0417\s*-\s*PORT\uFFFDO\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORTÃƒO VERMELHO - CENTRAL DE VGP')
-            .replace(/PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃƒO VERMELHO - CENTRAL DE VGP')
-            .replace(/PORT\uFFFDO\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃƒO VERMELHO - CENTRAL DE VGP')
-            .replace(/LI[^A-Z0-9]*CAO/gi, 'LIÃ‡ÃƒO')
-            .replace(/HIST[^A-Z0-9]*RIA/gi, 'HISTÃ“RIA')
-            .replace(/\uFFFD/g, 'Ãƒ')
-            .replace(/PORTÃƒO\s*VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃƒO VERMELHO - CENTRAL DE VGP')
-            .replace(/PORTAO\s*VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃƒO VERMELHO - CENTRAL DE VGP');
+            .replace(/CH[^A-Z0-9]*CARA/gi, 'CHÁCARA')
+            .replace(/AMBUIT[^A-Z0-9]*A/gi, 'AMBUITÁ')
+            .replace(/VIT[^A-Z0-9]*POLIS/gi, 'VITÁPOLIS')
+            .replace(/[^A-Z0-9]*GUA\s+ESPRAIADA/gi, 'ÁGUA ESPRAIADA')
+            .replace(/VILA\s+BELIZ[^A-Z0-9]*RIO/gi, 'VILA BELIZÁRIO')
+            .replace(/SAGRADO\s+CORA[^A-Z0-9]*O/gi, 'SAGRADO CORAÇÃO')
+            .replace(/S[^A-Z0-9]*TIO\s+JULINHO/gi, 'SÍTIO JULINHO')
+            .replace(/S[^A-Z0-9]*TIO\s+TABULEIRO/gi, 'SÍTIO TABULEIRO')
+            .replace(/S[^A-Z0-9]*TIO\s+TAQUARAL/gi, 'SÍTIO TAQUARAL')
+            .replace(/CH[^A-Z0-9]*CARA\s+SANTA\s+CEC[^A-Z0-9]*LIA/gi, 'CHÁCARA SANTA CECÍLIA')
+            .replace(/JARDIM\s+MAR[^A-Z0-9]*LIA/gi, 'JARDIM MARÍLIA')
+            .replace(/JARDIM\s+LAVAP[^A-Z0-9]*S\s+DAS\s+GRA[^A-Z0-9]*AS/gi, 'JARDIM LAVAPÉS DAS GRAÇAS')
+            .replace(/JARDIM\s+PETR[^A-Z0-9]*POLIS/gi, 'JARDIM PETRÓPOLIS')
+            .replace(/CENTRO\s+SANTANA\s+DE\s+PARNA[^A-Z0-9]*BA/gi, 'CENTRO SANTANA DE PARNAÍBA')
+            .replace(/S[^A-Z0-9]*O\s+JUDAS\s+TADEU/gi, 'SÃO JUDAS TADEU')
+            .replace(/CIDADE\s+S[^A-Z0-9]*O\s+PEDRO/gi, 'CIDADE SÃO PEDRO')
+            .replace(/CIDADE\s+SÃO\s+PEDRO/gi, 'CIDADE SÃO PEDRO')
+            .replace(/FAZENDINHA\s*-\s*STNA\s+DE\s+PARNA[IÍ]BA/gi, 'FAZENDINHA - SANTANA DE PARNAÍBA')
+            .replace(/JARDIM\s+ITAPU[AÃ]\s*-\s*STNA\s+DE\s+PARNA[IÍ]BA/gi, 'JARDIM ITAPUÃ - SANTANA DE PARNAÍBA')
+            .replace(/BR-22-0417\s*-\s*PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORTÃO VERMELHO - CENTRAL DE VGP')
+            .replace(/BR-22-0417\s*-\s*PORT\uFFFDO\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORTÃO VERMELHO - CENTRAL DE VGP')
+            .replace(/PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP')
+            .replace(/PORT\uFFFDO\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP')
+            .replace(/LI[^A-Z0-9]*CAO/gi, 'LIÇÃO')
+            .replace(/HIST[^A-Z0-9]*RIA/gi, 'HISTÓRIA')
+            .replace(/\uFFFD/g, 'Ã')
+            .replace(/PORTÃO\s*VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP')
+            .replace(/PORTAO\s*VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP');
     }
 
     function formatEbiStatusLabel(value) {
         var raw = String(value || '').toUpperCase()
             .replace(/\uFFFD/g, 'A')
-            .replace(/[ÃÃ€Ã‚Ãƒ]/g, 'A')
-            .replace(/[Ã‰ÃˆÃŠ]/g, 'E')
-            .replace(/[ÃÃŒÃŽ]/g, 'I')
-            .replace(/[Ã“Ã’Ã”Ã•]/g, 'O')
-            .replace(/[ÃšÃ™Ã›]/g, 'U')
+            .replace(/[ÁÀÂÃ]/g, 'A')
+            .replace(/[ÉÃˆÊ]/g, 'E')
+            .replace(/[ÍÃŒÃŽ]/g, 'I')
+            .replace(/[ÓÃ’ÔÕ]/g, 'O')
+            .replace(/[ÚÃ™Ã›]/g, 'U')
             .trim();
 
-        if (raw.indexOf('SEM HIST') !== -1) return 'SEM HISTÃ“RICO';
+        if (raw.indexOf('SEM HIST') !== -1) return 'SEM HISTÓRICO';
         if (raw.indexOf('PENDENTE') !== -1) return 'PENDENTE';
-        if (raw.indexOf('CRITICO') !== -1 || raw.indexOf('CRÃTICO') !== -1) return 'CRÃTICO';
+        if (raw.indexOf('CRITICO') !== -1 || raw.indexOf('CRÍTICO') !== -1) return 'CRÍTICO';
         if (raw.indexOf('HOJE') !== -1) return 'HOJE';
         if (raw.indexOf('EM DIA') !== -1) return 'EM DIA';
 
         return String(value || '').trim();
     }
 
+    function repairEbiText(text) {
+        var uiStandards = window.AppUiStandards || {};
+        var current = String(text || '');
+        var next = current;
+        var attempts = 0;
+        var hasMojibake = /(?:Ã.|.|ï¿½|\uFFFD)/;
+
+        if (!hasMojibake.test(current)) {
+            return current;
+        }
+
+        while (attempts < 3 && hasMojibake.test(next)) {
+            next = repairCadastroMusicText(next);
+
+            if (uiStandards.repairText) {
+                next = uiStandards.repairText(next);
+            }
+
+            if (next === current) {
+                break;
+            }
+
+            current = next;
+            attempts += 1;
+        }
+
+        return current;
+    }
+
+    function finalizeEbiLocalidadeLabel(value) {
+        return repairEbiText(value)
+            .replace(/CH[^A-Z0-9]*CARA/gi, 'CH\u00c1CARA')
+            .replace(/AMBUIT[^A-Z0-9]*A/gi, 'AMBUIT\u00c1')
+            .replace(/VIT[^A-Z0-9]*POLIS/gi, 'VIT\u00c1POLIS')
+            .replace(/[^A-Z0-9]*GUA\s+ESPRAIADA/gi, '\u00c1GUA ESPRAIADA')
+            .replace(/VILA\s+BELIZ[^A-Z0-9]*RIO/gi, 'VILA BELIZ\u00c1RIO')
+            .replace(/SAGRADO\s+CORA[^A-Z0-9]*O/gi, 'SAGRADO CORA\u00c7\u00c3O')
+            .replace(/S[^A-Z0-9]*TIO\s+JULINHO/gi, 'S\u00cdTIO JULINHO')
+            .replace(/S[^A-Z0-9]*TIO\s+TABULEIRO/gi, 'S\u00cdTIO TABULEIRO')
+            .replace(/S[^A-Z0-9]*TIO\s+TAQUARAL/gi, 'S\u00cdTIO TAQUARAL')
+            .replace(/CH[^A-Z0-9]*CARA\s+SANTA\s+CEC[^A-Z0-9]*LIA/gi, 'CH\u00c1CARA SANTA CEC\u00cdLIA')
+            .replace(/JARDIM\s+MAR[^A-Z0-9]*LIA/gi, 'JARDIM MAR\u00cdLIA')
+            .replace(/JARDIM\s+LAVAP[^A-Z0-9]*S\s+DAS\s+GRA[^A-Z0-9]*AS/gi, 'JARDIM LAVAP\u00c9S DAS GRA\u00c7AS')
+            .replace(/JARDIM\s+PETR[^A-Z0-9]*POLIS/gi, 'JARDIM PETR\u00d3POLIS')
+            .replace(/CENTRO\s+SANTANA\s+DE\s+PARNA[^A-Z0-9]*BA/gi, 'CENTRO SANTANA DE PARNA\u00cdBA')
+            .replace(/S[^A-Z0-9]*O\s+JUDAS\s+TADEU/gi, 'S\u00c3O JUDAS TADEU')
+            .replace(/CIDADE\s+S[^A-Z0-9]*O\s+PEDRO/gi, 'CIDADE S\u00c3O PEDRO')
+            .replace(/FAZENDINHA\s*-\s*STNA\s+DE\s+PARNA[I\u00cd]BA/gi, 'FAZENDINHA - SANTANA DE PARNA\u00cdBA')
+            .replace(/JARDIM\s+ITAPU[A\u00c3]\s*-\s*STNA\s+DE\s+PARNA[I\u00cd]BA/gi, 'JARDIM ITAPU\u00c3 - SANTANA DE PARNA\u00cdBA')
+            .replace(/BR-22-0417\s*-\s*PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORT\u00c3O VERMELHO - CENTRAL DE VGP')
+            .replace(/PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORT\u00c3O VERMELHO - CENTRAL DE VGP')
+            .replace(/LI[^A-Z0-9]*CAO/gi, 'LI\u00c7\u00c3O')
+            .replace(/HIST[^A-Z0-9]*RIA/gi, 'HIST\u00d3RIA')
+            .replace(/\uFFFD/g, '\u00c3')
+            .replace(/PORTAO\s*VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORT\u00c3O VERMELHO - CENTRAL DE VGP');
+    }
+
+    function formatEbiStatusKey(value) {
+        return repairEbiText(value)
+            .toString()
+            .toUpperCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^A-Z ]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function formatEbiStatusLabel(value) {
+        var raw = formatEbiStatusKey(value);
+
+        if (raw.indexOf('SEM HISTORICO') !== -1) return 'SEM HIST\u00d3RICO';
+        if (raw.indexOf('PENDENTE') !== -1) return 'PENDENTE';
+        if (raw.indexOf('CRITICO') !== -1) return 'CR\u00cdTICO';
+        if (raw.indexOf('HOJE') !== -1) return 'HOJE';
+        if (raw.indexOf('EM DIA') !== -1) return 'EM DIA';
+
+        return repairEbiText(String(value || '').trim());
+    }
+
+    function ensureEbiCodeSeparator(value) {
+        return repairEbiText(value || '')
+            .replace(/(BR-\d{2}-\d{4})\s*[-–—]?\s*([A-ZÀ-ÿ])/g, '$1 - $2')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+    }
+
+    function normalizeKnownEbiLabel(value) {
+        var text = ensureEbiCodeSeparator(value || '');
+        var code = extractEbiLocalidadeCode(text);
+        var byCode = {
+            'BR-22-1559': 'BR-22-1559 - JARDIM BOA ESPERANÇA',
+            'BR-22-2228': 'BR-22-2228 - JARDIM SÃO CARLOS',
+            'BR-22-3274': 'BR-22-3274 - VILA NOVA ESPERANÇA',
+            'BR-22-3510': 'BR-22-3510 - SÃO JOÃO'
+        };
+
+        if (code && byCode[code]) {
+            return byCode[code];
+        }
+
+        return text
+            .replace(/^JARDIM BOA ESPERAN.*$/i, 'JARDIM BOA ESPERANÇA')
+            .replace(/^JARDIM S.*O CARLOS$/i, 'JARDIM SÃO CARLOS')
+            .replace(/^VILA NOVA ESPERAN.*$/i, 'VILA NOVA ESPERANÇA')
+            .replace(/^S.*O JO.*O$/i, 'SÃO JOÃO');
+    }
+
     function resolveEbiPdfText(value) {
-        var repaired = finalizeEbiLocalidadeLabel(repairEbiText(value || ''));
+        var repaired = normalizeKnownEbiLabel(ensureEbiCodeSeparator(finalizeEbiLocalidadeLabel(repairEbiText(value || ''))));
         var normalized = normalizeEbiLocalidadeLookup(repaired);
         var localidadeCode = extractEbiLocalidadeCode(repaired);
 
         if (localidadeCode === 'BR-22-0417' || (normalized.indexOf('PORT') !== -1 && normalized.indexOf('VERMELHO') !== -1)) {
-            return 'BR-22-0417 - PORTÃƒO VERMELHO - CENTRAL DE VGP';
+            return 'BR-22-0417 - PORTÃO VERMELHO - CENTRAL DE VGP';
         }
 
         if (normalized.indexOf('PARNAIBA') !== -1) {
@@ -11056,7 +11164,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     }
 
     function resolveEbiLocalidadeLabel(value) {
-        var sourceValue = finalizeEbiLocalidadeLabel(value || '');
+        var sourceValue = normalizeKnownEbiLabel(ensureEbiCodeSeparator(finalizeEbiLocalidadeLabel(value || '')));
         var code = extractEbiLocalidadeCode(sourceValue);
         var activeSpace = findEbiActiveSpace(sourceValue);
         var catalogItems = (comumCatalogState && comumCatalogState.items) || [];
@@ -11064,22 +11172,22 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         var index;
         var candidate;
         var codeLabelMap = {
-            'BR-22-0417': 'BR-22-0417 - PORTÃƒO VERMELHO - CENTRAL DE VGP'
+            'BR-22-0417': 'BR-22-0417 - PORTÃO VERMELHO - CENTRAL DE VGP'
         };
 
         if (activeSpace && activeSpace.label) {
-            return finalizeEbiLocalidadeLabel(activeSpace.label);
+            return normalizeKnownEbiLabel(ensureEbiCodeSeparator(finalizeEbiLocalidadeLabel(activeSpace.label)));
         }
 
         if (code && codeLabelMap[code]) {
-            return codeLabelMap[code];
+            return normalizeKnownEbiLabel(ensureEbiCodeSeparator(codeLabelMap[code]));
         }
 
         if (code) {
             for (index = 0; index < catalogItems.length; index += 1) {
                 candidate = catalogItems[index];
                 if (extractEbiLocalidadeCode(candidate) === code) {
-                    return finalizeEbiLocalidadeLabel(candidate);
+                    return normalizeKnownEbiLabel(ensureEbiCodeSeparator(finalizeEbiLocalidadeLabel(candidate)));
                 }
             }
         }
@@ -11091,35 +11199,40 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             }
 
             if (normalizeEbiLocalidadeLookup(candidate) === normalizedSource) {
-                return finalizeEbiLocalidadeLabel(candidate);
+                return normalizeKnownEbiLabel(ensureEbiCodeSeparator(finalizeEbiLocalidadeLabel(candidate)));
             }
         }
 
-        return sourceValue;
+        return normalizeKnownEbiLabel(ensureEbiCodeSeparator(sourceValue));
     }
 
     function normalizeEbiDisplayText(value) {
-        return repairEbiText(value || '')
-            .replace(/PORT(?:ÃƒO|ÃƒÆ’O|AO)\s+VERMELHO/gi, 'PORTÃƒO VERMELHO')
-            .replace(/S(?:ÃƒÆ’|Ãƒ)?O\s+JUDAS\s+TADEU/gi, 'SÃƒO JUDAS TADEU')
-            .replace(/S(?:ÃƒÆ’|Ãƒ)?O\s+JO(?:ÃƒÆ’|Ãƒ)?O/gi, 'SÃƒO JOÃƒO')
-            .replace(/VILA\s+NOVA\s+ESPERAN(?:Ãƒâ€¡A|Ãƒ+A|CA)/gi, 'VILA NOVA ESPERANÃ‡A')
-            .replace(/JARDIM\s+BOA\s+ESPERAN(?:Ãƒâ€¡A|Ãƒ+A|CA)/gi, 'JARDIM BOA ESPERANÃ‡A')
-            .replace(/JARDIM\s+S(?:ÃƒÆ’|Ãƒ)?O\s+CARLOS/gi, 'JARDIM SÃƒO CARLOS')
-            .replace(/AMBUIT(?:ÃƒÂ|Ãƒ|A)/gi, 'AMBUITÃ')
-            .replace(/CH(?:ÃƒÂ|Ãƒ|A)CARA/gi, 'CHÃCARA')
-            .replace(/S(?:ÃƒÂ|Ãƒ|I)TIO/gi, 'SÃTIO')
-            .replace(/LI(?:Ãƒâ€¡|Ãƒ|C)AO/gi, 'LIÃ‡ÃƒO')
-            .replace(/HIST(?:Ãƒâ€œ|Ãƒ|O)RIA/gi, 'HISTÃ“RIA')
-            .replace(/PETR(?:Ãƒâ€œ|Ãƒ|O)POLIS/gi, 'PETRÃ“POLIS')
-            .replace(/LAVAP(?:Ãƒâ€°|Ãƒ|E)S/gi, 'LAVAPÃ‰S')
-            .replace(/GRA(?:Ãƒâ€¡|Ãƒ|C)AS/gi, 'GRAÃ‡AS')
-            .replace(/BELIZ(?:ÃƒÂ|Ãƒ|A)RIO/gi, 'BELIZÃRIO')
-            .replace(/VIT(?:ÃƒÂ|Ãƒ|A)POLIS/gi, 'VITÃPOLIS')
-            .replace(/MAR(?:ÃƒÂ|Ãƒ|I)LIA/gi, 'MARÃLIA')
-            .replace(/CEC(?:ÃƒÂ|Ãƒ|I)LIA/gi, 'CECÃLIA')
-            .replace(/PARNA(?:ÃƒÂ|Ãƒ|I)BA/gi, 'PARNAÃBA')
-            .replace(/ITAPU(?:Ãƒ|A)/gi, 'ITAPUÃƒ');
+        return normalizeKnownEbiLabel(ensureEbiCodeSeparator(repairEbiText(value || '')))
+            .replace(/ESPERANÇA/gi, 'ESPERANÇA')
+            .replace(/SÃO/gi, 'SÃO')
+            .replace(/JOÃO/gi, 'JOÃO')
+            .replace(/SÃO CARLOS/gi, 'SÃO CARLOS')
+            .replace(/SÃO JOÃO/gi, 'SÃO JOÃO')
+            .replace(/PORT(?:ÃO|ÃÆ’O|AO)\s+VERMELHO/gi, 'PORTÃO VERMELHO')
+            .replace(/S(?:ÃÆ’|Ã)?O\s+JUDAS\s+TADEU/gi, 'SÃO JUDAS TADEU')
+            .replace(/S(?:ÃÆ’|Ã)?O\s+JO(?:ÃÆ’|Ã)?O/gi, 'SÃO JOÃO')
+            .replace(/VILA\s+NOVA\s+ESPERAN(?:ÇA|Ã+A|CA)/gi, 'VILA NOVA ESPERANÇA')
+            .replace(/JARDIM\s+BOA\s+ESPERAN(?:ÇA|Ã+A|CA)/gi, 'JARDIM BOA ESPERANÇA')
+            .replace(/JARDIM\s+S(?:ÃÆ’|Ã)?O\s+CARLOS/gi, 'JARDIM SÃO CARLOS')
+            .replace(/AMBUIT(?:Á|Ã|A)/gi, 'AMBUITÁ')
+            .replace(/CH(?:Á|Ã|A)CARA/gi, 'CHÁCARA')
+            .replace(/S(?:Í|Ã|I)TIO/gi, 'SÍTIO')
+            .replace(/LI(?:Ç|Ã|C)AO/gi, 'LIÇÃO')
+            .replace(/HIST(?:Ó|Ã|O)RIA/gi, 'HISTÓRIA')
+            .replace(/PETR(?:Ó|Ã|O)POLIS/gi, 'PETRÓPOLIS')
+            .replace(/LAVAP(?:Ãâ€°|Ã|E)S/gi, 'LAVAPÉS')
+            .replace(/GRA(?:Ç|Ã|C)AS/gi, 'GRAÇAS')
+            .replace(/BELIZ(?:Á|Ã|A)RIO/gi, 'BELIZÁRIO')
+            .replace(/VIT(?:Á|Ã|A)POLIS/gi, 'VITÁPOLIS')
+            .replace(/MAR(?:Í|Ã|I)LIA/gi, 'MARÍLIA')
+            .replace(/CEC(?:Í|Ã|I)LIA/gi, 'CECÍLIA')
+            .replace(/PARNA(?:Í|Ã|I)BA/gi, 'PARNAÍBA')
+            .replace(/ITAPU(?:Ã|A)/gi, 'ITAPUÃ');
     }
 
     $scope.resolveEbiLocalidadeLabel = resolveEbiLocalidadeLabel;
@@ -11142,15 +11255,15 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     updateEbiCatalogOptions();
 
     $scope.livrosBiblia = [
-        'GÃªnesis', 'ÃŠxodo', 'LevÃ­tico', 'NÃºmeros', 'DeuteronÃ´mio', 'JosuÃ©', 'JuÃ­zes', 'Rute',
-        '1 Samuel', '2 Samuel', '1 Reis', '2 Reis', '1 CrÃ´nicas', '2 CrÃ´nicas', 'Esdras',
-        'Neemias', 'Ester', 'JÃ³', 'Salmos', 'ProvÃ©rbios', 'Eclesiastes', 'Cantares', 'IsaÃ­as',
-        'Jeremias', 'LamentaÃ§Ãµes', 'Ezequiel', 'Daniel', 'OsÃ©ias', 'Joel', 'AmÃ³s', 'Obadias',
-        'Jonas', 'MiquÃ©ias', 'Naum', 'Habacuque', 'Sofonias', 'Ageu', 'Zacarias', 'Malaquias',
-        'Mateus', 'Marcos', 'Lucas', 'JoÃ£o', 'Atos', 'Romanos', '1 CorÃ­ntios', '2 CorÃ­ntios',
-        'GÃ¡latas', 'EfÃ©sios', 'Filipenses', 'Colossenses', '1 Tessalonicenses',
-        '2 Tessalonicenses', '1 TimÃ³teo', '2 TimÃ³teo', 'Tito', 'Filemon', 'Hebreus', 'Tiago',
-        '1 Pedro', '2 Pedro', '1 JoÃ£o', '2 JoÃ£o', '3 JoÃ£o', 'Judas', 'Apocalipse'
+        'Gênesis', 'Êxodo', 'Levítico', 'Números', 'Deuteronômio', 'Josué', 'Juízes', 'Rute',
+        '1 Samuel', '2 Samuel', '1 Reis', '2 Reis', '1 Crônicas', '2 Crônicas', 'Esdras',
+        'Neemias', 'Ester', 'Jó', 'Salmos', 'Provérbios', 'Eclesiastes', 'Cantares', 'Isaías',
+        'Jeremias', 'Lamentações', 'Ezequiel', 'Daniel', 'Oséias', 'Joel', 'Amós', 'Obadias',
+        'Jonas', 'Miquéias', 'Naum', 'Habacuque', 'Sofonias', 'Ageu', 'Zacarias', 'Malaquias',
+        'Mateus', 'Marcos', 'Lucas', 'João', 'Atos', 'Romanos', '1 Coríntios', '2 Coríntios',
+        'Gálatas', 'Efésios', 'Filipenses', 'Colossenses', '1 Tessalonicenses',
+        '2 Tessalonicenses', '1 Timóteo', '2 Timóteo', 'Tito', 'Filemon', 'Hebreus', 'Tiago',
+        '1 Pedro', '2 Pedro', '1 João', '2 João', '3 João', 'Judas', 'Apocalipse'
     ].map(repairEbiText);
 
     $scope.selectFirstLocalidadeMatch = function ($event) {
@@ -11358,7 +11471,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         var groups = {};
 
         ($scope.filteredRecitativos || []).forEach(function (item) {
-            var municipio = getEbiMunicipio(item) || item.cidade || 'Sem municÃ­pio';
+            var municipio = getEbiMunicipio(item) || item.cidade || 'Sem município';
             groups[municipio] = groups[municipio] || [];
             groups[municipio].push(item);
         });
@@ -11389,7 +11502,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     }
 
     function getEbiWeekdayLabel(weekday) {
-        var names = ['Domingo', 'Segunda', 'TerÃ§a', 'Quarta', 'Quinta', 'Sexta', 'SÃ¡bado'];
+        var names = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
         return weekday === null || weekday === undefined ? 'Sem agenda' : names[weekday];
     }
 
@@ -11455,7 +11568,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     function getEbiPendingMunicipioCanonicalLabel(value) {
         var raw = normalizeComumCatalogLookup(repairCadastroMusicText(value || ''));
 
-        if (raw.indexOf('SANTANA') !== -1 && raw.indexOf('PARNA') !== -1) return 'SANTANA DE PARNAÃBA';
+        if (raw.indexOf('SANTANA') !== -1 && raw.indexOf('PARNA') !== -1) return 'SANTANA DE PARNAÍBA';
         if (raw.indexOf('VARGEM') !== -1 && raw.indexOf('PAULISTA') !== -1) return 'VARGEM GRANDE PAULISTA';
         if (raw.indexOf('PIRAPORA') !== -1) return 'PIRAPORA DO BOM JESUS';
         if (raw.indexOf('CAUCAIA') !== -1) return 'CAUCAIA DO ALTO';
@@ -11463,7 +11576,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         if (raw.indexOf('JANDIRA') !== -1) return 'JANDIRA';
         if (raw.indexOf('COTIA') !== -1) return 'COTIA';
 
-        return normalizeMunicipioRegionalLabel(repairCadastroMusicText(value || 'Sem municÃ­pio'));
+        return normalizeMunicipioRegionalLabel(repairCadastroMusicText(value || 'Sem município'));
     }
 
     function buildEbiRiskMunicipioGroups(items) {
@@ -11483,7 +11596,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         });
 
         (items || []).forEach(function (item) {
-            var canonicalLabel = getEbiPendingMunicipioCanonicalLabel(item && item.municipio || 'Sem municÃ­pio');
+            var canonicalLabel = getEbiPendingMunicipioCanonicalLabel(item && item.municipio || 'Sem município');
             var canonicalKey = normalizeComumCatalogLookup(canonicalLabel);
 
             groupsMap[canonicalKey] = groupsMap[canonicalKey] || {
@@ -11494,11 +11607,11 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
                 totalAlertas: 0
             };
 
-            if (item.status === 'PENDENTE' || item.status === 'CRITICO') {
+            if (item.status === 'PENDENTE' || item.status === 'CRÍTICO') {
                 groupsMap[canonicalKey].pendentes += 1;
             } else if (item.status === 'HOJE') {
                 groupsMap[canonicalKey].hoje += 1;
-            } else if (item.status === 'SEM HISTÃ“RICO') {
+            } else if (item.status === 'SEM HISTÓRICO') {
                 groupsMap[canonicalKey].semHistorico += 1;
             }
 
@@ -11555,7 +11668,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             summary.totalAlertas + ' EBIs exigem atencao: ' +
             (summary.pendentes || 0) + ' atrasados, ' +
             (summary.vencemHoje || 0) + ' previstos para hoje e ' +
-            (summary.semHistorico || 0) + ' sem histÃ³rico.',
+            (summary.semHistorico || 0) + ' sem histórico.',
             'warning'
         );
     }
@@ -11590,22 +11703,22 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             var priority = 0;
 
             if (!history.length) {
-                status = 'SEM HISTÃ“RICO';
-                statusDetail = 'Ainda nao existe lancamento para inferir a rotina semanal.';
+                status = 'SEM HISTÓRICO';
+                statusDetail = 'Ainda não existe lançamento para inferir a rotina semanal.';
                 priority = 4;
             } else if (expectedDate && hasLaunchedCurrentCycle) {
                 status = 'EM DIA';
-                statusDetail = 'Ultimo lancamento cobre o ciclo atual.';
+                statusDetail = 'Último lançamento cobre o ciclo atual.';
             } else if (expectedDate && expectedDate.getTime() === today.getTime()) {
                 status = 'HOJE';
-                statusDetail = 'Dia previsto para lancamento nesta localidade.';
+                statusDetail = 'Dia previsto para lançamento nesta localidade.';
                 priority = 2;
             } else if (expectedDate && lastDate && lastDate.getTime() < expectedDate.getTime()) {
-                status = daysLate >= 3 ? 'CRITICO' : 'PENDENTE';
-                statusDetail = daysLate > 0 ? daysLate + ' dia(s) de atraso no ciclo semanal.' : 'Lancamento pendente.';
-                priority = status === 'CRITICO' ? 5 : 3;
+                status = daysLate >= 3 ? 'CRÍTICO' : 'PENDENTE';
+                statusDetail = daysLate > 0 ? daysLate + ' dia(s) de atraso no ciclo semanal.' : 'Lançamento pendente.';
+                priority = status === 'CRÍTICO' ? 5 : 3;
             } else if (!expectedDate && history.length) {
-                status = 'SEM HISTÃ“RICO';
+                status = 'SEM HISTÓRICO';
                 statusDetail = 'Base insuficiente para inferir o dia da semana.';
                 priority = 1;
             }
@@ -11626,7 +11739,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
                 daysLate: daysLate,
                 priority: priority,
                 ultimaLocalidadeLancada: lastRecord ? resolveEbiLocalidadeLabel(lastRecord.localidade || '') : '',
-                responsavelResumo: lastRecord && lastRecord.instrutora ? lastRecord.instrutora : 'Acompanhar coordenacao local'
+                responsavelResumo: lastRecord && lastRecord.instrutora ? repairEbiText(lastRecord.instrutora) : 'Acompanhar coordenação local'
             };
         }).filter(matchesPendingViewFilters).sort(function (a, b) {
             if (b.priority !== a.priority) {
@@ -11641,9 +11754,9 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         summary = {
             previstosNoCiclo: items.filter(function (item) { return item.weekday !== null && item.weekday !== undefined; }).length,
             emDia: items.filter(function (item) { return item.status === 'EM DIA'; }).length,
-            pendentes: items.filter(function (item) { return item.status === 'PENDENTE' || item.status === 'CRITICO'; }).length,
+            pendentes: items.filter(function (item) { return item.status === 'PENDENTE' || item.status === 'CRÍTICO'; }).length,
             vencemHoje: items.filter(function (item) { return item.status === 'HOJE'; }).length,
-            semHistorico: items.filter(function (item) { return item.status === 'SEM HISTÃ“RICO'; }).length
+            semHistorico: items.filter(function (item) { return item.status === 'SEM HISTÓRICO'; }).length
         };
         summary.totalAlertas = summary.pendentes + summary.vencemHoje + summary.semHistorico;
 
@@ -12080,7 +12193,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     $scope.prepareAddAtividade = function() {
         $scope.viewing = false;
         $scope.editing = false;
-        $scope.currentAtividade = { data_reuniao: new Date(), meninas: 0, meninos: 0, colaboradoras: 0, suspenso: 'NÃ£o', justificativa: '' };
+        $scope.currentAtividade = { data_reuniao: new Date(), meninas: 0, meninos: 0, colaboradoras: 0, suspenso: 'Não', justificativa: '' };
         $('#modalAtividade').modal('show');
     };
 
@@ -12095,7 +12208,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         if (isEbiSuspenso($scope.currentAtividade)) {
             justificativaCurta = getEbiJustificativa($scope.currentAtividade);
             if (!justificativaCurta) {
-                swal('Justificativa obrigatÃ³ria', 'Informe uma justificativa breve para registrar o EBI suspenso.', 'warning');
+                swal('Justificativa obrigatória', 'Informe uma justificativa breve para registrar o EBI suspenso.', 'warning');
                 return;
             }
             $scope.currentAtividade.justificativa = justificativaCurta;
@@ -12103,7 +12216,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             $scope.currentAtividade.meninos = 0;
             $scope.currentAtividade.colaboradoras = 0;
         } else {
-            $scope.currentAtividade.suspenso = 'NÃ£o';
+            $scope.currentAtividade.suspenso = 'Não';
             $scope.currentAtividade.justificativa = '';
         }
         syncAtividadeMunicipio($scope.currentAtividade);
@@ -12125,6 +12238,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     };
 
     $scope.formatEbiStatusLabel = formatEbiStatusLabel;
+    $scope.formatEbiStatusKey = formatEbiStatusKey;
     $scope.isEbiSuspenso = isEbiSuspenso;
     $scope.getEbiJustificativa = getEbiJustificativa;
 
@@ -12189,7 +12303,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     $scope.saveAtividade = function() {
         var justificativaCurta = '';
         if ($scope.editing && !$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem salvar alteraÃ§Ãµes da EBI.');
+            showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem salvar alterações da EBI.');
             return;
         }
         syncAtividadeMunicipio($scope.currentAtividade);
@@ -12628,15 +12742,15 @@ function repairCadastroMusicText(text) {
         var ch;
         var code;
 
-        if (!/[ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸]/.test(input) || typeof TextDecoder === 'undefined') {
+        if (!/[ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬ ÃÆ’¢âââ‚¬Å¡¬âââ‚¬Å¾¢ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦Ãâ€š¡ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦Ãâ€š¡ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¡ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’¢âââ€šÂ¬Ã…Â¾Ãâ€š¢ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’ââ‚¬Å¡Ãâ€š¾ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¦ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¡ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¹ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€š ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š°ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¹ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’¢âââ€šÂ¬Ã…Â¾Ãâ€š¢ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š½ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¹ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¾ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’¢âââ‚¬Å¡¬Ã…ââ‚¬Å“ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€šÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¹ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’¢âââ‚¬Å¡¬Ã…ââ‚¬Å“ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦Ãâ€š¾ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¡ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šºÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¾ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¸]/.test(input) || typeof TextDecoder === 'undefined') {
             return input;
         }
 
         cp1252Extra = cp1252Extra || {
-            'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬': 0x80, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡': 0x82, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢': 0x83, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾': 0x84, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦': 0x85, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ': 0x86, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡': 0x87,
-            'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ': 0x88, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°': 0x89, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ': 0x8A, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹': 0x8B, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢': 0x8C, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½': 0x8E, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ': 0x91,
-            'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢': 0x92, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“': 0x93, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â': 0x94, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢': 0x95, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ': 0x96, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â': 0x97, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“': 0x98,
-            'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢': 0x99, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡': 0x9A, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº': 0x9B, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ': 0x9C, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾': 0x9E, 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸': 0x9F
+            'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦Ãâ€š¡ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¬': 0x80, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’ââ‚¬Å¡Ãâ€š¡': 0x82, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’¢âââ€šÂ¬Ã…Â¾Ãâ€š¢': 0x83, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’ââ‚¬Å¡Ãâ€š¾': 0x84, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¦': 0x85, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š ': 0x86, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¡': 0x87,
+            'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¹ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€š ': 0x88, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š°': 0x89, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š ': 0x8A, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¹': 0x8B, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’¢âââ€šÂ¬Ã…Â¾Ãâ€š¢': 0x8C, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š½': 0x8E, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¹ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“': 0x91,
+            'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¾ÃÆ’ââ‚¬Å¡Ãâ€š¢': 0x92, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’¢âââ‚¬Å¡¬Ã…ââ‚¬Å“': 0x93, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š': 0x94, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¢': 0x95, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“': 0x96, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€š': 0x97, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¹ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’¢âââ‚¬Å¡¬Ã…ââ‚¬Å“': 0x98,
+            'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦Ãâ€š¾ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¢': 0x99, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¡': 0x9A, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šº': 0x9B, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“': 0x9C, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¾': 0x9E, 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¦ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¸': 0x9F
         };
 
         for (i = 0; i < input.length; i += 1) {
@@ -12662,35 +12776,35 @@ function repairCadastroMusicText(text) {
     value = decodeOnce(value);
     value = decodeOnce(value);
     replacements = {
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â°',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¡',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â ',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âµ': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âµ',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âª': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âª',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â´': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â´',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§': 'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡': '',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ': 'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â': 'ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ': '\'',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢': '\'',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“': '"',
-        'ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â': '"'
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬ ÃÆ’¢âââ‚¬Å¡¬âââ‚¬Å¾¢': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€š°': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š°',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ã…ââ‚¬Å“',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€š': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’ââ‚¬Å¡Ãâ€š¡': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â¦Ãâ€š¡',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€š¡': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¡',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦Ãâ€š¡': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’ââ‚¬Å¡Ãâ€š ': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â¦Ãâ€š ',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š£': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šµ': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šµ',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¡': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¡',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š¢': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šª': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šª',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š©': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š©',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š­': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š³': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š³',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š´': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š´',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šº': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šº',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š§': 'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡': '',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“': 'ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’¢âââ‚¬Å¡¬Ã…ââ‚¬Å“',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’ââ‚¬Å¡Ãâ€š': 'ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ€šÂ¬Ã…Â¡Ãâ€š¬ÃÆ’¢âââ‚¬Å¡¬Ãâ€š',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¹ÃÆ’ââ‚¬Â¦âââ€šÂ¬Ã…“': '\'',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¾ÃÆ’ââ‚¬Å¡Ãâ€š¢': '\'',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬¦ÃÆ’¢âââ‚¬Å¡¬Ã…ââ‚¬Å“': '"',
+        'ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¢ÃÆ’Ã†’Ãâ€š¢ÃÆ’¢âââ‚¬Å¡¬Ã…¡ÃÆ’ââ‚¬Å¡Ãâ€š¬ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š': '"'
     };
 
     Object.keys(replacements).forEach(function (wrong) {
@@ -12745,7 +12859,7 @@ function repairEbiText(text) {
     var uiStandards = window.AppUiStandards || {};
     var original = String(text || '');
     var repaired = original;
-    var hasMojibake = /(?:ÃƒÆ’|ÃƒÂ¢|Ã‚|Ã†|Ã¢â‚¬|Ã¢â€š|Ã¢â€ž|\uFFFD)/.test(original);
+    var hasMojibake = /(?:ÃÆ’|â|Â|Ã†|ââ‚¬|ââ€š|ââ€ž|\uFFFD)/.test(original);
 
     if (!hasMojibake) {
         return original;
@@ -12887,14 +13001,14 @@ function normalizeMunicipioRegionalLabel(value) {
 
     fallbackLabel = repairCadastroMusicText(value || '');
     fallbackLabel = String(fallbackLabel || '')
-        .replace(/S\?O/gi, 'SÃƒO')
-        .replace(/JO\?O/gi, 'JOÃƒO')
-        .replace(/CORA\?\?O/gi, 'CORAÃ‡ÃƒO')
-        .replace(/PORT\?O/gi, 'PORTÃƒO')
-        .replace(/ITAPU\?/gi, 'ITAPUÃƒ')
-        .replace(/JAP\?O/gi, 'JAPÃƒO')
-        .replace(/PARAN[IÃ]BA/gi, 'PARNAÃBA')
-        .replace(/PARNA\?BA/gi, 'PARNAÃBA');
+        .replace(/S\?O/gi, 'SÃO')
+        .replace(/JO\?O/gi, 'JOÃO')
+        .replace(/CORA\?\?O/gi, 'CORAÇÃO')
+        .replace(/PORT\?O/gi, 'PORTÃO')
+        .replace(/ITAPU\?/gi, 'ITAPUÃ')
+        .replace(/JAP\?O/gi, 'JAPÃO')
+        .replace(/PARAN[IÍ]BA/gi, 'PARNAÍBA')
+        .replace(/PARNA\?BA/gi, 'PARNAÍBA');
 
     return labels[inferredKey] || labels[normalized] || fallbackLabel;
 }
@@ -13109,7 +13223,7 @@ function configureCadastroMusicForm($scope, modelName, AuthService) {
     $scope.totalComuns = comuns.length;
     $scope.uiPalette = uiStandards.palette || {};
     $scope.sexoOptions = ['Menina', 'Menino'];
-    $scope.simNaoOptions = ['Sim', 'NÃ£o'];
+    $scope.simNaoOptions = ['Sim', 'Não'];
     $scope.comumPickerState = {
         visible: false,
         targetField: null,
@@ -13339,7 +13453,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
     $scope.saveNewAluno = function() {
         if ($scope.formAddAlunoEbi && $scope.formAddAlunoEbi.$invalid) {
             $scope.formAddAlunoEbi.$setSubmitted();
-            swal("Campos obrigatÃ³rios", "Preencha os campos obrigatÃ³rios para salvar o cadastro da crianÃ§a.", "warning");
+            swal("Campos obrigatórios", "Preencha os campos obrigatórios para salvar o cadastro da criança.", "warning");
             return;
         }
 
@@ -13359,13 +13473,13 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         }
 
         if ($scope.editingAluno && !$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem salvar alteraÃ§Ãµes da EBI.');
+            showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem salvar alterações da EBI.');
             return;
         }
 
         var savePromise = $scope.editingAluno ? EbiService.updateAluno($scope.newAluno) : EbiService.saveAluno($scope.newAluno);
         savePromise.then(function() {
-            swal("Sucesso", $scope.editingAluno ? "Cadastro da crianÃ§a atualizado com sucesso." : "CrianÃ§a cadastrada com sucesso.", "success");
+            swal("Sucesso", $scope.editingAluno ? "Cadastro da criança atualizado com sucesso." : "Criança cadastrada com sucesso.", "success");
             $('#modalAddAlunoEbi').modal('hide');
             $scope.loadAlunos();
         }).catch(function(error) {
@@ -13379,7 +13493,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
             return;
         }
         swal({
-            title: "Remover CrianÃ§a?",
+            title: "Remover Criança?",
             text: "Deseja excluir o cadastro de " + aluno.nome_crianca + "?",
             type: "warning",
             showCancelButton: true,
@@ -13387,7 +13501,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
             closeOnConfirm: false
         }, function () {
             EbiService.deleteAluno(aluno.id).then(function() {
-                swal("Removido!", "CrianÃ§a removida com sucesso.", "success");
+                swal("Removido!", "Criança removida com sucesso.", "success");
                 $scope.loadAlunos();
             });
         });
@@ -13477,7 +13591,7 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
         }
 
         if ($scope.editingInstrutor && !$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem salvar alteraÃ§Ãµes da EBI.');
+            showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem salvar alterações da EBI.');
             return;
         }
 
@@ -13515,13 +13629,13 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
 
 function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     var visitasText = {
-        institution: 'CONGREGAÃ‡ÃƒO CRISTÃƒ NO BRASIL',
-        region: 'Regional Itapevi - SÃ£o Paulo',
+        institution: 'CONGREGAÇÃO CRISTàNO BRASIL',
+        region: 'Regional Itapevi - São Paulo',
         moduleName: 'DEPARTAMENTO DE VISITAS',
-        reportTitle: 'RelatÃ³rio Geral de Visitas',
-        issueDateLabel: 'EmissÃ£o',
-        periodLabel: 'PerÃ­odo',
-        pageLabel: 'PÃ¡gina',
+        reportTitle: 'Relatório Geral de Visitas',
+        issueDateLabel: 'Emissão',
+        periodLabel: 'Período',
+        pageLabel: 'Página',
         allRecordsLabel: 'Todos os registros'
     };
     var comumCatalogState = getFallbackComumCatalogState();
@@ -13530,7 +13644,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
         return [
             'Janeiro',
             'Fevereiro',
-            'MarÃ§o',
+            'Março',
             'Abril',
             'Maio',
             'Junho',
@@ -13567,26 +13681,50 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
         }
 
         value = String(value || '')
-            .replace(/PARNAIBA/gi, 'PARNAÃBA')
-            .replace(/MUSICOS/gi, 'MÃºsicos')
-            .replace(/EVANGELIZACAO/gi, 'EvangelizaÃ§Ã£o')
-            .replace(/SITIO/gi, 'SÃTIO')
-            .replace(/MARCO/gi, 'MarÃ§o')
-            .replace(/CRITICO/gi, 'CRÃTICO');
+            .replace(/PARNAIBA/gi, 'PARNAÍBA')
+            .replace(/MUSICOS/gi, 'Músicos')
+            .replace(/EVANGELIZACAO/gi, 'Evangelização')
+            .replace(/SITIO/gi, 'SÍTIO')
+            .replace(/MARCO/gi, 'Março')
+            .replace(/CRITICO/gi, 'CRÍTICO');
 
         if (/BR-22-3510/i.test(value)) {
-            return 'BR-22-3510 - SÃƒO JOÃƒO';
+            return 'BR-22-3510 - SÃO JOÃO';
         }
 
         if (/BR-21-1312/i.test(value)) {
-            return 'BR-21-1312 - SÃTIO JOSÃ‰ TEIXEIRA';
+            return 'BR-21-1312 - SÍTIO JOSÉ TEIXEIRA';
         }
 
         if (/CENTRAL\s*-\s*PARNA/i.test(value)) {
-            return 'CENTRAL - PARNAÃBA';
+            return 'CENTRAL - PARNAÍBA';
         }
 
         return value;
+    }
+
+    function formatVisitasStatusKey(value) {
+        return repairVisitasText(value)
+            .toString()
+            .toUpperCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^A-Z ]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function formatVisitasStatusLabel(value) {
+        var raw = formatVisitasStatusKey(value);
+
+        if (raw.indexOf('EXCELENTE') !== -1) return 'EXCELENTE';
+        if (raw.indexOf('BOM') !== -1) return 'BOM';
+        if (raw.indexOf('CRITICO') !== -1) return 'CRÍTICO';
+        if (raw.indexOf('PENDENTE') !== -1) return 'PENDENTE';
+        if (raw.indexOf('SEM HISTORICO') !== -1) return 'SEM HISTÓRICO';
+        if (raw.indexOf('EM DIA') !== -1) return 'EM DIA';
+
+        return repairVisitasText(String(value || '').trim());
     }
 
     function normalizeVisitasMunicipioFromComum(value) {
@@ -13603,13 +13741,13 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
 
     function getVisitasPeriodoLabel() {
         if ($scope.filters.dataInicio || $scope.filters.dataFim) {
-            return ($scope.filters.dataInicio ? formatVisitasDateBR($scope.filters.dataInicio) : 'InÃ­cio') +
-                ' atÃ© ' +
+            return ($scope.filters.dataInicio ? formatVisitasDateBR($scope.filters.dataInicio) : 'Início') +
+                ' até ' +
                 ($scope.filters.dataFim ? formatVisitasDateBR($scope.filters.dataFim) : 'Fim');
         }
 
         if ($scope.filters.mes) {
-            return 'MÃªs de ' + repairVisitasText($scope.filters.mes);
+            return 'Mês de ' + repairVisitasText($scope.filters.mes);
         }
 
         return visitasText.allRecordsLabel;
@@ -13619,7 +13757,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
         var groups = {};
 
         ($scope.filteredLancamentos || []).forEach(function(item) {
-            var municipio = repairVisitasText(item.municipio || 'Sem municÃ­pio');
+            var municipio = repairVisitasText(item.municipio || 'Sem município');
             groups[municipio] = groups[municipio] || [];
             groups[municipio].push(item);
         });
@@ -13816,7 +13954,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
                 lancamentos: lancamentos,
                 igrejas: igrejas,
                 taxa: taxa,
-                status: taxaNumero >= 80 ? 'EXCELENTE' : (taxaNumero >= 50 ? 'BOM' : 'CRÃTICO'),
+                status: taxaNumero >= 80 ? 'EXCELENTE' : (taxaNumero >= 50 ? 'BOM' : 'CRÍTICO'),
                 class: taxaNumero >= 80 ? 'excellent' : (taxaNumero >= 50 ? 'good' : 'critical')
             };
         }).filter(function (item) {
@@ -13825,7 +13963,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     }
 
     // List of cities from the regional
-    $scope.cidades = ['CAUCAIA DO ALTO', 'COTIA', 'ITAPEVI', 'JANDIRA', 'PIRAPORA DO BOM JESUS', 'SANTANA DE PARNAÃBA', 'VARGEM GRANDE PAULISTA'];
+    $scope.cidades = ['CAUCAIA DO ALTO', 'COTIA', 'ITAPEVI', 'JANDIRA', 'PIRAPORA DO BOM JESUS', 'SANTANA DE PARNAÍBA', 'VARGEM GRANDE PAULISTA'];
 
     // Filter models
     $scope.filters = {
@@ -13840,15 +13978,15 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     var allData = [
         { data: '2026-02-05', mes: 'Fevereiro', municipio: 'Itapevi', igreja: 'BR-22-0679 - JARDIM BELA VISTA - ITAPEVI', gvi: 1, gvm: 1, musicos: 2, rf: 8, re: 0 },
         { data: '2026-02-12', mes: 'Fevereiro', municipio: 'Itapevi', igreja: 'BR-22-3129 - PARQUE SUBURBANO III', gvi: 5, gvm: 2, musicos: 1, rf: 1, re: 1 },
-        { data: '2026-02-15', mes: 'Fevereiro', municipio: 'Itapevi', igreja: 'BR-22-3510 - SÃƒO JOÃƒO', gvi: 1, gvm: 0, musicos: 0, rf: 1, re: 1 },
+        { data: '2026-02-15', mes: 'Fevereiro', municipio: 'Itapevi', igreja: 'BR-22-3510 - SÃO JOÃO', gvi: 1, gvm: 0, musicos: 0, rf: 1, re: 1 },
         { data: '2026-02-18', mes: 'Fevereiro', municipio: 'Vargem Grande Paulista', igreja: 'BR-22-2798 - PARQUE DO AGRESTE', gvi: 3, gvm: 1, musicos: 3, rf: 3, re: 0 },
         { data: '2026-02-20', mes: 'Fevereiro', municipio: 'Jandira', igreja: 'BR-22-3193 - DOROLES PASCHOALIM', gvi: 2, gvm: 9, musicos: 5, rf: 2, re: 1 },
         { data: '2026-02-22', mes: 'Fevereiro', municipio: 'Cotia', igreja: 'BR-21-1020 - NHAMBUCA', gvi: 5, gvm: 5, musicos: 2, rf: 1, re: 2 },
-        { data: '2026-03-01', mes: 'MarÃ§o', municipio: 'Itapevi', igreja: 'BR-21-1312 - SÃTIO JOSÃ‰ TEIXEIRA', gvi: 5, gvm: 1, musicos: 1, rf: 5, re: 0 },
-        { data: '2026-03-05', mes: 'MarÃ§o', municipio: 'Cotia', igreja: 'BR-22-2797 - LAGEADO', gvi: 2, gvm: 2, musicos: 4, rf: 1, re: 0 },
-        { data: '2026-03-10', mes: 'MarÃ§o', municipio: 'Itapevi', igreja: 'BR-22-2292 - PARQUE SUBURBANO I', gvi: 0, gvm: 0, musicos: 2, rf: 4, re: 0 },
-        { data: '2026-03-12', mes: 'MarÃ§o', municipio: 'Cotia', igreja: 'BR-22-3714 - JARDIM BARRO BRANCO', gvi: 2, gvm: 1, musicos: 1, rf: 0, re: 1 },
-        { data: '2026-03-15', mes: 'MarÃ§o', municipio: 'Santana de ParnaÃ­ba', igreja: 'CENTRAL - PARNAÃBA', gvi: 10, gvm: 5, musicos: 3, rf: 2, re: 2 }
+        { data: '2026-03-01', mes: 'Março', municipio: 'Itapevi', igreja: 'BR-21-1312 - SÍTIO JOSÉ TEIXEIRA', gvi: 5, gvm: 1, musicos: 1, rf: 5, re: 0 },
+        { data: '2026-03-05', mes: 'Março', municipio: 'Cotia', igreja: 'BR-22-2797 - LAGEADO', gvi: 2, gvm: 2, musicos: 4, rf: 1, re: 0 },
+        { data: '2026-03-10', mes: 'Março', municipio: 'Itapevi', igreja: 'BR-22-2292 - PARQUE SUBURBANO I', gvi: 0, gvm: 0, musicos: 2, rf: 4, re: 0 },
+        { data: '2026-03-12', mes: 'Março', municipio: 'Cotia', igreja: 'BR-22-3714 - JARDIM BARRO BRANCO', gvi: 2, gvm: 1, musicos: 1, rf: 0, re: 1 },
+        { data: '2026-03-15', mes: 'Março', municipio: 'Santana de Parnaíba', igreja: 'CENTRAL - PARNAÍBA', gvi: 10, gvm: 5, musicos: 3, rf: 2, re: 2 }
     ].map(sanitizeVisitaItem);
 
     $scope.lancamentos = [];
@@ -13959,22 +14097,22 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
 
     $scope.copyPendingCharge = function (item) {
         var message = [
-            'PendÃªncia de lanÃ§amento de visitas',
+            'Pendência de lançamento de visitas',
             'Comum: ' + (item && item.nome ? item.nome : '-'),
-            'MunicÃ­pio: ' + (item && item.cidade ? item.cidade : '-'),
-            'PerÃ­odo: ' + getVisitasPeriodoLabel()
+            'Município: ' + (item && item.cidade ? item.cidade : '-'),
+            'Período: ' + getVisitasPeriodoLabel()
         ].join('\n');
 
         if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
             navigator.clipboard.writeText(message).then(function () {
-                notifyVisitasAction('CobranÃ§a copiada', 'A mensagem de cobranÃ§a foi copiada para a Ã¡rea de transferÃªncia.', 'success');
+                notifyVisitasAction('Cobrança copiada', 'A mensagem de cobrança foi copiada para a área de transferência.', 'success');
             }).catch(function () {
-                notifyVisitasAction('CobranÃ§a', message, 'info');
+                notifyVisitasAction('Cobrança', message, 'info');
             });
             return;
         }
 
-        notifyVisitasAction('CobranÃ§a', message, 'info');
+        notifyVisitasAction('Cobrança', message, 'info');
     };
 
     // Export to Excel
@@ -13988,7 +14126,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             [visitasText.issueDateLabel + ': ' + new Date().toLocaleDateString('pt-BR')],
             [visitasText.periodLabel + ': ' + getVisitasPeriodoLabel()],
             [],
-            ['Data', 'MunicÃ­pio', 'Comum', 'GVI', 'GVM', 'MÃºsicos', 'RF', 'RE', 'Total']
+            ['Data', 'Município', 'Comum', 'GVI', 'GVM', 'Músicos', 'RF', 'RE', 'Total']
         ];
         var merges = [
             { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
@@ -14003,7 +14141,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             var subtotal = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
 
             merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 8 } });
-            rows.push(['MUNICÃPIO: ' + grupo.municipio]);
+            rows.push(['MUNICÍPIO: ' + grupo.municipio]);
 
             grupo.itens.forEach(function(item) {
                 rows.push([
@@ -14041,7 +14179,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
         });
 
         if (!grupos.length) {
-            rows.push(['Nenhum lanÃ§amento encontrado.', '', '', '', '', '', '', '', '']);
+            rows.push(['Nenhum lançamento encontrado.', '', '', '', '', '', '', '', '']);
         }
 
         rows.push([
@@ -14086,11 +14224,11 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
         var grupos = getVisitasGroupsByMunicipio();
         var body = [[
             { text: 'DATA', style: 'tableHeader' },
-            { text: 'MUNICÃPIO', style: 'tableHeader' },
+            { text: 'MUNICÍPIO', style: 'tableHeader' },
             { text: 'COMUM', style: 'tableHeader' },
             { text: 'GVI', style: 'tableHeader' },
             { text: 'GVM', style: 'tableHeader' },
-            { text: 'MÃšSICOS', style: 'tableHeader' },
+            { text: 'MÚSICOS', style: 'tableHeader' },
             { text: 'RF', style: 'tableHeader' },
             { text: 'RE', style: 'tableHeader' },
             { text: 'TOTAL', style: 'tableHeader' }
@@ -14100,7 +14238,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             var subtotal = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
 
             body.push([
-                { text: 'MUNICÃPIO: ' + grupo.municipio, colSpan: 9, bold: true, color: '#1e4b7a', fillColor: '#eef4fa', margin: [4, 6, 4, 6] },
+                { text: 'MUNICÍPIO: ' + grupo.municipio, colSpan: 9, bold: true, color: '#1e4b7a', fillColor: '#eef4fa', margin: [4, 6, 4, 6] },
                 {}, {}, {}, {}, {}, {}, {}, {}
             ]);
 
@@ -14228,7 +14366,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
 }
 
 function getVisitasMonthLabels() {
-    return ['Janeiro', 'Fevereiro', 'MarÃ§o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    return ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 }
 
 function formatVisitasDateBRLocal(dateStr) {
@@ -14258,24 +14396,48 @@ function repairVisitasModuleText(text) {
     }
 
     return String(value || '')
-        .replace(/PARNAIBA/gi, 'PARNAÃBA')
-        .replace(/MUSICOS/gi, 'MÃºsicos')
-        .replace(/EVANGELIZACAO/gi, 'EvangelizaÃ§Ã£o')
-        .replace(/SITIO/gi, 'SÃTIO')
-        .replace(/MARCO/gi, 'MarÃ§o')
-        .replace(/Sï¿½O/gi, 'SÃƒO')
-        .replace(/JOï¿½O/gi, 'JOÃƒO')
-        .replace(/PARNAï¿½BA/gi, 'PARNAÃBA')
-        .replace(/CORAï¿½ï¿½O/gi, 'CORAÃ‡ÃƒO')
-        .replace(/PORTï¿½O/gi, 'PORTÃƒO')
-        .replace(/S\?O/gi, 'SÃƒO')
-        .replace(/JO\?O/gi, 'JOÃƒO')
-        .replace(/CORA\?\?O/gi, 'CORAÃ‡ÃƒO')
-        .replace(/PORT\?O/gi, 'PORTÃƒO')
-        .replace(/ITAPU\?/gi, 'ITAPUÃƒ')
-        .replace(/JAP\?O/gi, 'JAPÃƒO')
-        .replace(/PARNA\?BA/gi, 'PARNAÃBA')
-        .replace(/CRITICO/gi, 'CRÃTICO');
+        .replace(/PARNAIBA/gi, 'PARNAÍBA')
+        .replace(/MUSICOS/gi, 'Músicos')
+        .replace(/EVANGELIZACAO/gi, 'Evangelização')
+        .replace(/SITIO/gi, 'SÍTIO')
+        .replace(/MARCO/gi, 'Março')
+        .replace(/Sï¿½O/gi, 'SÃO')
+        .replace(/JOï¿½O/gi, 'JOÃO')
+        .replace(/PARNAï¿½BA/gi, 'PARNAÍBA')
+        .replace(/CORAï¿½ï¿½O/gi, 'CORAÇÃO')
+        .replace(/PORTï¿½O/gi, 'PORTÃO')
+        .replace(/S\?O/gi, 'SÃO')
+        .replace(/JO\?O/gi, 'JOÃO')
+        .replace(/CORA\?\?O/gi, 'CORAÇÃO')
+        .replace(/PORT\?O/gi, 'PORTÃO')
+        .replace(/ITAPU\?/gi, 'ITAPUÃ')
+        .replace(/JAP\?O/gi, 'JAPÃO')
+        .replace(/PARNA\?BA/gi, 'PARNAÍBA')
+        .replace(/CRITICO/gi, 'CRÍTICO');
+}
+
+function formatVisitasStatusKey(value) {
+    return repairVisitasModuleText(value)
+        .toString()
+        .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Z ]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function formatVisitasStatusLabel(value) {
+    var raw = formatVisitasStatusKey(value);
+
+    if (raw.indexOf('EXCELENTE') !== -1) return 'EXCELENTE';
+    if (raw.indexOf('BOM') !== -1) return 'BOM';
+    if (raw.indexOf('CRITICO') !== -1) return 'CRÍTICO';
+    if (raw.indexOf('PENDENTE') !== -1) return 'PENDENTE';
+    if (raw.indexOf('SEM HISTORICO') !== -1) return 'SEM HISTÓRICO';
+    if (raw.indexOf('EM DIA') !== -1) return 'EM DIA';
+
+    return repairVisitasModuleText(String(value || '').trim());
 }
 
 function normalizeVisitasMunicipioFromComumLocal(value) {
@@ -14293,15 +14455,15 @@ function extractVisitaCodigoLocal(value) {
     return match && match[1] ? match[1].toUpperCase() : '';
 }
 
-function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $rootScope, $state) {
+function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $rootScope, $state, $q) {
     var visitasText = {
-        institution: 'CONGREGAÃ‡ÃƒO CRISTÃƒ NO BRASIL',
-        region: 'Regional Itapevi - SÃ£o Paulo',
+        institution: 'CONGREGAÇÃO CRISTàNO BRASIL',
+        region: 'Regional Itapevi - São Paulo',
         moduleName: 'DEPARTAMENTO DE VISITAS',
-        reportTitle: 'RelatÃ³rio Geral de Visitas',
-        issueDateLabel: 'EmissÃ£o',
-        periodLabel: 'PerÃ­odo',
-        pageLabel: 'PÃ¡gina',
+        reportTitle: 'Relatório Geral de Visitas',
+        issueDateLabel: 'Emissão',
+        periodLabel: 'Período',
+        pageLabel: 'Página',
         allRecordsLabel: 'Todos os registros'
     };
     var monthLabels = getVisitasMonthLabels();
@@ -14350,6 +14512,26 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         atraso90: 0,
         semHistorico: 0,
         totalPendentes: 0
+    };
+    $scope.visitados = [];
+    $scope.filteredVisitadosDashboard = [];
+    $scope.agendaVisitas = [];
+    $scope.filteredAgendaVisitas = [];
+    $scope.communityCareSummary = {
+        total: 0,
+        enfermos: 0,
+        mocidade: 0,
+        musicos: 0,
+        semVisita30: 0,
+        semAgendaFutura: 0
+    };
+    $scope.communityProfiles = [];
+    $scope.communityAttentionList = [];
+    $scope.communityAgendaSummary = {
+        hoje: 0,
+        proximos7: 0,
+        futuras: 0,
+        concluidasMes: 0
     };
 
     function mergeExpectedEntry(grouped, nome, cidade) {
@@ -14573,11 +14755,11 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         if (status === '31-60 DIAS') {
             return { order: 3, tone: 'warn', label: '31-60 DIAS' };
         }
-        if (status === 'MÃŠS EM ABERTO') {
-            return { order: 4, tone: 'today', label: 'MÃŠS EM ABERTO' };
+        if (status === 'MÊS EM ABERTO') {
+            return { order: 4, tone: 'today', label: 'MÊS EM ABERTO' };
         }
-        if (status === 'SEM HISTÃ“RICO') {
-            return { order: 5, tone: 'muted', label: 'SEM HISTÃ“RICO' };
+        if (status === 'SEM HISTÓRICO') {
+            return { order: 5, tone: 'muted', label: 'SEM HISTÓRICO' };
         }
 
         return { order: 6, tone: 'ok', label: status || 'EM DIA' };
@@ -14687,12 +14869,12 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             var latestDateLabel = latestDate ? formatVisitasDateBRLocal(latestDate) : '-';
             var daysWithoutLaunch = latestDate ? getVisitasDayDiff(latestDate, today) : null;
             var pendingStatus = 'EM DIA';
-            var pendingStatusDetail = 'LanÃ§amento mensal registrado no mÃªs atual.';
+            var pendingStatusDetail = 'Lançamento mensal registrado no mês atual.';
             var statusMeta;
 
             if (!health || !latestDate) {
-                pendingStatus = 'SEM HISTÃ“RICO';
-                pendingStatusDetail = 'Ainda nÃ£o existe lanÃ§amento mensal para esta comum.';
+                pendingStatus = 'SEM HISTÓRICO';
+                pendingStatusDetail = 'Ainda não existe lançamento mensal para esta comum.';
                 summary.semHistorico += 1;
                 summary.totalPendentes += 1;
             } else if (health.hasCurrentMonthLaunch) {
@@ -14702,22 +14884,22 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 }
             } else if (daysWithoutLaunch > 90) {
                 pendingStatus = '90+ DIAS';
-                pendingStatusDetail = 'Ãšltimo lanÃ§amento hÃ¡ mais de 90 dias.';
+                pendingStatusDetail = 'Último lançamento há mais de 90 dias.';
                 summary.atraso90 += 1;
                 summary.totalPendentes += 1;
             } else if (daysWithoutLaunch > 60) {
                 pendingStatus = '61-90 DIAS';
-                pendingStatusDetail = 'Ãšltimo lanÃ§amento entre 61 e 90 dias.';
+                pendingStatusDetail = 'Último lançamento entre 61 e 90 dias.';
                 summary.atraso60 += 1;
                 summary.totalPendentes += 1;
             } else if (daysWithoutLaunch > 30) {
                 pendingStatus = '31-60 DIAS';
-                pendingStatusDetail = 'Ãšltimo lanÃ§amento entre 31 e 60 dias.';
+                pendingStatusDetail = 'Último lançamento entre 31 e 60 dias.';
                 summary.atraso30 += 1;
                 summary.totalPendentes += 1;
             } else {
-                pendingStatus = 'MÃŠS EM ABERTO';
-                pendingStatusDetail = 'Ainda falta o lanÃ§amento do mÃªs atual.';
+                pendingStatus = 'MÊS EM ABERTO';
+                pendingStatusDetail = 'Ainda falta o lançamento do mês atual.';
                 summary.mesAberto += 1;
                 summary.totalPendentes += 1;
             }
@@ -14810,11 +14992,11 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             });
 
             group.itens.forEach(function (item) {
-                if (item.pendingStatus === 'MÃŠS EM ABERTO') group.mesAberto += 1;
+                if (item.pendingStatus === 'MÊS EM ABERTO') group.mesAberto += 1;
                 else if (item.pendingStatus === '31-60 DIAS') group.atraso30 += 1;
                 else if (item.pendingStatus === '61-90 DIAS') group.atraso60 += 1;
                 else if (item.pendingStatus === '90+ DIAS') group.atraso90 += 1;
-                else if (item.pendingStatus === 'SEM HISTÃ“RICO') group.semHistorico += 1;
+                else if (item.pendingStatus === 'SEM HISTÓRICO') group.semHistorico += 1;
             });
 
             return group;
@@ -14882,15 +15064,287 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         return sanitized;
     }
 
+    function sanitizeVisitadoDashboardItem(item) {
+        var sanitized = angular.extend({}, item || {});
+        var resolvedMunicipio = normalizeMunicipioRegionalLabel(
+            sanitized.municipio
+            || resolveMunicipioFromCatalog($scope.comumCatalogState || comumCatalogState, [sanitized.comum, sanitized.codigo_comum])
+            || normalizeVisitasMunicipioFromComumLocal(sanitized.comum)
+            || ''
+        );
+
+        sanitized.nome = repairVisitasModuleText(sanitized.nome || '');
+        sanitized.comum = repairVisitasModuleText(sanitized.comum || '');
+        sanitized.codigo_comum = sanitized.codigo_comum || extractVisitaCodigoLocal(sanitized.comum);
+        sanitized.municipio = resolvedMunicipio;
+        sanitized.categoria = repairVisitasModuleText(sanitized.categoria || '');
+        sanitized.familia = repairVisitasModuleText(sanitized.familia || '');
+        sanitized.telefone = repairVisitasModuleText(sanitized.telefone || '');
+        sanitized.status = repairVisitasModuleText(sanitized.status || 'Ativo');
+        sanitized.frequencia_visita = repairVisitasModuleText(sanitized.frequencia_visita || '');
+        sanitized.referencia_geografica = repairVisitasModuleText(sanitized.referencia_geografica || '');
+        sanitized.perfil_enfermo = !!sanitized.perfil_enfermo;
+        sanitized.perfil_mocidade = !!sanitized.perfil_mocidade;
+        sanitized.perfil_musico = !!sanitized.perfil_musico;
+        sanitized.ultima_visita = sanitized.ultima_visita || null;
+
+        return sanitized;
+    }
+
+    function sanitizeAgendaDashboardItem(item) {
+        var sanitized = angular.extend({}, item || {});
+        sanitized.titulo = repairVisitasModuleText(sanitized.titulo || '');
+        sanitized.categoria = repairVisitasModuleText(sanitized.categoria || '');
+        sanitized.status = repairVisitasModuleText(sanitized.status || 'Agendada');
+        sanitized.equipe_responsavel = repairVisitasModuleText(sanitized.equipe_responsavel || '');
+        sanitized.setor = repairVisitasModuleText(sanitized.setor || '');
+        sanitized.endereco_visitado = repairVisitasModuleText(sanitized.endereco_visitado || '');
+        return sanitized;
+    }
+
+    function normalizeVisitasStatusLookup(value) {
+        return String(repairVisitasModuleText(value || ''))
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim();
+    }
+
+    function isVisitadoAtivo(item) {
+        var normalizedStatus = normalizeVisitasStatusLookup(item && item.status);
+        return normalizedStatus !== 'inativo' && normalizedStatus !== 'arquivado' && normalizedStatus !== 'cancelado';
+    }
+
+    function getVisitadoFrequencyDays(item) {
+        var normalized = normalizeVisitasStatusLookup(item && item.frequencia_visita);
+
+        if (normalized.indexOf('seman') !== -1) return 7;
+        if (normalized.indexOf('quinzen') !== -1) return 15;
+        if (normalized.indexOf('mens') !== -1) return 30;
+        if (normalized.indexOf('bimes') !== -1) return 60;
+        return 30;
+    }
+
+    function getVisitadoProfileKeys(item) {
+        var profiles = [];
+        var categoria = normalizeVisitasStatusLookup(item && item.categoria);
+
+        if (item && item.perfil_enfermo) profiles.push('enfermos');
+        if (item && item.perfil_mocidade) profiles.push('mocidade');
+        if (item && item.perfil_musico) profiles.push('musicos');
+        if (categoria.indexOf('evangel') !== -1) profiles.push('evangelizacao');
+        if (!profiles.length) profiles.push('irmandade');
+
+        return profiles;
+    }
+
+    function getVisitadoProfileLabel(key) {
+        if (key === 'enfermos') return 'Enfermos';
+        if (key === 'mocidade') return 'Mocidade';
+        if (key === 'musicos') return 'Músicos';
+        if (key === 'evangelizacao') return 'Evangelização';
+        return 'Irmandade';
+    }
+
+    function refreshCommunityCareData() {
+        var search = String($scope.filters.searchText || '').trim().toLowerCase();
+        var cityFilter = normalizeMunicipioRegionalLabel($scope.filters.cidade || '');
+        var today = getVisitasTodayLocalDate();
+        var currentMonth = today.getMonth();
+        var currentYear = today.getFullYear();
+        var visitadosById = {};
+        var profileMap = {};
+        var attentionList = [];
+        var agendaByVisitado = {};
+        var agendaHoje = 0;
+        var agendaProximos7 = 0;
+        var agendaFuturas = 0;
+        var agendaConcluidasMes = 0;
+
+        ($scope.visitados || []).forEach(function (item) {
+            visitadosById[item.id] = item;
+        });
+
+        ($scope.agendaVisitas || []).forEach(function (agenda) {
+            var visitado = agenda && agenda.irmandade_id ? visitadosById[agenda.irmandade_id] : null;
+            var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
+            var normalizedStatus = normalizeVisitasStatusLookup(agenda && agenda.status);
+            var isCanceled = normalizedStatus.indexOf('cancel') !== -1;
+            var dayDiff = agendaDate && !isNaN(agendaDate.getTime())
+                ? Math.floor((new Date(agendaDate.getFullYear(), agendaDate.getMonth(), agendaDate.getDate()).getTime() - today.getTime()) / 86400000)
+                : null;
+
+            if (visitado) {
+                agendaByVisitado[visitado.id] = agendaByVisitado[visitado.id] || [];
+                agendaByVisitado[visitado.id].push(agenda);
+            }
+
+            if (!agendaDate || isNaN(agendaDate.getTime()) || isCanceled) {
+                return;
+            }
+
+            if (dayDiff === 0) agendaHoje += 1;
+            if (dayDiff !== null && dayDiff >= 0 && dayDiff <= 7) agendaProximos7 += 1;
+            if (dayDiff !== null && dayDiff >= 0) agendaFuturas += 1;
+            if (normalizedStatus.indexOf('conclu') !== -1 && agendaDate.getMonth() === currentMonth && agendaDate.getFullYear() === currentYear) {
+                agendaConcluidasMes += 1;
+            }
+        });
+
+        $scope.filteredVisitadosDashboard = ($scope.visitados || []).filter(function (item) {
+            var matchText = true;
+            var matchCity = true;
+            var textSource;
+
+            if (search) {
+                textSource = [item.nome, item.comum, item.familia, item.telefone, item.categoria].join(' ').toLowerCase();
+                matchText = textSource.indexOf(search) !== -1;
+            }
+
+            if (cityFilter) {
+                matchCity = normalizeMunicipioRegionalLabel(item.municipio) === cityFilter;
+            }
+
+            return matchText && matchCity;
+        });
+
+        $scope.filteredAgendaVisitas = ($scope.agendaVisitas || []).filter(function (agenda) {
+            var visitado = agenda && agenda.irmandade_id ? visitadosById[agenda.irmandade_id] : null;
+            var matchText = true;
+            var matchCity = true;
+            var textSource;
+
+            if (search) {
+                textSource = [
+                    agenda.titulo,
+                    agenda.categoria,
+                    agenda.equipe_responsavel,
+                    visitado && visitado.nome,
+                    visitado && visitado.comum
+                ].join(' ').toLowerCase();
+                matchText = textSource.indexOf(search) !== -1;
+            }
+
+            if (cityFilter) {
+                matchCity = !!visitado && normalizeMunicipioRegionalLabel(visitado.municipio) === cityFilter;
+            }
+
+            return matchText && matchCity;
+        });
+
+        $scope.filteredVisitadosDashboard.forEach(function (item) {
+            var lastVisitDate = parseVisitasDateOnlyAsLocal(item.ultima_visita);
+            var daysWithoutVisit = lastVisitDate ? getVisitasDayDiff(lastVisitDate, today) : null;
+            var expectedFrequency = getVisitadoFrequencyDays(item);
+            var futureAgendaCount = (agendaByVisitado[item.id] || []).filter(function (agenda) {
+                var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
+                var normalizedStatus = normalizeVisitasStatusLookup(agenda && agenda.status);
+                return agendaDate && !isNaN(agendaDate.getTime()) &&
+                    new Date(agendaDate.getFullYear(), agendaDate.getMonth(), agendaDate.getDate()).getTime() >= today.getTime() &&
+                    normalizedStatus.indexOf('cancel') === -1;
+            }).length;
+            var needsAttention = false;
+            var attentionReasons = [];
+
+            getVisitadoProfileKeys(item).forEach(function (profileKey) {
+                profileMap[profileKey] = profileMap[profileKey] || {
+                    key: profileKey,
+                    label: getVisitadoProfileLabel(profileKey),
+                    total: 0,
+                    ativos: 0,
+                    semVisita30: 0,
+                    semAgenda: 0,
+                    comTelefone: 0
+                };
+
+                profileMap[profileKey].total += 1;
+                if (isVisitadoAtivo(item)) profileMap[profileKey].ativos += 1;
+                if (item.telefone) profileMap[profileKey].comTelefone += 1;
+                if (daysWithoutVisit === null || daysWithoutVisit > 30) profileMap[profileKey].semVisita30 += 1;
+                if (!futureAgendaCount) profileMap[profileKey].semAgenda += 1;
+            });
+
+            if (daysWithoutVisit === null) {
+                needsAttention = true;
+                attentionReasons.push('Sem visita registrada');
+            } else if (daysWithoutVisit > expectedFrequency) {
+                needsAttention = true;
+                attentionReasons.push(daysWithoutVisit + ' dias sem visita');
+            }
+
+            if (!futureAgendaCount && isVisitadoAtivo(item)) {
+                needsAttention = true;
+                attentionReasons.push('Sem agenda futura');
+            }
+
+            if (item.perfil_enfermo && (daysWithoutVisit === null || daysWithoutVisit > 15)) {
+                needsAttention = true;
+                attentionReasons.push('Enfermo requer prioridade');
+            }
+
+            if (needsAttention) {
+                attentionList.push({
+                    id: item.id,
+                    nome: item.nome,
+                    municipio: item.municipio || '-',
+                    comum: item.comum || '-',
+                    perfil: getVisitadoProfileKeys(item).map(getVisitadoProfileLabel).join(', '),
+                    diasSemVisita: daysWithoutVisit,
+                    proximaAgenda: futureAgendaCount,
+                    motivos: attentionReasons.join(' | ')
+                });
+            }
+        });
+
+        $scope.communityCareSummary = {
+            total: $scope.filteredVisitadosDashboard.length,
+            enfermos: (profileMap.enfermos && profileMap.enfermos.total) || 0,
+            mocidade: (profileMap.mocidade && profileMap.mocidade.total) || 0,
+            musicos: (profileMap.musicos && profileMap.musicos.total) || 0,
+            semVisita30: $scope.filteredVisitadosDashboard.filter(function (item) {
+                var daysWithoutVisit = item.ultima_visita ? getVisitasDayDiff(item.ultima_visita, today) : null;
+                return daysWithoutVisit === null || daysWithoutVisit > 30;
+            }).length,
+            semAgendaFutura: $scope.filteredVisitadosDashboard.filter(function (item) {
+                return !(agendaByVisitado[item.id] || []).some(function (agenda) {
+                    var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
+                    var normalizedStatus = normalizeVisitasStatusLookup(agenda && agenda.status);
+                    return agendaDate && !isNaN(agendaDate.getTime()) &&
+                        new Date(agendaDate.getFullYear(), agendaDate.getMonth(), agendaDate.getDate()).getTime() >= today.getTime() &&
+                        normalizedStatus.indexOf('cancel') === -1;
+                });
+            }).length
+        };
+
+        $scope.communityProfiles = Object.keys(profileMap).map(function (key) {
+            return profileMap[key];
+        }).sort(function (a, b) {
+            return b.total - a.total;
+        });
+
+        $scope.communityAttentionList = attentionList.sort(function (a, b) {
+            var aDays = a.diasSemVisita === null || a.diasSemVisita === undefined ? 9999 : a.diasSemVisita;
+            var bDays = b.diasSemVisita === null || b.diasSemVisita === undefined ? 9999 : b.diasSemVisita;
+            return bDays - aDays;
+        }).slice(0, 12);
+
+        $scope.communityAgendaSummary = {
+            hoje: agendaHoje,
+            proximos7: agendaProximos7,
+            futuras: agendaFuturas,
+            concluidasMes: agendaConcluidasMes
+        };
+    }
+
     function getPeriodoLabel() {
         if ($scope.filters.dataInicio || $scope.filters.dataFim) {
-            return ($scope.filters.dataInicio ? formatVisitasDateBRLocal($scope.filters.dataInicio) : 'InÃ­cio') +
-                ' atÃ© ' +
+            return ($scope.filters.dataInicio ? formatVisitasDateBRLocal($scope.filters.dataInicio) : 'Início') +
+                ' até ' +
                 ($scope.filters.dataFim ? formatVisitasDateBRLocal($scope.filters.dataFim) : 'Fim');
         }
 
         if ($scope.filters.mes) {
-            return 'MÃªs de ' + repairVisitasModuleText($scope.filters.mes);
+            return 'Mês de ' + repairVisitasModuleText($scope.filters.mes);
         }
 
         return visitasText.allRecordsLabel;
@@ -14900,7 +15354,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         var groups = {};
 
         ($scope.filteredLancamentos || []).forEach(function (item) {
-            var municipio = repairVisitasModuleText(item.municipio || 'Sem municÃ­pio');
+            var municipio = repairVisitasModuleText(item.municipio || 'Sem município');
             groups[municipio] = groups[municipio] || [];
             groups[municipio].push(item);
         });
@@ -15064,10 +15518,10 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             return !launchedByKey[entry.key];
         }).map(function (entry) {
             return angular.extend({}, entry, {
-                pendingStatus: 'SEM HISTÃ“RICO',
+                pendingStatus: 'SEM HISTÓRICO',
                 pendingStatusKey: 'sem_historico',
-                pendingStatusLabel: 'SEM HISTÃ“RICO',
-                pendingStatusDetail: 'Ainda nÃ£o existe lanÃ§amento reconhecido para esta comum no perÃ­odo filtrado.',
+                pendingStatusLabel: 'SEM HISTÓRICO',
+                pendingStatusDetail: 'Ainda não existe lançamento reconhecido para esta comum no período filtrado.',
                 latestDateLabel: '-',
                 daysWithoutLaunch: null
             });
@@ -15101,7 +15555,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 lancamentos: lancamentos,
                 igrejas: igrejas,
                 taxa: taxa,
-                status: taxaNumero >= 80 ? 'EXCELENTE' : (taxaNumero >= 50 ? 'BOM' : 'CRÃTICO')
+                status: taxaNumero >= 80 ? 'EXCELENTE' : (taxaNumero >= 50 ? 'BOM' : 'CRÍTICO')
             };
         }).filter(function (item) {
             return item.igrejas > 0 || item.lancamentos > 0;
@@ -15173,19 +15627,34 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         $scope.totalGeral = totals;
         $scope.municipiosResumo = Object.keys(muniMap).map(function (key) { return muniMap[key]; }).sort(function (a, b) { return b.total - a.total; });
         refreshManagementData();
+        refreshCommunityCareData();
     };
 
     $scope.loadLancamentos = function () {
         $scope.loading = true;
-        VisitasService.getLancamentos().then(function (data) {
+        $q.all([
+            VisitasService.getLancamentos(),
+            VisitasService.getVisitados(),
+            VisitasService.getAgenda()
+        ]).then(function (results) {
+            var lancamentos = results[0] || [];
+            var visitados = results[1] || [];
+            var agenda = results[2] || [];
+
             $scope.visitasError = '';
-            $scope.lancamentos = (data || []).map(sanitizeItem);
+            $scope.lancamentos = lancamentos.map(sanitizeItem);
+            $scope.visitados = visitados.map(sanitizeVisitadoDashboardItem);
+            $scope.agendaVisitas = agenda.map(sanitizeAgendaDashboardItem);
             updateDashboardLastUpdated();
             $scope.applyFilters();
         }).catch(function (error) {
-            $scope.visitasError = (error && error.message) || 'NÃ£o foi possÃ­vel carregar os lanÃ§amentos de visitas.';
+            $scope.visitasError = (error && error.message) || 'Não foi possível carregar os lançamentos de visitas.';
             $scope.lancamentos = [];
             $scope.filteredLancamentos = [];
+            $scope.visitados = [];
+            $scope.filteredVisitadosDashboard = [];
+            $scope.agendaVisitas = [];
+            $scope.filteredAgendaVisitas = [];
             updateDashboardLastUpdated();
             $scope.calculateDashboardData();
         }).finally(function () {
@@ -15214,7 +15683,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             $scope.ministerioRegionalCatalogState = mappedState;
             $scope.calculateDashboardData();
         }).catch(function () {
-            // MantÃ©m o fallback atual quando nÃ£o for possÃ­vel enriquecer o catÃ¡logo com o ministÃ©rio regional.
+            // Mantém o fallback atual quando não for possível enriquecer o catálogo com o ministério regional.
         });
     }
 
@@ -15250,7 +15719,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         try {
             window.sessionStorage.setItem('visitasPendingDraft', JSON.stringify(draft));
         } catch (error) {
-            // Se o storage falhar, ainda navegamos para a tela de lanÃ§amentos.
+            // Se o storage falhar, ainda navegamos para a tela de lançamentos.
         }
 
         $state.go('visitas.lancamentos');
@@ -15274,52 +15743,52 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         });
         var extra = group && group.itens && group.itens.length > 12 ? ['- ...'] : [];
         var message = [
-            'PendÃªncias de lanÃ§amento de visitas',
-            'MunicÃ­pio: ' + (group && group.municipio ? group.municipio : '-'),
-            'Comuns com atenÃ§Ã£o: ' + (group && typeof group.pendentes === 'number' ? group.pendentes : 0),
-            'MÃªs em aberto: ' + (group && typeof group.mesAberto === 'number' ? group.mesAberto : 0),
+            'Pendências de lançamento de visitas',
+            'Município: ' + (group && group.municipio ? group.municipio : '-'),
+            'Comuns com atenção: ' + (group && typeof group.pendentes === 'number' ? group.pendentes : 0),
+            'Mês em aberto: ' + (group && typeof group.mesAberto === 'number' ? group.mesAberto : 0),
             '31 a 60 dias: ' + (group && typeof group.atraso30 === 'number' ? group.atraso30 : 0),
             '61 a 90 dias: ' + (group && typeof group.atraso60 === 'number' ? group.atraso60 : 0),
             '90+ dias: ' + (group && typeof group.atraso90 === 'number' ? group.atraso90 : 0),
-            'Sem histÃ³rico: ' + (group && typeof group.semHistorico === 'number' ? group.semHistorico : 0),
+            'Sem histórico: ' + (group && typeof group.semHistorico === 'number' ? group.semHistorico : 0),
             '',
             'Comuns pendentes:'
         ].concat(itens, extra).join('\n');
 
         if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
             navigator.clipboard.writeText(message).then(function () {
-                notify('CobranÃ§a copiada', 'A cobranÃ§a do municÃ­pio foi copiada para a Ã¡rea de transferÃªncia.', 'success');
+                notify('Cobrança copiada', 'A cobrança do município foi copiada para a área de transferência.', 'success');
             }).catch(function () {
-                notify('CobranÃ§a', message, 'info');
+                notify('Cobrança', message, 'info');
             });
             return;
         }
 
-        notify('CobranÃ§a', message, 'info');
+        notify('Cobrança', message, 'info');
     };
 
     $scope.getVisitasPendingStatusClass = getVisitasPendingStatusClass;
 
     $scope.copyPendingCharge = function (item) {
         var message = [
-            'PendÃªncia de lanÃ§amento de visitas',
+            'Pendência de lançamento de visitas',
             'Comum: ' + (item && item.nome ? item.nome : '-'),
-            'MunicÃ­pio: ' + (item && item.cidade ? item.cidade : '-'),
+            'Município: ' + (item && item.cidade ? item.cidade : '-'),
             'Status: ' + (item && item.pendingStatusLabel ? item.pendingStatusLabel : '-'),
-            'Ãšltimo lanÃ§amento: ' + (item && item.latestDateLabel ? item.latestDateLabel : '-'),
-            'Dias sem lanÃ§ar: ' + (item && item.daysWithoutLaunch !== null && item.daysWithoutLaunch !== undefined ? item.daysWithoutLaunch : '-')
+            'Último lançamento: ' + (item && item.latestDateLabel ? item.latestDateLabel : '-'),
+            'Dias sem lançar: ' + (item && item.daysWithoutLaunch !== null && item.daysWithoutLaunch !== undefined ? item.daysWithoutLaunch : '-')
         ].join('\n');
 
         if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
             navigator.clipboard.writeText(message).then(function () {
-                notify('CobranÃ§a copiada', 'A mensagem de cobranÃ§a foi copiada para a Ã¡rea de transferÃªncia.', 'success');
+                notify('Cobrança copiada', 'A mensagem de cobrança foi copiada para a área de transferência.', 'success');
             }).catch(function () {
-                notify('CobranÃ§a', message, 'info');
+                notify('Cobrança', message, 'info');
             });
             return;
         }
 
-        notify('CobranÃ§a', message, 'info');
+        notify('Cobrança', message, 'info');
     };
 
     $scope.exportToExcel = function () {
@@ -15332,12 +15801,12 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             [visitasText.issueDateLabel + ': ' + new Date().toLocaleDateString('pt-BR')],
             [visitasText.periodLabel + ': ' + getPeriodoLabel()],
             [],
-            ['Data', 'MunicÃ­pio', 'Comum', 'GVI', 'GVM', 'MÃºsicos', 'RF', 'RE', 'Total']
+            ['Data', 'Município', 'Comum', 'GVI', 'GVM', 'Músicos', 'RF', 'RE', 'Total']
         ];
 
         grupos.forEach(function (grupo) {
             var subtotal = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
-            rows.push(['MUNICÃPIO: ' + grupo.municipio, '', '', '', '', '', '', '', '']);
+            rows.push(['MUNICÍPIO: ' + grupo.municipio, '', '', '', '', '', '', '', '']);
             grupo.itens.forEach(function (item) {
                 rows.push([
                     formatVisitasDateBRLocal(item.data),
@@ -15371,18 +15840,18 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         var grupos = getGroupsByMunicipio();
         var body = [[
             { text: 'DATA', style: 'tableHeader' },
-            { text: 'MUNICÃPIO', style: 'tableHeader' },
+            { text: 'MUNICÍPIO', style: 'tableHeader' },
             { text: 'COMUM', style: 'tableHeader' },
             { text: 'GVI', style: 'tableHeader' },
             { text: 'GVM', style: 'tableHeader' },
-            { text: 'MÃšSICOS', style: 'tableHeader' },
+            { text: 'MÚSICOS', style: 'tableHeader' },
             { text: 'RF', style: 'tableHeader' },
             { text: 'RE', style: 'tableHeader' },
             { text: 'TOTAL', style: 'tableHeader' }
         ]];
 
         grupos.forEach(function (grupo) {
-            body.push([{ text: 'MUNICÃPIO: ' + grupo.municipio, colSpan: 9, bold: true, fillColor: '#eef4fa' }, {}, {}, {}, {}, {}, {}, {}, {}]);
+            body.push([{ text: 'MUNICÍPIO: ' + grupo.municipio, colSpan: 9, bold: true, fillColor: '#eef4fa' }, {}, {}, {}, {}, {}, {}, {}, {}]);
             grupo.itens.forEach(function (item) {
                 body.push([
                     formatVisitasDateBRLocal(item.data),
@@ -15478,6 +15947,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     ensureScopeComumCatalog($scope, AuthService, function (catalogState) {
         comumCatalogState = catalogState || comumCatalogState;
         $scope.comumCatalogState = comumCatalogState;
+        $scope.visitados = ($scope.visitados || []).map(sanitizeVisitadoDashboardItem);
         $scope.applyFilters();
     });
 
@@ -15544,7 +16014,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
             musicos: 0,
             rf: 0,
             re: 0,
-            status: 'LanÃ§ado',
+            status: 'Lançado',
             observacoes: ''
         };
     }
@@ -15636,7 +16106,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         try {
             window.sessionStorage.removeItem(pendingDraftStorageKey);
         } catch (removeError) {
-            // Ignora falhas de remoÃ§Ã£o.
+            // Ignora falhas de remoção.
         }
 
         return draft;
@@ -15678,7 +16148,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         try {
             window.sessionStorage.removeItem(pendingFilterStorageKey);
         } catch (removeError) {
-            // Ignora falhas de remoÃ§Ã£o.
+            // Ignora falhas de remoção.
         }
 
         return draft;
@@ -15727,7 +16197,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
             });
             $scope.applyFilters();
         }).catch(function (error) {
-            $scope.visitasError = (error && error.message) || 'NÃ£o foi possÃ­vel carregar os lanÃ§amentos de visitas.';
+            $scope.visitasError = (error && error.message) || 'Não foi possível carregar os lançamentos de visitas.';
             $scope.lancamentos = [];
             $scope.filteredLancamentos = [];
             updateSummary();
@@ -15745,7 +16215,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
 
     $scope.editLancamento = function (item) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem editar lanÃ§amentos.');
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem editar lançamentos.');
             return;
         }
         $scope.editing = true;
@@ -15762,7 +16232,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
             musicos: item.musicos || 0,
             rf: item.rf || 0,
             re: item.re || 0,
-            status: item.status || 'LanÃ§ado',
+            status: item.status || 'Lançado',
             observacoes: item.observacoes || ''
         };
         $scope.formFilters.comumSearch = '';
@@ -15776,26 +16246,26 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.saveLancamento = function () {
         var promise;
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem lanÃ§ar registros.');
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem lançar registros.');
             return;
         }
         syncFormComum();
         if (!$scope.formData.comum) {
-            swal('AtenÃ§Ã£o', 'Selecione a comum para continuar.', 'warning');
+            swal('Atenção', 'Selecione a comum para continuar.', 'warning');
             return;
         }
         if (!resolveTypedComumValue($scope.formData.comum)) {
-            swal('AtenÃ§Ã£o', 'Selecione uma comum vÃ¡lida da lista para continuar.', 'warning');
+            swal('Atenção', 'Selecione uma comum válida da lista para continuar.', 'warning');
             return;
         }
         $scope.saving = true;
         promise = $scope.editing ? VisitasService.updateLancamento($scope.formData) : VisitasService.saveLancamento($scope.formData);
         promise.then(function () {
-            swal('Sucesso', $scope.editing ? 'LanÃ§amento atualizado com sucesso.' : 'LanÃ§amento registrado com sucesso.', 'success');
+            swal('Sucesso', $scope.editing ? 'Lançamento atualizado com sucesso.' : 'Lançamento registrado com sucesso.', 'success');
             $scope.prepareNovo();
             $scope.loadLancamentos();
         }).catch(function (error) {
-            swal('Erro', (error && error.message) || 'NÃ£o foi possÃ­vel salvar o lanÃ§amento.', 'error');
+            swal('Erro', (error && error.message) || 'Não foi possível salvar o lançamento.', 'error');
         }).finally(function () {
             $scope.saving = false;
         });
@@ -15803,12 +16273,12 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
 
     $scope.confirmDelete = function (item) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem excluir lanÃ§amentos.');
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem excluir lançamentos.');
             return;
         }
         swal({
             title: 'Tem certeza?',
-            text: 'Deseja excluir o lanÃ§amento de ' + (item.comum || '-') + ' referente a ' + (item.mes || '-') + '/' + (item.ano || '-') + '?',
+            text: 'Deseja excluir o lançamento de ' + (item.comum || '-') + ' referente a ' + (item.mes || '-') + '/' + (item.ano || '-') + '?',
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, excluir',
@@ -15817,13 +16287,13 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         }, function () {
             $scope.$applyAsync(function () {
                 VisitasService.deleteLancamento(item.id).then(function () {
-                    swal('ExcluÃ­do', 'O lanÃ§amento foi removido com sucesso.', 'success');
+                    swal('Excluído', 'O lançamento foi removido com sucesso.', 'success');
                     if ($scope.formData.id === item.id) {
                         $scope.prepareNovo();
                     }
                     $scope.loadLancamentos();
                 }).catch(function (error) {
-                    swal('Erro', (error && error.message) || 'NÃ£o foi possÃ­vel excluir o lanÃ§amento.', 'error');
+                    swal('Erro', (error && error.message) || 'Não foi possível excluir o lançamento.', 'error');
                 });
             });
         });
@@ -15864,6 +16334,1065 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.$watchGroup(['formData.comum', 'formData.municipio'], refreshAvailableComuns);
     $scope.prepareNovo();
     $scope.loadLancamentos();
+}
+
+function visitasVisitadosCtrl($scope, VisitasService, AuthService, $rootScope, $q) {
+    var comumCatalogState = getFallbackComumCatalogState();
+
+    $scope.loading = true;
+    $scope.saving = false;
+    $scope.pageError = '';
+    $scope.canManageCadastros = false;
+    $scope.cidades = MUNICIPIOS_REGIONAIS.map(normalizeMunicipioRegionalLabel);
+    $scope.comumCatalogState = comumCatalogState;
+    $scope.comunsDisponiveis = comumCatalogState.items.slice();
+    $scope.filteredComunsDisponiveis = comumCatalogState.items.slice();
+    $scope.visitados = [];
+    $scope.filteredVisitados = [];
+    $scope.agendaVisitas = [];
+    $scope.filters = {
+        searchText: '',
+        cidade: '',
+        status: '',
+        profile: ''
+    };
+    $scope.formFilters = {
+        comumSearch: ''
+    };
+    $scope.summary = {
+        total: 0,
+        ativos: 0,
+        semUltimaVisita: 0,
+        recentes: 0,
+        enfermos: 0,
+        semAgenda: 0,
+        agendaHoje: 0,
+        proximos7: 0,
+        aniversarios30: 0,
+        riscoAlto: 0
+    };
+    $scope.profileSummary = [];
+    $scope.priorityList = [];
+    $scope.municipioInsights = [];
+
+    function currentLocalDateIso() {
+        var now = new Date();
+        return now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0');
+    }
+
+    function updateManagementPermission() {
+        $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'Visitas');
+    }
+
+    function buildEmptyForm() {
+        return {
+            id: null,
+            nome: '',
+            categoria: '',
+            municipio: '',
+            comum: '',
+            codigo_comum: '',
+            familia: '',
+            referencia_geografica: '',
+            endereco: '',
+            telefone: '',
+            status: 'Ativo',
+            frequencia_visita: '',
+            data_nascimento: '',
+            ultima_visita: '',
+            observacoes: ''
+        };
+    }
+
+    function resolveTypedComumValue(value) {
+        var lookup = normalizeComumCatalogLookup(value || '');
+        var matchedComum = '';
+
+        if (!lookup) {
+            return '';
+        }
+
+        ($scope.comunsDisponiveis || []).some(function (comum) {
+            if (normalizeComumCatalogLookup(comum) === lookup) {
+                matchedComum = comum;
+                return true;
+            }
+            return false;
+        });
+
+        return matchedComum;
+    }
+
+    function syncFormComum() {
+        var canonicalComum = resolveTypedComumValue($scope.formData.comum);
+
+        if (canonicalComum) {
+            $scope.formData.comum = canonicalComum;
+        }
+
+        applyMappedComumSelection($scope.formData, 'comum', $scope.formData.comum, $scope.comumCatalogState, { cityField: 'municipio' });
+        $scope.formData.codigo_comum = extractVisitaCodigoLocal($scope.formData.comum);
+
+        if (!$scope.formData.municipio) {
+            $scope.formData.municipio = normalizeMunicipioRegionalLabel(resolveMunicipioFromCatalog($scope.comumCatalogState, [$scope.formData.comum]) || '');
+        }
+    }
+
+    function refreshAvailableComuns() {
+        var search = normalizeComumCatalogLookup($scope.formData.comum || $scope.formFilters.comumSearch || '');
+        var selectedCity = normalizeMunicipioRegionalLabel($scope.formData.municipio || '');
+
+        $scope.filteredComunsDisponiveis = ($scope.comunsDisponiveis || []).filter(function (comum) {
+            var entry = findComumCatalogEntry($scope.comumCatalogState, comum) || {};
+            var comumCity = normalizeMunicipioRegionalLabel(entry.cidade || resolveMunicipioFromCatalog($scope.comumCatalogState, [comum]) || '');
+            var matchCity = !selectedCity || comumCity === selectedCity;
+            var matchSearch = !search || normalizeComumCatalogLookup(comum).indexOf(search) !== -1;
+
+            return matchCity && matchSearch;
+        });
+    }
+
+    function enrichVisitado(item) {
+        var enriched = angular.extend({}, item || {});
+        var resolvedMunicipio = normalizeMunicipioRegionalLabel(
+            enriched.municipio
+            || resolveMunicipioFromCatalog($scope.comumCatalogState, [enriched.comum, enriched.codigo_comum])
+            || normalizeVisitasMunicipioFromComumLocal(enriched.comum)
+            || ''
+        );
+
+        enriched.municipio = resolvedMunicipio;
+        return enriched;
+    }
+
+    function updateSummary() {
+        var ativos = 0;
+        var semUltimaVisita = 0;
+        var recentes = 0;
+        var enfermos = 0;
+        var semAgenda = 0;
+        var agendaHoje = 0;
+        var proximos7 = 0;
+        var aniversarios30 = 0;
+        var riscoAlto = 0;
+        var today = new Date();
+        var todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var agendaByVisitado = {};
+
+        ($scope.agendaVisitas || []).forEach(function (agenda) {
+            if (!agenda || !agenda.irmandade_id) {
+                return;
+            }
+            agendaByVisitado[agenda.irmandade_id] = agendaByVisitado[agenda.irmandade_id] || [];
+            agendaByVisitado[agenda.irmandade_id].push(agenda);
+        });
+
+        ($scope.filteredVisitados || []).forEach(function (item) {
+            var ultimaVisita = item.ultima_visita ? new Date(item.ultima_visita + 'T00:00:00') : null;
+            var birthdayDate = parseDateOnlyAsLocal(item.data_nascimento);
+            var possuiAgendaFutura = (agendaByVisitado[item.id] || []).some(function (agenda) {
+                var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
+                var normalizedStatus = String((agenda && agenda.status) || '').toLowerCase();
+                var diffDays;
+                if (!(agendaDate && !isNaN(agendaDate.getTime()) && normalizedStatus.indexOf('cancel') === -1)) {
+                    return false;
+                }
+                diffDays = Math.floor((new Date(agendaDate.getFullYear(), agendaDate.getMonth(), agendaDate.getDate()).getTime() - todayLocal.getTime()) / 86400000);
+                if (diffDays === 0) agendaHoje += 1;
+                if (diffDays >= 0 && diffDays <= 7) proximos7 += 1;
+                return diffDays >= 0;
+            });
+            if (item.status === 'Ativo' || item.status === 'Acompanhamento') {
+                ativos += 1;
+            }
+            if (!ultimaVisita || isNaN(ultimaVisita.getTime())) {
+                semUltimaVisita += 1;
+            }
+            if (ultimaVisita && !isNaN(ultimaVisita.getTime()) && (today.getTime() - ultimaVisita.getTime()) <= (30 * 24 * 60 * 60 * 1000)) {
+                recentes += 1;
+            }
+            if (item.perfil_enfermo) {
+                enfermos += 1;
+            }
+            if (!possuiAgendaFutura) {
+                semAgenda += 1;
+            }
+            if ((item.riskScore || 0) >= 4) {
+                riscoAlto += 1;
+            }
+            if (birthdayDate) {
+                var nextBirthday = new Date(todayLocal.getFullYear(), birthdayDate.getMonth(), birthdayDate.getDate());
+                var birthdayDiff = Math.floor((nextBirthday.getTime() - todayLocal.getTime()) / 86400000);
+                if (birthdayDiff < 0) {
+                    nextBirthday = new Date(todayLocal.getFullYear() + 1, birthdayDate.getMonth(), birthdayDate.getDate());
+                    birthdayDiff = Math.floor((nextBirthday.getTime() - todayLocal.getTime()) / 86400000);
+                }
+                if (birthdayDiff >= 0 && birthdayDiff <= 30) {
+                    aniversarios30 += 1;
+                }
+            }
+        });
+
+        $scope.summary = {
+            total: ($scope.filteredVisitados || []).length,
+            ativos: ativos,
+            semUltimaVisita: semUltimaVisita,
+            recentes: recentes,
+            enfermos: enfermos,
+            semAgenda: semAgenda,
+            agendaHoje: agendaHoje,
+            proximos7: proximos7,
+            aniversarios30: aniversarios30,
+            riscoAlto: riscoAlto
+        };
+    }
+
+    function normalizeStatusLookup(value) {
+        return String(repairVisitasModuleText(value || ''))
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim();
+    }
+
+    function parseDateOnlyAsLocal(value) {
+        var text;
+        var parts;
+
+        if (!value) {
+            return null;
+        }
+
+        if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime())) {
+            return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+        }
+
+        text = String(value || '').trim().split('T')[0];
+        if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+            parts = text.split('-');
+            return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        }
+
+        return null;
+    }
+
+    function getDaysWithoutVisit(item) {
+        var today = new Date();
+        var localToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var lastVisit = parseDateOnlyAsLocal(item && item.ultima_visita);
+
+        if (!lastVisit) {
+            return null;
+        }
+
+        return Math.floor((localToday.getTime() - lastVisit.getTime()) / 86400000);
+    }
+
+    function getFrequencyDays(item) {
+        var normalized = normalizeStatusLookup(item && item.frequencia_visita);
+
+        if (normalized.indexOf('seman') !== -1) return 7;
+        if (normalized.indexOf('quinzen') !== -1) return 15;
+        if (normalized.indexOf('mens') !== -1) return 30;
+        if (normalized.indexOf('bimes') !== -1) return 60;
+        return 30;
+    }
+
+    function getProfileKeys(item) {
+        var profiles = [];
+        var categoria = normalizeStatusLookup(item && item.categoria);
+
+        if (item && item.perfil_enfermo) profiles.push('enfermos');
+        if (item && item.perfil_mocidade) profiles.push('mocidade');
+        if (item && item.perfil_musico) profiles.push('musicos');
+        if (categoria.indexOf('evangel') !== -1) profiles.push('evangelizacao');
+        if (!profiles.length) profiles.push('irmandade');
+
+        return profiles;
+    }
+
+    function getProfileLabel(key) {
+        if (key === 'enfermos') return 'Enfermos';
+        if (key === 'mocidade') return 'Mocidade';
+        if (key === 'musicos') return 'Músicos';
+        if (key === 'evangelizacao') return 'Evangelização';
+        return 'Irmandade';
+    }
+
+    function getProfileText(item) {
+        return getProfileKeys(item).map(getProfileLabel).join(', ');
+    }
+
+    function buildAgendaIndex() {
+        var agendaByVisitado = {};
+
+        ($scope.agendaVisitas || []).forEach(function (agenda) {
+            if (!agenda || !agenda.irmandade_id) {
+                return;
+            }
+            agendaByVisitado[agenda.irmandade_id] = agendaByVisitado[agenda.irmandade_id] || [];
+            agendaByVisitado[agenda.irmandade_id].push(agenda);
+        });
+
+        return agendaByVisitado;
+    }
+
+    function getNextAgendaInfo(item, agendaByVisitado) {
+        var today = new Date();
+        var todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var nextAgenda = null;
+
+        (agendaByVisitado[item.id] || []).forEach(function (agenda) {
+            var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
+            var normalizedStatus = normalizeStatusLookup(agenda && agenda.status);
+            var localAgendaDate;
+
+            if (!(agendaDate && !isNaN(agendaDate.getTime())) || normalizedStatus.indexOf('cancel') !== -1) {
+                return;
+            }
+
+            localAgendaDate = new Date(agendaDate.getFullYear(), agendaDate.getMonth(), agendaDate.getDate());
+            if (localAgendaDate.getTime() < todayLocal.getTime()) {
+                return;
+            }
+
+            if (!nextAgenda || localAgendaDate.getTime() < nextAgenda.localDate.getTime()) {
+                nextAgenda = {
+                    raw: agenda,
+                    localDate: localAgendaDate,
+                    label: formatVisitasDateBRLocal(localAgendaDate),
+                    titulo: repairVisitasModuleText(agenda.titulo || '')
+                };
+            }
+        });
+
+        return nextAgenda;
+    }
+
+    function getRiskMeta(item, nextAgendaInfo) {
+        var daysWithoutVisit = getDaysWithoutVisit(item);
+        var frequencyDays = getFrequencyDays(item);
+        var score = 0;
+        var label = 'Em dia';
+        var cssClass = 'success';
+        var reasons = [];
+
+        if (daysWithoutVisit === null) {
+            score += 3;
+            reasons.push('Sem visita registrada');
+        } else if (daysWithoutVisit > frequencyDays) {
+            score += daysWithoutVisit > 60 ? 3 : 2;
+            reasons.push(daysWithoutVisit + ' dias sem visita');
+        }
+
+        if (!nextAgendaInfo) {
+            score += 2;
+            reasons.push('Sem agenda futura');
+        }
+
+        if (item.perfil_enfermo) {
+            score += 2;
+            reasons.push('Perfil enfermo');
+        }
+
+        if (score >= 6) {
+            label = 'Crítico';
+            cssClass = 'danger';
+        } else if (score >= 4) {
+            label = 'Alto';
+            cssClass = 'warning';
+        } else if (score >= 2) {
+            label = 'Atenção';
+            cssClass = 'primary';
+        }
+
+        return {
+            score: score,
+            label: label,
+            cssClass: cssClass,
+            reasons: reasons
+        };
+    }
+
+    function getVisitadoRowClass(item) {
+        if ((item.riskScore || 0) >= 6) return 'danger';
+        if ((item.riskScore || 0) >= 4) return 'warning';
+        return '';
+    }
+
+    function getRiskLabelClass(item) {
+        if (item.riskClass === 'danger') return 'label-danger';
+        if (item.riskClass === 'warning') return 'label-warning';
+        if (item.riskClass === 'primary') return 'label-primary';
+        return 'label-success';
+    }
+
+    function refreshManagementInsights() {
+        var agendaByVisitado = {};
+        var profileMap = {};
+        var municipioMap = {};
+        var priority = [];
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        ($scope.agendaVisitas || []).forEach(function (agenda) {
+            if (!agenda || !agenda.irmandade_id) {
+                return;
+            }
+            agendaByVisitado[agenda.irmandade_id] = agendaByVisitado[agenda.irmandade_id] || [];
+            agendaByVisitado[agenda.irmandade_id].push(agenda);
+        });
+
+        ($scope.filteredVisitados || []).forEach(function (item) {
+            var profileKeys = getProfileKeys(item);
+            var daysWithoutVisit = getDaysWithoutVisit(item);
+            var frequencyDays = getFrequencyDays(item);
+            var hasAgendaFutura = (agendaByVisitado[item.id] || []).some(function (agenda) {
+                var agendaDate = agenda && agenda.data_inicio ? new Date(agenda.data_inicio) : null;
+                var normalizedStatus = normalizeStatusLookup(agenda && agenda.status);
+                return agendaDate && !isNaN(agendaDate.getTime()) &&
+                    new Date(agendaDate.getFullYear(), agendaDate.getMonth(), agendaDate.getDate()).getTime() >= today.getTime() &&
+                    normalizedStatus.indexOf('cancel') === -1;
+            });
+            var municipio = normalizeMunicipioRegionalLabel(item.municipio || '') || 'Sem município';
+            var reasons = [];
+            var riskScore = 0;
+
+            municipioMap[municipio] = municipioMap[municipio] || {
+                municipio: municipio,
+                total: 0,
+                enfermos: 0,
+                atrasados: 0,
+                semAgenda: 0
+            };
+            municipioMap[municipio].total += 1;
+            if (item.perfil_enfermo) municipioMap[municipio].enfermos += 1;
+
+            profileKeys.forEach(function (key) {
+                profileMap[key] = profileMap[key] || {
+                    key: key,
+                    label: getProfileLabel(key),
+                    total: 0,
+                    semVisita30: 0,
+                    semAgenda: 0,
+                    ativos: 0
+                };
+                profileMap[key].total += 1;
+                if (item.status === 'Ativo' || item.status === 'Acompanhamento') {
+                    profileMap[key].ativos += 1;
+                }
+                if (daysWithoutVisit === null || daysWithoutVisit > 30) {
+                    profileMap[key].semVisita30 += 1;
+                }
+                if (!hasAgendaFutura) {
+                    profileMap[key].semAgenda += 1;
+                }
+            });
+
+            if (daysWithoutVisit === null) {
+                reasons.push('Sem visita registrada');
+                riskScore += 3;
+            } else if (daysWithoutVisit > frequencyDays) {
+                reasons.push(daysWithoutVisit + ' dias sem visita');
+                riskScore += daysWithoutVisit > 60 ? 3 : 2;
+            }
+
+            if (!hasAgendaFutura) {
+                reasons.push('Sem agenda futura');
+                riskScore += 2;
+                municipioMap[municipio].semAgenda += 1;
+            }
+
+            if (daysWithoutVisit === null || daysWithoutVisit > 30) {
+                municipioMap[municipio].atrasados += 1;
+            }
+
+            if (item.perfil_enfermo) {
+                reasons.push('Perfil enfermo');
+                riskScore += 2;
+            }
+
+            if (riskScore > 0) {
+                priority.push({
+                    id: item.id,
+                    nome: item.nome,
+                    municipio: municipio,
+                    comum: item.comum || '-',
+                    perfil: profileKeys.map(getProfileLabel).join(', '),
+                    diasSemVisita: daysWithoutVisit,
+                    possuiAgendaFutura: hasAgendaFutura,
+                    motivos: reasons.join(' | '),
+                    riskScore: riskScore
+                });
+            }
+        });
+
+        $scope.profileSummary = Object.keys(profileMap).map(function (key) {
+            return profileMap[key];
+        }).sort(function (a, b) {
+            return b.total - a.total;
+        });
+
+        $scope.priorityList = priority.sort(function (a, b) {
+            if (b.riskScore !== a.riskScore) {
+                return b.riskScore - a.riskScore;
+            }
+            return (b.diasSemVisita || 0) - (a.diasSemVisita || 0);
+        }).slice(0, 12);
+
+        $scope.municipioInsights = Object.keys(municipioMap).map(function (key) {
+            return municipioMap[key];
+        }).sort(function (a, b) {
+            if (b.atrasados !== a.atrasados) {
+                return b.atrasados - a.atrasados;
+            }
+            if (b.semAgenda !== a.semAgenda) {
+                return b.semAgenda - a.semAgenda;
+            }
+            return b.total - a.total;
+        });
+    }
+
+    $scope.formData = buildEmptyForm();
+    $scope.editing = false;
+
+    $scope.onComumChange = function () {
+        syncFormComum();
+        refreshAvailableComuns();
+    };
+
+    $scope.onComumSearchChange = function () {
+        refreshAvailableComuns();
+    };
+
+    $scope.onFormMunicipioChange = function () {
+        if ($scope.formData.comum) {
+            $scope.formData.comum = '';
+            $scope.formData.codigo_comum = '';
+        }
+        refreshAvailableComuns();
+    };
+
+    $scope.applyFilters = function () {
+        var search = String($scope.filters.searchText || '').trim().toLowerCase();
+        var selectedProfile = String($scope.filters.profile || '').trim();
+        var agendaByVisitado = buildAgendaIndex();
+
+        $scope.filteredVisitados = ($scope.visitados || []).filter(function (item) {
+            var matchText = !search || [item.nome, item.comum, item.familia, item.referencia_geografica, item.telefone, item.categoria].join(' ').toLowerCase().indexOf(search) !== -1;
+            var matchCity = !$scope.filters.cidade || normalizeMunicipioRegionalLabel(item.municipio) === normalizeMunicipioRegionalLabel($scope.filters.cidade);
+            var matchStatus = !$scope.filters.status || item.status === $scope.filters.status;
+            var matchProfile = !selectedProfile || getProfileKeys(item).indexOf(selectedProfile) !== -1;
+            return matchText && matchCity && matchStatus && matchProfile;
+        }).map(function (item) {
+            var enriched = angular.extend({}, item);
+            var nextAgendaInfo = getNextAgendaInfo(enriched, agendaByVisitado);
+            var riskMeta = getRiskMeta(enriched, nextAgendaInfo);
+
+            enriched.profileText = getProfileText(enriched);
+            enriched.nextAgendaLabel = nextAgendaInfo ? nextAgendaInfo.label : '-';
+            enriched.nextAgendaTitle = nextAgendaInfo ? nextAgendaInfo.titulo : '';
+            enriched.hasNextAgenda = !!nextAgendaInfo;
+            enriched.daysWithoutVisit = getDaysWithoutVisit(enriched);
+            enriched.riskScore = riskMeta.score;
+            enriched.riskLabel = riskMeta.label;
+            enriched.riskClass = riskMeta.cssClass;
+            enriched.riskReasons = riskMeta.reasons.join(' | ');
+            return enriched;
+        });
+
+        updateSummary();
+        refreshManagementInsights();
+    };
+
+    $scope.getVisitadoRowClass = getVisitadoRowClass;
+    $scope.getRiskLabelClass = getRiskLabelClass;
+
+    $scope.showAgendaResumo = function (item) {
+        var resumo = [
+            'Pessoa: ' + (item.nome || '-'),
+            'Perfil: ' + (item.profileText || '-'),
+            'Última visita: ' + (item.ultima_visita || '-'),
+            'Próxima agenda: ' + (item.nextAgendaLabel || '-'),
+            item.nextAgendaTitle ? ('Compromisso: ' + item.nextAgendaTitle) : '',
+            'Risco: ' + (item.riskLabel || 'Em dia'),
+            item.riskReasons ? ('Motivos: ' + item.riskReasons) : ''
+        ].filter(Boolean).join('\n');
+
+        if (typeof swal === 'function') {
+            swal('Resumo pastoral', resumo, 'info');
+            return;
+        }
+
+        window.alert(resumo);
+    };
+
+    $scope.copyVisitadoResumo = function (item) {
+        var resumo = [
+            'Resumo pastoral',
+            'Pessoa: ' + (item.nome || '-'),
+            'Município: ' + (item.municipio || '-'),
+            'Comum: ' + (item.comum || '-'),
+            'Perfil: ' + (item.profileText || '-'),
+            'Última visita: ' + (item.ultima_visita || '-'),
+            'Próxima agenda: ' + (item.nextAgendaLabel || '-'),
+            'Risco: ' + (item.riskLabel || 'Em dia'),
+            item.riskReasons ? ('Motivos: ' + item.riskReasons) : ''
+        ].filter(Boolean).join('\n');
+
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(resumo).then(function () {
+                if (window.toastr && typeof window.toastr.success === 'function') {
+                    window.toastr.success('Resumo copiado para a área de transferência.', 'Resumo pastoral');
+                }
+            }).catch(function () {
+                if (typeof swal === 'function') {
+                    swal('Resumo pastoral', resumo, 'info');
+                }
+            });
+            return;
+        }
+
+        if (typeof swal === 'function') {
+            swal('Resumo pastoral', resumo, 'info');
+        }
+    };
+
+    $scope.loadData = function () {
+        $scope.loading = true;
+        $scope.pageError = '';
+
+        $q.all([
+            VisitasService.getVisitados(),
+            VisitasService.getAgenda()
+        ]).then(function (results) {
+            $scope.$applyAsync(function () {
+                $scope.visitados = (results[0] || []).map(enrichVisitado);
+                $scope.agendaVisitas = results[1] || [];
+                $scope.applyFilters();
+            });
+        }).catch(function (error) {
+            $scope.$applyAsync(function () {
+                $scope.pageError = (error && error.message) || 'Nao foi possivel carregar os cadastros de visitados.';
+                $scope.visitados = [];
+                $scope.filteredVisitados = [];
+                $scope.agendaVisitas = [];
+                updateSummary();
+                refreshManagementInsights();
+            });
+        }).finally(function () {
+            $scope.$applyAsync(function () {
+                $scope.loading = false;
+            });
+        });
+    };
+
+    $scope.prepareNovo = function () {
+        $scope.editing = false;
+        $scope.formData = buildEmptyForm();
+        $scope.formFilters.comumSearch = '';
+        refreshAvailableComuns();
+    };
+
+    $scope.editVisitado = function (item) {
+        if (!$scope.canManageCadastros) {
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem editar visitados.');
+            return;
+        }
+
+        $scope.editing = true;
+        $scope.formData = {
+            id: item.id,
+            nome: item.nome || '',
+            categoria: item.categoria || item.sexo || '',
+            municipio: item.municipio || '',
+            comum: item.comum || '',
+            codigo_comum: item.codigo_comum || '',
+            familia: item.familia || '',
+            referencia_geografica: item.referencia_geografica || item.bairro || '',
+            endereco: item.endereco || '',
+            telefone: item.telefone || '',
+            status: item.status || 'Ativo',
+            frequencia_visita: item.frequencia_visita || '',
+            data_nascimento: item.data_nascimento || '',
+            ultima_visita: item.ultima_visita || '',
+            observacoes: item.observacoes || ''
+        };
+        $scope.formFilters.comumSearch = '';
+        refreshAvailableComuns();
+    };
+
+    $scope.cancelEdit = function () {
+        $scope.prepareNovo();
+    };
+
+    $scope.saveVisitado = function () {
+        var promise;
+
+        if (!$scope.canManageCadastros) {
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem salvar visitados.');
+            return;
+        }
+
+        syncFormComum();
+        if (!$scope.formData.nome) {
+            swal('Atencao', 'Informe o nome da pessoa visitada.', 'warning');
+            return;
+        }
+
+        if (!$scope.formData.municipio) {
+            swal('Atencao', 'Selecione o municipio para continuar.', 'warning');
+            return;
+        }
+
+        $scope.saving = true;
+        promise = $scope.editing ? VisitasService.updateVisitado($scope.formData) : VisitasService.saveVisitado($scope.formData);
+        promise.then(function () {
+            swal('Sucesso', $scope.editing ? 'Cadastro atualizado com sucesso.' : 'Visitado cadastrado com sucesso.', 'success');
+            $scope.prepareNovo();
+            $scope.loadData();
+        }).catch(function (error) {
+            swal('Erro', (error && error.message) || 'Nao foi possivel salvar o visitado.', 'error');
+        }).finally(function () {
+            $scope.saving = false;
+        });
+    };
+
+    $scope.confirmDelete = function (item) {
+        if (!$scope.canManageCadastros) {
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem excluir visitados.');
+            return;
+        }
+
+        swal({
+            title: 'Tem certeza?',
+            text: 'Deseja excluir o cadastro de ' + (item.nome || '-') + '?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar',
+            closeOnConfirm: false
+        }, function () {
+            $scope.$applyAsync(function () {
+                VisitasService.deleteVisitado(item.id).then(function () {
+                    swal('Excluido', 'O cadastro foi removido com sucesso.', 'success');
+                    if ($scope.formData.id === item.id) {
+                        $scope.prepareNovo();
+                    }
+                    $scope.loadData();
+                }).catch(function (error) {
+                    swal('Erro', (error && error.message) || 'Nao foi possivel excluir o cadastro.', 'error');
+                });
+            });
+        });
+    };
+
+    updateManagementPermission();
+    $scope.$watch(function () { return $rootScope.currentUser; }, updateManagementPermission, true);
+    $scope.$watchGroup(['filters.searchText', 'filters.cidade', 'filters.status', 'filters.profile'], function () {
+        $scope.applyFilters();
+    });
+    ensureScopeComumCatalog($scope, AuthService, function (catalogState) {
+        comumCatalogState = catalogState || comumCatalogState;
+        $scope.comumCatalogState = comumCatalogState;
+        $scope.comunsDisponiveis = comumCatalogState.items.slice();
+        syncFormComum();
+        $scope.visitados = ($scope.visitados || []).map(enrichVisitado);
+        $scope.applyFilters();
+        refreshAvailableComuns();
+    });
+    $scope.$watchGroup(['formData.comum', 'formData.municipio'], refreshAvailableComuns);
+    $scope.prepareNovo();
+    $scope.loadData();
+}
+
+function visitasGruposCtrl($scope, VisitasService, AuthService, $rootScope, $q) {
+    var comumCatalogState = getFallbackComumCatalogState();
+
+    $scope.loading = true;
+    $scope.saving = false;
+    $scope.pageError = '';
+    $scope.canManageCadastros = false;
+    $scope.cidades = MUNICIPIOS_REGIONAIS.map(normalizeMunicipioRegionalLabel);
+    $scope.comumCatalogState = comumCatalogState;
+    $scope.comunsDisponiveis = comumCatalogState.items.slice();
+    $scope.filteredComunsDisponiveis = comumCatalogState.items.slice();
+    $scope.grupos = [];
+    $scope.filteredGrupos = [];
+    $scope.filters = {
+        searchText: '',
+        cidade: '',
+        status: ''
+    };
+    $scope.formFilters = {
+        comumSearch: ''
+    };
+
+    function updateManagementPermission() {
+        $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'Visitas');
+    }
+
+    function buildEmptyForm() {
+        return {
+            id: null,
+            nome: '',
+            municipio: '',
+            comum_base: '',
+            codigo_comum: '',
+            lider_nome: '',
+            lider_telefone: '',
+            dia_visita: '',
+            periodicidade: 'Semanal',
+            capacidade: 0,
+            status: 'Ativo',
+            observacoes: ''
+        };
+    }
+
+    function resolveTypedComumValue(value) {
+        var lookup = normalizeComumCatalogLookup(value || '');
+        var matchedComum = '';
+
+        if (!lookup) {
+            return '';
+        }
+
+        ($scope.comunsDisponiveis || []).some(function (comum) {
+            if (normalizeComumCatalogLookup(comum) === lookup) {
+                matchedComum = comum;
+                return true;
+            }
+            return false;
+        });
+
+        return matchedComum;
+    }
+
+    function syncFormComum() {
+        var canonicalComum = resolveTypedComumValue($scope.formData.comum_base);
+
+        if (canonicalComum) {
+            $scope.formData.comum_base = canonicalComum;
+        }
+
+        applyMappedComumSelection($scope.formData, 'comum_base', $scope.formData.comum_base, $scope.comumCatalogState, { cityField: 'municipio' });
+        $scope.formData.codigo_comum = extractVisitaCodigoLocal($scope.formData.comum_base);
+
+        if (!$scope.formData.municipio) {
+            $scope.formData.municipio = normalizeMunicipioRegionalLabel(resolveMunicipioFromCatalog($scope.comumCatalogState, [$scope.formData.comum_base]) || '');
+        }
+    }
+
+    function refreshAvailableComuns() {
+        var search = normalizeComumCatalogLookup($scope.formData.comum_base || $scope.formFilters.comumSearch || '');
+        var selectedCity = normalizeMunicipioRegionalLabel($scope.formData.municipio || '');
+
+        $scope.filteredComunsDisponiveis = ($scope.comunsDisponiveis || []).filter(function (comum) {
+            var entry = findComumCatalogEntry($scope.comumCatalogState, comum) || {};
+            var comumCity = normalizeMunicipioRegionalLabel(entry.cidade || resolveMunicipioFromCatalog($scope.comumCatalogState, [comum]) || '');
+            var matchCity = !selectedCity || comumCity === selectedCity;
+            var matchSearch = !search || normalizeComumCatalogLookup(comum).indexOf(search) !== -1;
+
+            return matchCity && matchSearch;
+        });
+    }
+
+    function updateSummary() {
+        var ativos = 0;
+        var capacidade = 0;
+        var semLider = 0;
+
+        ($scope.filteredGrupos || []).forEach(function (item) {
+            if (item.status === 'Ativo') {
+                ativos += 1;
+            }
+            if (!item.lider_nome) {
+                semLider += 1;
+            }
+            capacidade += parseInt(item.capacidade, 10) || 0;
+        });
+
+        $scope.summary = {
+            total: ($scope.filteredGrupos || []).length,
+            ativos: ativos,
+            capacidade: capacidade,
+            semLider: semLider
+        };
+    }
+
+    $scope.formData = buildEmptyForm();
+    $scope.editing = false;
+
+    $scope.onComumChange = function () {
+        syncFormComum();
+        refreshAvailableComuns();
+    };
+
+    $scope.onComumSearchChange = function () {
+        refreshAvailableComuns();
+    };
+
+    $scope.onFormMunicipioChange = function () {
+        if ($scope.formData.comum_base) {
+            $scope.formData.comum_base = '';
+            $scope.formData.codigo_comum = '';
+        }
+        refreshAvailableComuns();
+    };
+
+    $scope.applyFilters = function () {
+        var search = String($scope.filters.searchText || '').trim().toLowerCase();
+
+        $scope.filteredGrupos = ($scope.grupos || []).filter(function (item) {
+            var matchText = !search || [item.nome, item.comum_base, item.lider_nome, item.dia_visita, item.periodicidade].join(' ').toLowerCase().indexOf(search) !== -1;
+            var matchCity = !$scope.filters.cidade || normalizeMunicipioRegionalLabel(item.municipio) === normalizeMunicipioRegionalLabel($scope.filters.cidade);
+            var matchStatus = !$scope.filters.status || item.status === $scope.filters.status;
+            return matchText && matchCity && matchStatus;
+        });
+
+        updateSummary();
+    };
+
+    $scope.loadData = function () {
+        $scope.loading = true;
+        $scope.pageError = '';
+
+        $q.all([
+            VisitasService.getGrupos()
+        ]).then(function (results) {
+            $scope.$applyAsync(function () {
+                $scope.grupos = results[0] || [];
+                $scope.applyFilters();
+            });
+        }).catch(function (error) {
+            $scope.$applyAsync(function () {
+                $scope.pageError = (error && error.message) || 'Nao foi possivel carregar os grupos de visita.';
+                $scope.grupos = [];
+                $scope.filteredGrupos = [];
+                updateSummary();
+            });
+        }).finally(function () {
+            $scope.$applyAsync(function () {
+                $scope.loading = false;
+            });
+        });
+    };
+
+    $scope.prepareNovo = function () {
+        $scope.editing = false;
+        $scope.formData = buildEmptyForm();
+        $scope.formFilters.comumSearch = '';
+        refreshAvailableComuns();
+    };
+
+    $scope.editGrupo = function (item) {
+        if (!$scope.canManageCadastros) {
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem editar grupos.');
+            return;
+        }
+
+        $scope.editing = true;
+        $scope.formData = {
+            id: item.id,
+            nome: item.nome || '',
+            municipio: item.municipio || '',
+            comum_base: item.comum_base || '',
+            codigo_comum: item.codigo_comum || '',
+            lider_nome: item.lider_nome || '',
+            lider_telefone: item.lider_telefone || '',
+            dia_visita: item.dia_visita || '',
+            periodicidade: item.periodicidade || 'Semanal',
+            capacidade: item.capacidade || 0,
+            status: item.status || 'Ativo',
+            observacoes: item.observacoes || ''
+        };
+        $scope.formFilters.comumSearch = '';
+        refreshAvailableComuns();
+    };
+
+    $scope.cancelEdit = function () {
+        $scope.prepareNovo();
+    };
+
+    $scope.saveGrupo = function () {
+        var promise;
+
+        if (!$scope.canManageCadastros) {
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem salvar grupos.');
+            return;
+        }
+
+        syncFormComum();
+
+        if (!$scope.formData.nome) {
+            swal('Atencao', 'Informe o nome do grupo.', 'warning');
+            return;
+        }
+
+        if (!$scope.formData.municipio) {
+            swal('Atencao', 'Selecione o municipio para continuar.', 'warning');
+            return;
+        }
+
+        $scope.saving = true;
+        promise = $scope.editing ? VisitasService.updateGrupo($scope.formData) : VisitasService.saveGrupo($scope.formData);
+        promise.then(function () {
+            swal('Sucesso', $scope.editing ? 'Grupo atualizado com sucesso.' : 'Grupo cadastrado com sucesso.', 'success');
+            $scope.prepareNovo();
+            $scope.loadData();
+        }).catch(function (error) {
+            swal('Erro', (error && error.message) || 'Nao foi possivel salvar o grupo.', 'error');
+        }).finally(function () {
+            $scope.saving = false;
+        });
+    };
+
+    $scope.confirmDelete = function (item) {
+        if (!$scope.canManageCadastros) {
+            showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem excluir grupos.');
+            return;
+        }
+
+        swal({
+            title: 'Tem certeza?',
+            text: 'Deseja excluir o grupo ' + (item.nome || '-') + '?',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar',
+            closeOnConfirm: false
+        }, function () {
+            $scope.$applyAsync(function () {
+                VisitasService.deleteGrupo(item.id).then(function () {
+                    swal('Excluido', 'O grupo foi removido com sucesso.', 'success');
+                    if ($scope.formData.id === item.id) {
+                        $scope.prepareNovo();
+                    }
+                    $scope.loadData();
+                }).catch(function (error) {
+                    swal('Erro', (error && error.message) || 'Nao foi possivel excluir o grupo.', 'error');
+                });
+            });
+        });
+    };
+
+    updateManagementPermission();
+    $scope.$watch(function () { return $rootScope.currentUser; }, updateManagementPermission, true);
+    $scope.$watchGroup(['filters.searchText', 'filters.cidade', 'filters.status'], function () {
+        $scope.applyFilters();
+    });
+    ensureScopeComumCatalog($scope, AuthService, function (catalogState) {
+        comumCatalogState = catalogState || comumCatalogState;
+        $scope.comumCatalogState = comumCatalogState;
+        $scope.comunsDisponiveis = comumCatalogState.items.slice();
+        syncFormComum();
+        refreshAvailableComuns();
+    });
+    $scope.$watchGroup(['formData.comum_base', 'formData.municipio'], refreshAvailableComuns);
+    $scope.prepareNovo();
+    $scope.loadData();
 }
 
 angular
@@ -15930,6 +17459,8 @@ angular
     .controller('visitasCtrl', visitasCtrl)
     .controller('visitasDashboardCtrl', visitasDashboardCtrl)
     .controller('visitasLancamentosCtrl', visitasLancamentosCtrl)
+    .controller('visitasVisitadosCtrl', visitasVisitadosCtrl)
+    .controller('visitasGruposCtrl', visitasGruposCtrl)
     .controller('musicalizacaoCtrl', musicalizacaoCtrl)
     .controller('musicalizacaoAlunosCtrl', musicalizacaoAlunosCtrl)
     .controller('musicalizacaoPolosCtrl', musicalizacaoPolosCtrl)
@@ -15939,7 +17470,7 @@ angular
     .controller('musicalizacaoPresencaCtrl', musicalizacaoPresencaCtrl);
 
 /**
- * musicalizacaoCtrl - Controller for MusicalizaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o Dashboard
+ * musicalizacaoCtrl - Controller for MusicalizaÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š§ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š£o Dashboard
  * Fetches data from MusicalizacaoService (Supabase)
  */
 function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
@@ -16414,7 +17945,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
         var groups = {};
 
         ($scope.filteredAtividades || []).forEach(function (item) {
-            var municipio = item.cidade || 'Sem municÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­pio';
+            var municipio = item.cidade || 'Sem municÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio';
             groups[municipio] = groups[municipio] || [];
             groups[municipio].push(item);
         });
@@ -16435,18 +17966,18 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     $scope.exportToExcel = function() {
         var grupos = getDashboardGroupsByMunicipio();
         var rows = [
-            ['CONGREGAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O CRISTÃƒÆ’Ã†â€™ NO BRASIL'],
-            ['Regional Itapevi - SÃƒÆ’Ã‚Â£o Paulo'],
-            ['MUSICALIZAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O INFANTIL'],
-            ['RelatÃƒÆ’Ã‚Â³rio de Atividades MusicalizaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o'],
-            ['EmissÃƒÆ’Ã‚Â£o: ' + new Date().toLocaleDateString('pt-BR')],
-            ['PerÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­odo: ' + getDashboardPeriodoLabel()],
+            ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
+            ['Regional Itapevi - SÃÆ’£o Paulo'],
+            ['MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL'],
+            ['RelatÃÆ’³rio de Atividades MusicalizaÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o'],
+            ['EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR')],
+            ['PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + getDashboardPeriodoLabel()],
             []
         ];
         var totals = { meninas: 0, meninos: 0, geral: 0 };
 
         grupos.forEach(function (grupo) {
-            rows.push(['MUNICÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂPIO: ' + grupo.municipio]);
+            rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio]);
             rows.push(['Data', 'Localidade', 'Polo', 'Meninas', 'Meninos', 'Total']);
 
             grupo.atividades.forEach(function (item) {
@@ -16502,12 +18033,12 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     $scope.exportToPDF = function() {
         var grupos = getDashboardGroupsByMunicipio();
         var content = [
-            { text: 'CONGREGAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O CRISTÃƒÆ’Ã†â€™ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - SÃƒÆ’Ã‚Â£o Paulo', style: 'entitySub' },
-            { text: 'MUSICALIZAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O INFANTIL', style: 'moduleName' },
-            { text: 'RelatÃƒÆ’Ã‚Â³rio de Atividades MusicalizaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£o', style: 'reportTitle' },
-            { text: 'EmissÃƒÆ’Ã‚Â£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 5] },
-            { text: 'PerÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­odo: ' + getDashboardPeriodoLabel(), alignment: 'right', margin: [0, 0, 0, 10] }
+            { text: 'CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - SÃÆ’£o Paulo', style: 'entitySub' },
+            { text: 'MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL', style: 'moduleName' },
+            { text: 'RelatÃÆ’³rio de Atividades MusicalizaÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o', style: 'reportTitle' },
+            { text: 'EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 5] },
+            { text: 'PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + getDashboardPeriodoLabel(), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
         if (!grupos.length) {
@@ -16549,7 +18080,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
                 { text: totals.geral, bold: true, fillColor: '#f3f3f3' }
             ]);
 
-            content.push({ text: 'MUNICÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂPIO: ' + grupo.municipio, style: 'groupTitle' });
+            content.push({ text: 'MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio, style: 'groupTitle' });
             content.push({
                 table: {
                     headerRows: 1,
@@ -16859,7 +18390,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     }
 
     function getPoloMunicipioLabel(polo) {
-        return polo.localidade || 'Sem municÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­pio';
+        return polo.localidade || 'Sem municÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio';
     }
 
     function getGroupedPolos() {
@@ -17354,28 +18885,28 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
     function repairMusicalizacaoPdfText(value) {
         return repairCadastroMusicText(value || '')
-            .replace(/CONGREGA[^A-Z0-9 ]*O CRIST[^A-Z0-9 ]* NO BRASIL/gi, 'CONGREGAÃ‡ÃƒO CRISTÃƒ NO BRASIL')
-            .replace(/MUSICALIZA[^A-Z0-9 ]*O INFANTIL/gi, 'MUSICALIZAÃ‡ÃƒO INFANTIL')
-            .replace(/Relat[^A-Z0-9 ]*rio de Crian[^A-Z0-9 ]*as \/ Alunos/gi, 'RelatÃ³rio de CrianÃ§as / Alunos')
-            .replace(/Emiss[^A-Z0-9 ]*o/gi, 'EmissÃ£o')
-            .replace(/Respons[^A-Z0-9 ]*vel/gi, 'ResponsÃ¡vel')
-            .replace(/Pr[^A-Z0-9 ]*xima de 12 anos/gi, 'PrÃ³xima de 12 anos');
+            .replace(/CONGREGA[^A-Z0-9 ]*O CRIST[^A-Z0-9 ]* NO BRASIL/gi, 'CONGREGAÇÃO CRISTàNO BRASIL')
+            .replace(/MUSICALIZA[^A-Z0-9 ]*O INFANTIL/gi, 'MUSICALIZAÇÃO INFANTIL')
+            .replace(/Relat[^A-Z0-9 ]*rio de Crian[^A-Z0-9 ]*as \/ Alunos/gi, 'Relatório de Crianças / Alunos')
+            .replace(/Emiss[^A-Z0-9 ]*o/gi, 'Emissão')
+            .replace(/Respons[^A-Z0-9 ]*vel/gi, 'Responsável')
+            .replace(/Pr[^A-Z0-9 ]*xima de 12 anos/gi, 'Próxima de 12 anos');
     }
 
     $scope.exportToExcel = function () {
         var grupos = getGroupedAlunos();
         var rows = [
-            ['CONGREGAÃ‡ÃƒO CRISTÃƒ NO BRASIL'],
-            ['Regional Itapevi - SÃ£o Paulo'],
-            ['MUSICALIZAÃ‡ÃƒO INFANTIL'],
-            ['RelatÃ³rio de CrianÃ§as / Alunos'],
-            ['EmissÃ£o: ' + new Date().toLocaleDateString('pt-BR')],
+            ['CONGREGAÇÃO CRISTàNO BRASIL'],
+            ['Regional Itapevi - São Paulo'],
+            ['MUSICALIZAÇÃO INFANTIL'],
+            ['Relatório de Crianças / Alunos'],
+            ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
             []
         ];
 
         grupos.forEach(function (grupo) {
             rows.push(['POLO: ' + grupo.polo]);
-            rows.push(['Nome', 'Idade', 'ResponsÃ¡vel', 'Contato', 'Status', 'Alerta']);
+            rows.push(['Nome', 'Idade', 'Responsável', 'Contato', 'Status', 'Alerta']);
 
             grupo.alunos.forEach(function (aluno) {
                 var ageInfo = getAlunoAgeInfo(aluno.data_nascimento);
@@ -17385,7 +18916,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
                     aluno.nome_responsavel || '-',
                     aluno.celular_responsavel || '-',
                     aluno.status || 'Ativo',
-                    ageInfo.reachedLimit ? '12 anos ou mais' : (ageInfo.nearLimit ? 'PrÃ³xima de 12 anos' : '')
+                    ageInfo.reachedLimit ? '12 anos ou mais' : (ageInfo.nearLimit ? 'Próxima de 12 anos' : '')
                 ]);
             });
 
@@ -17421,18 +18952,18 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     $scope.exportToPDF = function () {
         var grupos = getGroupedAlunos();
         var content = [
-            { text: 'CONGREGAÃ‡ÃƒO CRISTÃƒ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - SÃ£o Paulo', style: 'entitySub' },
-            { text: 'MUSICALIZAÃ‡ÃƒO INFANTIL', style: 'moduleName' },
-            { text: 'RelatÃ³rio de CrianÃ§as / Alunos', style: 'reportTitle' },
-            { text: 'EmissÃ£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
+            { text: 'CONGREGAÇÃO CRISTàNO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
+            { text: 'Relatório de Crianças / Alunos', style: 'reportTitle' },
+            { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
         grupos.forEach(function (grupo) {
             var body = [[
                 { text: 'Nome', style: 'tableHeader' },
                 { text: 'Idade', style: 'tableHeader' },
-                { text: 'ResponsÃ¡vel', style: 'tableHeader' },
+                { text: 'Responsável', style: 'tableHeader' },
                 { text: 'Contato', style: 'tableHeader' },
                 { text: 'Status', style: 'tableHeader' },
                 { text: 'Alerta', style: 'tableHeader' }
@@ -17446,7 +18977,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
                     repairMusicalizacaoPdfText(aluno.nome_responsavel || '-'),
                     repairMusicalizacaoPdfText(aluno.celular_responsavel || '-'),
                     repairMusicalizacaoPdfText(aluno.status || 'Ativo'),
-                    ageInfo.reachedLimit ? '12 anos ou mais' : (ageInfo.nearLimit ? 'PrÃ³xima de 12 anos' : '')
+                    ageInfo.reachedLimit ? '12 anos ou mais' : (ageInfo.nearLimit ? 'Próxima de 12 anos' : '')
                 ]);
             });
 
@@ -17539,7 +19070,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
     $scope.prepareEdit = function (aluno) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem editar cadastros da pasta.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem editar cadastros da pasta.');
             return;
         }
         $scope.editingAluno = angular.copy(aluno);
@@ -17555,7 +19086,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
         if ($scope.savingEditAluno) return;
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem salvar alteraÃ§Ãµes da pasta.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem salvar alterações da pasta.');
             return;
         }
         if (!validateAlunoAge($scope.editingAluno)) return;
@@ -17591,7 +19122,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
     $scope.confirmDelete = function (aluno) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem excluir cadastros da pasta.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem excluir cadastros da pasta.');
             return;
         }
         showMusicalizacaoConfirm({
@@ -17753,7 +19284,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     }
 
     function getPoloMunicipioLabel(polo) {
-        return polo.localidade || 'Sem municÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­pio';
+        return polo.localidade || 'Sem municÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio';
     }
 
     function getGroupedPolos() {
@@ -17784,16 +19315,16 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     $scope.exportToExcel = function () {
         var grupos = getGroupedPolos();
         var rows = [
-            ['CONGREGAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O CRISTÃƒÆ’Ã†â€™ NO BRASIL'],
-            ['Regional Itapevi - SÃƒÆ’Ã‚Â£o Paulo'],
-            ['MUSICALIZAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O INFANTIL'],
-            ['RelatÃƒÆ’Ã‚Â³rio de Polos / Regionais'],
-            ['EmissÃƒÆ’Ã‚Â£o: ' + new Date().toLocaleDateString('pt-BR')],
+            ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
+            ['Regional Itapevi - SÃÆ’£o Paulo'],
+            ['MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL'],
+            ['RelatÃÆ’³rio de Polos / Regionais'],
+            ['EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR')],
             []
         ];
 
         grupos.forEach(function (grupo) {
-            rows.push(['MUNICÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂPIO: ' + grupo.municipio]);
+            rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio]);
             rows.push(['Nome do Polo', 'Localidade', 'Encarregado Local']);
 
             grupo.polos.forEach(function (polo) {
@@ -17826,11 +19357,11 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     $scope.exportToPDF = function () {
         var grupos = getGroupedPolos();
         var content = [
-            { text: 'CONGREGAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O CRISTÃƒÆ’Ã†â€™ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - SÃƒÆ’Ã‚Â£o Paulo', style: 'entitySub' },
-            { text: 'MUSICALIZAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O INFANTIL', style: 'moduleName' },
-            { text: 'RelatÃƒÆ’Ã‚Â³rio de Polos / Regionais', style: 'reportTitle' },
-            { text: 'EmissÃƒÆ’Ã‚Â£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
+            { text: 'CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - SÃÆ’£o Paulo', style: 'entitySub' },
+            { text: 'MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL', style: 'moduleName' },
+            { text: 'RelatÃÆ’³rio de Polos / Regionais', style: 'reportTitle' },
+            { text: 'EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
         grupos.forEach(function (grupo) {
@@ -17848,7 +19379,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
                 ]);
             });
 
-            content.push({ text: 'MUNICÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂPIO: ' + grupo.municipio, style: 'groupTitle' });
+            content.push({ text: 'MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio, style: 'groupTitle' });
             content.push({
                 table: {
                     headerRows: 1,
@@ -17907,7 +19438,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
 
     $scope.prepareEdit = function (polo) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem editar polos.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem editar polos.');
             return;
         }
         $scope.editingPolo = angular.copy(polo);
@@ -17927,7 +19458,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
 
     $scope.saveEdit = function () {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem salvar alteraÃ§Ãµes de polos.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem salvar alterações de polos.');
             return;
         }
         MusicalizacaoService.updatePolo($scope.editingPolo).then(function () {
@@ -17941,7 +19472,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
 
     $scope.confirmDelete = function (polo) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem excluir polos.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem excluir polos.');
             return;
         }
         showMusicalizacaoConfirm({
@@ -18135,7 +19666,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
         ]) ||
             inferMunicipioFromText(instrutor.polo_auxilio) ||
             inferMunicipioFromText(instrutor.comum_congregacao) ||
-            'Sem municÃƒÆ’Ã‚Â­pio';
+            'Sem municÃÆ’­pio';
     }
 
     function getGroupedInstrutoresByMunicipio() {
@@ -18232,19 +19763,19 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
     $scope.exportToPDF = function () {
         var grupos = getGroupedInstrutoresByMunicipio();
         var content = [
-            { text: 'CONGREGAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O CRISTÃƒÆ’Ã†â€™ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - SÃƒÆ’Ã‚Â£o Paulo', style: 'entitySub' },
-            { text: 'MUSICALIZAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O INFANTIL', style: 'moduleName' },
-            { text: 'RelatÃƒÆ’Ã‚Â³rio de Instrutores e Colaboradores', style: 'reportTitle' },
-            { text: 'EmissÃƒÆ’Ã‚Â£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
+            { text: 'CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - SÃÆ’£o Paulo', style: 'entitySub' },
+            { text: 'MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL', style: 'moduleName' },
+            { text: 'RelatÃÆ’³rio de Instrutores e Colaboradores', style: 'reportTitle' },
+            { text: 'EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
         grupos.forEach(function (grupo) {
             var body = [[
                 { text: 'Nome Completo', style: 'tableHeader' },
-                { text: 'FunÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o', style: 'tableHeader' },
+                { text: 'FunÃÆ’§ÃÆ’£o', style: 'tableHeader' },
                 { text: 'Telefone/Contato', style: 'tableHeader' },
-                { text: 'Polo de AtuaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o', style: 'tableHeader' },
+                { text: 'Polo de AtuaÃÆ’§ÃÆ’£o', style: 'tableHeader' },
                 { text: 'Status', style: 'tableHeader' }
             ]];
 
@@ -18258,7 +19789,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
                 ]);
             });
 
-            content.push({ text: 'MUNICÃƒÆ’Ã‚ÂPIO: ' + grupo.municipio, style: 'groupTitle' });
+            content.push({ text: 'MUNICÃÆ’PIO: ' + grupo.municipio, style: 'groupTitle' });
             content.push({
                 table: {
                     headerRows: 1,
@@ -18476,7 +20007,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
 
     $scope.saveNewInstrutor = function () {
         if (!isValidFullDate(($scope.newInstrutor || {}).data_nascimento)) {
-            swal("Data invÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
+            swal("Data invÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¡lida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
             return;
         }
         $scope.newInstrutor.localidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
@@ -18528,7 +20059,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
 
     $scope.prepareEdit = function (inst) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem editar cadastros da pasta.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem editar cadastros da pasta.');
             return;
         }
         openInstrutorModal(inst, '#modalEditInstrutor', false);
@@ -18536,11 +20067,11 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
 
     $scope.saveEdit = function () {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem salvar alteraÃ§Ãµes da pasta.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem salvar alterações da pasta.');
             return;
         }
         if (!isValidFullDate(($scope.editingInstrutor || {}).data_nascimento)) {
-            swal("Data invÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
+            swal("Data invÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¡lida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
             return;
         }
         $scope.editingInstrutor.localidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
@@ -18559,7 +20090,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
 
     $scope.confirmDelete = function (inst) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem excluir cadastros da pasta.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem excluir cadastros da pasta.');
             return;
         }
         showMusicalizacaoConfirm({
@@ -18637,7 +20168,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
         loadMusicalizacaoPresencaData($scope, MusicalizacaoService, aula).then(function() {
             $scope.loadingPresenca = false;
         }).catch(function(error) {
-            console.error('Erro ao carregar frequÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âªncia:', error);
+            console.error('Erro ao carregar frequÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šªncia:', error);
             $scope.loadingPresenca = false;
         });
     };
@@ -18676,7 +20207,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
 
     $scope.prepareEdit = function(aula) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem reabrir aulas.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem reabrir aulas.');
             return;
         }
         $state.go('musicalizacao.presenca', { id: aula.id });
@@ -18684,7 +20215,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
 
     $scope.confirmDelete = function(aula) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem excluir aulas.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem excluir aulas.');
             return;
         }
         showMusicalizacaoConfirm({
@@ -18745,7 +20276,7 @@ function musicalizacaoNovaAulaCtrl($scope, MusicalizacaoService, $state, $stateP
 
     $scope.init = function () {
          if ($scope.isEdit && !$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem editar aulas.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem editar aulas.');
             $state.go('musicalizacao.aulas');
             return;
          }
@@ -18777,7 +20308,7 @@ function musicalizacaoNovaAulaCtrl($scope, MusicalizacaoService, $state, $stateP
 
         if ($scope.isEdit) {
             if (!$scope.canManageCadastros) {
-                showScopedManagementRestriction('Somente coordenadores da MusicalizaÃ§Ã£o, admin ou master podem salvar alteraÃ§Ãµes de aulas.');
+                showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem salvar alterações de aulas.');
                 return;
             }
             MusicalizacaoService.updateAula(aulaToSave).then(function () {
@@ -18856,7 +20387,7 @@ function musicalizacaoPresencaCtrl($scope, MusicalizacaoService, $timeout, $stat
         }).then(function (alunos) {
             $scope.loading = false;
         }).catch(function (error) {
-            console.error('Erro ao inicializar presenÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§a:', error);
+            console.error('Erro ao inicializar presenÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§a:', error);
             $scope.loading = false;
         });
     };
@@ -18894,7 +20425,7 @@ function musicalizacaoPresencaCtrl($scope, MusicalizacaoService, $timeout, $stat
  */
 santaCeiaAdminCtrl.$inject = ['$scope', 'SantaCeiaService', 'AuthService', '$rootScope'];
 function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
-    var MONTH_LABELS = ["Janeiro", "Fevereiro", "MarÃ§o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    var MONTH_LABELS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     var MONTH_LABELS_SHORT = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
     var CURRENT_YEAR = 2026;
     var PREVIOUS_YEAR = 2025;
@@ -18953,21 +20484,21 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         }
 
         return repaired
-            .replace(/Sï¿½O/gi, 'SÃƒO')
-            .replace(/JOï¿½O/gi, 'JOÃƒO')
-            .replace(/PARNAï¿½BA/gi, 'PARNAÃBA')
-            .replace(/CORAï¿½ï¿½O/gi, 'CORAÃ‡ÃƒO')
-            .replace(/PORTï¿½O/gi, 'PORTÃƒO')
-            .replace(/GUIMARï¿½ES/gi, 'GUIMARÃƒES')
-            .replace(/ROSELï¿½NDIA/gi, 'ROSELÃ‚NDIA')
-            .replace(/ROSELNDIA/gi, 'ROSELÃ‚NDIA')
-            .replace(/S\?O/gi, 'SÃƒO')
-            .replace(/JO\?O/gi, 'JOÃƒO')
-            .replace(/PARNA\?BA/gi, 'PARNAÃBA')
-            .replace(/CORA\?\?O/gi, 'CORAÃ‡ÃƒO')
-            .replace(/PORT\?O/gi, 'PORTÃƒO')
-            .replace(/GUIMAR\?ES/gi, 'GUIMARÃƒES')
-            .replace(/ROSEL\?NDIA/gi, 'ROSELÃ‚NDIA');
+            .replace(/Sï¿½O/gi, 'SÃO')
+            .replace(/JOï¿½O/gi, 'JOÃO')
+            .replace(/PARNAï¿½BA/gi, 'PARNAÍBA')
+            .replace(/CORAï¿½ï¿½O/gi, 'CORAÇÃO')
+            .replace(/PORTï¿½O/gi, 'PORTÃO')
+            .replace(/GUIMARï¿½ES/gi, 'GUIMARÃES')
+            .replace(/ROSELï¿½NDIA/gi, 'ROSELÂNDIA')
+            .replace(/ROSELNDIA/gi, 'ROSELÂNDIA')
+            .replace(/S\?O/gi, 'SÃO')
+            .replace(/JO\?O/gi, 'JOÃO')
+            .replace(/PARNA\?BA/gi, 'PARNAÍBA')
+            .replace(/CORA\?\?O/gi, 'CORAÇÃO')
+            .replace(/PORT\?O/gi, 'PORTÃO')
+            .replace(/GUIMAR\?ES/gi, 'GUIMARÃES')
+            .replace(/ROSEL\?NDIA/gi, 'ROSELÂNDIA');
     }
 
     function pickFirstFilledValue() {
@@ -18995,7 +20526,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
                 source && source.nome,
                 source && source.name
             ),
-            fallback || 'Comum nÃ£o informada'
+            fallback || 'Comum não informada'
         ));
     }
 
@@ -19131,7 +20662,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
     function createSparklineData() {
         return [{
-            label: "ParticipaÃ§Ã£o",
+            label: "Participação",
             data: [[0, 0]],
             color: '#1ab394'
         }];
@@ -19171,7 +20702,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
     }
 
     function createBaseComum(eventRow, key) {
-        var comumName = extractComumName(eventRow, 'Comum nÃ£o informada');
+        var comumName = extractComumName(eventRow, 'Comum não informada');
 
         return {
             key: key,
@@ -19205,7 +20736,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
     function createCatalogBaseComum(nome, entry, key) {
         return {
             key: key,
-            comum: repairSantaCeiaText(normalizeText(nome, 'Comum nÃ£o informada')),
+            comum: repairSantaCeiaText(normalizeText(nome, 'Comum não informada')),
             municipio: repairSantaCeiaText(normalizeText(entry && entry.cidade, '-')),
             atendimento: '-',
             total: 0,
@@ -19322,7 +20853,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
             attendanceNames: attendanceNames,
             attendanceLabel: !attendanceNames.length
                 ? '-'
-                : (attendanceNames.length === 1 ? attendanceNames[0] : ('MÃºltiplos (' + attendanceNames.length + ')')),
+                : (attendanceNames.length === 1 ? attendanceNames[0] : ('Múltiplos (' + attendanceNames.length + ')')),
             attendanceDetail: attendanceNames.join(' | '),
             dateLabels: dates,
             dateLabel: !dates.length ? '-' : (dates.length === 1 ? dates[0] : (dates.length + ' datas')),
@@ -19510,7 +21041,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
             if (!grouped[eventKey]) {
                 grouped[eventKey] = createCatalogBaseComum(
-                    normalizeText(eventComum, 'Comum nÃ£o informada'),
+                    normalizeText(eventComum, 'Comum não informada'),
                     { cidade: extractMunicipioName(eventRow, activeCatalogState, eventComum, catalogEntry.cidade || eventRow.municipio) },
                     eventKey
                 );
@@ -19543,7 +21074,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
             if (!grouped[key]) {
                 grouped[key] = createCatalogBaseComum(
-                    normalizeText(commonName, 'Comum nÃ£o informada'),
+                    normalizeText(commonName, 'Comum não informada'),
                     { cidade: extractMunicipioName(row, activeCatalogState, commonName, catalogEntry.cidade || row.municipio) },
                     key
                 );
@@ -19562,7 +21093,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
             comumItem.irmas += irmas;
             comumItem.data = row.data_evento || row.data || row.created_at || comumItem.data;
             comumItem.status = 'concluido';
-            comumItem.statusLabel = 'ConcluÃ­das';
+            comumItem.statusLabel = 'Concluídas';
             comumItem.rounds.push({
                 data_evento: row.data_evento || row.data || row.created_at || null,
                 rodada: row.rodada,
@@ -19631,7 +21162,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         comparisonRows = officialComuns.map(buildComparisonRow);
 
         angular.forEach(comparisonRows, function (item) {
-            var municipioKey = normalizeText(item.municipio, 'MunicÃ­pio nÃ£o informado');
+            var municipioKey = normalizeText(item.municipio, 'Município não informado');
             var previousValue = toNumber(item.summaryPrevious.total);
             var currentValue = toNumber(item.summaryCurrent.total);
             var hasAtendimento = !!(
@@ -19877,7 +21408,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         var grouped = {};
 
         angular.forEach(items || [], function (item) {
-            var municipio = normalizeText(item && item.municipio, 'MunicÃ­pio nÃ£o informado');
+            var municipio = normalizeText(item && item.municipio, 'Município não informado');
 
             if (!grouped[municipio]) {
                 grouped[municipio] = {
@@ -20126,10 +21657,10 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
     function getSantaCeiaPeriodoLabel() {
         if (!$scope.dataInicioFiltro && !$scope.dataFimFiltro) {
-            return 'Sem filtro de perÃ­odo';
+            return 'Sem filtro de período';
         }
 
-        return ($scope.dataInicioFiltro ? formatDatePtBr($scope.dataInicioFiltro) : 'InÃ­cio livre')
+        return ($scope.dataInicioFiltro ? formatDatePtBr($scope.dataInicioFiltro) : 'Início livre')
             + ' a '
             + ($scope.dataFimFiltro ? formatDatePtBr($scope.dataFimFiltro) : 'Fim livre');
     }
@@ -20157,15 +21688,15 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
     $scope.exportToExcel = function () {
         var rows = [
-            ['CONGREGAÃ‡ÃƒO CRISTÃƒ NO BRASIL'],
-            ['Regional Itapevi - SÃ£o Paulo'],
+            ['CONGREGAÇÃO CRISTàNO BRASIL'],
+            ['Regional Itapevi - São Paulo'],
             ['SANTA CEIA'],
-            ['RelatÃ³rio AnalÃ­tico Comparativo'],
-            ['EmissÃ£o: ' + new Date().toLocaleDateString('pt-BR')],
+            ['Relatório Analítico Comparativo'],
+            ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
             ['Modo: ' + getSantaCeiaExportModeLabel()],
-            ['PerÃ­odo: ' + getSantaCeiaPeriodoLabel()],
+            ['Período: ' + getSantaCeiaPeriodoLabel()],
             [],
-            ['MunicÃ­pio', 'Comum', 'Atendimento 2025', 'IrmÃ£s 2025', 'IrmÃ£os 2025', 'Total 2025', 'Data 2025', 'Atendimento 2026', 'IrmÃ£s 2026', 'IrmÃ£os 2026', 'Total 2026', 'Data 2026', 'VariaÃ§Ã£o', 'SituaÃ§Ã£o']
+            ['Município', 'Comum', 'Atendimento 2025', 'Irmãs 2025', 'Irmãos 2025', 'Total 2025', 'Data 2025', 'Atendimento 2026', 'Irmãs 2026', 'Irmãos 2026', 'Total 2026', 'Data 2026', 'Variação', 'Situação']
         ].concat(getSantaCeiaExportRows());
         var ws = XLSX.utils.aoa_to_sheet(rows);
         ws['!cols'] = [
@@ -20179,20 +21710,20 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
     $scope.exportToPDF = function () {
         var body = [[
-            { text: 'MunicÃ­pio', style: 'tableHeader' },
+            { text: 'Município', style: 'tableHeader' },
             { text: 'Comum', style: 'tableHeader' },
             { text: 'Atendimento 2025', style: 'tableHeader' },
-            { text: 'IrmÃ£s 2025', style: 'tableHeader' },
-            { text: 'IrmÃ£os 2025', style: 'tableHeader' },
+            { text: 'Irmãs 2025', style: 'tableHeader' },
+            { text: 'Irmãos 2025', style: 'tableHeader' },
             { text: 'Total 2025', style: 'tableHeader' },
             { text: 'Data 2025', style: 'tableHeader' },
             { text: 'Atendimento 2026', style: 'tableHeader' },
-            { text: 'IrmÃ£s 2026', style: 'tableHeader' },
-            { text: 'IrmÃ£os 2026', style: 'tableHeader' },
+            { text: 'Irmãs 2026', style: 'tableHeader' },
+            { text: 'Irmãos 2026', style: 'tableHeader' },
             { text: 'Total 2026', style: 'tableHeader' },
             { text: 'Data 2026', style: 'tableHeader' },
-            { text: 'VariaÃ§Ã£o', style: 'tableHeader' },
-            { text: 'SituaÃ§Ã£o', style: 'tableHeader' }
+            { text: 'Variação', style: 'tableHeader' },
+            { text: 'Situação', style: 'tableHeader' }
         ]];
 
         ($scope.filteredComunsGovernance || []).forEach(function (item) {
@@ -20217,10 +21748,10 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         pdfMake.createPdf({
             pageOrientation: 'landscape',
             content: [
-                { text: 'CONGREGAÃ‡ÃƒO CRISTÃƒ NO BRASIL', alignment: 'center', bold: true, fontSize: 14 },
-                { text: 'Regional Itapevi - SÃ£o Paulo', alignment: 'center', fontSize: 10 },
-                { text: 'SANTA CEIA - RELATÃ“RIO ANALÃTICO COMPARATIVO', alignment: 'center', bold: true, margin: [0, 6, 0, 8] },
-                { text: 'Modo: ' + getSantaCeiaExportModeLabel() + ' | PerÃ­odo: ' + getSantaCeiaPeriodoLabel(), alignment: 'right', fontSize: 9, margin: [0, 0, 0, 8] },
+                { text: 'CONGREGAÇÃO CRISTàNO BRASIL', alignment: 'center', bold: true, fontSize: 14 },
+                { text: 'Regional Itapevi - São Paulo', alignment: 'center', fontSize: 10 },
+                { text: 'SANTA CEIA - RELATÓRIO ANALÍTICO COMPARATIVO', alignment: 'center', bold: true, margin: [0, 6, 0, 8] },
+                { text: 'Modo: ' + getSantaCeiaExportModeLabel() + ' | Período: ' + getSantaCeiaPeriodoLabel(), alignment: 'right', fontSize: 9, margin: [0, 0, 0, 8] },
                 {
                     table: {
                         headerRows: 1,
@@ -20276,10 +21807,10 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
                 loadDashboard();
 
                 if (window.swal) {
-                    window.swal('Sucesso!', (result.imported || 0) + ' atendimentos histÃ³ricos de 2025 importados em eventos.', 'success');
+                    window.swal('Sucesso!', (result.imported || 0) + ' atendimentos históricos de 2025 importados em eventos.', 'success');
                 }
             }).catch(function (error) {
-                var message = (error && (error.message || error.error_description || error.statusText)) || 'NÃ£o foi possÃ­vel importar os atendimentos histÃ³ricos.';
+                var message = (error && (error.message || error.error_description || error.statusText)) || 'Não foi possível importar os atendimentos históricos.';
 
                 if (window.swal) {
                     window.swal('Erro', message, 'error');
@@ -20296,7 +21827,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         if (window.swal) {
             window.swal({
                 title: 'Importar atendimento 2025?',
-                text: 'O sistema vai carregar os atendimentos histÃ³ricos de 2025 na tabela de eventos usando sua sessÃ£o autenticada.',
+                text: 'O sistema vai carregar os atendimentos históricos de 2025 na tabela de eventos usando sua sessão autenticada.',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#1ab394',
@@ -20314,7 +21845,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
             return;
         }
 
-        if (window.confirm('Importar os atendimentos histÃ³ricos de 2025 para a tabela de eventos?')) {
+        if (window.confirm('Importar os atendimentos históricos de 2025 para a tabela de eventos?')) {
             runImport();
         }
     };

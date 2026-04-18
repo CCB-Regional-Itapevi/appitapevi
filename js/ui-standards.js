@@ -35,7 +35,7 @@
     }
 
     function hasMojibake(value) {
-        return /Ã.|Â.|�/.test(String(value || ''));
+        return /(?:\u00C3[\u0080-\u00BF\u0192]|\u00C2[\u0080-\u00BF]|\uFFFD)/.test(String(value || ''));
     }
 
     function decodeMojibakeOnce(value) {
@@ -56,7 +56,7 @@
         }
 
         while (attempts < 3) {
-            next = decodeMojibakeOnce(next).replace(/Â(?=\S)/g, '');
+            next = decodeMojibakeOnce(next).replace(/\u00C2(?=\S)/g, '');
 
             if (next === current) {
                 break;
@@ -76,13 +76,13 @@
     function translateAlertMessage(value) {
         var message = repairText(value);
         var exactTranslations = {
-            'User already registered': 'Usuário já cadastrado.',
-            'Email already registered': 'E-mail já cadastrado.',
-            'Invalid login credentials': 'E-mail, usuário ou senha inválidos.',
-            'Email not confirmed': 'E-mail ainda não foi confirmado.',
-            'User not found': 'Usuário não encontrado.',
+            'User already registered': 'Usu?rio j? cadastrado.',
+            'Email already registered': 'E-mail j? cadastrado.',
+            'Invalid login credentials': 'E-mail, usu?rio ou senha inv?lidos.',
+            'Email not confirmed': 'E-mail ainda n?o foi confirmado.',
+            'User not found': 'Usu?rio n?o encontrado.',
             'Too many requests': 'Muitas tentativas. Tente novamente mais tarde.',
-            'Signup is disabled': 'O cadastro está desativado no momento.',
+            'Signup is disabled': 'O cadastro est? desativado no momento.',
             'Password should be at least 6 characters': 'A senha deve ter pelo menos 6 caracteres.',
             'Email rate limit exceeded': 'Limite de envio para este e-mail excedido. Tente novamente mais tarde.'
         };
@@ -92,11 +92,11 @@
         }
 
         if (/already registered/i.test(message)) {
-            return 'Usuário já cadastrado.';
+            return 'Usu?rio j? cadastrado.';
         }
 
         if (/invalid login credentials/i.test(message)) {
-            return 'E-mail, usuário ou senha inválidos.';
+            return 'E-mail, usu?rio ou senha inv?lidos.';
         }
 
         return message;
@@ -205,6 +205,38 @@
         Array.prototype.forEach.call(base.querySelectorAll('[placeholder], [title], input[type="button"], input[type="submit"], input[type="reset"]'), function (element) {
             repairElementAttributes(element);
         });
+    }
+
+    function observeDynamicText() {
+        var observer;
+
+        if (!window.MutationObserver || document.__appTextRepairObserver) return;
+
+        observer = new window.MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                Array.prototype.forEach.call(mutation.addedNodes || [], function (node) {
+                    if (!node) return;
+
+                    if (node.nodeType === 3) {
+                        if (hasMojibake(node.nodeValue)) {
+                            node.nodeValue = repairText(node.nodeValue);
+                        }
+                        return;
+                    }
+
+                    if (node.nodeType === 1) {
+                        repairVisibleText(node);
+                    }
+                });
+            });
+        });
+
+        observer.observe(document.body || document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+
+        document.__appTextRepairObserver = observer;
     }
 
     function normalizePdfDefinition(node) {
@@ -607,6 +639,7 @@
         window.jQuery(function () {
             applyActionIcons(document.body);
             repairVisibleText(document.body);
+            observeDynamicText();
             patchPdfMake();
             setupSweetAlertDefaults();
             setupFormUppercase();

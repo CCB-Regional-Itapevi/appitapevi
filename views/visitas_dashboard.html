@@ -31,6 +31,27 @@
         margin-right: 8px;
         margin-bottom: 4px;
     }
+    .visitas-care-card {
+        min-height: 96px;
+    }
+    .visitas-care-card .row {
+        display: flex;
+        align-items: center;
+    }
+    .visitas-care-card .care-icon {
+        text-align: center;
+    }
+    .visitas-care-card .care-icon i {
+        font-size: 42px;
+        line-height: 1;
+    }
+    .visitas-care-card .care-metric {
+        text-align: right;
+    }
+    .visitas-care-table td,
+    .visitas-care-table th {
+        vertical-align: middle !important;
+    }
 </style>
 
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -185,6 +206,190 @@
         </div>
     </div>
 
+    <div class="row m-t-md">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Painel Gerencial de Acompanhamento</h5>
+                    <div class="ibox-tools">
+                        <span class="label label-success">{{ communityCareSummary.total || 0 }} pessoas acompanhadas</span>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="widget style1 navy-bg visitas-care-card">
+                                <div class="row">
+                                    <div class="col-xs-4 care-icon">
+                                        <i class="fa fa-address-book-o"></i>
+                                    </div>
+                                    <div class="col-xs-8 care-metric">
+                                        <span>Carteira ativa</span>
+                                        <h2 class="font-bold">{{ communityCareSummary.total || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="widget style1 red-bg visitas-care-card">
+                                <div class="row">
+                                    <div class="col-xs-4 care-icon">
+                                        <i class="fa fa-heartbeat"></i>
+                                    </div>
+                                    <div class="col-xs-8 care-metric">
+                                        <span>Enfermos</span>
+                                        <h2 class="font-bold">{{ communityCareSummary.enfermos || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="widget style1 lazur-bg visitas-care-card">
+                                <div class="row">
+                                    <div class="col-xs-4 care-icon">
+                                        <i class="fa fa-users"></i>
+                                    </div>
+                                    <div class="col-xs-8 care-metric">
+                                        <span>Mocidade</span>
+                                        <h2 class="font-bold">{{ communityCareSummary.mocidade || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="widget style1 yellow-bg visitas-care-card">
+                                <div class="row">
+                                    <div class="col-xs-4 care-icon">
+                                        <i class="fa fa-music"></i>
+                                    </div>
+                                    <div class="col-xs-8 care-metric">
+                                        <span>Músicos</span>
+                                        <h2 class="font-bold">{{ communityCareSummary.musicos || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="widget style1 bg-danger visitas-care-card">
+                                <div class="row">
+                                    <div class="col-xs-4 care-icon">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="col-xs-8 care-metric">
+                                        <span>30+ dias sem visita</span>
+                                        <h2 class="font-bold">{{ communityCareSummary.semVisita30 || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-sm-4">
+                            <div class="widget style1 bg-primary visitas-care-card">
+                                <div class="row">
+                                    <div class="col-xs-4 care-icon">
+                                        <i class="fa fa-calendar-times-o"></i>
+                                    </div>
+                                    <div class="col-xs-8 care-metric">
+                                        <span>Sem agenda futura</span>
+                                        <h2 class="font-bold">{{ communityCareSummary.semAgendaFutura || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row m-t-md">
+                        <div class="col-lg-5">
+                            <div class="ibox">
+                                <div class="ibox-title">
+                                    <h5>Perfis Prioritários</h5>
+                                </div>
+                                <div class="ibox-content" style="padding-top:0;">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-bordered visitas-care-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Perfil</th>
+                                                    <th class="text-center">Total</th>
+                                                    <th class="text-center">Ativos</th>
+                                                    <th class="text-center">30+ dias</th>
+                                                    <th class="text-center">Sem agenda</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in communityProfiles">
+                                                    <td><strong>{{ item.label }}</strong></td>
+                                                    <td class="text-center"><span class="label label-info">{{ item.total }}</span></td>
+                                                    <td class="text-center"><span class="label label-success">{{ item.ativos }}</span></td>
+                                                    <td class="text-center"><span class="label label-warning">{{ item.semVisita30 }}</span></td>
+                                                    <td class="text-center"><span class="label label-danger">{{ item.semAgenda }}</span></td>
+                                                </tr>
+                                                <tr ng-if="!communityProfiles.length">
+                                                    <td colspan="5" class="text-center text-muted">Sem perfis mapeados para os filtros atuais.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="ibox">
+                                <div class="ibox-title">
+                                    <h5>Pessoas que Exigem Atenção Imediata</h5>
+                                    <div class="ibox-tools">
+                                        <span class="label label-warning">{{ communityAttentionList.length || 0 }} em destaque</span>
+                                    </div>
+                                </div>
+                                <div class="ibox-content" style="padding-top:0;">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-bordered visitas-care-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nome</th>
+                                                    <th>Perfil</th>
+                                                    <th class="text-center">Dias sem visita</th>
+                                                    <th class="text-center">Agendas futuras</th>
+                                                    <th>Motivos</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in communityAttentionList">
+                                                    <td>
+                                                        <strong>{{ item.nome }}</strong><br>
+                                                        <small class="text-muted">{{ item.municipio }} <span ng-if="item.comum">| {{ item.comum }}</span></small>
+                                                    </td>
+                                                    <td>{{ item.perfil || 'Irmandade' }}</td>
+                                                    <td class="text-center">{{ item.diasSemVisita === null ? '-' : item.diasSemVisita }}</td>
+                                                    <td class="text-center"><span class="label label-primary">{{ item.proximaAgenda || 0 }}</span></td>
+                                                    <td>{{ item.motivos }}</td>
+                                                </tr>
+                                                <tr ng-if="!communityAttentionList.length">
+                                                    <td colspan="5" class="text-center text-muted">Nenhuma pessoa crítica encontrada para os filtros atuais.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row m-t-sm">
+                        <div class="col-lg-12">
+                            <div class="alert alert-info" style="margin-bottom:0;">
+                                <strong>Agenda pastoral:</strong>
+                                hoje {{ communityAgendaSummary.hoje || 0 }},
+                                próximos 7 dias {{ communityAgendaSummary.proximos7 || 0 }},
+                                futuras {{ communityAgendaSummary.futuras || 0 }},
+                                concluídas no mês {{ communityAgendaSummary.concluidasMes || 0 }}.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Summary Table -->
     <div class="row m-t-md">
         <div class="col-lg-12">
@@ -286,8 +491,8 @@
                                             ng-class="{'progress-bar-danger': item.taxa < 50}"></div>
                                     </div>
                                     <span class="label" style="display: inline-block; margin-top: 2px;"
-                                        ng-class="{'label-primary': item.status === 'EXCELENTE', 'label-danger': item.status === 'CRÍTICO'}">{{
-                                        item.status }}</span>
+                                        ng-class="{'label-primary': formatVisitasStatusKey(item.status) === 'EXCELENTE', 'label-success': formatVisitasStatusKey(item.status) === 'BOM', 'label-danger': formatVisitasStatusKey(item.status) === 'CRITICO'}">{{
+                                        formatVisitasStatusLabel(item.status) }}</span>
                                 </td>
                                 <td class="text-center" style="vertical-align: middle;">
                                     <button class="btn btn-white btn-sm" ng-click="filterVisitasByMunicipio(item.municipio)">
