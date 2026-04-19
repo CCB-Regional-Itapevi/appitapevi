@@ -145,11 +145,11 @@
                             <div class="col-lg-12"><h4>Dados do Colaborador</h4></div>
                             <div class="col-sm-8 form-group">
                                 <label>Nome Completo *</label>
-                                <input type="text" ng-model="newInstrutor.nome_completo" class="form-control" required>
+                                <input type="text" ng-model="newInstrutor.nome_completo" class="form-control" tabindex="1" required>
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Comum Congregacao *</label>
-                                <input type="text" ng-model="newInstrutor.comum_congregacao" class="form-control comum-field" placeholder="Digite para pesquisar a comum" autocomplete="off" ng-focus="openComumPicker('comum_congregacao')" ng-change="filterComuns()" ng-keydown="handleComumFieldKeydown($event)" required>
+                                <input type="text" ng-model="newInstrutor.comum_congregacao" class="form-control comum-field" placeholder="Digite para pesquisar a comum" autocomplete="off" ng-focus="openComumPicker('comum_congregacao')" ng-change="filterComuns()" ng-keydown="handleComumFieldKeydown($event)" tabindex="2" required>
                                 <div class="cadastro-music-comum-picker" ng-if="isComumPickerOpen('comum_congregacao')">
                                     <div class="cadastro-music-comum-meta">{{comumPickerState.results.length}} de {{totalComuns}} comuns</div>
                                     <ul class="cadastro-music-comum-results">
@@ -159,12 +159,12 @@
                                 </div>
                             </div>
                             <div class="col-sm-3 form-group">
-                                <label>Idade *</label>
-                                <input type="text" ng-model="newInstrutor.idade" class="form-control" inputmode="numeric" required>
+                                <label>Data de Nascimento *</label>
+                                <input type="text" ng-model="newInstrutor.data_nascimento" ng-change="formatDateField('newInstrutor', 'data_nascimento')" class="form-control" placeholder="dd/mm/aaaa" tabindex="3" required>
                             </div>
                             <div class="col-sm-3 form-group">
                                 <label>E Batizado?</label>
-                                <select ng-model="newInstrutor.batizado" class="form-control">
+                                <select ng-model="newInstrutor.batizado" class="form-control" tabindex="4">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Nao</option>
@@ -172,15 +172,15 @@
                             </div>
                             <div class="col-sm-3 form-group">
                                 <label>Data do Batismo</label>
-                                <input type="text" ng-model="newInstrutor.data_batismo" class="form-control" placeholder="dd/mm/aaaa">
+                                <input type="text" ng-model="newInstrutor.data_batismo" ng-change="formatDateField('newInstrutor', 'data_batismo')" class="form-control" placeholder="dd/mm/aaaa" tabindex="5">
                             </div>
                             <div class="col-sm-3 form-group">
                                 <label>Celular *</label>
-                                <input type="text" ng-model="newInstrutor.celular" class="form-control" placeholder="(11) 99999-9999" required>
+                                <input type="text" ng-model="newInstrutor.celular" ng-change="formatPhoneField('newInstrutor', 'celular')" class="form-control" placeholder="(11) 9 9999-9999" tabindex="6" required>
                             </div>
                             <div class="col-sm-6 form-group">
                                 <label>E-mail (para controle de acesso) *</label>
-                                <input type="email" ng-model="newInstrutor.email" class="form-control" required>
+                                <input type="email" ng-model="newInstrutor.email" class="form-control" tabindex="7" required>
                                 <span class="help-block m-b-none">Esse e-mail e usado para controle de acesso ao material.</span>
                             </div>
                             <div class="col-sm-6 form-group">
@@ -190,6 +190,7 @@
                                     class="chosen-select"
                                     data-placeholder="Digite para pesquisar o polo"
                                     ng-model="newInstrutor.polo_auxilio"
+                                    tabindex="8"
                                     required>
                                     <option value=""></option>
                                     <option ng-repeat="polo in polosFixos" value="{{polo}}">{{polo}}</option>
@@ -203,7 +204,7 @@
                             <div class="col-lg-12"><h4>Vínculo Ministerial</h4></div>
                             <div class="col-sm-4 form-group">
                                 <label>E Musico ou Musicista?</label>
-                                <select ng-model="newInstrutor.musico_ou_musicista" class="form-control">
+                                <select ng-model="newInstrutor.musico_ou_musicista" class="form-control" tabindex="9">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Nao</option>
@@ -211,7 +212,7 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>E Oficializado(a)?</label>
-                                <select ng-model="newInstrutor.oficializado" class="form-control">
+                                <select ng-model="newInstrutor.oficializado" class="form-control" tabindex="10">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -219,11 +220,11 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Data da Oficialização</label>
-                                <input type="text" ng-model="newInstrutor.data_oficializacao" class="form-control" placeholder="dd/mm/aaaa">
+                                <input type="text" ng-model="newInstrutor.data_oficializacao" ng-change="formatDateField('newInstrutor', 'data_oficializacao')" class="form-control" placeholder="dd/mm/aaaa" tabindex="11">
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>E Instrutor(a) Atualmente?</label>
-                                <select ng-model="newInstrutor.instrutor_atualmente" class="form-control">
+                                <select ng-model="newInstrutor.instrutor_atualmente" class="form-control" tabindex="12">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -231,7 +232,7 @@
                             </div>
                             <div class="col-sm-8 form-group">
                                 <label>Se Sim, em Qual Igreja?</label>
-                                <input type="text" ng-model="newInstrutor.instrutor_em_qual_igreja" class="form-control">
+                                <input type="text" ng-model="newInstrutor.instrutor_em_qual_igreja" class="form-control" tabindex="13">
                             </div>
                         </div>
 
@@ -241,7 +242,7 @@
                             <div class="col-lg-12"><h4>Formação e Perfil</h4></div>
                             <div class="col-sm-4 form-group">
                                 <label>Tem Formação Academica em Musica?</label>
-                                <select ng-model="newInstrutor.formacao_musica" class="form-control">
+                                <select ng-model="newInstrutor.formacao_musica" class="form-control" tabindex="14">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -249,15 +250,15 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Se Sim, Qual?</label>
-                                <input type="text" ng-model="newInstrutor.formacao_qual" class="form-control">
+                                <input type="text" ng-model="newInstrutor.formacao_qual" class="form-control" tabindex="15">
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Data da Formação</label>
-                                <input type="text" ng-model="newInstrutor.formacao_data" class="form-control" placeholder="dd/mm/aaaa">
+                                <input type="text" ng-model="newInstrutor.formacao_data" ng-change="formatDateField('newInstrutor', 'formacao_data')" class="form-control" placeholder="dd/mm/aaaa" tabindex="16">
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>E Pedagogo(a)?</label>
-                                <select ng-model="newInstrutor.pedagogo" class="form-control">
+                                <select ng-model="newInstrutor.pedagogo" class="form-control" tabindex="17">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -265,11 +266,11 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Desde Quando?</label>
-                                <input type="text" ng-model="newInstrutor.pedagogo_desde" class="form-control" placeholder="dd/mm/aaaa">
+                                <input type="text" ng-model="newInstrutor.pedagogo_desde" ng-change="formatDateField('newInstrutor', 'pedagogo_desde')" class="form-control" placeholder="dd/mm/aaaa" tabindex="18">
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Se Sim, Atua na Área?</label>
-                                <select ng-model="newInstrutor.atua_na_area" class="form-control">
+                                <select ng-model="newInstrutor.atua_na_area" class="form-control" tabindex="19">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -277,7 +278,7 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Tem Afinidade com Crianças?</label>
-                                <select ng-model="newInstrutor.afinidade_criancas" class="form-control">
+                                <select ng-model="newInstrutor.afinidade_criancas" class="form-control" tabindex="20">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -285,7 +286,7 @@
                             </div>
                             <div class="col-sm-8 form-group">
                                 <label>Cursos / Workshop / Conhecimentos</label>
-                                <textarea ng-model="newInstrutor.cursos_conhecimentos" class="form-control" rows="3"></textarea>
+                                <textarea ng-model="newInstrutor.cursos_conhecimentos" class="form-control" rows="3" tabindex="21"></textarea>
                             </div>
                         </div>
 
@@ -296,7 +297,7 @@
                             <div class="col-sm-6 form-group">
                                 <div class="checkbox i-checks" style="margin-top: 6px;">
                                     <label>
-                                        <input type="checkbox" ng-model="newInstrutor.de_acordo_voluntario" ng-true-value="'Sim'" ng-false-value="''">
+                                        <input type="checkbox" ng-model="newInstrutor.de_acordo_voluntario" ng-true-value="'Sim'" ng-false-value="''" tabindex="22">
                                         <i></i> Declaro que atuarei voluntariamente
                                     </label>
                                 </div>
@@ -304,7 +305,7 @@
                             <div class="col-sm-6 form-group">
                                 <div class="checkbox i-checks" style="margin-top: 6px;">
                                     <label>
-                                        <input type="checkbox" ng-model="newInstrutor.autoriza_tratamento_dados" ng-true-value="'Sim'" ng-false-value="''">
+                                        <input type="checkbox" ng-model="newInstrutor.autoriza_tratamento_dados" ng-true-value="'Sim'" ng-false-value="''" tabindex="23">
                                         <i></i> Autorizo o tratamento dos meus dados
                                     </label>
                                 </div>
@@ -313,8 +314,12 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-white" data-dismiss="modal">{{viewOnly ? 'Voltar' : 'Cancelar'}}</button>
-                    <button type="button" class="btn btn-primary" style="background:#1ab394; border-color:#1ab394;" ng-click="saveNewInstrutor()" ng-disabled="formAddInstrutorEbi.$invalid" ng-if="!viewOnly">{{editingInstrutor ? 'Salvar Alteracoes' : 'Salvar Cadastro'}}</button>
+                    <button type="button" class="btn btn-white" data-dismiss="modal" tabindex="24">
+                        <i class="fa fa-times"></i> {{viewOnly ? 'Voltar' : 'Cancelar'}}
+                    </button>
+                    <button type="button" class="btn btn-primary" style="background:#1ab394; border-color:#1ab394;" ng-click="saveNewInstrutor()" ng-disabled="formAddInstrutorEbi.$invalid" tabindex="25" ng-if="!viewOnly">
+                        <i class="fa fa-floppy-o"></i> {{editingInstrutor ? 'Salvar Alteracoes' : 'Salvar Cadastro'}}
+                    </button>
                 </div>
             </div>
         </div>

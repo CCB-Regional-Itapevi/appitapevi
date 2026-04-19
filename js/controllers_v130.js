@@ -13317,7 +13317,9 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
     $scope.editingAluno = false;
     $scope.viewOnly = false;
     $scope.canManageCadastros = false;
+    $scope.cepLookupLoading = false;
     configureCadastroMusicForm($scope, 'newAluno', AuthService);
+    var lastCepLookupDigits = '';
 
     function updateManagementPermission() {
         $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'EBI');
@@ -13347,6 +13349,196 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         }
 
         return null;
+    }
+
+    function formatBrazilPhone(value) {
+        var digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+        var area = digits.slice(0, 2);
+        var rest = digits.slice(2);
+
+        if (!digits) return '';
+        if (digits.length <= 2) return '(' + digits;
+
+        if (rest.charAt(0) === '9') {
+            if (rest.length <= 1) return '(' + area + ') ' + rest;
+            if (rest.length <= 5) return '(' + area + ') ' + rest.charAt(0) + ' ' + rest.slice(1);
+            return '(' + area + ') ' + rest.charAt(0) + ' ' + rest.slice(1, 5) + '-' + rest.slice(5, 9);
+        }
+
+        if (rest.length <= 4) return '(' + area + ') ' + rest;
+        return '(' + area + ') ' + rest.slice(0, 4) + '-' + rest.slice(4, 8);
+    }
+
+    function formatDateInput(value) {
+        var parsed = parseAlunoDate(value);
+        var digits = String(value || '').replace(/\D/g, '').slice(0, 8);
+        var parts = [];
+
+        if (parsed && !isNaN(parsed.getTime()) && typeof value === 'string' && value.indexOf('-') !== -1) {
+            return [
+                ('0' + parsed.getDate()).slice(-2),
+                ('0' + (parsed.getMonth() + 1)).slice(-2),
+                parsed.getFullYear()
+            ].join('/');
+        }
+
+        if (digits.length >= 2) {
+            parts.push(digits.slice(0, 2));
+        } else if (digits.length) {
+            parts.push(digits);
+        }
+
+        if (digits.length >= 4) {
+            parts.push(digits.slice(2, 4));
+        } else if (digits.length > 2) {
+            parts.push(digits.slice(2));
+        }
+
+        if (digits.length > 4) {
+            parts.push(digits.slice(4, 8));
+        }
+
+        return parts.join('/');
+    }
+
+    function formatCepInput(value) {
+        var digits = String(value || '').replace(/\D/g, '').slice(0, 8);
+
+        if (digits.length <= 5) return digits;
+        return digits.slice(0, 5) + '-' + digits.slice(5, 8);
+    }
+
+    function splitLogradouroNumero(value) {
+        var raw = String(value || '').trim();
+        var match = null;
+
+        if (!raw) {
+            return { logradouro: '', numero: '' };
+        }
+
+        match = raw.match(/^(.*?)(?:,\s*|\s+-\s+)(\d+[A-Za-z0-9\-\/]*)$/);
+        if (!match) {
+            match = raw.match(/^(.*\D)\s+(\d+[A-Za-z0-9\-\/]*)$/);
+        }
+        if (match) {
+            return {
+                logradouro: (match[1] || '').trim(),
+                numero: (match[2] || '').trim()
+            };
+        }
+
+        return {
+            logradouro: raw,
+            numero: ''
+        };
+    }
+
+    function composeLogradouroNumero(aluno) {
+        var addressParts = splitLogradouroNumero((aluno || {}).logradouro_numero);
+        var logradouro = String(addressParts.logradouro || '').trim();
+        var numero = String((aluno || {}).numero_casa_ui || '').trim();
+
+        if (!logradouro) return '';
+        if (!numero) {
+            numero = String(addressParts.numero || '').trim();
+        }
+        if (!numero) return logradouro;
+        return logradouro + ', ' + numero;
+    }
+
+    function syncAlunoEnderecoForSave() {
+        $scope.newAluno = $scope.newAluno || {};
+        $scope.newAluno.cep = formatCepInput($scope.newAluno.cep || '');
+        $scope.newAluno.logradouro_numero = composeLogradouroNumero($scope.newAluno);
+    }
+
+    function applyCepAddress(data) {
+        if (!$scope.newAluno || !data) return;
+
+        if (data.logradouro) {
+            $scope.newAluno.logradouro_numero = data.logradouro;
+        }
+
+        if (data.bairro) {
+            $scope.newAluno.bairro = data.bairro;
+        }
+
+        if (data.localidade) {
+            $scope.newAluno.cidade = data.localidade;
+            $scope.newAluno.localidade = $scope.newAluno.localidade || data.localidade;
+        }
+    }
+
+    function lookupCep(cepDigits) {
+        if (!cepDigits || cepDigits.length !== 8 || $scope.viewOnly) {
+            return;
+        }
+
+        if (lastCepLookupDigits === cepDigits) {
+            return;
+        }
+
+        lastCepLookupDigits = cepDigits;
+        $scope.cepLookupLoading = true;
+
+        fetch('https://viacep.com.br/ws/' + cepDigits + '/json/')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                $scope.$applyAsync(function () {
+                    $scope.cepLookupLoading = false;
+
+                    if (data && !data.erro) {
+                        applyCepAddress(data);
+                    }
+                });
+            })
+            .catch(function () {
+                $scope.$applyAsync(function () {
+                    $scope.cepLookupLoading = false;
+                });
+            });
+    }
+
+    function showAlunoModal() {
+        $timeout(function () {
+            var $modal = $('#modalAddAlunoEbi');
+
+            if (typeof window.cleanupBootstrapModalState === 'function') {
+                window.cleanupBootstrapModalState();
+            }
+
+            $modal.off('shown.bs.modal.ebi hidden.bs.modal.ebi');
+            $modal.on('shown.bs.modal.ebi', function () {
+                var $currentModal = $(this);
+                $currentModal.attr('aria-hidden', 'false');
+
+                $timeout(function () {
+                    var $focusTarget = $currentModal.find('input, select, textarea, button')
+                        .filter(':visible:not([disabled])')
+                        .first();
+
+                    if ($focusTarget && $focusTarget.length) {
+                        $focusTarget.trigger('focus');
+                    }
+                }, 0);
+            });
+
+            $modal.on('hidden.bs.modal.ebi', function () {
+                $(this).attr('aria-hidden', 'true');
+                if (typeof window.cleanupBootstrapModalState === 'function') {
+                    window.cleanupBootstrapModalState();
+                }
+            });
+
+            if (!$modal.parent().is('body')) {
+                $modal.appendTo('body');
+            }
+
+            $modal.modal('show');
+            $modal.attr('aria-hidden', 'false');
+        }, 0);
     }
 
     function getAlunoAgeInfo(dateStr) {
@@ -13404,6 +13596,52 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         return ageInfo.nearLimit && !ageInfo.reachedLimit;
     };
 
+    $scope.formatDateField = function (modelName, fieldName) {
+        if (!modelName || !fieldName) return;
+        $scope[modelName] = $scope[modelName] || {};
+        $scope[modelName][fieldName] = formatDateInput((($scope[modelName] || {})[fieldName]) || '');
+    };
+
+    $scope.formatPhoneField = function (modelName, fieldName) {
+        if (!modelName || !fieldName) return;
+        $scope[modelName] = $scope[modelName] || {};
+        $scope[modelName][fieldName] = formatBrazilPhone((($scope[modelName] || {})[fieldName]) || '');
+    };
+
+    $scope.handleCepChange = function () {
+        var cepDigits = '';
+
+        $scope.newAluno = $scope.newAluno || {};
+        $scope.newAluno.cep = formatCepInput($scope.newAluno.cep || '');
+        cepDigits = String($scope.newAluno.cep || '').replace(/\D/g, '');
+
+        if (cepDigits.length < 8) {
+            lastCepLookupDigits = '';
+            $scope.cepLookupLoading = false;
+            return;
+        }
+
+        lookupCep(cepDigits);
+    };
+
+    $scope.$watch('newAluno.cep', function (newValue, oldValue) {
+        var formattedValue;
+
+        if (newValue === oldValue && newValue !== undefined) {
+            return;
+        }
+
+        formattedValue = formatCepInput(newValue || '');
+        if ($scope.newAluno && $scope.newAluno.cep !== formattedValue) {
+            $scope.newAluno.cep = formattedValue;
+            return;
+        }
+
+        if (String(formattedValue || '').replace(/\D/g, '').length === 8) {
+            lookupCep(String(formattedValue || '').replace(/\D/g, ''));
+        }
+    });
+
     $scope.loadAlunos = function() {
         $scope.loading = true;
         EbiService.getAlunos().then(function(data) {
@@ -13416,12 +13654,13 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         $scope.newAluno = {
             status: 'Ativo'
         };
+        $scope.newAluno.numero_casa_ui = '';
         $scope.editingAluno = false;
         $scope.viewOnly = false;
+        $scope.cepLookupLoading = false;
+        lastCepLookupDigits = '';
         configureCadastroMusicForm($scope, 'newAluno', AuthService);
-        $timeout(function() {
-            $('#modalAddAlunoEbi').modal('show');
-        }, 0);
+        showAlunoModal();
     };
 
     $scope.prepareEdit = function(aluno) {
@@ -13431,23 +13670,43 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         }
         $scope.newAluno = angular.copy(aluno || {});
         $scope.newAluno.status = $scope.newAluno.status || 'Ativo';
+        angular.extend($scope.newAluno, (function () {
+            var addressParts = splitLogradouroNumero($scope.newAluno.logradouro_numero);
+            return {
+                logradouro_numero: addressParts.logradouro,
+                numero_casa_ui: addressParts.numero,
+                cep: formatCepInput($scope.newAluno.cep || ''),
+                celular_responsavel: formatBrazilPhone($scope.newAluno.celular_responsavel || ''),
+                data_nascimento: formatDateInput($scope.newAluno.data_nascimento || '')
+            };
+        })());
         $scope.editingAluno = true;
         $scope.viewOnly = false;
+        $scope.cepLookupLoading = false;
+        lastCepLookupDigits = String($scope.newAluno.cep || '').replace(/\D/g, '');
         configureCadastroMusicForm($scope, 'newAluno', AuthService);
-        $timeout(function() {
-            $('#modalAddAlunoEbi').modal('show');
-        }, 0);
+        showAlunoModal();
     };
 
     $scope.verDetalhes = function(aluno) {
         $scope.newAluno = angular.copy(aluno || {});
         $scope.newAluno.status = $scope.newAluno.status || 'Ativo';
+        angular.extend($scope.newAluno, (function () {
+            var addressParts = splitLogradouroNumero($scope.newAluno.logradouro_numero);
+            return {
+                logradouro_numero: addressParts.logradouro,
+                numero_casa_ui: addressParts.numero,
+                cep: formatCepInput($scope.newAluno.cep || ''),
+                celular_responsavel: formatBrazilPhone($scope.newAluno.celular_responsavel || ''),
+                data_nascimento: formatDateInput($scope.newAluno.data_nascimento || '')
+            };
+        })());
         $scope.editingAluno = false;
         $scope.viewOnly = true;
+        $scope.cepLookupLoading = false;
+        lastCepLookupDigits = String($scope.newAluno.cep || '').replace(/\D/g, '');
         configureCadastroMusicForm($scope, 'newAluno', AuthService);
-        $timeout(function() {
-            $('#modalAddAlunoEbi').modal('show');
-        }, 0);
+        showAlunoModal();
     };
 
     $scope.saveNewAluno = function() {
@@ -13461,6 +13720,9 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
             return;
         }
 
+        $scope.newAluno.data_nascimento = formatDateInput($scope.newAluno.data_nascimento || '');
+        $scope.newAluno.celular_responsavel = formatBrazilPhone($scope.newAluno.celular_responsavel || '');
+        syncAlunoEnderecoForSave();
         $scope.newAluno.cidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
             $scope.newAluno.cidade,
             $scope.newAluno.localidade,
@@ -13479,9 +13741,17 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
 
         var savePromise = $scope.editingAluno ? EbiService.updateAluno($scope.newAluno) : EbiService.saveAluno($scope.newAluno);
         savePromise.then(function() {
-            swal("Sucesso", $scope.editingAluno ? "Cadastro da criança atualizado com sucesso." : "Criança cadastrada com sucesso.", "success");
-            $('#modalAddAlunoEbi').modal('hide');
-            $scope.loadAlunos();
+            swal({
+                title: "Sucesso",
+                text: $scope.editingAluno ? "Cadastro da criança atualizado com sucesso." : "Criança cadastrada com sucesso.",
+                type: "success",
+                timer: 3000,
+                showConfirmButton: false
+            });
+            $timeout(function () {
+                $('#modalAddAlunoEbi').modal('hide');
+                $scope.loadAlunos();
+            }, 3000);
         }).catch(function(error) {
             swal("Erro", "Erro ao salvar cadastro: " + (error.message || error), "error");
         });
@@ -13522,6 +13792,101 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
     $scope.canManageCadastros = false;
     configureCadastroMusicForm($scope, 'newInstrutor', AuthService);
 
+    function parseInstrutorDate(dateStr) {
+        var parts = null;
+
+        if (!dateStr) return null;
+        if (angular.isDate(dateStr)) return isNaN(dateStr.getTime()) ? null : new Date(dateStr.getTime());
+
+        if (typeof dateStr === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+            parts = dateStr.split('/');
+            return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        }
+
+        if (typeof dateStr === 'string' && dateStr.indexOf('-') !== -1) {
+            parts = dateStr.split('T')[0].split('-');
+            if (parts.length === 3) {
+                return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            }
+        }
+
+        return null;
+    }
+
+    function formatInstrutorDateInput(value) {
+        var parsed = parseInstrutorDate(value);
+        var digits = String(value || '').replace(/\D/g, '').slice(0, 8);
+        var parts = [];
+
+        if (parsed && !isNaN(parsed.getTime()) && typeof value === 'string' && value.indexOf('-') !== -1) {
+            return [
+                ('0' + parsed.getDate()).slice(-2),
+                ('0' + (parsed.getMonth() + 1)).slice(-2),
+                parsed.getFullYear()
+            ].join('/');
+        }
+
+        if (digits.length >= 2) {
+            parts.push(digits.slice(0, 2));
+        } else if (digits.length) {
+            parts.push(digits);
+        }
+
+        if (digits.length >= 4) {
+            parts.push(digits.slice(2, 4));
+        } else if (digits.length > 2) {
+            parts.push(digits.slice(2));
+        }
+
+        if (digits.length > 4) {
+            parts.push(digits.slice(4, 8));
+        }
+
+        return parts.join('/');
+    }
+
+    function formatInstrutorPhone(value) {
+        var digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+        var area = digits.slice(0, 2);
+        var rest = digits.slice(2);
+
+        if (!digits) return '';
+        if (digits.length <= 2) return '(' + digits;
+
+        if (rest.charAt(0) === '9') {
+            if (rest.length <= 1) return '(' + area + ') ' + rest;
+            if (rest.length <= 5) return '(' + area + ') ' + rest.charAt(0) + ' ' + rest.slice(1);
+            return '(' + area + ') ' + rest.charAt(0) + ' ' + rest.slice(1, 5) + '-' + rest.slice(5, 9);
+        }
+
+        if (rest.length <= 4) return '(' + area + ') ' + rest;
+        return '(' + area + ') ' + rest.slice(0, 4) + '-' + rest.slice(4, 8);
+    }
+
+    function normalizeInstrutorFormFields(instrutor) {
+        if (!instrutor) return;
+
+        instrutor.data_nascimento = formatInstrutorDateInput(instrutor.data_nascimento || '');
+        instrutor.data_batismo = formatInstrutorDateInput(instrutor.data_batismo || '');
+        instrutor.data_oficializacao = formatInstrutorDateInput(instrutor.data_oficializacao || '');
+        instrutor.formacao_data = formatInstrutorDateInput(instrutor.formacao_data || '');
+        instrutor.pedagogo_desde = formatInstrutorDateInput(instrutor.pedagogo_desde || '');
+        instrutor.celular = formatInstrutorPhone(instrutor.celular || '');
+        delete instrutor.idade;
+    }
+
+    $scope.formatDateField = function (modelName, fieldName) {
+        if (!modelName || !fieldName) return;
+        $scope[modelName] = $scope[modelName] || {};
+        $scope[modelName][fieldName] = formatInstrutorDateInput((($scope[modelName] || {})[fieldName]) || '');
+    };
+
+    $scope.formatPhoneField = function (modelName, fieldName) {
+        if (!modelName || !fieldName) return;
+        $scope[modelName] = $scope[modelName] || {};
+        $scope[modelName][fieldName] = formatInstrutorPhone((($scope[modelName] || {})[fieldName]) || '');
+    };
+
     function updateManagementPermission() {
         $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'EBI');
     }
@@ -13543,6 +13908,7 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
         $scope.newInstrutor = {
             status: 'Ativo'
         };
+        normalizeInstrutorFormFields($scope.newInstrutor);
         $scope.editingInstrutor = false;
         $scope.viewOnly = false;
         configureCadastroMusicForm($scope, 'newInstrutor', AuthService);
@@ -13558,6 +13924,7 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
         }
         $scope.newInstrutor = angular.copy(instrutor || {});
         $scope.newInstrutor.status = $scope.newInstrutor.status || 'Ativo';
+        normalizeInstrutorFormFields($scope.newInstrutor);
         $scope.editingInstrutor = true;
         $scope.viewOnly = false;
         configureCadastroMusicForm($scope, 'newInstrutor', AuthService);
@@ -13569,6 +13936,7 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
     $scope.verDetalhes = function(instrutor) {
         $scope.newInstrutor = angular.copy(instrutor || {});
         $scope.newInstrutor.status = $scope.newInstrutor.status || 'Ativo';
+        normalizeInstrutorFormFields($scope.newInstrutor);
         $scope.editingInstrutor = false;
         $scope.viewOnly = true;
         configureCadastroMusicForm($scope, 'newInstrutor', AuthService);
@@ -13578,12 +13946,14 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
     };
 
     $scope.saveNewInstrutor = function() {
+        normalizeInstrutorFormFields($scope.newInstrutor);
         $scope.newInstrutor.cidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
             $scope.newInstrutor.cidade,
             $scope.newInstrutor.localidade,
             $scope.newInstrutor.comum_congregacao
         ]) || $scope.newInstrutor.cidade || '';
         $scope.newInstrutor.localidade = $scope.newInstrutor.localidade || $scope.newInstrutor.cidade || '';
+        delete $scope.newInstrutor.idade;
 
         if ($scope.viewOnly) {
             $('#modalAddInstrutorEbi').modal('hide');
@@ -13596,9 +13966,17 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
         }
 
         ($scope.editingInstrutor ? EbiService.updateInstrutor($scope.newInstrutor) : EbiService.saveInstrutor($scope.newInstrutor)).then(function() {
-            swal("Sucesso", $scope.editingInstrutor ? "Colaborador atualizado com sucesso." : "Colaborador cadastrado com sucesso.", "success");
-            $('#modalAddInstrutorEbi').modal('hide');
-            $scope.loadInstrutores();
+            swal({
+                title: "Sucesso",
+                text: $scope.editingInstrutor ? "Colaborador atualizado com sucesso." : "Colaborador cadastrado com sucesso.",
+                type: "success",
+                timer: 3000,
+                showConfirmButton: false
+            });
+            $timeout(function () {
+                $('#modalAddInstrutorEbi').modal('hide');
+                $scope.loadInstrutores();
+            }, 3000);
         }).catch(function(error) {
             swal("Erro", "Erro ao salvar cadastro: " + (error.message || error), "error");
         });

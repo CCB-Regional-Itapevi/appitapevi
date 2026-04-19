@@ -159,11 +159,11 @@
                             <div class="col-lg-12"><h4>Dados da Criança</h4></div>
                             <div class="col-sm-6 form-group">
                                 <label>Nome da Criança *</label>
-                                <input type="text" ng-model="newAluno.nome_crianca" class="form-control" required>
+                                <input type="text" ng-model="newAluno.nome_crianca" class="form-control" tabindex="1" required>
                             </div>
                             <div class="col-sm-3 form-group">
                                 <label>Sexo *</label>
-                                <select ng-model="newAluno.sexo" class="form-control" required>
+                                <select ng-model="newAluno.sexo" class="form-control" tabindex="2" required>
                                     <option value="">Selecione</option>
                                     <option>Menina</option>
                                     <option>Menino</option>
@@ -171,11 +171,11 @@
                             </div>
                             <div class="col-sm-3 form-group">
                                 <label>Nascimento *</label>
-                                <input type="text" ng-model="newAluno.data_nascimento" class="form-control" placeholder="dd/mm/aaaa" required>
+                                <input type="text" ng-model="newAluno.data_nascimento" ng-change="formatDateField('newAluno', 'data_nascimento')" class="form-control" placeholder="dd/mm/aaaa" tabindex="3" required>
                             </div>
                             <div class="col-sm-6 form-group">
                                 <label>Comum Congregação *</label>
-                                <input type="text" ng-model="newAluno.comum_congregacao" class="form-control comum-field" placeholder="Digite para pesquisar a comum" autocomplete="off" ng-focus="openComumPicker('comum_congregacao')" ng-change="filterComuns()" ng-keydown="handleComumFieldKeydown($event)" required>
+                                <input type="text" ng-model="newAluno.comum_congregacao" class="form-control comum-field" placeholder="Digite para pesquisar a comum" autocomplete="off" ng-focus="openComumPicker('comum_congregacao')" ng-change="filterComuns()" ng-keydown="handleComumFieldKeydown($event)" tabindex="4" required>
                                 <div class="cadastro-music-comum-picker" ng-if="isComumPickerOpen('comum_congregacao')">
                                     <div class="cadastro-music-comum-meta">{{comumPickerState.results.length}} de {{totalComuns}} comuns</div>
                                     <ul class="cadastro-music-comum-results">
@@ -186,7 +186,7 @@
                             </div>
                             <div class="col-sm-6 form-group">
                                 <label>Polo de Participação *</label>
-                                <select ng-model="newAluno.polo_participacao" class="form-control" required>
+                                <select ng-model="newAluno.polo_participacao" class="form-control" tabindex="5" required>
                                     <option value="">Selecione</option>
                                     <option ng-repeat="polo in polosFixos" value="{{polo}}">{{polo}}</option>
                                 </select>
@@ -199,11 +199,11 @@
                             <div class="col-lg-12"><h4>Dados dos Pais / Responsáveis</h4></div>
                             <div class="col-sm-8 form-group">
                                 <label>Nome do Pai</label>
-                                <input type="text" ng-model="newAluno.nome_pai" class="form-control">
+                                <input type="text" ng-model="newAluno.nome_pai" class="form-control" tabindex="6">
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Pai é Crente?</label>
-                                <select ng-model="newAluno.pai_e_crente" class="form-control">
+                                <select ng-model="newAluno.pai_e_crente" class="form-control" tabindex="7">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -211,11 +211,11 @@
                             </div>
                             <div class="col-sm-8 form-group">
                                 <label>Nome da Mãe</label>
-                                <input type="text" ng-model="newAluno.nome_mae" class="form-control">
+                                <input type="text" ng-model="newAluno.nome_mae" class="form-control" tabindex="8">
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Mãe é Crente?</label>
-                                <select ng-model="newAluno.mae_e_crente" class="form-control">
+                                <select ng-model="newAluno.mae_e_crente" class="form-control" tabindex="9">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -223,7 +223,7 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Os Pais Vivem Juntos?</label>
-                                <select ng-model="newAluno.pais_vivem_juntos" class="form-control">
+                                <select ng-model="newAluno.pais_vivem_juntos" class="form-control" tabindex="10">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -231,7 +231,7 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>A Criança Vive com os Pais?</label>
-                                <select ng-model="newAluno.crianca_vive_com_os_pais" class="form-control">
+                                <select ng-model="newAluno.crianca_vive_com_os_pais" class="form-control" tabindex="11">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -239,19 +239,19 @@
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Se Não, Vive com Quem?</label>
-                                <input type="text" ng-model="newAluno.se_nao_vive_com_pais_com_quem_vive" class="form-control">
+                                <input type="text" ng-model="newAluno.se_nao_vive_com_pais_com_quem_vive" class="form-control" tabindex="12">
                             </div>
                             <div class="col-sm-6 form-group">
                                 <label>Responsável pela Inscrição *</label>
-                                <input type="text" ng-model="newAluno.nome_responsavel" class="form-control" required>
+                                <input type="text" ng-model="newAluno.nome_responsavel" class="form-control" tabindex="13" required>
                             </div>
                             <div class="col-sm-3 form-group">
                                 <label>Celular do Responsável *</label>
-                                <input type="text" ng-model="newAluno.celular_responsavel" class="form-control" placeholder="(11) 99999-9999" required>
+                                <input type="text" ng-model="newAluno.celular_responsavel" ng-change="formatPhoneField('newAluno', 'celular_responsavel')" class="form-control" placeholder="(11) 9 9999-9999" tabindex="14" required>
                             </div>
                             <div class="col-sm-3 form-group">
                                 <label>Tem WhatsApp?</label>
-                                <select ng-model="newAluno.tem_whatsapp" class="form-control">
+                                <select ng-model="newAluno.tem_whatsapp" class="form-control" tabindex="15">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -265,7 +265,7 @@
                             <div class="col-lg-12"><h4>Participação</h4></div>
                             <div class="col-sm-6 form-group">
                                 <label>Participa das Reuniões (Jovens e Menores)?</label>
-                                <select ng-model="newAluno.participa_reunioes_jovens_menores" class="form-control">
+                                <select ng-model="newAluno.participa_reunioes_jovens_menores" class="form-control" tabindex="16">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -273,7 +273,7 @@
                             </div>
                             <div class="col-sm-6 form-group">
                                 <label>Participa do Espaço Infantil?</label>
-                                <select ng-model="newAluno.participa_espaco_infantil" class="form-control">
+                                <select ng-model="newAluno.participa_espaco_infantil" class="form-control" tabindex="17">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -285,25 +285,30 @@
 
                         <div class="row">
                             <div class="col-lg-12"><h4>Endereço</h4></div>
-                            <div class="col-sm-6 form-group">
-                                <label>Rua / Número *</label>
-                                <input type="text" ng-model="newAluno.logradouro_numero" class="form-control" required>
-                            </div>
-                            <div class="col-sm-6 form-group">
-                                <label>Complemento</label>
-                                <input type="text" ng-model="newAluno.complemento" class="form-control">
+                            <div class="col-sm-4 form-group">
+                                <label>CEP *</label>
+                                <input type="text" ng-model="newAluno.cep" ng-change="handleCepChange()" ng-blur="handleCepChange()" class="form-control" placeholder="00000-000" maxlength="9" inputmode="numeric" tabindex="18" required>
                             </div>
                             <div class="col-sm-4 form-group">
-                                <label>Bairro *</label>
-                                <input type="text" ng-model="newAluno.bairro" class="form-control" required>
+                                <label>Número *</label>
+                                <input type="text" ng-model="newAluno.numero_casa_ui" class="form-control" placeholder="Ex.: 123" tabindex="20" required>
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Cidade *</label>
-                                <input type="text" ng-model="newAluno.cidade" class="form-control" required>
+                                <input type="text" ng-model="newAluno.cidade" class="form-control" tabindex="19" required>
                             </div>
-                            <div class="col-sm-4 form-group">
-                                <label>CEP *</label>
-                                <input type="text" ng-model="newAluno.cep" class="form-control" placeholder="00000-000" required>
+                            <div class="col-sm-6 form-group">
+                                <label>Rua / Logradouro *</label>
+                                <input type="text" ng-model="newAluno.logradouro_numero" class="form-control" tabindex="21" required>
+                                <span class="help-block" ng-if="cepLookupLoading">Buscando endereço pelo CEP...</span>
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <label>Complemento</label>
+                                <input type="text" ng-model="newAluno.complemento" class="form-control" tabindex="22">
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <label>Bairro *</label>
+                                <input type="text" ng-model="newAluno.bairro" class="form-control" tabindex="23" required>
                             </div>
                         </div>
 
@@ -313,7 +318,7 @@
                             <div class="col-lg-12"><h4>Observações</h4></div>
                             <div class="col-sm-4 form-group">
                                 <label>Dificuldade de Aprendizagem?</label>
-                                <select ng-model="newAluno.dificuldade_aprendizagem" class="form-control">
+                                <select ng-model="newAluno.dificuldade_aprendizagem" class="form-control" tabindex="24">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -321,11 +326,11 @@
                             </div>
                             <div class="col-sm-8 form-group">
                                 <label>Se Sim, Descreva</label>
-                                <input type="text" ng-model="newAluno.dificuldade_descricao" class="form-control">
+                                <input type="text" ng-model="newAluno.dificuldade_descricao" class="form-control" tabindex="25">
                             </div>
                             <div class="col-sm-4 form-group">
                                 <label>Faz Terapia?</label>
-                                <select ng-model="newAluno.faz_terapia" class="form-control">
+                                <select ng-model="newAluno.faz_terapia" class="form-control" tabindex="26">
                                     <option value="">Selecione</option>
                                     <option>Sim</option>
                                     <option>Não</option>
@@ -333,14 +338,18 @@
                             </div>
                             <div class="col-sm-8 form-group">
                                 <label>Se Sim, Qual Especialidade?</label>
-                                <input type="text" ng-model="newAluno.terapia_especialidade" class="form-control">
+                                <input type="text" ng-model="newAluno.terapia_especialidade" class="form-control" tabindex="27">
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer" style="background:#f5f5f5; padding: 14px 20px;">
-                    <button type="button" class="btn btn-white" data-dismiss="modal">{{viewOnly ? 'Voltar' : 'Cancelar'}}</button>
-                    <button type="button" class="btn btn-primary" ng-if="!viewOnly" ng-click="saveNewAluno()" style="background:#1ab394; border-color:#1ab394;">{{editingAluno ? 'Salvar alterações' : 'Salvar Cadastro'}}</button>
+                    <button type="button" class="btn btn-white" data-dismiss="modal" tabindex="28">
+                        <i class="fa fa-times"></i> {{viewOnly ? 'Voltar' : 'Cancelar'}}
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-if="!viewOnly" ng-click="saveNewAluno()" tabindex="29" style="background:#1ab394; border-color:#1ab394;">
+                        <i class="fa fa-floppy-o"></i> {{editingAluno ? 'Salvar alterações' : 'Salvar Cadastro'}}
+                    </button>
                 </div>
             </div>
         </div>

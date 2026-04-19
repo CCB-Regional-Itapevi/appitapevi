@@ -24,6 +24,20 @@
     })
     .constant('UiStandards', window.AppUiStandards || {})
     .run(['$rootScope', '$timeout', function ($rootScope, $timeout) {
+        function closeOpenModals() {
+            var $openModals = angular.element('.modal.in');
+
+            if ($openModals.length) {
+                $openModals.modal('hide');
+            }
+
+            $timeout(function () {
+                if (typeof window.cleanupBootstrapModalState === 'function') {
+                    window.cleanupBootstrapModalState();
+                }
+            }, 0, false);
+        }
+
         angular.element(document).on('show.bs.modal', '.modal', function () {
             var $modal = angular.element(this);
 
@@ -44,6 +58,7 @@
         }
 
         refreshUiStandards();
+        $rootScope.$on('$stateChangeStart', closeOpenModals);
         $rootScope.$on('$stateChangeSuccess', refreshUiStandards);
         $rootScope.$on('$viewContentLoaded', refreshUiStandards);
     }]);

@@ -67,6 +67,31 @@
             'autoriza_tratamento_dados',
             'status'
         ];
+        var ALUNO_UPPERCASE_FIELDS = [
+            'nome_crianca',
+            'comum_congregacao',
+            'localidade',
+            'polo_participacao',
+            'nome_pai',
+            'nome_mae',
+            'se_nao_vive_com_pais_com_quem_vive',
+            'nome_responsavel',
+            'logradouro_numero',
+            'complemento',
+            'bairro',
+            'cidade',
+            'dificuldade_descricao',
+            'terapia_especialidade'
+        ];
+        var MONITOR_UPPERCASE_FIELDS = [
+            'nome_completo',
+            'comum_congregacao',
+            'localidade',
+            'polo_auxilio',
+            'instrutor_em_qual_igreja',
+            'formacao_qual',
+            'cursos_conhecimentos'
+        ];
 
         var supabase = window.__appSupabaseClient
             || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
@@ -149,6 +174,16 @@
             Object.keys(record || {}).forEach(function (key) {
                 if (typeof record[key] === 'string') {
                     record[key] = repairTextValue(record[key]);
+                }
+            });
+
+            return record;
+        }
+
+        function applyUppercaseFields(record, fields) {
+            (fields || []).forEach(function (field) {
+                if (typeof (record || {})[field] === 'string') {
+                    record[field] = String(record[field] || '').trim().toUpperCase();
                 }
             });
 
@@ -362,7 +397,9 @@
                 payload.status = 'Ativo';
             }
 
-            return repairRecordStrings(payload);
+            repairRecordStrings(payload);
+            applyUppercaseFields(payload, ALUNO_UPPERCASE_FIELDS);
+            return payload;
         }
 
         function normalizeAtividadePayload(atividade) {
@@ -408,6 +445,7 @@
             var record = angular.copy(aluno || {});
 
             repairRecordStrings(record);
+            applyUppercaseFields(record, ALUNO_UPPERCASE_FIELDS);
 
             record.localidade = record.localidade || record.comum_congregacao || '';
             record.comum_congregacao = record.comum_congregacao || record.localidade || '';
@@ -438,13 +476,22 @@
                 payload.status = 'Ativo';
             }
 
-            return repairRecordStrings(payload);
+            repairRecordStrings(payload);
+            applyUppercaseFields(payload, MONITOR_UPPERCASE_FIELDS);
+            if (typeof payload.email === 'string') {
+                payload.email = String(payload.email || '').trim().toLowerCase();
+            }
+            return payload;
         }
 
         function normalizeMonitorRecord(instrutor) {
             var record = angular.copy(instrutor || {});
 
             repairRecordStrings(record);
+            applyUppercaseFields(record, MONITOR_UPPERCASE_FIELDS);
+            if (typeof record.email === 'string') {
+                record.email = String(record.email || '').trim().toLowerCase();
+            }
 
             record.localidade = record.localidade || record.comum_congregacao || '';
             record.comum_congregacao = record.comum_congregacao || record.localidade || '';
