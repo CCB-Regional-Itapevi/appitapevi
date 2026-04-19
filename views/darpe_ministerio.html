@@ -1,0 +1,192 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Dashboard Administrativo D.A.R.P.E</h2>
+        <ol class="breadcrumb">
+            <li><a href="#/darpe/musicos">D.A.R.P.E</a></li>
+            <li class="active"><strong>Ministério</strong></li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="darpeDashboardCtrl">
+    <div class="text-center text-muted m-b-md" ng-if="loading">
+        <i class="fa fa-spinner fa-spin"></i> Carregando dashboard do DARPE...
+    </div>
+
+    <div ng-if="!loading">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="widget style1 navy-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-music fa-4x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Músicos ativos</span>
+                            <h2 class="font-bold">{{ dashboard.musicosAtivos || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="widget style1 lazur-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-hospital-o fa-4x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Locais ativos</span>
+                            <h2 class="font-bold">{{ dashboard.locaisAtivos || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="widget style1 yellow-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-calendar fa-4x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Atendimentos no mês</span>
+                            <h2 class="font-bold">{{ dashboard.atendimentosMes || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="widget style1 blue-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-check-square-o fa-4x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Atendimentos realizados</span>
+                            <h2 class="font-bold">{{ dashboard.realizados || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Leitura executiva da agenda</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <p>
+                            O DARPE possui <strong>{{ dashboard.totalAtendimentos || 0 }}</strong> atendimentos cadastrados,
+                            com <strong>{{ dashboard.agendados || 0 }}</strong> agendados e
+                            <strong>{{ dashboard.realizados || 0 }}</strong> já realizados.
+                        </p>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="well well-sm">
+                                    <strong>Periodicidade semanal</strong>
+                                    <div class="m-t-xs" style="font-size:26px; font-weight:700;">{{ dashboard.semanais || 0 }}</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="well well-sm">
+                                    <strong>Periodicidade quinzenal</strong>
+                                    <div class="m-t-xs" style="font-size:26px; font-weight:700;">{{ dashboard.quinzenais || 0 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Próximas visitas agendadas</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Local</th>
+                                        <th>Cidade</th>
+                                        <th>Músicos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in dashboard.proximaAgenda">
+                                        <td>{{ item.data_atendimento || '-' }}</td>
+                                        <td>{{ item.local_nome || '-' }}</td>
+                                        <td>{{ item.cidade || '-' }}</td>
+                                        <td>{{ item.quantidade_musicos || 0 }}</td>
+                                    </tr>
+                                    <tr ng-if="!dashboard.proximaAgenda.length">
+                                        <td colspan="4" class="text-center text-muted">Nenhuma visita futura cadastrada.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Atendimentos por cidade</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Cidade</th>
+                                        <th>Total</th>
+                                        <th>Realizados</th>
+                                        <th>Agendados</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in dashboard.cidades">
+                                        <td><strong>{{ item.cidade }}</strong></td>
+                                        <td>{{ item.total }}</td>
+                                        <td>{{ item.realizados }}</td>
+                                        <td>{{ item.agendados }}</td>
+                                    </tr>
+                                    <tr ng-if="!dashboard.cidades.length">
+                                        <td colspan="4" class="text-center text-muted">Nenhum dado por cidade ainda.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Locais com maior volume de atendimentos</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Local</th>
+                                        <th>Cidade</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in dashboard.locaisRanking">
+                                        <td><strong>{{ item.local }}</strong></td>
+                                        <td>{{ item.cidade }}</td>
+                                        <td>{{ item.total }}</td>
+                                    </tr>
+                                    <tr ng-if="!dashboard.locaisRanking.length">
+                                        <td colspan="3" class="text-center text-muted">Nenhum ranking disponível ainda.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

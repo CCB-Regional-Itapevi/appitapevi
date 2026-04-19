@@ -284,32 +284,32 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('darpe.musicos', {
             url: '/musicos',
-            templateUrl: 'views/darpe_musicos.html?v=2.0.0-FIX',
+            templateUrl: 'views/darpe_musicos.html?v=2.1.0',
             data: { pageTitle: 'D.A.R.P.E - Músicos' }
         })
         .state('darpe.clinicas', {
             url: "/clinicas",
-            templateUrl: 'views/darpe_clinicas.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.A.R.P.E - Clínicas' }
+            templateUrl: 'views/darpe_clinicas.html?v=2.1.0',
+            data: { pageTitle: 'D.A.R.P.E - Locais de Atendimento' }
         })
         .state('darpe.ministerio', {
             url: "/ministerio",
-            templateUrl: 'views/darpe_ministerio.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.A.R.P.E - Ministério' }
+            templateUrl: 'views/darpe_ministerio.html?v=2.1.0',
+            data: { pageTitle: 'D.A.R.P.E - Dashboard Administrativo' }
         })
         .state('darpe.atendimentos', {
             url: "/atendimentos",
-            templateUrl: 'views/darpe_atendimentos.html?v=2.0.0-FIX',
+            templateUrl: 'views/darpe_atendimentos.html?v=2.1.0',
             data: { pageTitle: 'D.A.R.P.E - Atendimentos' }
         })
         .state('darpe.membros', {
             url: "/membros",
-            templateUrl: 'views/darpe_membros.html?v=2.0.0-FIX',
+            templateUrl: 'views/darpe_membros.html?v=2.1.0',
             data: { pageTitle: 'D.A.R.P.E - Membros' }
         })
         .state('darpe.batismos', {
             url: "/batismos",
-            templateUrl: 'views/darpe_batismos.html?v=2.0.0-FIX',
+            templateUrl: 'views/darpe_batismos.html?v=2.1.0',
             data: { pageTitle: 'D.A.R.P.E - Batismos' }
         })
 

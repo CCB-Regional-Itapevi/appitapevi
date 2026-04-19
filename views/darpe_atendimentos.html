@@ -1,0 +1,185 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Atendimentos D.A.R.P.E</h2>
+        <ol class="breadcrumb">
+            <li><a href="#/darpe/musicos">D.A.R.P.E</a></li>
+            <li class="active"><strong>Atendimentos</strong></li>
+        </ol>
+    </div>
+</div>
+
+<style>
+    .darpe-musicos-selector {
+        border: 1px solid #e7eaec;
+        border-radius: 6px;
+        max-height: 220px;
+        overflow-y: auto;
+        padding: 10px 12px;
+        background: #fbfcfd;
+    }
+    .darpe-musicos-selector .checkbox {
+        margin: 0 0 8px;
+    }
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="darpeAtendimentosCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Agenda e histórico de atendimentos musicais</h5>
+                    <div class="ibox-tools">
+                        <button class="btn btn-primary btn-xs" type="button" ng-click="prepareAdd()">
+                            <i class="fa fa-plus"></i> Novo Atendimento
+                        </button>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                <input type="text" class="form-control" ng-model="searchText" placeholder="Pesquisar por local, cidade, responsável ou músicos...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-muted m-b-md" ng-if="loading">
+                        <i class="fa fa-spinner fa-spin"></i> Carregando atendimentos...
+                    </div>
+
+                    <div class="table-responsive" ng-if="!loading">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                    <th>Local</th>
+                                    <th>Cidade</th>
+                                    <th>Periodicidade</th>
+                                    <th>Músicos</th>
+                                    <th>Próxima Visita</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in atendimentos | filter:searchText">
+                                    <td>
+                                        <span class="label" ng-class="{'label-primary': item.status === 'Agendado', 'label-success': item.status === 'Realizado', 'label-default': item.status === 'Cancelado'}">
+                                            {{item.status || 'Agendado'}}
+                                        </span>
+                                    </td>
+                                    <td>{{item.data_atendimento || '-'}}</td>
+                                    <td><strong>{{item.local_nome || '-'}}</strong></td>
+                                    <td>{{item.cidade || '-'}}</td>
+                                    <td>{{item.periodicidade || '-'}}</td>
+                                    <td>{{item.quantidade_musicos || 0}}</td>
+                                    <td>{{item.proxima_visita || '-'}}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-primary btn-xs" ng-click="verDetalhes(item)"><i class="fa fa-eye"></i> Ver</button>
+                                        <button class="btn btn-warning btn-xs" ng-if="canManageCadastros" ng-click="prepareEdit(item)"><i class="fa fa-pencil-square-o"></i> Editar</button>
+                                        <button class="btn btn-danger btn-xs" ng-if="canManageCadastros" ng-click="confirmDelete(item)"><i class="fa fa-trash-o"></i> Apagar</button>
+                                    </td>
+                                </tr>
+                                <tr ng-if="!atendimentos.length">
+                                    <td colspan="8" class="text-center text-muted">Nenhum atendimento cadastrado até o momento.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAddAtendimentoDarpe" class="modal inmodal fade" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content animated bounceInRight">
+                <div class="modal-header" style="background:#1ab394; color:#fff;">
+                    <button type="button" class="close" data-dismiss="modal" style="color:#fff; opacity:1;">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Fechar</span>
+                    </button>
+                    <h4 class="modal-title">
+                        <i class="fa" ng-class="viewOnly ? 'fa-folder-open' : (editingAtendimento ? 'fa-calendar' : 'fa-stethoscope')"></i>
+                        {{viewOnly ? 'Detalhes do Atendimento' : (editingAtendimento ? 'Editar Atendimento' : 'Cadastrar Atendimento')}}
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form name="formAddAtendimentoDarpe" novalidate>
+                        <div class="row">
+                            <div class="col-sm-4 form-group">
+                                <label>Data do Atendimento *</label>
+                                <input type="text" class="form-control" ng-model="currentAtendimento.data_atendimento" ng-change="formatDateField('currentAtendimento','data_atendimento')" placeholder="dd/mm/aaaa" ng-disabled="viewOnly" tabindex="1" required>
+                            </div>
+                            <div class="col-sm-4 form-group">
+                                <label>Periodicidade *</label>
+                                <select class="form-control" ng-model="currentAtendimento.periodicidade" ng-disabled="viewOnly" tabindex="2" required>
+                                    <option value="">Selecione</option>
+                                    <option>Semanal</option>
+                                    <option>Quinzenal</option>
+                                    <option>Mensal</option>
+                                    <option>Sob Escala</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4 form-group">
+                                <label>Status *</label>
+                                <select class="form-control" ng-model="currentAtendimento.status" ng-disabled="viewOnly" tabindex="3" required>
+                                    <option>Agendado</option>
+                                    <option>Realizado</option>
+                                    <option>Cancelado</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label>Local de Atendimento *</label>
+                                <select class="form-control" ng-model="currentAtendimento.local_id" ng-change="handleLocalChange()" ng-disabled="viewOnly" tabindex="4" required>
+                                    <option value="">Selecione</option>
+                                    <option ng-repeat="local in clinicas" value="{{local.id}}">{{local.nome_local}} - {{local.cidade}}</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <label>Tipo</label>
+                                <input type="text" class="form-control" ng-model="currentAtendimento.tipo_local" ng-disabled="true" tabindex="5">
+                            </div>
+                            <div class="col-sm-3 form-group">
+                                <label>Cidade</label>
+                                <input type="text" class="form-control" ng-model="currentAtendimento.cidade" ng-disabled="true" tabindex="6">
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label>Responsável do Ministério</label>
+                                <input type="text" class="form-control" ng-model="currentAtendimento.responsavel_ministerio" ng-disabled="viewOnly" tabindex="7">
+                            </div>
+                            <div class="col-sm-6 form-group">
+                                <label>Próxima Visita</label>
+                                <input type="text" class="form-control" ng-model="currentAtendimento.proxima_visita" ng-change="formatDateField('currentAtendimento','proxima_visita')" placeholder="dd/mm/aaaa" ng-disabled="viewOnly" tabindex="8">
+                            </div>
+                            <div class="col-sm-12 form-group">
+                                <label>Músicos Selecionados *</label>
+                                <div class="darpe-musicos-selector">
+                                    <div class="checkbox" ng-repeat="musico in musicos">
+                                        <label>
+                                            <input type="checkbox" ng-checked="isMusicoSelected(musico.id)" ng-click="toggleMusicoSelection(musico.id)" ng-disabled="viewOnly">
+                                            {{musico.nome_completo}} <span class="text-muted">| {{musico.instrumento || 'Sem instrumento'}} | {{musico.cidade || '-'}}</span>
+                                        </label>
+                                    </div>
+                                    <div class="text-muted" ng-if="!musicos.length">Cadastre músicos ativos para selecionar neste atendimento.</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 form-group">
+                                <label>Repertório / Observações Musicais</label>
+                                <textarea class="form-control" rows="3" ng-model="currentAtendimento.repertorio" ng-disabled="viewOnly" tabindex="9"></textarea>
+                            </div>
+                            <div class="col-sm-12 form-group">
+                                <label>Observações Gerais</label>
+                                <textarea class="form-control" rows="3" ng-model="currentAtendimento.observacoes" ng-disabled="viewOnly" tabindex="10"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                    <button type="button" class="btn btn-primary" ng-click="saveAtendimento()"><i class="fa fa-floppy-o"></i> {{viewOnly ? 'Fechar' : 'Salvar Cadastro'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
