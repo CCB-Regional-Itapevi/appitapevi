@@ -16,6 +16,18 @@
 </div>
 
 <style>
+    .visitas-mobile-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
+    }
+
+    .visitas-mobile-scroll > table,
+    .visitas-mobile-scroll table {
+        min-width: 720px;
+    }
+
     .visitas-visitados-summary .widget {
         min-height: 86px;
     }
@@ -105,6 +117,42 @@
         display: inline-block;
         min-width: 64px;
         text-align: center;
+    }
+
+    @media (max-width: 767px) {
+        .visitas-visitados-summary .summary-icon,
+        .visitas-visitados-kpis .kpi-icon {
+            justify-content: center;
+            min-height: auto;
+            padding: 16px 15px 0;
+        }
+
+        .visitas-visitados-summary .summary-icon i,
+        .visitas-visitados-kpis .kpi-icon i {
+            font-size: 34px;
+        }
+
+        .visitas-visitados-summary .summary-metric,
+        .visitas-visitados-kpis .kpi-metric {
+            text-align: center;
+            min-height: auto;
+            padding: 0 15px 16px;
+        }
+
+        .ibox-title {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .ibox-title h5,
+        .ibox-title .ibox-tools {
+            width: 100%;
+        }
+
+        .ibox-title .ibox-tools {
+            text-align: left;
+        }
     }
 </style>
 
@@ -386,7 +434,7 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive visitas-visitados-table" ng-if="!loading">
+                    <div class="table-responsive visitas-mobile-scroll visitas-visitados-table" ng-if="!loading">
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -444,7 +492,7 @@
                     <h5>Perfis Priorit&aacute;rios</h5>
                 </div>
                 <div class="ibox-content" style="padding-top:0;">
-                    <div class="table-responsive">
+                    <div class="table-responsive visitas-mobile-scroll">
                         <table class="table table-hover table-bordered">
                             <thead>
                                 <tr>
@@ -477,7 +525,7 @@
                     <h5>Munic&iacute;pios em Aten&ccedil;&atilde;o</h5>
                 </div>
                 <div class="ibox-content" style="padding-top:0;">
-                    <div class="table-responsive">
+                    <div class="table-responsive visitas-mobile-scroll">
                         <table class="table table-hover table-bordered">
                             <thead>
                                 <tr>
@@ -510,7 +558,7 @@
                     <h5>Resumo da agenda</h5>
                 </div>
                 <div class="ibox-content" style="padding-top:0;">
-                    <div class="table-responsive">
+                    <div class="table-responsive visitas-mobile-scroll">
                         <table class="table table-hover table-bordered">
                             <thead>
                                 <tr>

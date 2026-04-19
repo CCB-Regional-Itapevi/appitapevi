@@ -13,6 +13,29 @@
 </div>
 
 <style>
+    .visitas-dashboard-top-summary {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .visitas-dashboard-top-summary-col {
+        width: 20%;
+    }
+    .visitas-dashboard-top-summary-col .widget {
+        height: 100%;
+    }
+    .visitas-dashboard-range .form-control {
+        min-width: 0;
+    }
+    .visitas-mobile-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
+    }
+    .visitas-mobile-scroll > table,
+    .visitas-mobile-scroll table table {
+        min-width: 720px;
+    }
     .visitas-pendencias-table-wrap {
         max-height: 360px;
         overflow-y: auto;
@@ -318,16 +341,85 @@
         background-color: #ed5565;
     }
     @media (max-width: 991px) {
+        .visitas-dashboard-top-summary-col {
+            width: 50%;
+        }
         .visitas-care-kpi-grid {
             grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 767px) {
+        .visitas-dashboard-top-summary-col {
+            width: 100%;
+        }
+        .visitas-dashboard-range {
+            display: block;
+        }
+        .visitas-dashboard-range .form-control,
+        .visitas-dashboard-range .input-group-addon {
+            display: block;
+            width: 100%;
+            border-radius: 4px !important;
+        }
+        .visitas-dashboard-range .input-group-addon {
+            margin: 8px 0;
+            border: 1px solid #e5e6e7;
+            background: #f8fafb;
+            text-align: center;
+        }
+        .visitas-dashboard-range .form-control + .input-group-addon {
+            border-top-width: 1px;
+        }
+        .visitas-care-panel,
+        .visitas-health-summary-card {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+        .visitas-care-panel-title,
+        .visitas-status-header,
+        .visitas-status-footer,
+        .ibox-title {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .ibox-title h5,
+        .ibox-title .ibox-tools,
+        .visitas-care-panel-title h6 {
+            width: 100%;
+        }
+        .ibox-title .ibox-tools {
+            text-align: left;
+        }
+        .visitas-care-kpi {
+            min-height: auto;
+            padding: 14px;
+        }
+        .visitas-care-kpi-icon {
+            width: 44px;
+            flex-basis: 44px;
+        }
+        .visitas-care-kpi-icon i {
+            font-size: 28px;
+        }
+        .visitas-care-kpi-metric .label-text {
+            font-size: 11px;
+        }
+        .visitas-care-kpi-metric .value,
+        .visitas-health-summary-card .value {
+            font-size: 28px;
+        }
+        .visitas-operational-status {
+            min-width: 0;
+            width: 100%;
         }
     }
 </style>
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <!-- Top Summary Widgets -->
-    <div class="row">
-        <div class="col-lg-2" style="width: 20%;">
+    <div class="row visitas-dashboard-top-summary">
+        <div class="col-xs-12 visitas-dashboard-top-summary-col">
             <div class="widget style1 navy-bg">
                 <div class="row">
                     <div class="col-xs-4 text-center">
@@ -340,7 +432,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2" style="width: 20%;">
+        <div class="col-xs-12 visitas-dashboard-top-summary-col">
             <div class="widget style1 lazur-bg">
                 <div class="row">
                     <div class="col-xs-4 text-center">
@@ -353,7 +445,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2" style="width: 20%;">
+        <div class="col-xs-12 visitas-dashboard-top-summary-col">
             <div class="widget style1 yellow-bg">
                 <div class="row">
                     <div class="col-xs-4 text-center">
@@ -366,7 +458,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2" style="width: 20%;">
+        <div class="col-xs-12 visitas-dashboard-top-summary-col">
             <div class="widget style1 bg-primary">
                 <div class="row">
                     <div class="col-xs-4 text-center">
@@ -379,7 +471,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2" style="width: 20%;">
+        <div class="col-xs-12 visitas-dashboard-top-summary-col">
             <div class="widget style1 bg-danger">
                 <div class="row">
                     <div class="col-xs-4 text-center">
@@ -437,7 +529,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label class="control-label">Periodo</label>
-                                <div class="input-group">
+                                <div class="input-group visitas-dashboard-range">
                                     <input type="date" class="form-control input-sm" ng-model="filters.dataInicio">
                                     <span class="input-group-addon">até</span>
                                     <input type="date" class="form-control input-sm" ng-model="filters.dataFim">
@@ -557,7 +649,7 @@
                                 <p class="visitas-care-panel-subtitle">
                                     Prioridade operacional para visitas sem registro recente ou sem agenda futura definida.
                                 </p>
-                                <div class="table-responsive">
+                                <div class="table-responsive visitas-mobile-scroll">
                                     <table class="table table-hover table-bordered visitas-care-table visitas-care-attention-table">
                                         <thead>
                                             <tr>
@@ -823,7 +915,7 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive m-t-md">
+                    <div class="table-responsive visitas-mobile-scroll m-t-md">
                         <table class="table table-hover table-bordered visitas-operational-table">
                             <thead>
                                 <tr>
@@ -901,7 +993,7 @@
                         </table>
                     </div>
 
-                    <div class="table-responsive m-t-md">
+                    <div class="table-responsive visitas-mobile-scroll m-t-md">
                         <table class="table table-hover table-bordered">
                             <thead>
                                 <tr>
@@ -996,7 +1088,7 @@
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <div class="table-responsive">
+                    <div class="table-responsive visitas-mobile-scroll">
                         <table class="table table-hover table-bordered visitas-operational-table">
                             <thead>
                                 <tr>

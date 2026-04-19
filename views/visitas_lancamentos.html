@@ -16,6 +16,18 @@
 </div>
 
 <style>
+    .visitas-mobile-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
+    }
+
+    .visitas-mobile-scroll > table,
+    .visitas-mobile-scroll table {
+        min-width: 760px;
+    }
+
     .visitas-lancamentos-summary .widget {
         min-height: 86px;
     }
@@ -63,6 +75,37 @@
         margin-top: 4px;
         color: #8a97a6;
         line-height: 1.4;
+    }
+
+    @media (max-width: 767px) {
+        .visitas-lancamentos-summary .summary-icon {
+            justify-content: center;
+            padding: 16px 15px 0;
+        }
+
+        .visitas-lancamentos-summary .summary-icon i {
+            font-size: 36px;
+        }
+
+        .visitas-lancamentos-summary .summary-metric {
+            text-align: center;
+            padding: 0 15px 16px;
+        }
+
+        .ibox-title {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .ibox-title h5,
+        .ibox-title .ibox-tools {
+            width: 100%;
+        }
+
+        .ibox-title .ibox-tools {
+            text-align: left;
+        }
     }
 </style>
 
@@ -162,7 +205,7 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive visitas-lancamentos-history-table">
+                    <div class="table-responsive visitas-mobile-scroll visitas-lancamentos-history-table">
                         <table class="table table-striped table-hover table-bordered">
                             <thead>
                                 <tr>
