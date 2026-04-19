@@ -94,8 +94,8 @@ SELECT
     COALESCE(logout_log.details ->> 'reason', logout_log.action, NULL) AS logout_reason,
     jsonb_strip_nulls(jsonb_build_object(
         'source', 'audit_backfill',
-        'actor_name', COALESCE(login_log.details ->> 'actor_name', profile.full_name, profile.username, profile.email),
-        'email', COALESCE(login_log.details ->> 'email', profile.email),
+        'actor_name', COALESCE(login_log.details ->> 'actor_name', profile.full_name, profile.username, auth_user.email),
+        'email', COALESCE(login_log.details ->> 'email', auth_user.email),
         'resolved_role', login_log.details ->> 'resolved_role',
         'resolved_sector', login_log.details ->> 'resolved_sector'
     )) AS details
@@ -111,6 +111,8 @@ LEFT JOIN LATERAL (
 ) AS logout_log ON true
 LEFT JOIN public.profiles AS profile
     ON profile.user_id = login_log.user_id
+LEFT JOIN auth.users AS auth_user
+    ON auth_user.id = login_log.user_id
 WHERE login_log.action = 'LOGIN'
   AND NOT EXISTS (
       SELECT 1
@@ -142,7 +144,7 @@ AS $$
             MAX(NULLIF(access_session.details ->> 'actor_name', '')),
             MAX(NULLIF(profile.full_name, '')),
             MAX(NULLIF(profile.username, '')),
-            MAX(NULLIF(profile.email, '')),
+            MAX(NULLIF(access_session.details ->> 'email', '')),
             'Sistema'
         ) AS actor_name,
         COUNT(*)::bigint AS total_accesses,

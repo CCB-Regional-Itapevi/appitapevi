@@ -1041,6 +1041,13 @@
             };
         }
 
+        function isInvalidRefreshTokenError(error) {
+            var message = (error && error.message) ? String(error.message).toLowerCase() : String(error || '').toLowerCase();
+            return message.indexOf('invalid refresh token') !== -1 ||
+                message.indexOf('refresh token not found') !== -1 ||
+                message.indexOf('jwt expired') !== -1;
+        }
+
         function register(userData) {
             var deferred = $q.defer();
 
@@ -2135,10 +2142,23 @@
             var deferred = $q.defer();
             supabase.auth.getSession().then(function (response) {
                 if (response.error) {
+                    if (isInvalidRefreshTokenError(response.error)) {
+                        clearClientSession('expired');
+                        deferred.resolve(null);
+                        return;
+                    }
                     deferred.reject(response.error);
                 } else {
                     deferred.resolve(response.data.session);
                 }
+            }).catch(function (error) {
+                if (isInvalidRefreshTokenError(error)) {
+                    clearClientSession('expired');
+                    deferred.resolve(null);
+                    return;
+                }
+
+                deferred.reject(error);
             });
             return deferred.promise;
         }

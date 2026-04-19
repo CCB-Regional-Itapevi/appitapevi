@@ -23,6 +23,9 @@
     .visitas-dashboard-top-summary-col .widget {
         height: 100%;
     }
+    .visitas-dashboard-top-summary-col {
+        margin-bottom: 12px;
+    }
     .visitas-dashboard-range .form-control {
         min-width: 0;
     }
@@ -395,6 +398,9 @@
             min-height: auto;
             padding: 14px;
         }
+        .visitas-care-kpi-grid {
+            gap: 14px;
+        }
         .visitas-care-kpi-icon {
             width: 44px;
             flex-basis: 44px;
@@ -412,6 +418,9 @@
         .visitas-operational-status {
             min-width: 0;
             width: 100%;
+        }
+        .visitas-dashboard-top-summary-col:last-child {
+            margin-bottom: 0;
         }
     }
 </style>
@@ -758,52 +767,54 @@
                     <h5>Taxa de Conclusão (%) por Município</h5>
                 </div>
                 <div class="ibox-content">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Município</th>
-                                <th class="text-center">Lançamentos</th>
-                                <th class="text-center">Igrejas</th>
-                                <th>Status de Lançamento</th>
-                                <th class="text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="item in taxasConclusao">
-                                <td style="width: 250px;">
-                                    <strong>{{ item.municipio }}</strong>
-                                    <br />
-                                    <small class="text-muted">Regional Itapevi</small>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge badge-plain">{{ item.lancamentos }}</span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge badge-plain">{{ item.igrejas }}</span>
-                                </td>
-                                <td class="visitas-status-cell" style="vertical-align: middle;">
-                                    <div class="visitas-status-header">
-                                        <div class="stat-percent">{{ item.taxa }}% <i class="fa"
-                                                ng-class="{'fa-level-up text-success': item.taxa >= 80, 'fa-exclamation text-warning': item.taxa >= 50 && item.taxa < 80, 'fa-level-down text-danger': item.taxa < 50}"></i>
+                    <div class="table-responsive visitas-mobile-scroll">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Município</th>
+                                    <th class="text-center">Lançamentos</th>
+                                    <th class="text-center">Igrejas</th>
+                                    <th>Status de Lançamento</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in taxasConclusao">
+                                    <td style="width: 250px;">
+                                        <strong>{{ item.municipio }}</strong>
+                                        <br />
+                                        <small class="text-muted">Regional Itapevi</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-plain">{{ item.lancamentos }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-plain">{{ item.igrejas }}</span>
+                                    </td>
+                                    <td class="visitas-status-cell" style="vertical-align: middle;">
+                                        <div class="visitas-status-header">
+                                            <div class="stat-percent">{{ item.taxa }}% <i class="fa"
+                                                    ng-class="{'fa-level-up text-success': item.taxa >= 80, 'fa-exclamation text-warning': item.taxa >= 50 && item.taxa < 80, 'fa-level-down text-danger': item.taxa < 50}"></i>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="progress progress-striped active visitas-status-progress">
-                                        <div ng-style="{width: item.taxa + '%'}" class="progress-bar"
-                                            ng-class="{'progress-bar-success': item.taxa >= 80, 'progress-bar-warning': item.taxa >= 50 && item.taxa < 80, 'progress-bar-danger': item.taxa < 50}"></div>
-                                    </div>
-                                    <div class="visitas-status-footer">
-                                        <span class="badge"
-                                            ng-class="{'badge-success': item.taxa >= 80, 'badge-warning': item.taxa >= 50 && item.taxa < 80, 'badge-danger': item.taxa < 50}">{{ item.taxa >= 80 ? 'EXCELENTE' : (item.taxa >= 50 ? 'ALERTA' : 'CRÍTICO') }}</span>
-                                    </div>
-                                </td>
-                                <td class="text-center" style="vertical-align: middle;">
-                                    <button class="btn btn-white btn-sm" ng-click="filterVisitasByMunicipio(item.municipio)">
-                                        <i class="fa fa-filter"></i> Filtrar
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                        <div class="progress progress-striped active visitas-status-progress">
+                                            <div ng-style="{width: item.taxa + '%'}" class="progress-bar"
+                                                ng-class="{'progress-bar-success': item.taxa >= 80, 'progress-bar-warning': item.taxa >= 50 && item.taxa < 80, 'progress-bar-danger': item.taxa < 50}"></div>
+                                        </div>
+                                        <div class="visitas-status-footer">
+                                            <span class="badge"
+                                                ng-class="{'badge-success': item.taxa >= 80, 'badge-warning': item.taxa >= 50 && item.taxa < 80, 'badge-danger': item.taxa < 50}">{{ item.taxa >= 80 ? 'EXCELENTE' : (item.taxa >= 50 ? 'ALERTA' : 'CRÍTICO') }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center" style="vertical-align: middle;">
+                                        <button class="btn btn-white btn-sm" ng-click="filterVisitasByMunicipio(item.municipio)">
+                                            <i class="fa fa-filter"></i> Filtrar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
