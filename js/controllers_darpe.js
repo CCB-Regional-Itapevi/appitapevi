@@ -92,7 +92,13 @@
 
         Object.keys(record).forEach(function (key) {
             if (typeof record[key] === 'string') {
-                record[key] = String(record[key] || '').trim();
+                var value = String(record[key] || '').trim();
+                
+                if (window.AppUiStandards && typeof window.AppUiStandards.repairText === 'function') {
+                    value = window.AppUiStandards.repairText(value);
+                }
+
+                record[key] = value;
             }
         });
 

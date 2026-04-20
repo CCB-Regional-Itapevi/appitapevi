@@ -503,11 +503,11 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
         var user = $rootScope.currentUser;
         var role = AuthService && typeof AuthService.getCurrentUserRole === 'function' ? AuthService.getCurrentUserRole() : null;
         var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'profile';
-        
+
         if (user && !user.comum && !isPublic && role !== null && role >= 3) {
             event.preventDefault();
             $state.go('profile');
-            
+
             if (typeof swal === 'function') {
                 swal({
                     title: "Perfil Incompleto",
@@ -6455,8 +6455,8 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         refreshFilteredPendingUsers();
     });
 
-$scope.loadReferenceData();
-$scope.loadPendingUsers();
+    $scope.loadReferenceData();
+    $scope.loadPendingUsers();
 }
 
 function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $filter) {
@@ -7124,9 +7124,9 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
 
     $scope.$watchGroup(['searchText', 'roleFilter', 'statusFilter', 'comumFilter', 'groupBy'], refreshFilteredUsers);
 
-$scope.loadReferenceData();
-syncMasterAccess();
-$scope.loadUsers();
+    $scope.loadReferenceData();
+    syncMasterAccess();
+    $scope.loadUsers();
 }
 
 function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $filter) {
@@ -8624,16 +8624,16 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     };
 
     // Apply multiple filters
-    $scope.applyFilters = function() {
+    $scope.applyFilters = function () {
         if (!$scope.recitativos) return;
 
-        $scope.filteredRecitativos = $scope.recitativos.filter(function(item) {
+        $scope.filteredRecitativos = $scope.recitativos.filter(function (item) {
             // Text search
             var matchText = true;
             if ($scope.filters.searchText) {
                 var search = $scope.filters.searchText.toLowerCase();
                 matchText = (item.comum && item.comum.toLowerCase().indexOf(search) !== -1) ||
-                            (item.data_reuniao && item.data_reuniao.indexOf(search) !== -1);
+                    (item.data_reuniao && item.data_reuniao.indexOf(search) !== -1);
             }
 
             // City search (checking if city is in comum name or a separate field)
@@ -8672,9 +8672,9 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     };
 
     // Calculate summary data for the dashboard
-    $scope.calculateDashboardData = function() {
+    $scope.calculateDashboardData = function () {
         // Function to remove accents and convert to uppercase for better matching
-        var normalizeStr = function(str) {
+        var normalizeStr = function (str) {
             if (!str) return '';
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         };
@@ -8685,12 +8685,12 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         };
 
         // Initialize municipalities from the list
-        $scope.cidades.forEach(function(city) {
+        $scope.cidades.forEach(function (city) {
             var normCity = normalizeStr(city);
             summary.municipios[normCity] = { nome: repairEbiText(city), meninas: 0, meninos: 0, mocas: 0, mocos: 0, total: 0, recitativos: 0, media: 0 };
         });
 
-        $scope.filteredRecitativos.forEach(function(item) {
+        $scope.filteredRecitativos.forEach(function (item) {
             var mna = item.meninas || 0;
             var mno = item.meninos || 0;
             var mca = item.mocas || 0;
@@ -8718,7 +8718,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         });
 
         // Convert municipios object to array (no more 'OUTROS')
-        var municipiosArray = Object.keys(summary.municipios).map(function(key) {
+        var municipiosArray = Object.keys(summary.municipios).map(function (key) {
             var item = summary.municipios[key];
             item.media = item.recitativos ? (item.total / item.recitativos) : 0;
             return item;
@@ -8726,7 +8726,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
 
         $scope.dashboardData = {
             totais: summary.totais,
-            municipios: municipiosArray.sort(function(a, b) {
+            municipios: municipiosArray.sort(function (a, b) {
                 return b.total - a.total;
             })
         };
@@ -8743,20 +8743,20 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
                 if (municipio) municipiosAtivosMap[municipio] = true;
             });
 
-        $scope.rjmExecutiveMetrics = {
-            lancamentos: ($scope.filteredRecitativos || []).length,
-            recitativos: ($scope.filteredRecitativos || []).length,
-            participantes: summary.totais.geral,
-            comunsAtivas: Object.keys(comunsAtivasMap).length,
-            auxiliares: ($scope.rjmAuxiliares || []).length,
-            municipiosAtivos: Object.keys(municipiosAtivosMap).length || Object.keys(summary.municipios || {}).length,
+            $scope.rjmExecutiveMetrics = {
+                lancamentos: ($scope.filteredRecitativos || []).length,
+                recitativos: ($scope.filteredRecitativos || []).length,
+                participantes: summary.totais.geral,
+                comunsAtivas: Object.keys(comunsAtivasMap).length,
+                auxiliares: ($scope.rjmAuxiliares || []).length,
+                municipiosAtivos: Object.keys(municipiosAtivosMap).length || Object.keys(summary.municipios || {}).length,
                 coberturaComuns: totalComuns ? ((Object.keys(comunsAtivasMap).length / totalComuns) * 100).toFixed(2) : '0.00'
             };
         })();
     };
 
     // Watch for filter changes
-    $scope.$watch('filters', function() {
+    $scope.$watch('filters', function () {
         $scope.applyFilters();
     }, true);
 
@@ -8942,146 +8942,146 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     };
 
     // Export to Excel
-    $scope.exportToExcel = function() {
-    var dataEmissao = new Date().toLocaleDateString('pt-BR');
-    var filteredDates = ($scope.filteredRecitativos || [])
-        .map(function(item) {
-            return item && item.data_reuniao ? parseDateOnlyAsLocal(item.data_reuniao) : null;
-        })
-        .filter(function(date) {
-            return date && !isNaN(date.getTime());
-        })
-        .sort(function(a, b) {
-            return a - b;
+    $scope.exportToExcel = function () {
+        var dataEmissao = new Date().toLocaleDateString('pt-BR');
+        var filteredDates = ($scope.filteredRecitativos || [])
+            .map(function (item) {
+                return item && item.data_reuniao ? parseDateOnlyAsLocal(item.data_reuniao) : null;
+            })
+            .filter(function (date) {
+                return date && !isNaN(date.getTime());
+            })
+            .sort(function (a, b) {
+                return a - b;
+            });
+        var periodoInicio = $scope.filters.dataInicio
+            ? formatDateOnlyPtBr($scope.filters.dataInicio)
+            : (filteredDates.length ? filteredDates[0].toLocaleDateString('pt-BR') : 'Todos os registros');
+        var periodoFim = $scope.filters.dataFim
+            ? formatDateOnlyPtBr($scope.filters.dataFim)
+            : (filteredDates.length ? filteredDates[filteredDates.length - 1].toLocaleDateString('pt-BR') : 'Todos os registros');
+        var groupedByCidade = {};
+        var orderedCidades = [];
+        var totals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
+        var rows = [
+            ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
+            ['Regional Itapevi - SÃÆ’£o Paulo'],
+            ['ESPAÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¡O BÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šBLICO INFANTIL - EBI'],
+            ['RelatÃÆ’³rio Detalhado de Atividades e Comparecimento'],
+            ['EmissÃÆ’£o: ' + dataEmissao],
+            ['PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + periodoInicio + ' a ' + periodoFim],
+            [],
+            ['Data', 'MunicÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio', 'Localidade', 'HistÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š³ria Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
+        ];
+        rows = rows.map(function (row) {
+            return row.map(function (cell) {
+                return typeof cell === 'string' ? repairEbiText(cell) : cell;
+            });
         });
-    var periodoInicio = $scope.filters.dataInicio
-        ? formatDateOnlyPtBr($scope.filters.dataInicio)
-        : (filteredDates.length ? filteredDates[0].toLocaleDateString('pt-BR') : 'Todos os registros');
-    var periodoFim = $scope.filters.dataFim
-        ? formatDateOnlyPtBr($scope.filters.dataFim)
-        : (filteredDates.length ? filteredDates[filteredDates.length - 1].toLocaleDateString('pt-BR') : 'Todos os registros');
-    var groupedByCidade = {};
-    var orderedCidades = [];
-    var totals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
-    var rows = [
-        ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
-        ['Regional Itapevi - SÃÆ’£o Paulo'],
-        ['ESPAÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¡O BÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šBLICO INFANTIL - EBI'],
-        ['RelatÃÆ’³rio Detalhado de Atividades e Comparecimento'],
-        ['EmissÃÆ’£o: ' + dataEmissao],
-        ['PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + periodoInicio + ' a ' + periodoFim],
-        [],
-        ['Data', 'MunicÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio', 'Localidade', 'HistÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š³ria Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
-    ];
-    rows = rows.map(function (row) {
-        return row.map(function (cell) {
-            return typeof cell === 'string' ? repairEbiText(cell) : cell;
-        });
-    });
-    var merges = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
-        { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } },
-        { s: { r: 5, c: 0 }, e: { r: 5, c: 7 } }
-    ];
+        var merges = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+            { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+            { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
+            { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
+            { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } },
+            { s: { r: 5, c: 0 }, e: { r: 5, c: 7 } }
+        ];
 
-    ($scope.filteredRecitativos || []).forEach(function(item) {
-        var cidadeKey = (getRecitativoMunicipio(item) || 'SEM MUNICIPIO').toString().trim().toUpperCase();
-        if (!groupedByCidade[cidadeKey]) {
-            groupedByCidade[cidadeKey] = [];
-            orderedCidades.push(cidadeKey);
-        }
-        groupedByCidade[cidadeKey].push(item);
-    });
-
-    orderedCidades.sort(function(a, b) {
-        return a.localeCompare(b, 'pt-BR');
-    });
-
-    orderedCidades.forEach(function(cidade) {
-        var cityTotals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
-        var cityItems = groupedByCidade[cidade].slice().sort(function(a, b) {
-            var dateA = a && a.data_reuniao ? parseDateOnlyAsLocal(a.data_reuniao).getTime() : 0;
-            var dateB = b && b.data_reuniao ? parseDateOnlyAsLocal(b.data_reuniao).getTime() : 0;
-            if (dateA !== dateB) return dateA - dateB;
-            return (a.localidade || '').localeCompare((b.localidade || ''), 'pt-BR');
+        ($scope.filteredRecitativos || []).forEach(function (item) {
+            var cidadeKey = (getRecitativoMunicipio(item) || 'SEM MUNICIPIO').toString().trim().toUpperCase();
+            if (!groupedByCidade[cidadeKey]) {
+                groupedByCidade[cidadeKey] = [];
+                orderedCidades.push(cidadeKey);
+            }
+            groupedByCidade[cidadeKey].push(item);
         });
 
-        merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 7 } });
-        rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + cidade]);
+        orderedCidades.sort(function (a, b) {
+            return a.localeCompare(b, 'pt-BR');
+        });
 
-        cityItems.forEach(function(item) {
-            var total = $scope.calculateTotal(item);
+        orderedCidades.forEach(function (cidade) {
+            var cityTotals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
+            var cityItems = groupedByCidade[cidade].slice().sort(function (a, b) {
+                var dateA = a && a.data_reuniao ? parseDateOnlyAsLocal(a.data_reuniao).getTime() : 0;
+                var dateB = b && b.data_reuniao ? parseDateOnlyAsLocal(b.data_reuniao).getTime() : 0;
+                if (dateA !== dateB) return dateA - dateB;
+                return (a.localidade || '').localeCompare((b.localidade || ''), 'pt-BR');
+            });
+
+            merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 7 } });
+            rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + cidade]);
+
+            cityItems.forEach(function (item) {
+                var total = $scope.calculateTotal(item);
+                rows.push([
+                    formatDateOnlyPtBr(item.data_reuniao),
+                    getRecitativoMunicipio(item) || '',
+                    item.localidade || '',
+                    item.titulo_historia || '',
+                    item.meninas || 0,
+                    item.meninos || 0,
+                    item.colaboradoras || 0,
+                    total
+                ]);
+                cityTotals.meninas += (item.meninas || 0);
+                cityTotals.meninos += (item.meninos || 0);
+                cityTotals.colaboradoras += (item.colaboradoras || 0);
+                cityTotals.geral += total;
+                totals.meninas += (item.meninas || 0);
+                totals.meninos += (item.meninos || 0);
+                totals.colaboradoras += (item.colaboradoras || 0);
+                totals.geral += total;
+            });
+
             rows.push([
-                formatDateOnlyPtBr(item.data_reuniao),
-                getRecitativoMunicipio(item) || '',
-                item.localidade || '',
-                item.titulo_historia || '',
-                item.meninas || 0,
-                item.meninos || 0,
-                item.colaboradoras || 0,
-                total
+                '',
+                '',
+                '',
+                'SUBTOTAL ' + cidade,
+                cityTotals.meninas,
+                cityTotals.meninos,
+                cityTotals.colaboradoras,
+                cityTotals.geral
             ]);
-            cityTotals.meninas += (item.meninas || 0);
-            cityTotals.meninos += (item.meninos || 0);
-            cityTotals.colaboradoras += (item.colaboradoras || 0);
-            cityTotals.geral += total;
-            totals.meninas += (item.meninas || 0);
-            totals.meninos += (item.meninos || 0);
-            totals.colaboradoras += (item.colaboradoras || 0);
-            totals.geral += total;
+            rows.push([]);
         });
 
         rows.push([
             '',
             '',
             '',
-            'SUBTOTAL ' + cidade,
-            cityTotals.meninas,
-            cityTotals.meninos,
-            cityTotals.colaboradoras,
-            cityTotals.geral
+            'TOTAIS GERAIS',
+            totals.meninas,
+            totals.meninos,
+            totals.colaboradoras,
+            totals.geral
         ]);
-        rows.push([]);
-    });
 
-    rows.push([
-        '',
-        '',
-        '',
-        'TOTAIS GERAIS',
-        totals.meninas,
-        totals.meninos,
-        totals.colaboradoras,
-        totals.geral
-    ]);
-
-    var ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!merges'] = merges;
-    ws['!cols'] = [
-        { wch: 12 },
-        { wch: 16 },
-        { wch: 38 },
-        { wch: 34 },
-        { wch: 10 },
-        { wch: 10 },
-        { wch: 10 },
-        { wch: 10 }
-    ];
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Atividades EBI');
-    XLSX.writeFile(wb, 'Relatorio_EBI_' + new Date().toISOString().slice(0,10) + '.xlsx');
-};
-$scope.exportToPDF = function() {
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!merges'] = merges;
+        ws['!cols'] = [
+            { wch: 12 },
+            { wch: 16 },
+            { wch: 38 },
+            { wch: 34 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 }
+        ];
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Atividades EBI');
+        XLSX.writeFile(wb, 'Relatorio_EBI_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    };
+    $scope.exportToPDF = function () {
         var body = [
             ['Data', 'Comum', 'Mnna', 'Mnno', 'MoÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§a', 'MoÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§o', 'Total']
         ];
 
         var totals = { meninas: 0, meninos: 0, mocas: 0, mocos: 0, geral: 0 };
 
-        $scope.filteredRecitativos.forEach(function(item) {
+        $scope.filteredRecitativos.forEach(function (item) {
             var total = $scope.calculateTotal(item);
             body.push([
                 item.data_reuniao || '',
@@ -9092,7 +9092,7 @@ $scope.exportToPDF = function() {
                 item.mocos || 0,
                 total
             ]);
-            
+
             totals.meninas += (item.meninas || 0);
             totals.meninos += (item.meninos || 0);
             totals.mocas += (item.mocas || 0);
@@ -9140,7 +9140,7 @@ $scope.exportToPDF = function() {
             }
         };
 
-        pdfMake.createPdf(docDefinition).download("Relatorio_Recitativos_" + new Date().toISOString().slice(0,10) + ".pdf");
+        pdfMake.createPdf(docDefinition).download("Relatorio_Recitativos_" + new Date().toISOString().slice(0, 10) + ".pdf");
     };
 
     function resolveDashboardMonthNumber(value) {
@@ -11592,8 +11592,8 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         $event.preventDefault();
     };
 
-    $scope.rangeCount = function(n) {
-        return Array.from({length: n + 1}, (v, i) => i);
+    $scope.rangeCount = function (n) {
+        return Array.from({ length: n + 1 }, (v, i) => i);
     };
 
     $scope.loadRegistrationStats = function () {
@@ -12317,18 +12317,18 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         };
     }
 
-    $scope.applyFilters = function() {
+    $scope.applyFilters = function () {
         if (!$scope.recitativos) return;
 
         buildFilteredComumOptions();
-        $scope.filteredRecitativos = sortRecitativos(($scope.recitativos || []).filter(function(item) {
+        $scope.filteredRecitativos = sortRecitativos(($scope.recitativos || []).filter(function (item) {
             return matchesEbiFilters(item, $scope.filters);
         }));
         $scope.calculateDashboardData();
     };
 
-    $scope.calculateDashboardData = function() {
-        var normalizeStr = function(str) {
+    $scope.calculateDashboardData = function () {
+        var normalizeStr = function (str) {
             if (!str) return '';
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
         };
@@ -12349,7 +12349,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         var comparison;
         var pendingInsights;
 
-        $scope.cidades.forEach(function(cidade) {
+        $scope.cidades.forEach(function (cidade) {
             var normCidade = normalizeStr(cidade);
             summary.municipios[normCidade] = { nome: normalizeMunicipioRegionalLabel(cidade), meninas: 0, meninos: 0, colaboradoras: 0, total: 0 };
             municipalityStats[normalizeMunicipioRegionalLabel(cidade)] = {
@@ -12370,7 +12370,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             };
         });
 
-        ($scope.filteredRecitativos || []).forEach(function(item) {
+        ($scope.filteredRecitativos || []).forEach(function (item) {
             var mna = Number(item.meninas || 0);
             var mno = Number(item.meninos || 0);
             var col = Number(item.colaboradoras || 0);
@@ -12426,9 +12426,9 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             municipalityStats[municipio].ultimaData = municipalityStats[municipio].ultimaData || itemDateLabel;
         });
 
-        municipiosArray = Object.keys(summary.municipios).map(function(key) {
+        municipiosArray = Object.keys(summary.municipios).map(function (key) {
             return summary.municipios[key];
-        }).sort(function(a, b) {
+        }).sort(function (a, b) {
             return a.nome.localeCompare(b.nome);
         });
 
@@ -12495,14 +12495,14 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         }
     };
 
-    $scope.prepareAddAtividade = function() {
+    $scope.prepareAddAtividade = function () {
         $scope.viewing = false;
         $scope.editing = false;
         $scope.currentAtividade = { data_reuniao: new Date(), meninas: 0, meninos: 0, colaboradoras: 0, suspenso: 'Não', justificativa: '' };
         $('#modalAtividade').modal('show');
     };
 
-    $scope.prepareEdit = function(item) {
+    $scope.prepareEdit = function (item) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem editar registros da EBI.');
             return;
@@ -12529,7 +12529,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         $('#modalAtividade').modal('show');
     };
 
-    $scope.verDetalhes = function(item) {
+    $scope.verDetalhes = function (item) {
         $scope.viewing = true;
         $scope.editing = false;
         $scope.currentAtividade = angular.copy(item);
@@ -12593,7 +12593,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         return $scope.expandedEbiDetailMunicipio === municipio;
     };
 
-    $scope.clearFilters = function() {
+    $scope.clearFilters = function () {
         $scope.filters = {
             searchText: '',
             cidade: '',
@@ -12605,7 +12605,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         $scope.applyFilters();
     };
 
-    $scope.saveAtividade = function() {
+    $scope.saveAtividade = function () {
         var justificativaCurta = '';
         if ($scope.editing && !$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem salvar alterações da EBI.');
@@ -12613,7 +12613,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         }
         syncAtividadeMunicipio($scope.currentAtividade);
         var promise = $scope.editing ? EbiService.updateAtividade($scope.currentAtividade) : EbiService.saveAtividade($scope.currentAtividade);
-        promise.then(function() {
+        promise.then(function () {
             swal({
                 title: "Sucesso!",
                 text: "Registro salvo com sucesso.",
@@ -12625,12 +12625,12 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             });
             $('#modalAtividade').modal('hide');
             $scope.loadData();
-        }).catch(function(err) {
+        }).catch(function (err) {
             swal("Erro", "Erro ao salvar: " + (err.message || err), "error");
         });
     };
 
-    $scope.confirmDelete = function(item) {
+    $scope.confirmDelete = function (item) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem excluir registros da EBI.');
             return;
@@ -12644,7 +12644,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             confirmButtonText: "Sim, excluir!",
             closeOnConfirm: false
         }, function () {
-            EbiService.deleteAtividade(item.id).then(function() {
+            EbiService.deleteAtividade(item.id).then(function () {
                 swal({
                     title: "Sucesso!",
                     text: "Registro removido com sucesso.",
@@ -12659,7 +12659,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         });
     };
 
-    $scope.$watch('filters', function() { $scope.applyFilters(); }, true);
+    $scope.$watch('filters', function () { $scope.applyFilters(); }, true);
     $scope.$watch('currentAtividade.localidade', function () {
         if (!$scope.currentAtividade || $scope.viewing) {
             return;
@@ -12670,140 +12670,140 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
 
     $scope.calculateTotal = function (row) { return (row.meninas || 0) + (row.meninos || 0); };
 
-$scope.exportToExcel = function() {
-    var dataEmissao = new Date().toLocaleDateString('pt-BR');
-    var filteredDates = ($scope.filteredRecitativos || [])
-        .map(function(item) {
-            return item && item.data_reuniao ? parseDateOnlyAsLocal(item.data_reuniao) : null;
-        })
-        .filter(function(date) {
-            return date && !isNaN(date.getTime());
-        })
-        .sort(function(a, b) {
-            return a - b;
+    $scope.exportToExcel = function () {
+        var dataEmissao = new Date().toLocaleDateString('pt-BR');
+        var filteredDates = ($scope.filteredRecitativos || [])
+            .map(function (item) {
+                return item && item.data_reuniao ? parseDateOnlyAsLocal(item.data_reuniao) : null;
+            })
+            .filter(function (date) {
+                return date && !isNaN(date.getTime());
+            })
+            .sort(function (a, b) {
+                return a - b;
+            });
+        var periodoInicio = $scope.filters.dataInicio
+            ? formatDateOnlyPtBr($scope.filters.dataInicio)
+            : (filteredDates.length ? filteredDates[0].toLocaleDateString('pt-BR') : ebiText.allRecordsLabel);
+        var periodoFim = $scope.filters.dataFim
+            ? formatDateOnlyPtBr($scope.filters.dataFim)
+            : (filteredDates.length ? filteredDates[filteredDates.length - 1].toLocaleDateString('pt-BR') : ebiText.allRecordsLabel);
+        var groupedByCidade = {};
+        var orderedCidades = [];
+        var totals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
+        var rows = [
+            [ebiText.institution],
+            [ebiText.region],
+            [ebiText.moduleName],
+            [ebiText.detailedReportTitle],
+            [ebiText.issueDateLabel + ': ' + dataEmissao],
+            [ebiText.periodLabel + ': ' + periodoInicio + ' a ' + periodoFim],
+            [],
+            ['Data', ebiText.municipalityLabel, 'Localidade', ebiText.storyLabel, 'Meninas', 'Meninos', 'Colab', 'Total']
+        ];
+        var merges = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+            { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
+            { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
+            { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
+            { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } },
+            { s: { r: 5, c: 0 }, e: { r: 5, c: 7 } }
+        ];
+
+        ($scope.filteredRecitativos || []).forEach(function (item) {
+            var cidadeKey = (getEbiMunicipio(item) || 'SEM MUNICIPIO').toString().trim().toUpperCase();
+            if (!groupedByCidade[cidadeKey]) {
+                groupedByCidade[cidadeKey] = [];
+                orderedCidades.push(cidadeKey);
+            }
+            groupedByCidade[cidadeKey].push(item);
         });
-    var periodoInicio = $scope.filters.dataInicio
-        ? formatDateOnlyPtBr($scope.filters.dataInicio)
-        : (filteredDates.length ? filteredDates[0].toLocaleDateString('pt-BR') : ebiText.allRecordsLabel);
-    var periodoFim = $scope.filters.dataFim
-        ? formatDateOnlyPtBr($scope.filters.dataFim)
-        : (filteredDates.length ? filteredDates[filteredDates.length - 1].toLocaleDateString('pt-BR') : ebiText.allRecordsLabel);
-    var groupedByCidade = {};
-    var orderedCidades = [];
-    var totals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
-    var rows = [
-        [ebiText.institution],
-        [ebiText.region],
-        [ebiText.moduleName],
-        [ebiText.detailedReportTitle],
-        [ebiText.issueDateLabel + ': ' + dataEmissao],
-        [ebiText.periodLabel + ': ' + periodoInicio + ' a ' + periodoFim],
-        [],
-        ['Data', ebiText.municipalityLabel, 'Localidade', ebiText.storyLabel, 'Meninas', 'Meninos', 'Colab', 'Total']
-    ];
-    var merges = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } },
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
-        { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } },
-        { s: { r: 5, c: 0 }, e: { r: 5, c: 7 } }
-    ];
 
-    ($scope.filteredRecitativos || []).forEach(function(item) {
-        var cidadeKey = (getEbiMunicipio(item) || 'SEM MUNICIPIO').toString().trim().toUpperCase();
-        if (!groupedByCidade[cidadeKey]) {
-            groupedByCidade[cidadeKey] = [];
-            orderedCidades.push(cidadeKey);
-        }
-        groupedByCidade[cidadeKey].push(item);
-    });
+        orderedCidades.sort(function (a, b) {
+            return a.localeCompare(b, 'pt-BR');
+        });
 
-    orderedCidades.sort(function(a, b) {
-        return a.localeCompare(b, 'pt-BR');
-    });
-
-        orderedCidades.forEach(function(cidade) {
+        orderedCidades.forEach(function (cidade) {
             var cityTotals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
-            var cityItems = groupedByCidade[cidade].slice().sort(function(a, b) {
+            var cityItems = groupedByCidade[cidade].slice().sort(function (a, b) {
                 var dateA = a && a.data_reuniao ? parseDateOnlyAsLocal(a.data_reuniao).getTime() : 0;
                 var dateB = b && b.data_reuniao ? parseDateOnlyAsLocal(b.data_reuniao).getTime() : 0;
                 if (dateA !== dateB) return dateB - dateA;
                 return resolveEbiLocalidadeLabel(a.localidade || '').localeCompare(resolveEbiLocalidadeLabel(b.localidade || ''), 'pt-BR');
             });
 
-        merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 7 } });
-        rows.push([ebiText.municipalitySectionLabel + ': ' + normalizeMunicipioRegionalLabel(cidade)]);
+            merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 7 } });
+            rows.push([ebiText.municipalitySectionLabel + ': ' + normalizeMunicipioRegionalLabel(cidade)]);
 
-        cityItems.forEach(function(item) {
-            var total = $scope.calculateTotal(item);
+            cityItems.forEach(function (item) {
+                var total = $scope.calculateTotal(item);
+                rows.push([
+                    formatDateOnlyPtBr(item.data_reuniao),
+                    resolveEbiPdfText(getEbiMunicipio(item) || ''),
+                    resolveEbiPdfText(resolveEbiLocalidadeLabel(item.localidade || '')),
+                    resolveEbiPdfText(item.titulo_historia || ''),
+                    item.meninas || 0,
+                    item.meninos || 0,
+                    item.colaboradoras || 0,
+                    total
+                ]);
+                cityTotals.meninas += (item.meninas || 0);
+                cityTotals.meninos += (item.meninos || 0);
+                cityTotals.colaboradoras += (item.colaboradoras || 0);
+                cityTotals.geral += total;
+                totals.meninas += (item.meninas || 0);
+                totals.meninos += (item.meninos || 0);
+                totals.colaboradoras += (item.colaboradoras || 0);
+                totals.geral += total;
+            });
+
             rows.push([
-                formatDateOnlyPtBr(item.data_reuniao),
-                resolveEbiPdfText(getEbiMunicipio(item) || ''),
-                resolveEbiPdfText(resolveEbiLocalidadeLabel(item.localidade || '')),
-                resolveEbiPdfText(item.titulo_historia || ''),
-                item.meninas || 0,
-                item.meninos || 0,
-                item.colaboradoras || 0,
-                total
+                '',
+                '',
+                '',
+                'SUBTOTAL ' + normalizeMunicipioRegionalLabel(cidade),
+                cityTotals.meninas,
+                cityTotals.meninos,
+                cityTotals.colaboradoras,
+                cityTotals.geral
             ]);
-            cityTotals.meninas += (item.meninas || 0);
-            cityTotals.meninos += (item.meninos || 0);
-            cityTotals.colaboradoras += (item.colaboradoras || 0);
-            cityTotals.geral += total;
-            totals.meninas += (item.meninas || 0);
-            totals.meninos += (item.meninos || 0);
-            totals.colaboradoras += (item.colaboradoras || 0);
-            totals.geral += total;
+            rows.push([]);
         });
 
         rows.push([
             '',
             '',
             '',
-            'SUBTOTAL ' + normalizeMunicipioRegionalLabel(cidade),
-            cityTotals.meninas,
-            cityTotals.meninos,
-            cityTotals.colaboradoras,
-            cityTotals.geral
+            'TOTAIS GERAIS',
+            totals.meninas,
+            totals.meninos,
+            totals.colaboradoras,
+            totals.geral
         ]);
-        rows.push([]);
-    });
 
-    rows.push([
-        '',
-        '',
-        '',
-        'TOTAIS GERAIS',
-        totals.meninas,
-        totals.meninos,
-        totals.colaboradoras,
-        totals.geral
-    ]);
-
-    rows = rows.map(function (row) {
-        return row.map(function (cell) {
-            return typeof cell === 'string' ? repairEbiText(cell) : cell;
+        rows = rows.map(function (row) {
+            return row.map(function (cell) {
+                return typeof cell === 'string' ? repairEbiText(cell) : cell;
+            });
         });
-    });
 
-    var ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!merges'] = merges;
-    ws['!cols'] = [
-        { wch: 12 },
-        { wch: 16 },
-        { wch: 38 },
-        { wch: 34 },
-        { wch: 10 },
-        { wch: 10 },
-        { wch: 10 },
-        { wch: 10 }
-    ];
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Atividades EBI');
-    XLSX.writeFile(wb, 'Relatorio_EBI_' + new Date().toISOString().slice(0,10) + '.xlsx');
-};
-    $scope.exportToPDF = function() {
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!merges'] = merges;
+        ws['!cols'] = [
+            { wch: 12 },
+            { wch: 16 },
+            { wch: 38 },
+            { wch: 34 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 }
+        ];
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Atividades EBI');
+        XLSX.writeFile(wb, 'Relatorio_EBI_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    };
+    $scope.exportToPDF = function () {
         function buildEbiPdfStoryCell(item) {
             var storyTitle = normalizeEbiDisplayText(resolveEbiPdfText(item && item.titulo_historia || ''));
             var livro = normalizeEbiDisplayText(resolveEbiPdfText(item && item.livro || ''));
@@ -12835,13 +12835,13 @@ $scope.exportToExcel = function() {
         var logoFullBase64 = '';
         var hasValidLogo = false;
         var filteredDates = ($scope.filteredRecitativos || [])
-            .map(function(item) {
+            .map(function (item) {
                 return item && item.data_reuniao ? parseDateOnlyAsLocal(item.data_reuniao) : null;
             })
-            .filter(function(date) {
+            .filter(function (date) {
                 return date && !isNaN(date.getTime());
             })
-            .sort(function(a, b) {
+            .sort(function (a, b) {
                 return a - b;
             });
         var periodoInicio = $scope.filters.dataInicio
@@ -12850,7 +12850,7 @@ $scope.exportToExcel = function() {
         var periodoFim = $scope.filters.dataFim
             ? formatDateOnlyPtBr($scope.filters.dataFim)
             : (filteredDates.length ? filteredDates[filteredDates.length - 1].toLocaleDateString('pt-BR') : ebiText.allRecordsLabel);
-        
+
         var body = [
             [
                 { text: 'Data', style: 'tableHeader' },
@@ -12868,7 +12868,7 @@ $scope.exportToExcel = function() {
         var groupedByCidade = {};
         var orderedCidades = [];
 
-        ($scope.filteredRecitativos || []).forEach(function(item) {
+        ($scope.filteredRecitativos || []).forEach(function (item) {
             var cidadeKey = (getEbiMunicipio(item) || 'SEM MUNICIPIO').toString().trim().toUpperCase();
             if (!groupedByCidade[cidadeKey]) {
                 groupedByCidade[cidadeKey] = [];
@@ -12877,13 +12877,13 @@ $scope.exportToExcel = function() {
             groupedByCidade[cidadeKey].push(item);
         });
 
-        orderedCidades.sort(function(a, b) {
+        orderedCidades.sort(function (a, b) {
             return a.localeCompare(b, 'pt-BR');
         });
 
-        orderedCidades.forEach(function(cidade, cidadeIndex) {
+        orderedCidades.forEach(function (cidade, cidadeIndex) {
             var cityTotals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
-            var cityItems = groupedByCidade[cidade].slice().sort(function(a, b) {
+            var cityItems = groupedByCidade[cidade].slice().sort(function (a, b) {
                 var dateA = a && a.data_reuniao ? parseDateOnlyAsLocal(a.data_reuniao).getTime() : 0;
                 var dateB = b && b.data_reuniao ? parseDateOnlyAsLocal(b.data_reuniao).getTime() : 0;
                 if (dateA !== dateB) return dateB - dateA;
@@ -12895,7 +12895,7 @@ $scope.exportToExcel = function() {
                 {}, {}, {}, {}, {}, {}, {}
             ]);
 
-            cityItems.forEach(function(item) {
+            cityItems.forEach(function (item) {
                 var total = (item.meninas || 0) + (item.meninos || 0);
                 body.push([
                     formatDateOnlyPtBr(item.data_reuniao),
@@ -12952,7 +12952,7 @@ $scope.exportToExcel = function() {
             pageOrientation: 'landscape',
             pageSize: 'A4',
             pageMargins: [30, 110, 30, 40],
-            header: function(currentPage, pageCount) {
+            header: function (currentPage, pageCount) {
                 var logoColumn = hasValidLogo
                     ? { image: logoFullBase64, width: 60 }
                     : { text: '', width: 60 };
@@ -13015,7 +13015,7 @@ $scope.exportToExcel = function() {
         };
 
         try {
-            pdfMake.createPdf(docDefinition).download("Relatorio_EBI_Detalhado_" + new Date().toISOString().slice(0,10) + ".pdf");
+            pdfMake.createPdf(docDefinition).download("Relatorio_EBI_Detalhado_" + new Date().toISOString().slice(0, 10) + ".pdf");
         } catch (error) {
             swal("Erro", ebiText.pdfErrorMessage, "error");
             if (window.console && console.error) {
@@ -13888,15 +13888,15 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         return true;
     }
 
-    $scope.getAlunoAgeText = function(dateStr) {
+    $scope.getAlunoAgeText = function (dateStr) {
         return getAlunoAgeInfo(dateStr).text;
     };
 
-    $scope.isAlunoOverAge = function(dateStr) {
+    $scope.isAlunoOverAge = function (dateStr) {
         return getAlunoAgeInfo(dateStr).reachedLimit;
     };
 
-    $scope.isAlunoNearAgeLimit = function(dateStr) {
+    $scope.isAlunoNearAgeLimit = function (dateStr) {
         var ageInfo = getAlunoAgeInfo(dateStr);
         return ageInfo.nearLimit && !ageInfo.reachedLimit;
     };
@@ -13947,15 +13947,15 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         }
     });
 
-    $scope.loadAlunos = function() {
+    $scope.loadAlunos = function () {
         $scope.loading = true;
-        EbiService.getAlunos().then(function(data) {
+        EbiService.getAlunos().then(function (data) {
             $scope.alunos = (data || []).map(sanitizeEbiEntityRecord);
             $scope.loading = false;
         });
     };
 
-    $scope.prepareAdd = function() {
+    $scope.prepareAdd = function () {
         $scope.newAluno = {
             status: 'Ativo'
         };
@@ -13968,7 +13968,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         showAlunoModal();
     };
 
-    $scope.prepareEdit = function(aluno) {
+    $scope.prepareEdit = function (aluno) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem editar cadastros da EBI.');
             return;
@@ -13993,7 +13993,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         showAlunoModal();
     };
 
-    $scope.verDetalhes = function(aluno) {
+    $scope.verDetalhes = function (aluno) {
         $scope.newAluno = angular.copy(aluno || {});
         $scope.newAluno.status = $scope.newAluno.status || 'Ativo';
         angular.extend($scope.newAluno, (function () {
@@ -14014,7 +14014,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         showAlunoModal();
     };
 
-    $scope.saveNewAluno = function() {
+    $scope.saveNewAluno = function () {
         if ($scope.formAddAlunoEbi && $scope.formAddAlunoEbi.$invalid) {
             $scope.formAddAlunoEbi.$setSubmitted();
             swal("Campos obrigatórios", "Preencha os campos obrigatórios para salvar o cadastro da criança.", "warning");
@@ -14045,7 +14045,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         }
 
         var savePromise = $scope.editingAluno ? EbiService.updateAluno($scope.newAluno) : EbiService.saveAluno($scope.newAluno);
-        savePromise.then(function() {
+        savePromise.then(function () {
             swal({
                 title: "Sucesso",
                 text: $scope.editingAluno ? "Cadastro da criança atualizado com sucesso." : "Criança cadastrada com sucesso.",
@@ -14057,12 +14057,12 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
                 $('#modalAddAlunoEbi').modal('hide');
                 $scope.loadAlunos();
             }, 3000);
-        }).catch(function(error) {
+        }).catch(function (error) {
             swal("Erro", "Erro ao salvar cadastro: " + (error.message || error), "error");
         });
     };
 
-    $scope.confirmDelete = function(aluno) {
+    $scope.confirmDelete = function (aluno) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem excluir cadastros da EBI.');
             return;
@@ -14075,7 +14075,7 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
             confirmButtonText: "Sim, excluir!",
             closeOnConfirm: false
         }, function () {
-            EbiService.deleteAluno(aluno.id).then(function() {
+            EbiService.deleteAluno(aluno.id).then(function () {
                 swal("Removido!", "Criança removida com sucesso.", "success");
                 $scope.loadAlunos();
             });
@@ -14201,15 +14201,15 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
         return $rootScope.currentUser;
     }, updateManagementPermission, true);
 
-    $scope.loadInstrutores = function() {
+    $scope.loadInstrutores = function () {
         $scope.loading = true;
-        EbiService.getInstrutores().then(function(data) {
+        EbiService.getInstrutores().then(function (data) {
             $scope.instrutores = (data || []).map(sanitizeEbiEntityRecord);
             $scope.loading = false;
         });
     };
 
-    $scope.prepareAdd = function() {
+    $scope.prepareAdd = function () {
         $scope.newInstrutor = {
             status: 'Ativo'
         };
@@ -14217,12 +14217,12 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
         $scope.editingInstrutor = false;
         $scope.viewOnly = false;
         configureCadastroMusicForm($scope, 'newInstrutor', AuthService);
-        $timeout(function() {
+        $timeout(function () {
             $('#modalAddInstrutorEbi').modal('show');
         }, 0);
     };
 
-    $scope.prepareEdit = function(instrutor) {
+    $scope.prepareEdit = function (instrutor) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem editar cadastros da EBI.');
             return;
@@ -14233,24 +14233,24 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
         $scope.editingInstrutor = true;
         $scope.viewOnly = false;
         configureCadastroMusicForm($scope, 'newInstrutor', AuthService);
-        $timeout(function() {
+        $timeout(function () {
             $('#modalAddInstrutorEbi').modal('show');
         }, 0);
     };
 
-    $scope.verDetalhes = function(instrutor) {
+    $scope.verDetalhes = function (instrutor) {
         $scope.newInstrutor = angular.copy(instrutor || {});
         $scope.newInstrutor.status = $scope.newInstrutor.status || 'Ativo';
         normalizeInstrutorFormFields($scope.newInstrutor);
         $scope.editingInstrutor = false;
         $scope.viewOnly = true;
         configureCadastroMusicForm($scope, 'newInstrutor', AuthService);
-        $timeout(function() {
+        $timeout(function () {
             $('#modalAddInstrutorEbi').modal('show');
         }, 0);
     };
 
-    $scope.saveNewInstrutor = function() {
+    $scope.saveNewInstrutor = function () {
         normalizeInstrutorFormFields($scope.newInstrutor);
         $scope.newInstrutor.cidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
             $scope.newInstrutor.cidade,
@@ -14270,7 +14270,7 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
             return;
         }
 
-        ($scope.editingInstrutor ? EbiService.updateInstrutor($scope.newInstrutor) : EbiService.saveInstrutor($scope.newInstrutor)).then(function() {
+        ($scope.editingInstrutor ? EbiService.updateInstrutor($scope.newInstrutor) : EbiService.saveInstrutor($scope.newInstrutor)).then(function () {
             swal({
                 title: "Sucesso",
                 text: $scope.editingInstrutor ? "Colaborador atualizado com sucesso." : "Colaborador cadastrado com sucesso.",
@@ -14282,12 +14282,12 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
                 $('#modalAddInstrutorEbi').modal('hide');
                 $scope.loadInstrutores();
             }, 3000);
-        }).catch(function(error) {
+        }).catch(function (error) {
             swal("Erro", "Erro ao salvar cadastro: " + (error.message || error), "error");
         });
     };
 
-    $scope.confirmDelete = function(inst) {
+    $scope.confirmDelete = function (inst) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da EBI, admin ou master podem excluir cadastros da EBI.');
             return;
@@ -14300,7 +14300,7 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
             confirmButtonText: "Sim, excluir!",
             closeOnConfirm: false
         }, function () {
-            EbiService.deleteInstrutor(inst.id).then(function() {
+            EbiService.deleteInstrutor(inst.id).then(function () {
                 swal("Removido!", "Instrutor removido com sucesso.", "success");
                 $scope.loadInstrutores();
             });
@@ -14439,18 +14439,18 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     function getVisitasGroupsByMunicipio() {
         var groups = {};
 
-        ($scope.filteredLancamentos || []).forEach(function(item) {
+        ($scope.filteredLancamentos || []).forEach(function (item) {
             var municipio = repairVisitasText(item.municipio || 'Sem município');
             groups[municipio] = groups[municipio] || [];
             groups[municipio].push(item);
         });
 
-        return Object.keys(groups).sort(function(a, b) {
+        return Object.keys(groups).sort(function (a, b) {
             return a.localeCompare(b, 'pt-BR');
-        }).map(function(municipio) {
+        }).map(function (municipio) {
             return {
                 municipio: municipio,
-                itens: groups[municipio].slice().sort(function(a, b) {
+                itens: groups[municipio].slice().sort(function (a, b) {
                     return String(a.data || '').localeCompare(String(b.data || ''));
                 })
             };
@@ -14685,14 +14685,14 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     $scope.comumCatalogState = comumCatalogState;
 
     // Apply multiple filters
-    $scope.applyFilters = function() {
-        $scope.filteredLancamentos = allData.filter(function(item) {
+    $scope.applyFilters = function () {
+        $scope.filteredLancamentos = allData.filter(function (item) {
             // Text search
             var matchText = true;
             if ($scope.filters.searchText) {
                 var search = $scope.filters.searchText.toLowerCase();
                 matchText = (item.igreja && item.igreja.toLowerCase().indexOf(search) !== -1) ||
-                            (item.municipio && item.municipio.toLowerCase().indexOf(search) !== -1);
+                    (item.municipio && item.municipio.toLowerCase().indexOf(search) !== -1);
             }
 
             // City filter
@@ -14722,7 +14722,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             }
 
             return matchText && matchCity && matchDate && matchMonth;
-        }).map(function(item) {
+        }).map(function (item) {
             var totalRow = (item.gvi || 0) + (item.gvm || 0) + (item.musicos || 0) + (item.rf || 0) + (item.re || 0);
             return angular.extend({}, item, { total: totalRow });
         });
@@ -14731,16 +14731,16 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     };
 
     // Calculate summary data for the dashboard based on filtered results
-    $scope.calculateDashboardData = function() {
+    $scope.calculateDashboardData = function () {
         var totals = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
         var muniMap = {};
 
         // Initialize cities
-        $scope.cidades.forEach(function(c) {
+        $scope.cidades.forEach(function (c) {
             muniMap[c.toUpperCase()] = { nome: c, gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
         });
 
-        $scope.filteredLancamentos.forEach(function(item) {
+        $scope.filteredLancamentos.forEach(function (item) {
             var m = (item.municipio || 'ITAPEVI').toUpperCase();
             if (!muniMap[m]) {
                 muniMap[m] = { nome: normalizeMunicipioRegionalLabel(item.municipio), gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
@@ -14762,16 +14762,16 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
         });
 
         $scope.totalGeral = totals;
-        $scope.municipiosResumo = Object.keys(muniMap).map(function(key) {
+        $scope.municipiosResumo = Object.keys(muniMap).map(function (key) {
             return muniMap[key];
-        }).sort(function(a, b) {
+        }).sort(function (a, b) {
             return b.total - a.total;
         });
 
         refreshVisitasManagementData();
     };
 
-    
+
     $scope.applyFilters();
 
     $scope.filterVisitasByMunicipio = function (municipio) {
@@ -14799,7 +14799,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     };
 
     // Export to Excel
-    $scope.exportToExcel = function() {
+    $scope.exportToExcel = function () {
         var grupos = getVisitasGroupsByMunicipio();
         var rows = [
             [visitasText.institution],
@@ -14820,13 +14820,13 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             { s: { r: 5, c: 0 }, e: { r: 5, c: 8 } }
         ];
 
-        grupos.forEach(function(grupo) {
+        grupos.forEach(function (grupo) {
             var subtotal = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
 
             merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 8 } });
             rows.push(['MUNICÍPIO: ' + grupo.municipio]);
 
-            grupo.itens.forEach(function(item) {
+            grupo.itens.forEach(function (item) {
                 rows.push([
                     formatVisitasDateBR(item.data),
                     repairVisitasText(item.municipio),
@@ -14877,8 +14877,8 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             $scope.totalGeral.total || 0
         ]);
 
-        rows = rows.map(function(row) {
-            return row.map(function(cell) {
+        rows = rows.map(function (row) {
+            return row.map(function (cell) {
                 return typeof cell === 'string' ? repairVisitasText(cell) : cell;
             });
         });
@@ -14899,11 +14899,11 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
 
         var wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Relatorio Visitas');
-        XLSX.writeFile(wb, 'Relatorio_Visitas_' + new Date().toISOString().slice(0,10) + '.xlsx');
+        XLSX.writeFile(wb, 'Relatorio_Visitas_' + new Date().toISOString().slice(0, 10) + '.xlsx');
     };
 
     // Export to PDF
-    $scope.exportToPDF = function() {
+    $scope.exportToPDF = function () {
         var grupos = getVisitasGroupsByMunicipio();
         var body = [[
             { text: 'DATA', style: 'tableHeader' },
@@ -14917,7 +14917,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             { text: 'TOTAL', style: 'tableHeader' }
         ]];
 
-        grupos.forEach(function(grupo, grupoIndex) {
+        grupos.forEach(function (grupo, grupoIndex) {
             var subtotal = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
 
             body.push([
@@ -14925,7 +14925,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
                 {}, {}, {}, {}, {}, {}, {}, {}
             ]);
 
-            grupo.itens.forEach(function(item) {
+            grupo.itens.forEach(function (item) {
                 body.push([
                     formatVisitasDateBR(item.data),
                     repairVisitasText(item.municipio),
@@ -14982,7 +14982,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             pageOrientation: 'landscape',
             pageSize: 'A4',
             pageMargins: [30, 110, 30, 40],
-            header: function(currentPage, pageCount) {
+            header: function (currentPage, pageCount) {
                 return {
                     margin: [30, 20, 30, 0],
                     columns: [
@@ -15016,13 +15016,13 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
                         body: body
                     },
                     layout: {
-                        fillColor: function(rowIndex) {
+                        fillColor: function (rowIndex) {
                             return (rowIndex % 2 === 0 && rowIndex !== 0) ? '#f9f9f9' : null;
                         },
-                        hLineColor: function(i, node) {
+                        hLineColor: function (i, node) {
                             return (i === 0 || i === node.table.body.length) ? '#1e4b7a' : '#eee';
                         },
-                        vLineColor: function() {
+                        vLineColor: function () {
                             return '#eee';
                         }
                     }
@@ -15040,10 +15040,10 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             }
         };
 
-        pdfMake.createPdf(docDefinition).download('Relatorio_Visitas_' + new Date().toISOString().slice(0,10) + '.pdf');
+        pdfMake.createPdf(docDefinition).download('Relatorio_Visitas_' + new Date().toISOString().slice(0, 10) + '.pdf');
     };
 
-    $scope.clearFilters = function() {
+    $scope.clearFilters = function () {
         $scope.filters = { searchText: '', cidade: '', dataInicio: null, dataFim: null, mes: getMesAtualLabel() };
     };
 }
@@ -18444,11 +18444,11 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
 
     $scope.loadData = function () {
         $scope.loading = true;
-        
+
         // Fetch global registration stats concurrently
-        var p1 = MusicalizacaoService.getAlunos().then(function(data) {
+        var p1 = MusicalizacaoService.getAlunos().then(function (data) {
             var stats = { meninas: 0, meninos: 0, total: 0 };
-            data.forEach(function(c) {
+            data.forEach(function (c) {
                 if ((c.sexo || '').toUpperCase() === 'FEMININO' || (c.sexo || '').toUpperCase() === 'F') stats.meninas++;
                 else stats.meninos++;
                 stats.total++;
@@ -18456,9 +18456,9 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
             $scope.globalAlunos = stats;
         });
 
-        var p2 = MusicalizacaoService.getInstrutores().then(function(data) {
+        var p2 = MusicalizacaoService.getInstrutores().then(function (data) {
             var stats = { instrutores: 0, colaboradores: 0, coordenadores: 0, total: 0 };
-            data.forEach(function(m) {
+            data.forEach(function (m) {
                 var role = (m.role || '').toUpperCase();
                 if (role.indexOf('INSTRUTOR') !== -1) stats.instrutores++;
                 else if (role.indexOf('COLABORADOR') !== -1) stats.colaboradores++;
@@ -18473,7 +18473,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
                 $scope.atividades = data;
             });
 
-        $q.all([p1, p2, p3]).then(function() {
+        $q.all([p1, p2, p3]).then(function () {
             $scope.applyFilters();
             $scope.loading = false;
         }).catch(function (err) {
@@ -18483,17 +18483,17 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     };
 
     // Apply multiple filters
-    $scope.applyFilters = function() {
+    $scope.applyFilters = function () {
         if (!$scope.atividades) return;
 
-        $scope.filteredAtividades = $scope.atividades.filter(function(item) {
+        $scope.filteredAtividades = $scope.atividades.filter(function (item) {
             // Text search
             var matchText = true;
             if ($scope.filters.searchText) {
                 var search = $scope.filters.searchText.toLowerCase();
                 matchText = (item.cidade && item.cidade.toLowerCase().indexOf(search) !== -1) ||
-                            (item.nome_atividade && item.nome_atividade.toLowerCase().indexOf(search) !== -1) ||
-                            (item.data_aula && item.data_aula.indexOf(search) !== -1);
+                    (item.nome_atividade && item.nome_atividade.toLowerCase().indexOf(search) !== -1) ||
+                    (item.data_aula && item.data_aula.indexOf(search) !== -1);
             }
 
             // City/Location filter
@@ -18531,40 +18531,40 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     };
 
     // Calculate summary data for the dashboard
-    $scope.calculateDashboardData = function() {
-        var normalizeStr = function(str) {
+    $scope.calculateDashboardData = function () {
+        var normalizeStr = function (str) {
             if (!str) return '';
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         };
 
         var summary = {
-            totais: { 
-                meninas: 0, 
-                meninos: 0, 
-                instrutores: 0, 
-                colaboradores: 0, 
-                coordenadores: 0, 
-                geral: 0, 
-                equipe_total: 0 
+            totais: {
+                meninas: 0,
+                meninos: 0,
+                instrutores: 0,
+                colaboradores: 0,
+                coordenadores: 0,
+                geral: 0,
+                equipe_total: 0
             },
             municipios: {}
         };
 
-        $scope.cidades.forEach(function(city) {
+        $scope.cidades.forEach(function (city) {
             var normCity = normalizeStr(city);
-            summary.municipios[normCity] = { 
-                nome: city, 
-                meninas: 0, 
-                meninos: 0, 
-                instrutores: 0, 
-                colaboradores: 0, 
-                coordenadores: 0, 
-                total: 0, 
-                equipe: 0 
+            summary.municipios[normCity] = {
+                nome: city,
+                meninas: 0,
+                meninos: 0,
+                instrutores: 0,
+                colaboradores: 0,
+                coordenadores: 0,
+                total: 0,
+                equipe: 0
             };
         });
 
-        $scope.filteredAtividades.forEach(function(item) {
+        $scope.filteredAtividades.forEach(function (item) {
             var mna = item.meninas_presentes || 0;
             var mno = item.meninos_presentes || 0;
             var ins = item.instrutores_presentes || 0;
@@ -18581,7 +18581,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
             summary.totais.equipe_total += equipeRow;
             summary.totais.geral += rowTotal;
 
-            var itemCity = 'ITAPEVI'; 
+            var itemCity = 'ITAPEVI';
             var normalizedItemLocalidade = normalizeStr(item.cidade);
 
             for (var normKey in summary.municipios) {
@@ -18602,13 +18602,13 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
             }
         });
 
-        var municipiosArray = Object.keys(summary.municipios).map(function(key) {
+        var municipiosArray = Object.keys(summary.municipios).map(function (key) {
             return summary.municipios[key];
         });
 
         $scope.dashboardData = {
             totais: summary.totais,
-            municipios: municipiosArray.sort(function(a, b) {
+            municipios: municipiosArray.sort(function (a, b) {
                 return b.total - a.total;
             })
         };
@@ -18841,7 +18841,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     };
 
     // Watch for filter changes
-    $scope.$watch('filters', function() {
+    $scope.$watch('filters', function () {
         $scope.applyFilters();
     }, true);
 
@@ -18898,7 +18898,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     }
 
     // Export to Excel
-    $scope.exportToExcel = function() {
+    $scope.exportToExcel = function () {
         var grupos = getDashboardGroupsByMunicipio();
         var rows = [
             ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
@@ -18950,11 +18950,11 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
         ];
         var wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Atividades Musicalizacao");
-        XLSX.writeFile(wb, "Relatorio_Musicalizacao_" + new Date().toISOString().slice(0,10) + ".xlsx");
+        XLSX.writeFile(wb, "Relatorio_Musicalizacao_" + new Date().toISOString().slice(0, 10) + ".xlsx");
     };
 
     // Helper to format date to DD/MM/YYYY
-    var formatDateBR = function(dateStr) {
+    var formatDateBR = function (dateStr) {
         if (!dateStr) return '';
         var date = new Date(dateStr);
         if (isNaN(date.getTime())) return dateStr;
@@ -18965,7 +18965,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     };
 
     // Export to PDF
-    $scope.exportToPDF = function() {
+    $scope.exportToPDF = function () {
         var grupos = getDashboardGroupsByMunicipio();
         var content = [
             { text: 'CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL', style: 'entityName' },
@@ -18991,7 +18991,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
             ]];
             var totals = { meninas: 0, meninos: 0, geral: 0 };
 
-            grupo.atividades.forEach(function(item) {
+            grupo.atividades.forEach(function (item) {
                 var total = $scope.calculateTotal(item);
                 body.push([
                     formatDateBR(item.data_aula),
@@ -19049,7 +19049,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
             }
         };
 
-        pdfMake.createPdf(docDefinition).download("Relatorio_Musicalizacao_" + new Date().toISOString().slice(0,10) + ".pdf");
+        pdfMake.createPdf(docDefinition).download("Relatorio_Musicalizacao_" + new Date().toISOString().slice(0, 10) + ".pdf");
     };
 
     $scope.loadData();
@@ -19066,7 +19066,7 @@ function getMusicalizacaoFriendlyErrorMessage(action, error) {
 
     if (lowerMessage.indexOf('unique_polo_localidade') !== -1 ||
         (lowerMessage.indexOf('duplicate key value violates unique constraint') !== -1 &&
-         (lowerMessage.indexOf('polo') !== -1 || lowerMessage.indexOf('localidade') !== -1))) {
+            (lowerMessage.indexOf('polo') !== -1 || lowerMessage.indexOf('localidade') !== -1))) {
         return 'Ja existe um polo com esse nome neste municipio/localidade. Confira os dados e tente novamente.';
     }
 
@@ -21060,7 +21060,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
     $scope.aulas = [];
     $scope.loading = true;
     $scope.canManageCadastros = false;
-    
+
     // Modal states
     $scope.selectedAula = null;
     $scope.alunosPolo = [];
@@ -21094,15 +21094,15 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
         });
     };
 
-    $scope.abrirFrequencia = function(aula) {
+    $scope.abrirFrequencia = function (aula) {
         resetMusicalizacaoPresencaScope($scope, aula);
         $scope.loadingPresenca = true;
-        
+
         $('#frequenciaModal').modal('show');
 
-        loadMusicalizacaoPresencaData($scope, MusicalizacaoService, aula).then(function() {
+        loadMusicalizacaoPresencaData($scope, MusicalizacaoService, aula).then(function () {
             $scope.loadingPresenca = false;
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.error('Erro ao carregar frequÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€šªncia:', error);
             $scope.loadingPresenca = false;
         });
@@ -21116,31 +21116,31 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
         return getMusicalizacaoPresencaStatusLabel(status);
     };
 
-    $scope.salvarPresenca = function() {
+    $scope.salvarPresenca = function () {
         if (!$scope.selectedAula) return;
         var dadosPresenca = buildMusicalizacaoPresencaPayload($scope);
-        MusicalizacaoService.savePresenca(dadosPresenca).then(function() {
+        MusicalizacaoService.savePresenca(dadosPresenca).then(function () {
             return verifyMusicalizacaoPresencaSaved(MusicalizacaoService, $scope.selectedAula.id, dadosPresenca);
         }).then(function () {
             showMusicalizacaoSuccess("Sucesso", "Frequencia salva com sucesso!");
             $('#frequenciaModal').modal('hide');
             resetMusicalizacaoPresencaScope($scope, null);
             $scope.getAulas();
-        }).catch(function(error) {
+        }).catch(function (error) {
             showMusicalizacaoError('salvar a frequencia', error);
         });
     };
 
-    $scope.abrirDetalhes = function(aula) {
+    $scope.abrirDetalhes = function (aula) {
         $scope.selectedAula = aula;
         $('#detalhesModal').modal('show');
     };
 
-    $scope.verDetalhes = function(item) {
+    $scope.verDetalhes = function (item) {
         $scope.abrirDetalhes(item);
     };
 
-    $scope.prepareEdit = function(aula) {
+    $scope.prepareEdit = function (aula) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem reabrir aulas.');
             return;
@@ -21148,7 +21148,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
         $state.go('musicalizacao.presenca', { id: aula.id });
     };
 
-    $scope.confirmDelete = function(aula) {
+    $scope.confirmDelete = function (aula) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem excluir aulas.');
             return;
@@ -21160,17 +21160,17 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
             cancelButtonText: "Cancelar"
         }, function () {
             $scope.$applyAsync(function () {
-                MusicalizacaoService.deleteAula(aula.id).then(function() {
+                MusicalizacaoService.deleteAula(aula.id).then(function () {
                     showMusicalizacaoSuccess("Excluido", "Registro removido com sucesso.");
                     $scope.getAulas();
-                }).catch(function(error) {
+                }).catch(function (error) {
                     showMusicalizacaoError('excluir a aula', error);
                 });
             });
         });
     };
 
-    $scope.formatDateBR = function(dateStr) {
+    $scope.formatDateBR = function (dateStr) {
         if (!dateStr) return '';
         var p = dateStr.split('T')[0].split('-');
         if (p.length === 3) return p[2] + '/' + p[1] + '/' + p[0];
@@ -21210,24 +21210,24 @@ function musicalizacaoNovaAulaCtrl($scope, MusicalizacaoService, $state, $stateP
     $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'Musicalizacao');
 
     $scope.init = function () {
-         if ($scope.isEdit && !$scope.canManageCadastros) {
+        if ($scope.isEdit && !$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem editar aulas.');
             $state.go('musicalizacao.aulas');
             return;
-         }
-         MusicalizacaoService.getPolos().then(function (data) {
+        }
+        MusicalizacaoService.getPolos().then(function (data) {
             $scope.polos = (data || []).filter(function (polo) {
                 return cidadesRegional.indexOf((polo.localidade || '').toUpperCase()) !== -1;
             });
-            
+
             if ($scope.isEdit) {
-                MusicalizacaoService.getAula($stateParams.id).then(function(aulaData) {
+                MusicalizacaoService.getAula($stateParams.id).then(function (aulaData) {
                     $scope.aula = aulaData;
                     if (aulaData.data_aula) {
                         // Converter string YYYY-MM-DD para objeto Date
                         $scope.aula.data_aula = new Date(aulaData.data_aula + 'T12:00:00');
                     }
-                }).catch(function(error) {
+                }).catch(function (error) {
                     showMusicalizacaoError('carregar os dados da aula', error);
                 });
             }
@@ -22241,11 +22241,11 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         };
 
         $scope.regionalStats.coverageRate = $scope.regionalStats.totalTarget ? (($scope.regionalStats.completed / $scope.regionalStats.totalTarget) * 100) : 0;
-        var sparklineSeriesCurrent = (monthlyCurrent || []).map(function(val, idx) {
+        var sparklineSeriesCurrent = (monthlyCurrent || []).map(function (val, idx) {
             return [idx, val];
         });
 
-        var sparklineSeriesPrevious = (monthlyPrevious || []).map(function(val, idx) {
+        var sparklineSeriesPrevious = (monthlyPrevious || []).map(function (val, idx) {
             return [idx, val];
         });
 
@@ -22623,7 +22623,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
     $scope.exportToExcel = function () {
         var rows = [
-            ['CONGREGAÇÃO CRISTàNO BRASIL'],
+            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
             ['Regional Itapevi - São Paulo'],
             ['SANTA CEIA'],
             ['Relatório Analítico Comparativo'],
@@ -22683,7 +22683,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         pdfMake.createPdf({
             pageOrientation: 'landscape',
             content: [
-                { text: 'CONGREGAÇÃO CRISTàNO BRASIL', alignment: 'center', bold: true, fontSize: 14 },
+                { text: 'CONGREGAÇÃO CRISTã NO BRASIL', alignment: 'center', bold: true, fontSize: 14 },
                 { text: 'Regional Itapevi - São Paulo', alignment: 'center', fontSize: 10 },
                 { text: 'SANTA CEIA - RELATÓRIO ANALÍTICO COMPARATIVO', alignment: 'center', bold: true, margin: [0, 6, 0, 8] },
                 { text: 'Modo: ' + getSantaCeiaExportModeLabel() + ' | Período: ' + getSantaCeiaPeriodoLabel(), alignment: 'right', fontSize: 9, margin: [0, 0, 0, 8] },

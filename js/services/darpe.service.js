@@ -148,16 +148,15 @@
         function repairTextValue(value) {
             var repaired = value;
 
-            if (typeof repaired !== 'string') {
+            if (typeof repaired !== 'string' || !repaired) {
                 return repaired;
             }
 
+            // Priority: Use the standardized global repair function if available
             if (window.AppUiStandards && typeof window.AppUiStandards.repairText === 'function') {
                 repaired = window.AppUiStandards.repairText(repaired);
-            }
-
-            if (typeof repairCadastroMusicText === 'function') {
-                repaired = repairCadastroMusicText(repaired);
+            } else if (AuthService && typeof AuthService.repairCatalogText === 'function') {
+                repaired = AuthService.repairCatalogText(repaired);
             }
 
             return repaired;

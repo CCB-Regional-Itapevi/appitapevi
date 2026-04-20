@@ -130,10 +130,12 @@
                 member: 7
             };
 
+            // Priority 1: Use the numeric ID from the database if provided
             if (!isNaN(parsedRoleId) && parsedRoleId > 0) {
                 return parsedRoleId;
             }
 
+            // Priority 2: Fallback to name-based mapping ONLY if ID is missing
             return roleMap[normalizedRoleName] || 7;
         }
 
@@ -484,7 +486,7 @@
                         restricted: true
                     };
                 }
-                
+
                 if (municipio) {
                     return {
                         mode: 'municipio',
@@ -551,7 +553,7 @@
             } else if (scope.mode === 'municipio') {
                 fieldName = getScopeFieldName(config, 'municipio', scope);
                 fieldValue = getScopeValue(scope, 'municipio');
-                
+
                 if (fieldName && fieldValue) {
                     // Use a more permissive wildcard match for Supabase
                     // JS filter will do the precise normalization later
@@ -559,7 +561,7 @@
                     var mainTerm = searchTerms[0] || fieldValue;
                     return query.ilike(fieldName, '%' + mainTerm + '%');
                 }
-                
+
                 return query;
             }
 
@@ -630,15 +632,23 @@
             recordMunicipio = resolveScopedRecordFieldValue(record, config, 'municipio', scope);
 
             if (scope.mode === 'municipio') {
-                return !!recordMunicipio && recordMunicipio === getScopeValue(scope, 'municipio');
+                // Smart comparison: case-insensitive and normalized
+                var normRecordCity = normalizeText(String(recordMunicipio || ''));
+                var normScopeCity = normalizeText(String(getScopeValue(scope, 'municipio') || ''));
+                return !!recordMunicipio && (normRecordCity === normScopeCity || normRecordCity.indexOf(normScopeCity) !== -1);
             }
 
             recordComum = resolveScopedRecordFieldValue(record, config, 'comum', scope);
             if (recordComum) {
-                return recordComum === getScopeValue(scope, 'comum');
+                // Smart comparison: case-insensitive and normalized
+                var normRecordComum = normalizeText(String(recordComum || ''));
+                var normScopeComum = normalizeText(String(getScopeValue(scope, 'comum') || ''));
+                return (normRecordComum === normScopeComum || normRecordComum.indexOf(normScopeComum) !== -1);
             }
 
-            return !!recordMunicipio && recordMunicipio === getScopeValue(scope, 'municipio');
+            var normRecordCityFallback = normalizeText(String(recordMunicipio || ''));
+            var normScopeCityFallback = normalizeText(String(getScopeValue(scope, 'municipio') || ''));
+            return !!recordMunicipio && (normRecordCityFallback === normScopeCityFallback || normRecordCityFallback.indexOf(normScopeCityFallback) !== -1);
         }
 
         function filterCollectionByDataScope(records, config, profile) {
@@ -725,7 +735,7 @@
             return normalizeStatus(previousProfile.status) !== normalizeStatus(nextProfile.status) ||
                 normalizeRoleId(previousProfile.role_id, previousProfile.role) !== normalizeRoleId(nextProfile.role_id, nextProfile.role) ||
                 normalizeSector(previousProfile.sector, previousProfile.role_id, previousProfile.role) !==
-                    normalizeSector(nextProfile.sector, nextProfile.role_id, nextProfile.role);
+                normalizeSector(nextProfile.sector, nextProfile.role_id, nextProfile.role);
         }
 
         function syncCurrentUserProfile(profile, options) {
@@ -2510,11 +2520,11 @@
                 .then(function (response) {
                     if (response.error) {
                         console.warn('Perfil não encontrado, usando dados temporários', response.error);
-                        deferred.resolve(normalizeProfile({ 
-                            user_id: userId, 
-                            role_id: 6, 
-                            sector: 'Inscrição', 
-                            status: 'pending' 
+                        deferred.resolve(normalizeProfile({
+                            user_id: userId,
+                            role_id: 6,
+                            sector: 'Inscrição',
+                            status: 'pending'
                         }));
                     } else {
                         deferred.resolve(normalizeProfile(response.data));

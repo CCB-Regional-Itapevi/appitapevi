@@ -35,7 +35,15 @@
     }
 
     function hasMojibake(value) {
-        return /(?:\u00C3[\u0080-\u00BF\u0192]|\u00C2[\u0080-\u00BF]|\uFFFD)/.test(String(value || ''));
+        var str = String(value || '');
+        // The UTF-8 replacement character is always a sign of corruption
+        if (/\uFFFD/.test(str)) return true;
+        
+        // Common mojibake patterns for UTF-8 misread as Latin-1:
+        // Look for Ã or Â followed by characters that are rarely used as standalone symbols in this context
+        // BUT avoid matching valid accented characters if they are alone.
+        // The most distinct mojibake is Ã followed by specific control-like or symbol-like characters.
+        return /(?:\u00C3[\u0082\u008a\u008c\u008e\u0092\u0095\u0099\u009a]|\u00C2[\u0080-\u009F]|\u00C3\u0192\u00CB\u0153)/.test(str);
     }
 
     function decodeMojibakeOnce(value) {
@@ -76,13 +84,13 @@
     function translateAlertMessage(value) {
         var message = repairText(value);
         var exactTranslations = {
-            'User already registered': 'Usu?rio j? cadastrado.',
-            'Email already registered': 'E-mail j? cadastrado.',
-            'Invalid login credentials': 'E-mail, usu?rio ou senha inv?lidos.',
-            'Email not confirmed': 'E-mail ainda n?o foi confirmado.',
-            'User not found': 'Usu?rio n?o encontrado.',
+            'User already registered': 'Usuário já cadastrado.',
+            'Email already registered': 'E-mail já cadastrado.',
+            'Invalid login credentials': 'E-mail, usuário ou senha inválidos.',
+            'Email not confirmed': 'E-mail ainda não foi confirmado.',
+            'User not found': 'Usuário não encontrado.',
             'Too many requests': 'Muitas tentativas. Tente novamente mais tarde.',
-            'Signup is disabled': 'O cadastro est? desativado no momento.',
+            'Signup is disabled': 'O cadastro está desativado no momento.',
             'Password should be at least 6 characters': 'A senha deve ter pelo menos 6 caracteres.',
             'Email rate limit exceeded': 'Limite de envio para este e-mail excedido. Tente novamente mais tarde.'
         };
