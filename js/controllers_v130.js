@@ -813,6 +813,101 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
     };
 };
 
+function repairCommonText(text) {
+    var uiStandards = window.AppUiStandards || {};
+    var original = String(text || '');
+    var hasMojibake = /(?:ÃÆ’|Ãâ€|â|Â|Ã†|ââ‚¬|ââ€š|ââ€ž|\uFFFD)/.test(original);
+
+    if (!hasMojibake) {
+        return original;
+    }
+
+    var repaired = typeof repairCadastroMusicText === 'function' ? repairCadastroMusicText(original) : original;
+    
+    if (uiStandards.repairText) {
+        repaired = uiStandards.repairText(repaired);
+    }
+    return repaired;
+}
+
+function finalizeCommonComumLabel(value) {
+    return repairCommonText(value)
+        .replace(/CH[^A-Z0-9]*CARA/gi, 'CHÁCARA')
+        .replace(/AMBUIT[^A-Z0-9]*A/gi, 'AMBUITÁ')
+        .replace(/VIT[^A-Z0-9]*POLIS/gi, 'VITÁPOLIS')
+        .replace(/[^A-Z0-9]*GUA\s+ESPRAIADA/gi, 'ÁGUA ESPRAIADA')
+        .replace(/VILA\s+BELIZ[^A-Z0-9]*RIO/gi, 'VILA BELIZÁRIO')
+        .replace(/SAGRADO\s+CORA[^A-Z0-9]*O/gi, 'SAGRADO CORAÇÃO')
+        .replace(/S[^A-Z0-9]*TIO\s+JULINHO/gi, 'SÍTIO JULINHO')
+        .replace(/S[^A-Z0-9]*TIO\s+TABULEIRO/gi, 'SÍTIO TABULEIRO')
+        .replace(/S[^A-Z0-9]*TIO\s+TAQUARAL/gi, 'SÍTIO TAQUARAL')
+        .replace(/CH[^A-Z0-9]*CARA\s+SANTA\s+CEC[^A-Z0-9]*LIA/gi, 'CHÁCARA SANTA CECÍLIA')
+        .replace(/JARDIM\s+MAR[^A-Z0-9]*LIA/gi, 'JARDIM MARÍLIA')
+        .replace(/JARDIM\s+LAVAP[^A-Z0-9]*S\s+DAS\s+GRA[^A-Z0-9]*AS/gi, 'JARDIM LAVAPÉS DAS GRAÇAS')
+        .replace(/JARDIM\s+PETR[^A-Z0-9]*POLIS/gi, 'JARDIM PETRÓPOLIS')
+        .replace(/CENTRO\s+SANTANA\s+DE\s+PARNA[^A-Z0-9]*BA/gi, 'CENTRO SANTANA DE PARNAÍBA')
+        .replace(/S[^A-Z0-9]*O\s+JUDAS\s+TADEU/gi, 'SÃO JUDAS TADEU')
+        .replace(/CIDADE\s+S[^A-Z0-9]*O\s+PEDRO/gi, 'CIDADE SÃO PEDRO')
+        .replace(/FAZENDINHA\s*-\s*STNA\s+DE\s+PARNA[IÍ]BA/gi, 'FAZENDINHA - SANTANA DE PARNAÍBA')
+        .replace(/JARDIM\s+ITAPU[AÃ]\s*-\s*STNA\s+DE\s+PARNA[IÍ]BA/gi, 'JARDIM ITAPUÃ - SANTANA DE PARNAÍBA')
+        .replace(/BR-22-0417\s*-\s*PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORTÃO VERMELHO - CENTRAL DE VGP')
+        .replace(/LI[^A-Z0-9]*CAO/gi, 'LIÇÃO')
+        .replace(/HIST[^A-Z0-9]*RIA/gi, 'HISTÓRIA');
+}
+
+function normalizeCommonDisplayText(value) {
+    return finalizeCommonComumLabel(value)
+        .replace(/ESPERANÇA/gi, 'ESPERANÇA')
+        .replace(/SÃO/gi, 'SÃO')
+        .replace(/JOÃO/gi, 'JOÃO')
+        .replace(/SÃO CARLOS/gi, 'SÃO CARLOS')
+        .replace(/SÃO JOÃO/gi, 'SÃO JOÃO')
+        .replace(/AMBUITÁ/gi, 'AMBUITÁ')
+        .replace(/ITAPUÃ/gi, 'ITAPUÃ')
+        .replace(/PARNAÍBA/gi, 'PARNAÍBA');
+}
+
+function sanitizeCommonRecord(item, scopeCatalogState) {
+    var sanitized = angular.extend({}, item);
+    var activeCatalogState = scopeCatalogState || getFallbackComumCatalogState();
+    var resolvedMunicipio;
+
+    Object.keys(sanitized).forEach(function (key) {
+        if (typeof sanitized[key] === 'string') {
+            sanitized[key] = repairCommonText(sanitized[key]);
+        }
+    });
+
+    if (sanitized.cidade) {
+        sanitized.cidade = normalizeMunicipioRegionalLabel(sanitized.cidade);
+    }
+
+    if (sanitized.municipio) {
+        sanitized.municipio = normalizeMunicipioRegionalLabel(sanitized.municipio);
+    }
+
+    resolvedMunicipio = resolveMunicipioFromCatalog(activeCatalogState, [
+        sanitized && sanitized.localidade,
+        sanitized && sanitized.cidade,
+        sanitized && sanitized.municipio
+    ]) || sanitized.localidade || sanitized.cidade || sanitized.municipio || '';
+
+    if (resolvedMunicipio) {
+        sanitized.localidade = normalizeMunicipioRegionalLabel(resolvedMunicipio);
+    }
+
+    return sanitized;
+}
+
+// Aliases for compatibility with EBI and other modules
+var repairEbiText = repairCommonText;
+var finalizeEbiLocalidadeLabel = finalizeCommonComumLabel;
+var normalizeEbiDisplayText = normalizeCommonDisplayText;
+var sanitizeEbiRecord = sanitizeCommonRecord;
+
+
+
+
 
 /**
  * dashboardFlotOne - simple controller for data
@@ -8495,7 +8590,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     var monthLabels = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
     function getCurrentMonthLabel() {
-        return repairEbiText(monthLabels[new Date().getMonth()]);
+        return repairCommonText(monthLabels[new Date().getMonth()]);
     }
 
     $scope.recitativos = [];
@@ -8525,7 +8620,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     $scope.monthOptions = monthLabels.map(function (label, index) {
         return {
             value: String(index + 1),
-            label: repairEbiText(label)
+            label: repairCommonText(label)
         };
     });
 
@@ -8548,7 +8643,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     }
 
     function getRecitativoComum(item) {
-        return repairEbiText(String(item && item.comum || '').trim());
+        return repairCommonText(String(item && item.comum || '').trim());
     }
 
     function getRecitativoQuantidade(item) {
@@ -8561,13 +8656,13 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     }
 
     function normalizeMonthFilterValue(value) {
-        var normalized = repairEbiText(String(value || ''))
+        var normalized = repairCommonText(String(value || ''))
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .trim()
             .toLowerCase();
         var monthIndex = monthLabels.map(function (label) {
-            return repairEbiText(label)
+            return repairCommonText(label)
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
                 .trim()
@@ -8598,7 +8693,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         $scope.loading = true;
         RjmService.getRecitativos()
             .then(function (data) {
-                $scope.recitativos = (data || []).map(sanitizeEbiRecord);
+                $scope.recitativos = (data || []).map(function(item) { return sanitizeCommonRecord(item, $scope.comumCatalogState); });
                 $scope.applyFilters();
                 $scope.loading = false;
             })
@@ -8687,7 +8782,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         // Initialize municipalities from the list
         $scope.cidades.forEach(function (city) {
             var normCity = normalizeStr(city);
-            summary.municipios[normCity] = { nome: repairEbiText(city), meninas: 0, meninos: 0, mocas: 0, mocos: 0, total: 0, recitativos: 0, media: 0 };
+            summary.municipios[normCity] = { nome: repairCommonText(city), meninas: 0, meninos: 0, mocas: 0, mocos: 0, total: 0, recitativos: 0, media: 0 };
         });
 
         $scope.filteredRecitativos.forEach(function (item) {
@@ -8835,7 +8930,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
 
         $scope.cidades.forEach(function (city) {
             var normCity = normalizeStr(city);
-            summary.municipios[normCity] = { nome: repairEbiText(city), meninas: 0, meninos: 0, mocas: 0, mocos: 0, total: 0, recitativos: 0, lancamentos: 0, media: 0 };
+            summary.municipios[normCity] = { nome: repairCommonText(city), meninas: 0, meninos: 0, mocas: 0, mocos: 0, total: 0, recitativos: 0, lancamentos: 0, media: 0 };
         });
 
         ($scope.filteredRecitativos || []).forEach(function (item) {
@@ -8975,7 +9070,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         ];
         rows = rows.map(function (row) {
             return row.map(function (cell) {
-                return typeof cell === 'string' ? repairEbiText(cell) : cell;
+                return typeof cell === 'string' ? repairCommonText(cell) : cell;
             });
         });
         var merges = [
@@ -9144,13 +9239,13 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     };
 
     function resolveDashboardMonthNumber(value) {
-        var normalized = repairEbiText(String(value || ''))
+        var normalized = repairCommonText(String(value || ''))
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .trim()
             .toLowerCase();
         var monthIndex = monthLabels.map(function (label) {
-            return repairEbiText(label)
+            return repairCommonText(label)
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
                 .trim()
@@ -9165,7 +9260,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     }
 
     function normalizeDashboardSearchText(value) {
-        return repairEbiText(String(value || ''))
+        return repairCommonText(String(value || ''))
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
@@ -9254,7 +9349,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         ($scope.cidades || []).forEach(function (city) {
             var normCity = normalizeStr(city);
             summary.municipios[normCity] = {
-                nome: repairEbiText(city),
+                nome: repairCommonText(city),
                 meninas: 0,
                 meninos: 0,
                 mocas: 0,
@@ -9335,7 +9430,7 @@ function rjmAnalyticsCtrl($scope, RjmService, $q, AuthService) {
     var monthLabels = ['Janeiro', 'Fevereiro', 'Mar\u00e7o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
     function normalizeText(value) {
-        return repairEbiText(String(value || ''))
+        return repairCommonText(String(value || ''))
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .trim()
@@ -9407,7 +9502,7 @@ function rjmAnalyticsCtrl($scope, RjmService, $q, AuthService) {
     }
 
     function getRecitativoComum(item) {
-        return normalizeEbiDisplayText(finalizeEbiLocalidadeLabel(repairEbiText(String((item && (item.comum || item.localidade || item.nome)) || '').trim())));
+        return normalizeCommonDisplayText(String((item && (item.comum || item.localidade || item.nome)) || '').trim());
     }
 
     function getRecitativosQuantidade(item) {
@@ -9979,7 +10074,7 @@ function rjmAnalyticsCtrl($scope, RjmService, $q, AuthService) {
         var monthWindow = buildMonthWindow(comparisonBase.length ? comparisonBase : $scope.recitativos, 6);
 
         ($scope.rjmComuns || []).forEach(function (item) {
-            var comumNome = repairEbiText(String(item && item.comum || '').trim());
+            var comumNome = repairCommonText(String(item && item.comum || '').trim());
             var municipioNome = normalizeMunicipioRegionalLabel(item && (item.cidade || item.municipio) || '') || 'SEM MUNICIPIO';
             var key = normalizeKey(comumNome || municipioNome);
 
@@ -10432,7 +10527,7 @@ function rjmComunsCtrl($scope, RjmService, $timeout, AuthService, $rootScope) {
     $scope.cidades = MUNICIPIOS_REGIONAIS.slice();
 
     function formatRjmComumLabel(value) {
-        return normalizeEbiDisplayText(finalizeEbiLocalidadeLabel(repairEbiText(String(value || '').trim())));
+        return normalizeCommonDisplayText(String(value || '').trim());
     }
 
     function normalizeSearchText(value) {
@@ -10458,8 +10553,8 @@ function rjmComunsCtrl($scope, RjmService, $timeout, AuthService, $rootScope) {
                 var normalized = angular.copy(item || {});
                 normalized.comum = formatRjmComumLabel(item && (item.comum || item.nome));
                 normalized.cidade = normalizeMunicipioRegionalLabel(item && item.cidade) || item.cidade || '';
-                normalized.cooperador_jovens = repairEbiText(item && item.cooperador_jovens || '');
-                normalized.telefone = repairEbiText(item && item.telefone || '');
+                normalized.cooperador_jovens = repairCommonText(item && item.cooperador_jovens || '');
+                normalized.telefone = repairCommonText(item && item.telefone || '');
                 return normalized;
             });
         }).finally(function () {
@@ -11291,38 +11386,6 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         return match ? ('BR-' + match[1] + '-' + match[2]) : '';
     }
 
-    function finalizeEbiLocalidadeLabel(value) {
-        return repairEbiText(value)
-            .replace(/CH[^A-Z0-9]*CARA/gi, 'CHÁCARA')
-            .replace(/AMBUIT[^A-Z0-9]*A/gi, 'AMBUITÁ')
-            .replace(/VIT[^A-Z0-9]*POLIS/gi, 'VITÁPOLIS')
-            .replace(/[^A-Z0-9]*GUA\s+ESPRAIADA/gi, 'ÁGUA ESPRAIADA')
-            .replace(/VILA\s+BELIZ[^A-Z0-9]*RIO/gi, 'VILA BELIZÁRIO')
-            .replace(/SAGRADO\s+CORA[^A-Z0-9]*O/gi, 'SAGRADO CORAÇÃO')
-            .replace(/S[^A-Z0-9]*TIO\s+JULINHO/gi, 'SÍTIO JULINHO')
-            .replace(/S[^A-Z0-9]*TIO\s+TABULEIRO/gi, 'SÍTIO TABULEIRO')
-            .replace(/S[^A-Z0-9]*TIO\s+TAQUARAL/gi, 'SÍTIO TAQUARAL')
-            .replace(/CH[^A-Z0-9]*CARA\s+SANTA\s+CEC[^A-Z0-9]*LIA/gi, 'CHÁCARA SANTA CECÍLIA')
-            .replace(/JARDIM\s+MAR[^A-Z0-9]*LIA/gi, 'JARDIM MARÍLIA')
-            .replace(/JARDIM\s+LAVAP[^A-Z0-9]*S\s+DAS\s+GRA[^A-Z0-9]*AS/gi, 'JARDIM LAVAPÉS DAS GRAÇAS')
-            .replace(/JARDIM\s+PETR[^A-Z0-9]*POLIS/gi, 'JARDIM PETRÓPOLIS')
-            .replace(/CENTRO\s+SANTANA\s+DE\s+PARNA[^A-Z0-9]*BA/gi, 'CENTRO SANTANA DE PARNAÍBA')
-            .replace(/S[^A-Z0-9]*O\s+JUDAS\s+TADEU/gi, 'SÃO JUDAS TADEU')
-            .replace(/CIDADE\s+S[^A-Z0-9]*O\s+PEDRO/gi, 'CIDADE SÃO PEDRO')
-            .replace(/CIDADE\s+SÃO\s+PEDRO/gi, 'CIDADE SÃO PEDRO')
-            .replace(/FAZENDINHA\s*-\s*STNA\s+DE\s+PARNA[IÍ]BA/gi, 'FAZENDINHA - SANTANA DE PARNAÍBA')
-            .replace(/JARDIM\s+ITAPU[AÃ]\s*-\s*STNA\s+DE\s+PARNA[IÍ]BA/gi, 'JARDIM ITAPUÃ - SANTANA DE PARNAÍBA')
-            .replace(/BR-22-0417\s*-\s*PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORTÃO VERMELHO - CENTRAL DE VGP')
-            .replace(/BR-22-0417\s*-\s*PORT\uFFFDO\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'BR-22-0417 - PORTÃO VERMELHO - CENTRAL DE VGP')
-            .replace(/PORT[^A-Z0-9]*O\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP')
-            .replace(/PORT\uFFFDO\s+VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP')
-            .replace(/LI[^A-Z0-9]*CAO/gi, 'LIÇÃO')
-            .replace(/HIST[^A-Z0-9]*RIA/gi, 'HISTÓRIA')
-            .replace(/\uFFFD/g, 'Ã')
-            .replace(/PORTÃO\s*VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP')
-            .replace(/PORTAO\s*VERMELHO(\s*-\s*CENTRAL\s+DE\s+VGP)?/gi, 'PORTÃO VERMELHO - CENTRAL DE VGP');
-    }
-
     function formatEbiStatusLabel(value) {
         var raw = String(value || '').toUpperCase()
             .replace(/\uFFFD/g, 'A')
@@ -11511,7 +11574,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         return normalizeKnownEbiLabel(ensureEbiCodeSeparator(sourceValue));
     }
 
-    function normalizeEbiDisplayText(value) {
+    function normalizeCommonDisplayText(value) {
         return normalizeKnownEbiLabel(ensureEbiCodeSeparator(repairEbiText(value || '')))
             .replace(/ESPERANÇA/gi, 'ESPERANÇA')
             .replace(/SÃO/gi, 'SÃO')
@@ -12805,9 +12868,9 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     };
     $scope.exportToPDF = function () {
         function buildEbiPdfStoryCell(item) {
-            var storyTitle = normalizeEbiDisplayText(resolveEbiPdfText(item && item.titulo_historia || ''));
-            var livro = normalizeEbiDisplayText(resolveEbiPdfText(item && item.livro || ''));
-            var justificativa = normalizeEbiDisplayText(getEbiJustificativa(item) || '');
+            var storyTitle = normalizeCommonDisplayText(resolveEbiPdfText(item && item.titulo_historia || ''));
+            var livro = normalizeCommonDisplayText(resolveEbiPdfText(item && item.livro || ''));
+            var justificativa = normalizeCommonDisplayText(getEbiJustificativa(item) || '');
             var partes = [];
 
             if (isEbiSuspenso(item)) {
@@ -12899,8 +12962,8 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
                 var total = (item.meninas || 0) + (item.meninos || 0);
                 body.push([
                     formatDateOnlyPtBr(item.data_reuniao),
-                    normalizeEbiDisplayText(resolveEbiPdfText(getEbiMunicipio(item) || '')),
-                    normalizeEbiDisplayText(resolveEbiPdfText(resolveEbiLocalidadeLabel(item.localidade || ''))),
+                    normalizeCommonDisplayText(resolveEbiPdfText(getEbiMunicipio(item) || '')),
+                    normalizeCommonDisplayText(resolveEbiPdfText(resolveEbiLocalidadeLabel(item.localidade || ''))),
                     buildEbiPdfStoryCell(item),
                     { text: item.meninas || 0, alignment: 'center' },
                     { text: item.meninos || 0, alignment: 'center' },
@@ -18611,232 +18674,6 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
             municipios: municipiosArray.sort(function (a, b) {
                 return b.total - a.total;
             })
-        };
-    };
-
-    $scope.applyFilters = function () {
-        if (!$scope.recitativos) return;
-
-        $scope.filteredRecitativos = ($scope.recitativos || []).filter(function (item) {
-            var matchText = true;
-            var matchCity = true;
-            var matchDate = true;
-            var matchMonth = true;
-            var itemDate = getRecitativoDate(item);
-            var itemMonth = itemDate ? monthLabels[itemDate.getMonth()] : '';
-
-            if ($scope.filters.searchText) {
-                var search = String($scope.filters.searchText || '').toLowerCase();
-                matchText = (item.comum && item.comum.toLowerCase().indexOf(search) !== -1) ||
-                    (item.data_reuniao && String(item.data_reuniao).indexOf(search) !== -1) ||
-                    (item.auxiliar_nome && String(item.auxiliar_nome).toLowerCase().indexOf(search) !== -1);
-            }
-
-            if ($scope.filters.cidade) {
-                matchCity = getRecitativoMunicipio(item) === String($scope.filters.cidade || '').toUpperCase();
-            }
-
-            if ($scope.filters.dataInicio) {
-                var startDate = new Date($scope.filters.dataInicio);
-                if (!itemDate || itemDate < startDate) matchDate = false;
-            }
-
-            if ($scope.filters.dataFim) {
-                var endDate = new Date($scope.filters.dataFim);
-                if (!itemDate || itemDate > endDate) matchDate = false;
-            }
-
-            if ($scope.filters.mes) {
-                matchMonth = itemMonth === $scope.filters.mes;
-            }
-
-            return matchText && matchCity && matchDate && matchMonth;
-        });
-
-        $scope.calculateDashboardData();
-    };
-
-    $scope.calculateDashboardData = function () {
-        var normalizeStr = function (str) {
-            if (!str) return '';
-            return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
-        };
-        var summary = {
-            totais: { meninas: 0, meninos: 0, mocas: 0, mocos: 0, geral: 0 },
-            municipios: {}
-        };
-        var totalRecitativos = 0;
-        var totalComuns = ($scope.rjmComuns || []).length || ((comumCatalogState && comumCatalogState.items && comumCatalogState.items.length) ? comumCatalogState.items.length : 0);
-        var comunsAtivasMap = {};
-        var municipiosAtivosMap = {};
-
-        $scope.cidades.forEach(function (city) {
-            var normCity = normalizeStr(city);
-            summary.municipios[normCity] = { nome: repairEbiText(city), meninas: 0, meninos: 0, mocas: 0, mocos: 0, total: 0, recitativos: 0, lancamentos: 0, media: 0 };
-        });
-
-        ($scope.filteredRecitativos || []).forEach(function (item) {
-            var mna = item.meninas || 0;
-            var mno = item.meninos || 0;
-            var mca = item.mocas || 0;
-            var mco = item.mocos || 0;
-            var rowTotal = mna + mno + mca + mco;
-            var quantidadeRecitativos = parseInt(item && item.total_recitativos, 10) || 0;
-            var itemCity = normalizeStr(getRecitativoMunicipio(item));
-            var comum = normalizeStr(item.comum || '');
-
-            summary.totais.meninas += mna;
-            summary.totais.meninos += mno;
-            summary.totais.mocas += mca;
-            summary.totais.mocos += mco;
-            summary.totais.geral += rowTotal;
-            totalRecitativos += quantidadeRecitativos;
-
-            if (summary.municipios[itemCity]) {
-                summary.municipios[itemCity].meninas += mna;
-                summary.municipios[itemCity].meninos += mno;
-                summary.municipios[itemCity].mocas += mca;
-                summary.municipios[itemCity].mocos += mco;
-                summary.municipios[itemCity].total += rowTotal;
-                summary.municipios[itemCity].recitativos += quantidadeRecitativos;
-                summary.municipios[itemCity].lancamentos += 1;
-            }
-
-            if (comum) comunsAtivasMap[comum] = true;
-            if (itemCity) municipiosAtivosMap[itemCity] = true;
-        });
-
-        $scope.dashboardData = {
-            totais: summary.totais,
-            municipios: Object.keys(summary.municipios).map(function (key) {
-                var item = summary.municipios[key];
-                item.media = item.lancamentos ? (item.total / item.lancamentos) : 0;
-                return item;
-            }).sort(function (a, b) {
-                return b.total - a.total;
-            })
-        };
-
-        $scope.rjmExecutiveMetrics = {
-            recitativos: totalRecitativos,
-            participantes: summary.totais.geral,
-            comunsAtivas: Object.keys(comunsAtivasMap).length,
-            auxiliares: ($scope.rjmAuxiliares || []).length,
-            municipiosAtivos: Object.keys(municipiosAtivosMap).length || Object.keys(summary.municipios || {}).length,
-            coberturaComuns: totalComuns ? ((Object.keys(comunsAtivasMap).length / totalComuns) * 100).toFixed(2) : '0.00'
-        };
-    };
-
-    $scope.applyFilters = function () {
-        if (!$scope.recitativos) return;
-
-        $scope.filteredRecitativos = ($scope.recitativos || []).filter(function (item) {
-            var matchText = true;
-            var matchCity = true;
-            var matchDate = true;
-            var matchMonth = true;
-            var itemDate = getRecitativoDate(item);
-            var itemMonth = itemDate ? monthLabels[itemDate.getMonth()] : '';
-
-            if ($scope.filters.searchText) {
-                var search = String($scope.filters.searchText || '').toLowerCase();
-                matchText = (item.comum && item.comum.toLowerCase().indexOf(search) !== -1) ||
-                    (item.data_reuniao && String(item.data_reuniao).indexOf(search) !== -1) ||
-                    (item.auxiliar_nome && String(item.auxiliar_nome).toLowerCase().indexOf(search) !== -1);
-            }
-
-            if ($scope.filters.cidade) {
-                matchCity = getRecitativoMunicipio(item) === String($scope.filters.cidade || '').toUpperCase();
-            }
-
-            if ($scope.filters.dataInicio) {
-                var startDate = new Date($scope.filters.dataInicio);
-                if (!itemDate || itemDate < startDate) matchDate = false;
-            }
-
-            if ($scope.filters.dataFim) {
-                var endDate = new Date($scope.filters.dataFim);
-                if (!itemDate || itemDate > endDate) matchDate = false;
-            }
-
-            if ($scope.filters.mes) {
-                matchMonth = itemMonth === $scope.filters.mes;
-            }
-
-            return matchText && matchCity && matchDate && matchMonth;
-        });
-
-        $scope.calculateDashboardData();
-    };
-
-    $scope.calculateDashboardData = function () {
-        var normalizeStr = function (str) {
-            if (!str) return '';
-            return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
-        };
-        var summary = {
-            totais: { meninas: 0, meninos: 0, mocas: 0, mocos: 0, geral: 0 },
-            municipios: {}
-        };
-        var totalRecitativos = 0;
-        var totalComuns = ($scope.rjmComuns || []).length || ((comumCatalogState && comumCatalogState.items && comumCatalogState.items.length) ? comumCatalogState.items.length : 0);
-        var comunsAtivasMap = {};
-        var municipiosAtivosMap = {};
-
-        $scope.cidades.forEach(function (city) {
-            var normCity = normalizeStr(city);
-            summary.municipios[normCity] = { nome: repairEbiText(city), meninas: 0, meninos: 0, mocas: 0, mocos: 0, total: 0, recitativos: 0, lancamentos: 0, media: 0 };
-        });
-
-        ($scope.filteredRecitativos || []).forEach(function (item) {
-            var mna = item.meninas || 0;
-            var mno = item.meninos || 0;
-            var mca = item.mocas || 0;
-            var mco = item.mocos || 0;
-            var rowTotal = mna + mno + mca + mco;
-            var quantidadeRecitativos = parseInt(item && item.total_recitativos, 10) || 0;
-            var itemCity = normalizeStr(getRecitativoMunicipio(item));
-            var comum = normalizeStr(item.comum || '');
-
-            summary.totais.meninas += mna;
-            summary.totais.meninos += mno;
-            summary.totais.mocas += mca;
-            summary.totais.mocos += mco;
-            summary.totais.geral += rowTotal;
-            totalRecitativos += quantidadeRecitativos;
-
-            if (summary.municipios[itemCity]) {
-                summary.municipios[itemCity].meninas += mna;
-                summary.municipios[itemCity].meninos += mno;
-                summary.municipios[itemCity].mocas += mca;
-                summary.municipios[itemCity].mocos += mco;
-                summary.municipios[itemCity].total += rowTotal;
-                summary.municipios[itemCity].recitativos += quantidadeRecitativos;
-                summary.municipios[itemCity].lancamentos += 1;
-            }
-
-            if (comum) comunsAtivasMap[comum] = true;
-            if (itemCity) municipiosAtivosMap[itemCity] = true;
-        });
-
-        $scope.dashboardData = {
-            totais: summary.totais,
-            municipios: Object.keys(summary.municipios).map(function (key) {
-                var item = summary.municipios[key];
-                item.media = item.lancamentos ? (item.total / item.lancamentos) : 0;
-                return item;
-            }).sort(function (a, b) {
-                return b.total - a.total;
-            })
-        };
-
-        $scope.rjmExecutiveMetrics = {
-            recitativos: totalRecitativos,
-            participantes: summary.totais.geral,
-            comunsAtivas: Object.keys(comunsAtivasMap).length,
-            auxiliares: ($scope.rjmAuxiliares || []).length,
-            municipiosAtivos: Object.keys(municipiosAtivosMap).length || Object.keys(summary.municipios || {}).length,
-            coberturaComuns: totalComuns ? ((Object.keys(comunsAtivasMap).length / totalComuns) * 100).toFixed(2) : '0.00'
         };
     };
 

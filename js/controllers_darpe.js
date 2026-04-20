@@ -94,8 +94,12 @@
             if (typeof record[key] === 'string') {
                 var value = String(record[key] || '').trim();
                 
-                if (window.AppUiStandards && typeof window.AppUiStandards.repairText === 'function') {
-                    value = window.AppUiStandards.repairText(value);
+                try {
+                    if (window.AppUiStandards && typeof window.AppUiStandards.repairText === 'function') {
+                        value = window.AppUiStandards.repairText(value);
+                    }
+                } catch (e) {
+                    console.warn('Display text repair failed for key:', key, e);
                 }
 
                 record[key] = value;

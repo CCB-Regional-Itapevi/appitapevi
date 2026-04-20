@@ -70,7 +70,8 @@
             enforceInactivityTimeout: enforceInactivityTimeout,
             syncInactivityTimer: syncInactivityTimer,
             consumeLogoutReason: consumeLogoutReason,
-            getInactivityTimeoutMs: getInactivityTimeoutMs
+            getInactivityTimeoutMs: getInactivityTimeoutMs,
+            repairCatalogText: repairCatalogText
         };
 
         return service;
@@ -191,16 +192,21 @@
             sectorMap.inscricao = 'Inscrição';
 
             sectorMap.inscricao = 'Inscri\u00e7\u00e3o';
+            sectorMap.musicalizacao = 'Musicalização';
 
-            if (normalizedRoleId === 1) {
+            if (sectorMap[normalizedSector]) {
+                return sectorMap[normalizedSector];
+            }
+
+            if (normalizedRoleId === 1 && !normalizedSector) {
                 return 'Global';
             }
 
-            if (normalizedRoleId === 2) {
+            if (normalizedRoleId === 2 && !normalizedSector) {
                 return 'Administrativo';
             }
 
-            return sectorMap[normalizedSector] || repairCatalogText(sector) || '';
+            return repairCatalogText(sector) || '';
         }
 
         function titleCaseWords(value) {

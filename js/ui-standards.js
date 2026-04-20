@@ -100,11 +100,11 @@
         }
 
         if (/already registered/i.test(message)) {
-            return 'Usu?rio j? cadastrado.';
+            return 'Usuário já cadastrado.';
         }
 
         if (/invalid login credentials/i.test(message)) {
-            return 'E-mail, usu?rio ou senha inv?lidos.';
+            return 'E-mail, usuário ou senha inválidos.';
         }
 
         return message;
@@ -646,8 +646,9 @@
     if (window.jQuery) {
         window.jQuery(function () {
             applyActionIcons(document.body);
-            repairVisibleText(document.body);
-            observeDynamicText();
+            // Auto repair disabled for performance and stability - handle via services
+            // repairVisibleText(document.body);
+            // observeDynamicText();
             patchPdfMake();
             setupSweetAlertDefaults();
             setupFormUppercase();

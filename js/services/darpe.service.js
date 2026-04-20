@@ -152,11 +152,15 @@
                 return repaired;
             }
 
-            // Priority: Use the standardized global repair function if available
-            if (window.AppUiStandards && typeof window.AppUiStandards.repairText === 'function') {
-                repaired = window.AppUiStandards.repairText(repaired);
-            } else if (AuthService && typeof AuthService.repairCatalogText === 'function') {
-                repaired = AuthService.repairCatalogText(repaired);
+            try {
+                // Priority: Use the standardized global repair function if available
+                if (window.AppUiStandards && typeof window.AppUiStandards.repairText === 'function') {
+                    repaired = window.AppUiStandards.repairText(repaired);
+                } else if (AuthService && typeof AuthService.repairCatalogText === 'function') {
+                    repaired = AuthService.repairCatalogText(repaired);
+                }
+            } catch (e) {
+                console.warn('Text repair failed for value:', value, e);
             }
 
             return repaired;
