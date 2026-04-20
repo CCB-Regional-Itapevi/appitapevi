@@ -92,6 +92,20 @@
             'formacao_qual',
             'cursos_conhecimentos'
         ];
+        var EBI_ATIVIDADES_SCOPE = {
+            municipioFields: ['cidade', 'localidade']
+        };
+        var EBI_ALUNOS_SCOPE = {
+            commonField: 'comum_congregacao',
+            municipioField: 'cidade',
+            commonFields: ['comum_congregacao', 'localidade'],
+            municipioFields: ['cidade']
+        };
+        var EBI_MONITORES_SCOPE = {
+            commonField: 'comum_congregacao',
+            commonFields: ['comum_congregacao', 'localidade'],
+            municipioFields: ['cidade']
+        };
 
         var supabase = window.__appSupabaseClient
             || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
@@ -192,17 +206,28 @@
 
         function getRecitativos() {
             var deferred = $q.defer();
-            supabase.from('ebi_atividades').select('*').order('data_reuniao', { ascending: false })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('ebi_atividades').select('*'),
+                EBI_ATIVIDADES_SCOPE
+            ).order('data_reuniao', { ascending: false })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeAtividadeRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeAtividadeRecord),
+                            EBI_ATIVIDADES_SCOPE
+                        )
+                    );
                 });
             return deferred.promise;
         }
 
         function saveAtividade(data) {
             var deferred = $q.defer();
-            var payload = normalizeAtividadePayload(data);
+            var payload = AuthService.applyDataScopeToPayload(
+                normalizeAtividadePayload(data),
+                EBI_ATIVIDADES_SCOPE
+            );
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_atividades').insert([currentPayload]);
             }, payload, deferred);
@@ -221,9 +246,15 @@
 
         function updateAtividade(data) {
             var deferred = $q.defer();
-            var updateData = normalizeAtividadePayload(data);
+            var updateData = AuthService.applyDataScopeToPayload(
+                normalizeAtividadePayload(data),
+                EBI_ATIVIDADES_SCOPE
+            );
             runWithMissingColumnRetry(function (currentPayload) {
-                return supabase.from('ebi_atividades').update(currentPayload).eq('id', data.id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('ebi_atividades').update(currentPayload).eq('id', data.id),
+                    EBI_ATIVIDADES_SCOPE
+                );
             }, updateData, deferred);
             deferred.promise.then(function () {
                 auditEbi('EBI_ATIVIDADE_UPDATE', {
@@ -239,7 +270,10 @@
 
         function deleteAtividade(id) {
             var deferred = $q.defer();
-            supabase.from('ebi_atividades').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('ebi_atividades').delete().eq('id', id),
+                EBI_ATIVIDADES_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -256,17 +290,28 @@
         // Students (Alunos)
         function getAlunos() {
             var deferred = $q.defer();
-            supabase.from('ebi_criancas').select('*').order('nome_crianca', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('ebi_criancas').select('*'),
+                EBI_ALUNOS_SCOPE
+            ).order('nome_crianca', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeAlunoRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeAlunoRecord),
+                            EBI_ALUNOS_SCOPE
+                        )
+                    );
                 });
             return deferred.promise;
         }
 
         function saveAluno(data) {
             var deferred = $q.defer();
-            var payload = normalizeAlunoPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(
+                normalizeAlunoPayload(data),
+                EBI_ALUNOS_SCOPE
+            );
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_criancas').insert([currentPayload]);
             }, payload, deferred);
@@ -285,9 +330,15 @@
 
         function updateAluno(data) {
             var deferred = $q.defer();
-            var updateData = normalizeAlunoPayload(data);
+            var updateData = AuthService.applyDataScopeToPayload(
+                normalizeAlunoPayload(data),
+                EBI_ALUNOS_SCOPE
+            );
             runWithMissingColumnRetry(function (currentPayload) {
-                return supabase.from('ebi_criancas').update(currentPayload).eq('id', data.id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('ebi_criancas').update(currentPayload).eq('id', data.id),
+                    EBI_ALUNOS_SCOPE
+                );
             }, updateData, deferred);
             deferred.promise.then(function () {
                 auditEbi('EBI_ALUNO_UPDATE', {
@@ -303,7 +354,10 @@
 
         function deleteAluno(id) {
             var deferred = $q.defer();
-            supabase.from('ebi_criancas').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('ebi_criancas').delete().eq('id', id),
+                EBI_ALUNOS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -320,17 +374,28 @@
         // Instructors (Instrutores)
         function getInstrutores() {
             var deferred = $q.defer();
-            supabase.from('ebi_monitores').select('*').order('nome_completo', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('ebi_monitores').select('*'),
+                EBI_MONITORES_SCOPE
+            ).order('nome_completo', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeMonitorRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeMonitorRecord),
+                            EBI_MONITORES_SCOPE
+                        )
+                    );
                 });
             return deferred.promise;
         }
 
         function saveInstrutor(data) {
             var deferred = $q.defer();
-            var payload = normalizeMonitorPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(
+                normalizeMonitorPayload(data),
+                EBI_MONITORES_SCOPE
+            );
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('ebi_monitores').insert([currentPayload]);
             }, payload, deferred);
@@ -349,9 +414,15 @@
 
         function updateInstrutor(data) {
             var deferred = $q.defer();
-            var updateData = normalizeMonitorPayload(data);
+            var updateData = AuthService.applyDataScopeToPayload(
+                normalizeMonitorPayload(data),
+                EBI_MONITORES_SCOPE
+            );
             runWithMissingColumnRetry(function (currentPayload) {
-                return supabase.from('ebi_monitores').update(currentPayload).eq('id', data.id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('ebi_monitores').update(currentPayload).eq('id', data.id),
+                    EBI_MONITORES_SCOPE
+                );
             }, updateData, deferred);
             deferred.promise.then(function () {
                 auditEbi('EBI_INSTRUTOR_UPDATE', {
@@ -367,7 +438,10 @@
 
         function deleteInstrutor(id) {
             var deferred = $q.defer();
-            supabase.from('ebi_monitores').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('ebi_monitores').delete().eq('id', id),
+                EBI_MONITORES_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {

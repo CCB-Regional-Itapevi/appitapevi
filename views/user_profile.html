@@ -56,12 +56,6 @@
                     </div>
                     <div class="ibox-content">
                         <form novalidate>
-                            <div class="alert alert-info">
-                                Esta tela grava diretamente no registro do usuario logado em <strong>profiles</strong>.
-                                Para evitar "dados fantasmas", a barra lateral e o topo agora leem apenas
-                                <strong>full_name</strong>, <strong>cargo</strong> e <strong>avatar_url</strong>.
-                            </div>
-
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -73,6 +67,87 @@
                                     <div class="form-group">
                                         <label>Cargo Exibido</label>
                                         <input type="text" class="form-control" ng-model="profile.cargo" placeholder="Ex.: Secretaria da Musicalizacao">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Comum</label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               ng-model="profile.comum" 
+                                               placeholder="Pesquise sua comum..."
+                                               uib-typeahead="item.nome for item in searchComuns($viewValue)"
+                                               typeahead-on-select="onComumSelect($item)"
+                                               typeahead-loading="loadingComuns"
+                                               typeahead-no-results="noComunResults"
+                                               typeahead-min-length="2"
+                                               typeahead-editable="true">
+                                        <i ng-show="loadingComuns" class="fa fa-refresh fa-spin"></i>
+                                        <div ng-show="noComunResults" class="text-danger small">
+                                            <i class="fa fa-times"></i> Nenhuma comum encontrada.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Município</label>
+                                        <input type="text" class="form-control" ng-model="profile.municipio" readonly>
+                                        <span class="help-block m-b-none">Preenchido automaticamente pela comum informada.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Telefone</label>
+                                        <input type="text" class="form-control" ng-model="profile.telefone" ng-change="formatProfileField('telefone', 'phone')" placeholder="(11) 9999-9999">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Celular</label>
+                                        <input type="text" class="form-control" ng-model="profile.celular" ng-change="formatProfileField('celular', 'phone')" placeholder="(11) 9 9999-9999">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>WhatsApp</label>
+                                        <input type="text" class="form-control" ng-model="profile.whatsapp" ng-change="formatProfileField('whatsapp', 'phone')" placeholder="(11) 9 9999-9999">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>CEP</label>
+                                        <input type="text" class="form-control" ng-model="profile.cep" ng-change="formatProfileField('cep', 'cep')" placeholder="00000-000">
+                                        <span class="help-block m-b-none" ng-if="cepLookupLoading">Buscando endereço...</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <label>Logradouro e Número</label>
+                                        <input type="text" class="form-control" ng-model="profile.logradouro_numero" placeholder="Rua, avenida, número">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Bairro</label>
+                                        <input type="text" class="form-control" ng-model="profile.bairro" placeholder="Informe seu bairro">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Complemento</label>
+                                        <input type="text" class="form-control" ng-model="profile.complemento" placeholder="Casa, bloco, referencia">
                                     </div>
                                 </div>
                             </div>
@@ -101,11 +176,6 @@
                             <div class="form-group">
                                 <label>avatar_url</label>
                                 <input type="text" class="form-control" ng-model="profile.avatar_url" placeholder="A imagem enviada preenchera este campo automaticamente">
-                            </div>
-
-                            <div class="form-group">
-                                <label>cargo</label>
-                                <input type="text" class="form-control" ng-model="profile.cargo" placeholder="Este e o campo usado no menu lateral e no topo">
                             </div>
 
                             <div class="hr-line-dashed"></div>

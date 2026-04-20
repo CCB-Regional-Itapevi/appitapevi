@@ -83,6 +83,24 @@
 
         var supabase = window.__appSupabaseClient
             || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+        var MUSICALIZACAO_ALUNOS_SCOPE = {
+            commonField: 'comum_congregacao',
+            commonFields: ['comum_congregacao'],
+            municipioFields: ['cidade']
+        };
+        var MUSICALIZACAO_INSTRUTORES_SCOPE = {
+            commonField: 'comum_congregacao',
+            commonFields: ['comum_congregacao'],
+            municipioFields: ['cidade']
+        };
+        var MUSICALIZACAO_AULAS_SCOPE = {
+            municipioField: 'cidade',
+            municipioFields: ['cidade']
+        };
+        var MUSICALIZACAO_POLOS_SCOPE = {
+            municipioField: 'localidade',
+            municipioFields: ['cidade', 'localidade']
+        };
 
         var service = {
             getAtividades: getAtividades,
@@ -129,20 +147,31 @@
 
         function getAtividades() {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_aulas').select('*').order('data_aula', { ascending: false })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_aulas').select('*'),
+                MUSICALIZACAO_AULAS_SCOPE
+            ).order('data_aula', { ascending: false })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else deferred.resolve(AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_AULAS_SCOPE));
                 });
             return deferred.promise;
         }
 
         function getAlunos() {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_criancas').select('*').order('nome_crianca', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_criancas').select('*'),
+                MUSICALIZACAO_ALUNOS_SCOPE
+            ).order('nome_crianca', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeAlunoRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeAlunoRecord),
+                            MUSICALIZACAO_ALUNOS_SCOPE
+                        )
+                    );
                 });
             return deferred.promise;
         }
@@ -150,13 +179,16 @@
         function getPolos() {
             var deferred = $q.defer();
             // Polos might be fetched from a specific table or profiles with a certain role/sector
-            supabase.from('musicalizacao_polos').select('*').order('nome_polo', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_polos').select('*'),
+                MUSICALIZACAO_POLOS_SCOPE
+            ).order('nome_polo', { ascending: true })
                 .then(function (response) {
                     if (response.error) {
                         // Fallback: If table doesn't exist, return sample or empty
                         deferred.resolve([]);
                     } else {
-                        deferred.resolve(response.data);
+                        deferred.resolve(AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_POLOS_SCOPE));
                     }
                 });
             return deferred.promise;
@@ -164,27 +196,38 @@
 
         function getInstrutores() {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_monitores').select('*').order('nome_completo', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_monitores').select('*'),
+                MUSICALIZACAO_INSTRUTORES_SCOPE
+            ).order('nome_completo', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_INSTRUTORES_SCOPE)
+                    );
                 });
             return deferred.promise;
         }
 
         function getAulas() {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_aulas').select('*').order('data_aula', { ascending: false })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_aulas').select('*'),
+                MUSICALIZACAO_AULAS_SCOPE
+            ).order('data_aula', { ascending: false })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(response.data);
+                    else deferred.resolve(AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_AULAS_SCOPE));
                 });
             return deferred.promise;
         }
 
         function getAula(id) {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_aulas').select('*').eq('id', id).single()
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_aulas').select('*').eq('id', id),
+                MUSICALIZACAO_AULAS_SCOPE
+            ).single()
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else deferred.resolve(response.data);
@@ -211,11 +254,17 @@
         function updateAluno(aluno) {
             var deferred = $q.defer();
             var id = aluno.id;
-            var data = normalizeAlunoPayload(aluno);
-            var legacyData = normalizeAlunoLegacyPayload(aluno);
+            var data = AuthService.applyDataScopeToPayload(normalizeAlunoPayload(aluno), MUSICALIZACAO_ALUNOS_SCOPE);
+            var legacyData = AuthService.applyDataScopeToPayload(
+                normalizeAlunoLegacyPayload(aluno),
+                MUSICALIZACAO_ALUNOS_SCOPE
+            );
 
             runWithAlunoSchemaFallback(function (payload) {
-                return supabase.from('musicalizacao_criancas').update(payload).eq('id', id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('musicalizacao_criancas').update(payload).eq('id', id),
+                    MUSICALIZACAO_ALUNOS_SCOPE
+                );
             }, data, legacyData, deferred);
             deferred.promise.then(function () {
                 auditMusicalizacao('MUSICALIZACAO_ALUNO_UPDATE', {
@@ -231,8 +280,11 @@
 
         function saveAluno(alunoData) {
             var deferred = $q.defer();
-            var data = normalizeAlunoPayload(alunoData);
-            var legacyData = normalizeAlunoLegacyPayload(alunoData);
+            var data = AuthService.applyDataScopeToPayload(normalizeAlunoPayload(alunoData), MUSICALIZACAO_ALUNOS_SCOPE);
+            var legacyData = AuthService.applyDataScopeToPayload(
+                normalizeAlunoLegacyPayload(alunoData),
+                MUSICALIZACAO_ALUNOS_SCOPE
+            );
 
             runWithAlunoSchemaFallback(function (payload) {
                 return supabase.from('musicalizacao_criancas').insert([payload]);
@@ -253,10 +305,13 @@
         function updateInstrutor(instrutor) {
             var deferred = $q.defer();
             var id = instrutor.id;
-            var data = normalizeMonitorPayload(instrutor);
+            var data = AuthService.applyDataScopeToPayload(normalizeMonitorPayload(instrutor), MUSICALIZACAO_INSTRUTORES_SCOPE);
 
             runWithMissingColumnRetry(function (payload) {
-                return supabase.from('musicalizacao_monitores').update(payload).eq('id', id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('musicalizacao_monitores').update(payload).eq('id', id),
+                    MUSICALIZACAO_INSTRUTORES_SCOPE
+                );
             }, data, deferred);
             deferred.promise.then(function () {
                 auditMusicalizacao('MUSICALIZACAO_INSTRUTOR_UPDATE', {
@@ -272,7 +327,7 @@
 
         function saveInstrutor(instrutorData) {
             var deferred = $q.defer();
-            var data = normalizeMonitorPayload(instrutorData);
+            var data = AuthService.applyDataScopeToPayload(normalizeMonitorPayload(instrutorData), MUSICALIZACAO_INSTRUTORES_SCOPE);
 
             runWithMissingColumnRetry(function (payload) {
                 return supabase.from('musicalizacao_monitores').insert([payload]);
@@ -292,7 +347,7 @@
 
         function saveAula(aulaData) {
             var deferred = $q.defer();
-            var data = normalizeAulaPayload(aulaData);
+            var data = AuthService.applyDataScopeToPayload(normalizeAulaPayload(aulaData), MUSICALIZACAO_AULAS_SCOPE);
 
             runWithMissingColumnRetry(function (payload) {
                 return supabase.from('musicalizacao_aulas').insert([payload]);
@@ -314,10 +369,13 @@
         function updateAula(aula) {
             var deferred = $q.defer();
             var id = aula.id;
-            var data = normalizeAulaPayload(aula);
+            var data = AuthService.applyDataScopeToPayload(normalizeAulaPayload(aula), MUSICALIZACAO_AULAS_SCOPE);
 
             runWithMissingColumnRetry(function (payload) {
-                return supabase.from('musicalizacao_aulas').update(payload).eq('id', id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('musicalizacao_aulas').update(payload).eq('id', id),
+                    MUSICALIZACAO_AULAS_SCOPE
+                );
             }, data, deferred);
             deferred.promise.then(function () {
                 auditMusicalizacao('MUSICALIZACAO_AULA_UPDATE', {
@@ -334,7 +392,10 @@
 
         function deleteAula(id) {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_aulas').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_aulas').delete().eq('id', id),
+                MUSICALIZACAO_AULAS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -350,7 +411,9 @@
     
         function savePolo(poloData) {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_polos').insert([poloData])
+            supabase.from('musicalizacao_polos').insert([
+                AuthService.applyDataScopeToPayload(poloData, MUSICALIZACAO_POLOS_SCOPE)
+            ])
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -368,11 +431,14 @@
         function updatePolo(polo) {
             var deferred = $q.defer();
             var id = polo.id;
-            var data = angular.copy(polo);
+            var data = AuthService.applyDataScopeToPayload(angular.copy(polo), MUSICALIZACAO_POLOS_SCOPE);
             delete data.id;
             delete data.created_at;
     
-            supabase.from('musicalizacao_polos').update(data).eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_polos').update(data).eq('id', id),
+                MUSICALIZACAO_POLOS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -390,7 +456,10 @@
 
         function deletePolo(id) {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_polos').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_polos').delete().eq('id', id),
+                MUSICALIZACAO_POLOS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -405,7 +474,10 @@
         }
         function deleteAluno(id) {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_criancas').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_criancas').delete().eq('id', id),
+                MUSICALIZACAO_ALUNOS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -421,7 +493,10 @@
 
         function deleteInstrutor(id) {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_monitores').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_monitores').delete().eq('id', id),
+                MUSICALIZACAO_INSTRUTORES_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {

@@ -12,6 +12,24 @@
 
         var supabase = window.__appSupabaseClient
             || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+        var RJM_RECITATIVOS_SCOPE = {
+            commonField: 'comum',
+            municipioField: 'municipio',
+            commonFields: ['comum'],
+            municipioFields: ['municipio']
+        };
+        var RJM_COMUNS_SCOPE = {
+            commonField: 'comum',
+            municipioField: 'cidade',
+            commonFields: ['comum'],
+            municipioFields: ['cidade']
+        };
+        var RJM_AUXILIARES_SCOPE = {
+            commonField: 'comum',
+            municipioField: 'cidade',
+            commonFields: ['comum'],
+            municipioFields: ['cidade']
+        };
 
         var service = {
             getRecitativos: getRecitativos,
@@ -153,15 +171,25 @@
         function getRecitativos() {
             return createDeferredQuery(
                 function () {
-                    return supabase.from('rjm_recitativos').select('*').order('data_reuniao', { ascending: false });
+                    return AuthService.applyDataScopeToQuery(
+                        supabase.from('rjm_recitativos').select('*'),
+                        RJM_RECITATIVOS_SCOPE
+                    ).order('data_reuniao', { ascending: false });
                 },
-                normalizeRecitativoRecord
+                function (item) {
+                    return normalizeRecitativoRecord(item);
+                }
             );
         }
 
         function updateRecitativo(data) {
             var deferred = $q.defer();
-            supabase.from('rjm_recitativos').update(normalizeRecitativoPayload(data)).eq('id', data.id).then(function (response) {
+            AuthService.applyDataScopeToQuery(
+                supabase.from('rjm_recitativos').update(
+                    AuthService.applyDataScopeToPayload(normalizeRecitativoPayload(data), RJM_RECITATIVOS_SCOPE)
+                ).eq('id', data.id),
+                RJM_RECITATIVOS_SCOPE
+            ).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_RECITATIVO_UPDATE', {
@@ -179,7 +207,10 @@
 
         function deleteRecitativo(id) {
             var deferred = $q.defer();
-            supabase.from('rjm_recitativos').delete().eq('id', id).then(function (response) {
+            AuthService.applyDataScopeToQuery(
+                supabase.from('rjm_recitativos').delete().eq('id', id),
+                RJM_RECITATIVOS_SCOPE
+            ).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_RECITATIVO_DELETE', {
@@ -195,7 +226,10 @@
         function getComuns() {
             return createDeferredQuery(
                 function () {
-                    return supabase.from('rjm_comuns').select('*').order('cidade', { ascending: true }).order('comum', { ascending: true });
+                    return AuthService.applyDataScopeToQuery(
+                        supabase.from('rjm_comuns').select('*'),
+                        RJM_COMUNS_SCOPE
+                    ).order('cidade', { ascending: true }).order('comum', { ascending: true });
                 },
                 normalizeComumRecord,
                 true
@@ -204,7 +238,9 @@
 
         function saveComum(data) {
             var deferred = $q.defer();
-            supabase.from('rjm_comuns').insert([normalizeComumPayload(data)]).then(function (response) {
+            supabase.from('rjm_comuns').insert([
+                AuthService.applyDataScopeToPayload(normalizeComumPayload(data), RJM_COMUNS_SCOPE)
+            ]).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_COMUM_CREATE', {
@@ -220,7 +256,12 @@
 
         function updateComum(data) {
             var deferred = $q.defer();
-            supabase.from('rjm_comuns').update(normalizeComumPayload(data)).eq('id', data.id).then(function (response) {
+            AuthService.applyDataScopeToQuery(
+                supabase.from('rjm_comuns').update(
+                    AuthService.applyDataScopeToPayload(normalizeComumPayload(data), RJM_COMUNS_SCOPE)
+                ).eq('id', data.id),
+                RJM_COMUNS_SCOPE
+            ).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_COMUM_UPDATE', {
@@ -237,7 +278,10 @@
 
         function deleteComum(id) {
             var deferred = $q.defer();
-            supabase.from('rjm_comuns').delete().eq('id', id).then(function (response) {
+            AuthService.applyDataScopeToQuery(
+                supabase.from('rjm_comuns').delete().eq('id', id),
+                RJM_COMUNS_SCOPE
+            ).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_COMUM_DELETE', {
@@ -253,7 +297,10 @@
         function getAuxiliares() {
             return createDeferredQuery(
                 function () {
-                    return supabase.from('rjm_auxiliares').select('*').order('cidade', { ascending: true }).order('full_name', { ascending: true });
+                    return AuthService.applyDataScopeToQuery(
+                        supabase.from('rjm_auxiliares').select('*'),
+                        RJM_AUXILIARES_SCOPE
+                    ).order('cidade', { ascending: true }).order('full_name', { ascending: true });
                 },
                 normalizeAuxiliarRecord,
                 true
@@ -269,7 +316,9 @@
                 return deferred.promise;
             }
 
-            supabase.from('rjm_auxiliares').insert([payload]).then(function (response) {
+            supabase.from('rjm_auxiliares').insert([
+                AuthService.applyDataScopeToPayload(payload, RJM_AUXILIARES_SCOPE)
+            ]).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_AUXILIAR_CREATE', {
@@ -295,12 +344,17 @@
                 return deferred.promise;
             }
 
-            supabase.from('rjm_auxiliares').update({
-                full_name: payload.full_name,
-                email: payload.email,
-                comum: payload.comum,
-                cidade: payload.cidade
-            }).eq('id', payload.id).then(function (response) {
+            AuthService.applyDataScopeToQuery(
+                supabase.from('rjm_auxiliares').update(
+                    AuthService.applyDataScopeToPayload({
+                        full_name: payload.full_name,
+                        email: payload.email,
+                        comum: payload.comum,
+                        cidade: payload.cidade
+                    }, RJM_AUXILIARES_SCOPE)
+                ).eq('id', payload.id),
+                RJM_AUXILIARES_SCOPE
+            ).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_AUXILIAR_UPDATE', {
@@ -319,7 +373,10 @@
 
         function deleteAuxiliar(id) {
             var deferred = $q.defer();
-            supabase.from('rjm_auxiliares').delete().eq('id', id).then(function (response) {
+            AuthService.applyDataScopeToQuery(
+                supabase.from('rjm_auxiliares').delete().eq('id', id),
+                RJM_AUXILIARES_SCOPE
+            ).then(function (response) {
                 if (response.error) deferred.reject(response.error);
                 else {
                     auditRjm('RJM_AUXILIAR_DELETE', {

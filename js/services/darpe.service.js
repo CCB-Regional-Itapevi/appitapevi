@@ -71,6 +71,20 @@
 
         var supabase = window.__appSupabaseClient
             || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+        var DARPE_MUSICOS_SCOPE = {
+            commonField: 'comum_congregacao',
+            municipioField: 'cidade',
+            commonFields: ['comum_congregacao'],
+            municipioFields: ['cidade']
+        };
+        var DARPE_CLINICAS_SCOPE = {
+            municipioField: 'cidade',
+            municipioFields: ['cidade']
+        };
+        var DARPE_ATENDIMENTOS_SCOPE = {
+            municipioField: 'cidade',
+            municipioFields: ['cidade']
+        };
 
         return {
             getMusicos: getMusicos,
@@ -189,17 +203,25 @@
 
         function getMusicos() {
             var deferred = $q.defer();
-            supabase.from('darpe_musicos').select('*').order('nome_completo', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_musicos').select('*'),
+                DARPE_MUSICOS_SCOPE
+            ).order('nome_completo', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeMusicoRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeMusicoRecord),
+                            DARPE_MUSICOS_SCOPE
+                        )
+                    );
                 });
             return deferred.promise;
         }
 
         function saveMusico(data) {
             var deferred = $q.defer();
-            var payload = normalizeMusicoPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(normalizeMusicoPayload(data), DARPE_MUSICOS_SCOPE);
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('darpe_musicos').insert([currentPayload]);
             }, payload, deferred);
@@ -217,9 +239,12 @@
 
         function updateMusico(data) {
             var deferred = $q.defer();
-            var payload = normalizeMusicoPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(normalizeMusicoPayload(data), DARPE_MUSICOS_SCOPE);
             runWithMissingColumnRetry(function (currentPayload) {
-                return supabase.from('darpe_musicos').update(currentPayload).eq('id', data.id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('darpe_musicos').update(currentPayload).eq('id', data.id),
+                    DARPE_MUSICOS_SCOPE
+                );
             }, payload, deferred);
             deferred.promise.then(function () {
                 auditDarpe('DARPE_MUSICO_UPDATE', {
@@ -234,7 +259,10 @@
 
         function deleteMusico(id) {
             var deferred = $q.defer();
-            supabase.from('darpe_musicos').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_musicos').delete().eq('id', id),
+                DARPE_MUSICOS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -250,17 +278,25 @@
 
         function getClinicas() {
             var deferred = $q.defer();
-            supabase.from('darpe_clinicas').select('*').order('nome_local', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_clinicas').select('*'),
+                DARPE_CLINICAS_SCOPE
+            ).order('nome_local', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeClinicaRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeClinicaRecord),
+                            DARPE_CLINICAS_SCOPE
+                        )
+                    );
                 });
             return deferred.promise;
         }
 
         function saveClinica(data) {
             var deferred = $q.defer();
-            var payload = normalizeClinicaPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(normalizeClinicaPayload(data), DARPE_CLINICAS_SCOPE);
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('darpe_clinicas').insert([currentPayload]);
             }, payload, deferred);
@@ -278,9 +314,12 @@
 
         function updateClinica(data) {
             var deferred = $q.defer();
-            var payload = normalizeClinicaPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(normalizeClinicaPayload(data), DARPE_CLINICAS_SCOPE);
             runWithMissingColumnRetry(function (currentPayload) {
-                return supabase.from('darpe_clinicas').update(currentPayload).eq('id', data.id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('darpe_clinicas').update(currentPayload).eq('id', data.id),
+                    DARPE_CLINICAS_SCOPE
+                );
             }, payload, deferred);
             deferred.promise.then(function () {
                 auditDarpe('DARPE_CLINICA_UPDATE', {
@@ -295,7 +334,10 @@
 
         function deleteClinica(id) {
             var deferred = $q.defer();
-            supabase.from('darpe_clinicas').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_clinicas').delete().eq('id', id),
+                DARPE_CLINICAS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
@@ -311,17 +353,25 @@
 
         function getAtendimentos() {
             var deferred = $q.defer();
-            supabase.from('darpe_atendimentos').select('*').order('data_atendimento', { ascending: false })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_atendimentos').select('*'),
+                DARPE_ATENDIMENTOS_SCOPE
+            ).order('data_atendimento', { ascending: false })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeAtendimentoRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeAtendimentoRecord),
+                            DARPE_ATENDIMENTOS_SCOPE
+                        )
+                    );
                 });
             return deferred.promise;
         }
 
         function saveAtendimento(data) {
             var deferred = $q.defer();
-            var payload = normalizeAtendimentoPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(normalizeAtendimentoPayload(data), DARPE_ATENDIMENTOS_SCOPE);
             runWithMissingColumnRetry(function (currentPayload) {
                 return supabase.from('darpe_atendimentos').insert([currentPayload]);
             }, payload, deferred);
@@ -340,9 +390,12 @@
 
         function updateAtendimento(data) {
             var deferred = $q.defer();
-            var payload = normalizeAtendimentoPayload(data);
+            var payload = AuthService.applyDataScopeToPayload(normalizeAtendimentoPayload(data), DARPE_ATENDIMENTOS_SCOPE);
             runWithMissingColumnRetry(function (currentPayload) {
-                return supabase.from('darpe_atendimentos').update(currentPayload).eq('id', data.id);
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('darpe_atendimentos').update(currentPayload).eq('id', data.id),
+                    DARPE_ATENDIMENTOS_SCOPE
+                );
             }, payload, deferred);
             deferred.promise.then(function () {
                 auditDarpe('DARPE_ATENDIMENTO_UPDATE', {
@@ -358,7 +411,10 @@
 
         function deleteAtendimento(id) {
             var deferred = $q.defer();
-            supabase.from('darpe_atendimentos').delete().eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_atendimentos').delete().eq('id', id),
+                DARPE_ATENDIMENTOS_SCOPE
+            )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {

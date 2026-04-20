@@ -1,4 +1,4 @@
-﻿/**
+/**
  * INSPINIA - Responsive Admin Theme
  *
  * Main controller.js file
@@ -496,6 +496,29 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
         main.checkPendingUsers();
     });
 
+    /**
+     * Profile Completion Guard
+     */
+    $rootScope.$on('$stateChangeStart', function (event, toState) {
+        var user = $rootScope.currentUser;
+        var role = AuthService && typeof AuthService.getCurrentUserRole === 'function' ? AuthService.getCurrentUserRole() : null;
+        var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'profile';
+        
+        if (user && !user.comum && !isPublic && role !== null && role >= 3) {
+            event.preventDefault();
+            $state.go('profile');
+            
+            if (typeof swal === 'function') {
+                swal({
+                    title: "Perfil Incompleto",
+                    text: "Por favor, selecione sua Comum Congregação no perfil para liberar o acesso ao sistema.",
+                    type: "warning",
+                    confirmButtonText: "Ok"
+                });
+            }
+        }
+    });
+
 
     /**
      * countries - Used as duallistbox in form advanced view
@@ -882,6 +905,8 @@ function dashboardFlotOne() {
 
 function profileCtrl($scope, $rootScope, AuthService) {
     var DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?_=20150327203541';
+    var comumCatalogIndex = {};
+    var lastProfileCepLookupDigits = '';
 
     function getTrimmedValue() {
         var i;
@@ -893,6 +918,104 @@ function profileCtrl($scope, $rootScope, AuthService) {
         return '';
     }
 
+    function normalizeLookupText(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+    }
+
+    function formatProfilePhone(value) {
+        var digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+
+        if (digits.length <= 2) {
+            return digits ? '(' + digits : '';
+        }
+
+        if (digits.length <= 6) {
+            return '(' + digits.slice(0, 2) + ') ' + digits.slice(2);
+        }
+
+        if (digits.length <= 10) {
+            return '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 6) + '-' + digits.slice(6);
+        }
+
+        return '(' + digits.slice(0, 2) + ') ' + digits.slice(2, 7) + '-' + digits.slice(7);
+    }
+
+    function formatProfileCep(value) {
+        var digits = String(value || '').replace(/\D/g, '').slice(0, 8);
+
+        if (digits.length <= 5) {
+            return digits;
+        }
+
+        return digits.slice(0, 5) + '-' + digits.slice(5);
+    }
+
+    function syncMunicipioFromComum() {
+        var normalizedComum = normalizeLookupText($scope.profile && $scope.profile.comum);
+        var catalogEntry = normalizedComum ? comumCatalogIndex[normalizedComum] : null;
+
+        if (catalogEntry && catalogEntry.cidade) {
+            $scope.profile.municipio = catalogEntry.cidade;
+        }
+    }
+
+    function applyProfileCepAddress(data) {
+        if (!$scope.profile || !data) {
+            return;
+        }
+
+        if (data.logradouro) {
+            $scope.profile.logradouro_numero = data.logradouro;
+        }
+
+        if (data.bairro) {
+            $scope.profile.bairro = data.bairro;
+        }
+
+        if (data.localidade) {
+            $scope.profile.cidade = data.localidade;
+            if (!$scope.profile.comum || !$scope.profile.comum.trim()) {
+                $scope.profile.municipio = data.localidade;
+            }
+        }
+    }
+
+    function lookupProfileCep(cepDigits) {
+        if (!cepDigits || cepDigits.length !== 8) {
+            return;
+        }
+
+        if (lastProfileCepLookupDigits === cepDigits) {
+            return;
+        }
+
+        lastProfileCepLookupDigits = cepDigits;
+        $scope.cepLookupLoading = true;
+
+        fetch('https://viacep.com.br/ws/' + cepDigits + '/json/')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                $scope.$applyAsync(function () {
+                    $scope.cepLookupLoading = false;
+
+                    if (data && !data.erro) {
+                        applyProfileCepAddress(data);
+                    }
+                });
+            })
+            .catch(function () {
+                $scope.$applyAsync(function () {
+                    $scope.cepLookupLoading = false;
+                });
+            });
+    }
+
     function buildEditableProfile(user) {
         user = user || {};
         return {
@@ -902,7 +1025,17 @@ function profileCtrl($scope, $rootScope, AuthService) {
             avatar_url: getTrimmedValue(user.avatar_url),
             sector: user.sector || '',
             role: user.role || 'member',
-            email: getTrimmedValue(user.email)
+            email: getTrimmedValue(user.email),
+            comum: getTrimmedValue(user.comum),
+            municipio: getTrimmedValue(user.municipio, user.cidade),
+            telefone: formatProfilePhone(getTrimmedValue(user.telefone)),
+            celular: formatProfilePhone(getTrimmedValue(user.celular)),
+            whatsapp: formatProfilePhone(getTrimmedValue(user.whatsapp)),
+            cep: formatProfileCep(getTrimmedValue(user.cep)),
+            logradouro_numero: getTrimmedValue(user.logradouro_numero, user.endereco),
+            complemento: getTrimmedValue(user.complemento),
+            bairro: getTrimmedValue(user.bairro),
+            cidade: getTrimmedValue(user.cidade, user.municipio)
         };
     }
 
@@ -910,6 +1043,23 @@ function profileCtrl($scope, $rootScope, AuthService) {
     $scope.avatarPreview = $scope.profile.avatar_url || DEFAULT_AVATAR_URL;
     $scope.profileLoading = true;
     $scope.profileSaving = false;
+    $scope.cepLookupLoading = false;
+
+    function loadComumCatalog() {
+        return AuthService.listComunsCatalog().then(function (items) {
+            comumCatalogIndex = {};
+            angular.forEach(items || [], function (item) {
+                var key = normalizeLookupText(item && item.nome);
+                if (!key) {
+                    return;
+                }
+
+                comumCatalogIndex[key] = item;
+            });
+        }).catch(function () {
+            comumCatalogIndex = {};
+        });
+    }
 
     $scope.getFriendlyRole = function () {
         var cargo = getTrimmedValue($scope.profile.cargo);
@@ -947,6 +1097,8 @@ function profileCtrl($scope, $rootScope, AuthService) {
                     }
                     $rootScope.currentUser = profile;
                     $scope.profile = buildEditableProfile(profile);
+                    lastProfileCepLookupDigits = String($scope.profile.cep || '').replace(/\D/g, '');
+                    syncMunicipioFromComum();
                     $scope.avatarPreview = $scope.profile.avatar_url || DEFAULT_AVATAR_URL;
                 });
             }
@@ -1022,6 +1174,21 @@ function profileCtrl($scope, $rootScope, AuthService) {
         $scope.avatarPreview = DEFAULT_AVATAR_URL;
     };
 
+    $scope.formatProfileField = function (fieldName, formatter) {
+        if (!$scope.profile || !$scope.profile[fieldName]) {
+            return;
+        }
+
+        if (formatter === 'phone') {
+            $scope.profile[fieldName] = formatProfilePhone($scope.profile[fieldName]);
+            return;
+        }
+
+        if (formatter === 'cep') {
+            $scope.profile[fieldName] = formatProfileCep($scope.profile[fieldName]);
+        }
+    };
+
     $scope.saveProfile = function () {
         var payload;
 
@@ -1031,12 +1198,24 @@ function profileCtrl($scope, $rootScope, AuthService) {
         }
 
         $scope.profileSaving = true;
+        syncMunicipioFromComum();
         payload = {
             full_name: $scope.profile.full_name.trim(),
             cargo: getTrimmedValue($scope.profile.cargo),
             avatar_url: getTrimmedValue($scope.profile.avatar_url),
             role: $scope.profile.role || 'member',
-            sector: $scope.profile.sector || null
+            sector: $scope.profile.sector || null,
+            comum: getTrimmedValue($scope.profile.comum) || null,
+            municipio: getTrimmedValue($scope.profile.municipio, $scope.profile.cidade) || null,
+            cidade: getTrimmedValue($scope.profile.cidade, $scope.profile.municipio) || null,
+            telefone: getTrimmedValue($scope.profile.telefone) || null,
+            celular: getTrimmedValue($scope.profile.celular) || null,
+            whatsapp: getTrimmedValue($scope.profile.whatsapp) || null,
+            cep: getTrimmedValue($scope.profile.cep) || null,
+            logradouro_numero: getTrimmedValue($scope.profile.logradouro_numero) || null,
+            endereco: getTrimmedValue($scope.profile.logradouro_numero) || null,
+            complemento: getTrimmedValue($scope.profile.complemento) || null,
+            bairro: getTrimmedValue($scope.profile.bairro) || null
         };
 
         AuthService.updateUserProfile($scope.profile.user_id, payload).then(function (updatedProfile) {
@@ -1044,16 +1223,79 @@ function profileCtrl($scope, $rootScope, AuthService) {
                 $scope.profile.email = updatedProfile.email;
             }
             $scope.profile = buildEditableProfile(updatedProfile);
+            syncMunicipioFromComum();
             $scope.avatarPreview = $scope.profile.avatar_url || DEFAULT_AVATAR_URL;
-            swal("Sucesso", "Perfil atualizado com sucesso!", "success");
+            swal({
+                title: "Sucesso",
+                text: "Perfil atualizado com sucesso!",
+                type: "success",
+                confirmButtonColor: "#214e7a",
+                confirmButtonText: "OK",
+                showConfirmButton: true,
+                customClass: "app-swal-auto-close",
+                timer: 3000
+            });
         }).catch(function (error) {
-            swal("Erro", "NÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o foi possÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­vel salvar seu perfil: " + (error.message || error), "error");
+            var errorMsg = error.message || error;
+            if (typeof errorMsg === 'string' && errorMsg.indexOf('column') !== -1) {
+                errorMsg = "Ocorreu um erro de incompatibilidade no banco de dados. Por favor, contate o suporte.";
+            }
+            swal("Erro ao Salvar", "Não foi possível salvar seu perfil: " + errorMsg, "error");
         }).finally(function () {
             $scope.profileSaving = false;
         });
     };
 
-    $scope.loadProfile();
+    $scope.$watch('profile.comum', function (newValue, oldValue) {
+        if (newValue === oldValue) {
+            return;
+        }
+
+        syncMunicipioFromComum();
+    });
+
+    $scope.$watch('profile.cep', function (newValue, oldValue) {
+        var formattedValue;
+        var cepDigits;
+
+        if (newValue === oldValue && newValue) {
+            return;
+        }
+
+        formattedValue = formatProfileCep(newValue || '');
+        if ($scope.profile && $scope.profile.cep !== formattedValue) {
+            $scope.profile.cep = formattedValue;
+            return;
+        }
+
+        cepDigits = String(formattedValue || '').replace(/\D/g, '');
+        if (cepDigits.length < 8) {
+            lastProfileCepLookupDigits = '';
+            $scope.cepLookupLoading = false;
+            return;
+        }
+
+        lookupProfileCep(cepDigits);
+    });
+
+    $scope.searchComuns = function (val) {
+        return AuthService.searchComunsCatalog(val, 10).then(function (results) {
+            return results;
+        });
+    };
+
+    $scope.onComumSelect = function (item) {
+        if (!item) {
+            return;
+        }
+
+        $scope.profile.comum = item.nome || '';
+        $scope.profile.municipio = item.cidade || '';
+    };
+
+    loadComumCatalog().finally(function () {
+        $scope.loadProfile();
+    });
 }
 
 function pendingAccessDashboardCtrl($scope, AuthService) {
@@ -10788,6 +11030,13 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     }
 
     function buildEbiActiveSpaceLookup(items) {
+        var scopedConfig = {
+            commonField: 'label',
+            municipioField: 'municipio',
+            commonFields: ['label', 'comum', 'detalhada', 'foto'],
+            municipioFields: ['municipio']
+        };
+        var collectedItems = [];
         var lookup = {
             items: [],
             entriesByKey: {},
@@ -10826,9 +11075,31 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
                 lookup.byCode[normalizeEbiLookup(entry.codigo)] = entry;
             }
 
-            lookup.items.push(entry);
-            lookup.byMunicipio[municipio] = lookup.byMunicipio[municipio] || {};
-            lookup.byMunicipio[municipio][entry.label] = true;
+            collectedItems.push(entry);
+        });
+
+        lookup.items = AuthService.filterCollectionByDataScope(collectedItems, scopedConfig);
+        lookup.entriesByKey = {};
+        lookup.byCode = {};
+        lookup.byMunicipio = {};
+
+        lookup.items.forEach(function (entry) {
+            var aliases = [];
+
+            [entry.codigo, entry.comum, entry.detalhada, entry.foto, entry.label].forEach(function (value) {
+                var normalized = normalizeEbiLookup(value);
+                if (normalized && aliases.indexOf(normalized) === -1) {
+                    aliases.push(normalized);
+                    lookup.entriesByKey[normalized] = entry;
+                }
+            });
+
+            if (entry.codigo) {
+                lookup.byCode[normalizeEbiLookup(entry.codigo)] = entry;
+            }
+
+            lookup.byMunicipio[entry.municipio] = lookup.byMunicipio[entry.municipio] || {};
+            lookup.byMunicipio[entry.municipio][entry.label] = true;
         });
 
         return lookup;
@@ -10934,7 +11205,39 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     };
     $scope.meses = meses;
 
-    $scope.cidades = MUNICIPIOS_REGIONAIS.slice().map(normalizeMunicipioRegionalLabel);
+    function getScopedEbiMunicipios() {
+        var scope = AuthService.getCurrentUserDataScope();
+        var available = {};
+
+        if (scope && scope.restricted && scope.municipio) {
+            return [normalizeMunicipioRegionalLabel(scope.municipio)];
+        }
+
+        ((ebiActiveLookup && ebiActiveLookup.items) || []).forEach(function (item) {
+            var municipio = normalizeMunicipioRegionalLabel(item && item.municipio);
+            if (municipio) {
+                available[municipio] = true;
+            }
+        });
+
+        if (Object.keys(available).length) {
+            return Object.keys(available).sort(function (a, b) {
+                return a.localeCompare(b, 'pt-BR');
+            });
+        }
+
+        return MUNICIPIOS_REGIONAIS.slice().map(normalizeMunicipioRegionalLabel);
+    }
+
+    function refreshScopedEbiCities() {
+        $scope.cidades = getScopedEbiMunicipios();
+
+        if ($scope.filters.cidade && $scope.cidades.indexOf(normalizeMunicipioRegionalLabel($scope.filters.cidade)) === -1) {
+            $scope.filters.cidade = '';
+        }
+    }
+
+    $scope.cidades = getScopedEbiMunicipios();
 
     $scope.localidadesEBI = [
         'Água Espraiada', 'Altos de Caucaia', 'Caucaia do Alto - Central', 'Jd. Lavapés',
@@ -10946,13 +11249,15 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     var localidadesFallback = $scope.localidadesEBI.slice();
 
     function updateEbiCatalogOptions() {
+        var scope = AuthService.getCurrentUserDataScope();
         var mappedLocalidades = (ebiActiveLookup && ebiActiveLookup.items && ebiActiveLookup.items.length)
             ? ebiActiveLookup.items.map(function (item) { return item.label; })
             : (($scope.comumCatalogState && $scope.comumCatalogState.items && $scope.comumCatalogState.items.length)
                 ? $scope.comumCatalogState.items.slice()
                 : []);
 
-        $scope.localidadesEBI = (mappedLocalidades.length ? mappedLocalidades : localidadesFallback).map(repairEbiText);
+        $scope.localidadesEBI = (mappedLocalidades.length ? mappedLocalidades : (scope && scope.restricted ? [] : localidadesFallback)).map(repairEbiText);
+        refreshScopedEbiCities();
     }
 
     function getEbiMunicipio(item) {

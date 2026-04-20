@@ -13,6 +13,25 @@
             || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
         var monthLabels = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
+        var VISITAS_LANCAMENTOS_SCOPE = {
+            commonField: 'comum',
+            municipioField: 'municipio',
+            commonFields: ['comum'],
+            municipioFields: ['municipio']
+        };
+        var VISITAS_VISITADOS_SCOPE = {
+            commonField: 'comum',
+            municipioField: 'municipio',
+            commonFields: ['comum'],
+            municipioFields: ['municipio']
+        };
+        var VISITAS_GRUPOS_SCOPE = {
+            commonField: 'comum_base',
+            municipioField: 'municipio',
+            commonFields: ['comum_base'],
+            municipioFields: ['municipio']
+        };
+
         return {
             getLancamentos: getLancamentos,
             saveLancamento: saveLancamento,
@@ -311,8 +330,16 @@
         }
 
         function executeOrderedSelect(tableName, orderSteps, normalizeFn, fallbackMessage) {
+            return executeOrderedSelectWithScope(tableName, null, orderSteps, normalizeFn, fallbackMessage);
+        }
+
+        function executeOrderedSelectWithScope(tableName, scopeConfig, orderSteps, normalizeFn, fallbackMessage) {
             var deferred = $q.defer();
             var query = supabase.from(tableName).select('*');
+
+            if (scopeConfig) {
+                query = AuthService.applyDataScopeToQuery(query, scopeConfig);
+            }
 
             (orderSteps || []).forEach(function (step) {
                 query = query.order(step.column, { ascending: step.ascending });
@@ -324,7 +351,11 @@
                     return;
                 }
 
-                deferred.resolve((response.data || []).map(normalizeFn));
+                deferred.resolve(
+                    scopeConfig
+                        ? AuthService.filterCollectionByDataScope((response.data || []).map(normalizeFn), scopeConfig)
+                        : (response.data || []).map(normalizeFn)
+                );
             }).catch(function (error) {
                 deferred.reject(buildFriendlyError(error, fallbackMessage));
             });
@@ -332,12 +363,13 @@
             return deferred.promise;
         }
 
-        function saveRecord(tableName, payload, normalizeFn, action, entity, fallbackMessage, detailsBuilder) {
+        function saveRecord(tableName, payload, normalizeFn, action, entity, fallbackMessage, detailsBuilder, scopeConfig) {
             var deferred = $q.defer();
+            var scopedPayload = scopeConfig ? AuthService.applyDataScopeToPayload(payload, scopeConfig) : payload;
 
             supabase
                 .from(tableName)
-                .insert([payload])
+                .insert([scopedPayload])
                 .select('*')
                 .single()
                 .then(function (response) {
@@ -348,7 +380,7 @@
 
                     auditVisitas(action, entity, angular.extend({
                         record_id: response.data && response.data.id
-                    }, detailsBuilder ? detailsBuilder(payload, response.data) : {}));
+                    }, detailsBuilder ? detailsBuilder(scopedPayload, response.data) : {}));
                     deferred.resolve(normalizeFn(response.data));
                 }).catch(function (error) {
                     deferred.reject(buildFriendlyError(error, fallbackMessage));
@@ -357,18 +389,22 @@
             return deferred.promise;
         }
 
-        function updateRecord(tableName, id, payload, normalizeFn, action, entity, missingIdMessage, fallbackMessage, detailsBuilder) {
+        function updateRecord(tableName, id, payload, normalizeFn, action, entity, missingIdMessage, fallbackMessage, detailsBuilder, scopeConfig) {
             var deferred = $q.defer();
+            var scopedPayload = scopeConfig ? AuthService.applyDataScopeToPayload(payload, scopeConfig) : payload;
 
             if (!id) {
                 deferred.reject({ code: 'missing_id', message: missingIdMessage });
                 return deferred.promise;
             }
 
-            supabase
-                .from(tableName)
-                .update(payload)
-                .eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase
+                    .from(tableName)
+                    .update(scopedPayload)
+                    .eq('id', id),
+                scopeConfig
+            )
                 .select('*')
                 .single()
                 .then(function (response) {
@@ -379,7 +415,7 @@
 
                     auditVisitas(action, entity, angular.extend({
                         record_id: id
-                    }, detailsBuilder ? detailsBuilder(payload, response.data) : {}));
+                    }, detailsBuilder ? detailsBuilder(scopedPayload, response.data) : {}));
                     deferred.resolve(normalizeFn(response.data));
                 }).catch(function (error) {
                     deferred.reject(buildFriendlyError(error, fallbackMessage));
@@ -388,7 +424,7 @@
             return deferred.promise;
         }
 
-        function deleteRecord(tableName, id, action, entity, missingIdMessage, fallbackMessage) {
+        function deleteRecord(tableName, id, action, entity, missingIdMessage, fallbackMessage, scopeConfig) {
             var deferred = $q.defer();
 
             if (!id) {
@@ -396,10 +432,13 @@
                 return deferred.promise;
             }
 
-            supabase
-                .from(tableName)
-                .delete()
-                .eq('id', id)
+            AuthService.applyDataScopeToQuery(
+                supabase
+                    .from(tableName)
+                    .delete()
+                    .eq('id', id),
+                scopeConfig
+            )
                 .then(function (response) {
                     if (response.error) {
                         deferred.reject(buildFriendlyError(response.error, fallbackMessage));
@@ -418,7 +457,7 @@
         }
 
         function getLancamentos() {
-            return executeOrderedSelect('visitas_lancamentos', [
+            return executeOrderedSelectWithScope('visitas_lancamentos', VISITAS_LANCAMENTOS_SCOPE, [
                 { column: 'referencia_ano', ascending: false },
                 { column: 'referencia_mes', ascending: false },
                 { column: 'municipio', ascending: true },
@@ -451,7 +490,8 @@
                         referencia_mes: payload.referencia_mes,
                         total_visitas: payload.gvi + payload.gvm + payload.gvmu + payload.rf + payload.re
                     };
-                }
+                },
+                VISITAS_LANCAMENTOS_SCOPE
             );
         }
 
@@ -474,7 +514,8 @@
                         referencia_mes: payload.referencia_mes,
                         total_visitas: payload.gvi + payload.gvm + payload.gvmu + payload.rf + payload.re
                     };
-                }
+                },
+                VISITAS_LANCAMENTOS_SCOPE
             );
         }
 
@@ -485,12 +526,13 @@
                 'VISITAS_LANCAMENTO_DELETE',
                 'visitas_lancamentos',
                 'ID do lancamento nao informado.',
-                'Erro ao excluir lancamento.'
+                'Erro ao excluir lancamento.',
+                VISITAS_LANCAMENTOS_SCOPE
             );
         }
 
         function getVisitados() {
-            return executeOrderedSelect('visitas_irmandade', [
+            return executeOrderedSelectWithScope('visitas_irmandade', VISITAS_VISITADOS_SCOPE, [
                 { column: 'status', ascending: true },
                 { column: 'comum', ascending: true },
                 { column: 'nome', ascending: true }
@@ -513,7 +555,8 @@
                         comum: payload.comum,
                         categoria: payload.categoria
                     };
-                }
+                },
+                VISITAS_VISITADOS_SCOPE
             );
         }
 
@@ -535,7 +578,8 @@
                         comum: payload.comum,
                         categoria: payload.categoria
                     };
-                }
+                },
+                VISITAS_VISITADOS_SCOPE
             );
         }
 
@@ -546,12 +590,13 @@
                 'VISITAS_VISITADO_DELETE',
                 'visitas_irmandade',
                 'ID do visitado nao informado.',
-                'Erro ao excluir visitado.'
+                'Erro ao excluir visitado.',
+                VISITAS_VISITADOS_SCOPE
             );
         }
 
         function getGrupos() {
-            return executeOrderedSelect('visitas_grupos', [
+            return executeOrderedSelectWithScope('visitas_grupos', VISITAS_GRUPOS_SCOPE, [
                 { column: 'status', ascending: true },
                 { column: 'municipio', ascending: true },
                 { column: 'nome', ascending: true }
@@ -574,7 +619,8 @@
                         municipio: payload.municipio,
                         lider_nome: payload.lider_nome
                     };
-                }
+                },
+                VISITAS_GRUPOS_SCOPE
             );
         }
 
@@ -596,7 +642,8 @@
                         municipio: payload.municipio,
                         lider_nome: payload.lider_nome
                     };
-                }
+                },
+                VISITAS_GRUPOS_SCOPE
             );
         }
 
@@ -607,7 +654,8 @@
                 'VISITAS_GRUPO_DELETE',
                 'visitas_grupos',
                 'ID do grupo nao informado.',
-                'Erro ao excluir grupo de visita.'
+                'Erro ao excluir grupo de visita.',
+                VISITAS_GRUPOS_SCOPE
             );
         }
     }

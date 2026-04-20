@@ -1,0 +1,9 @@
+{
+  "counts": {
+    "clinicas": 37,
+    "musicos": 194,
+    "atendimentos": 161,
+    "agenda_nao_correspondida": 0
+  },
+  "agenda_unmatched": []
+}
