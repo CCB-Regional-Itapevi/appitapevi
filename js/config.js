@@ -330,7 +330,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
                     return $ocLazyLoad.load([
                         {
                             insertBefore: '#loadBefore',
-                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/lang/pt-br.js', 'js/plugins/fullcalendar/gcal.js']
+                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/lang/pt-br.js', 'js/plugins/fullcalendar/gcal.js'], serie: true
                         },
                         {
                             name: 'ui.calendar',
@@ -921,7 +921,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
                     return $ocLazyLoad.load([
                         {
                             insertBefore: '#loadBefore',
-                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/lang/pt-br.js', 'js/plugins/fullcalendar/gcal.js']
+                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/lang/pt-br.js', 'js/plugins/fullcalendar/gcal.js'], serie: true
                         },
                         {
                             name: 'ui.calendar',
