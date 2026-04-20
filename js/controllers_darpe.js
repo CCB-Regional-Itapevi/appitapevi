@@ -667,6 +667,7 @@
         $scope.loadData();
     }
 
+
     function darpeDashboardCtrl($scope, DarpeService) {
         $scope.loading = true;
         $scope.dashboard = {
@@ -685,7 +686,6 @@
 
         function normalizeDateForCompare(value) {
             var date = parseDarpeDate(value);
-
             if (!date || isNaN(date.getTime())) return null;
             date.setHours(0, 0, 0, 0);
             return date;
@@ -697,7 +697,6 @@
             var year = today.getFullYear();
             var cityMap = {};
             var localMap = {};
-
             today.setHours(0, 0, 0, 0);
 
             atendimentos.forEach(function (item) {
@@ -706,73 +705,30 @@
                 var localKey = item.local_nome || 'SEM LOCAL';
 
                 if (!cityMap[cityKey]) {
-                    cityMap[cityKey] = {
-                        cidade: item.cidade || 'Sem cidade',
-                        total: 0,
-                        realizados: 0,
-                        agendados: 0
-                    };
+                    cityMap[cityKey] = { cidade: item.cidade || 'Sem cidade', total: 0, realizados: 0, agendados: 0 };
                 }
-
                 if (!localMap[localKey]) {
-                    localMap[localKey] = {
-                        local: localKey,
-                        total: 0,
-                        cidade: item.cidade || '-'
-                    };
+                    localMap[localKey] = { local: localKey, total: 0, cidade: item.cidade || '-' };
                 }
 
                 cityMap[cityKey].total += 1;
                 localMap[localKey].total += 1;
 
-                if ((item.status || '').toUpperCase() === 'REALIZADO') {
-                    cityMap[cityKey].realizados += 1;
-                } else if ((item.status || '').toUpperCase() === 'AGENDADO') {
-                    cityMap[cityKey].agendados += 1;
-                }
+                if ((item.status || '').toUpperCase() === 'REALIZADO') cityMap[cityKey].realizados += 1;
+                else if ((item.status || '').toUpperCase() === 'AGENDADO') cityMap[cityKey].agendados += 1;
 
-                if (itemDate && itemDate >= today) {
-                    $scope.dashboard.proximaAgenda.push(item);
-                }
+                if (itemDate && itemDate >= today) $scope.dashboard.proximaAgenda.push(item);
             });
 
             $scope.dashboard.totalMusicos = musicos.length;
-            $scope.dashboard.musicosAtivos = musicos.filter(function (item) {
-                return (item.status || 'Ativo') === 'Ativo';
-            }).length;
-            $scope.dashboard.locaisAtivos = clinicas.filter(function (item) {
-                return (item.status || 'Ativo') === 'Ativo';
-            }).length;
+            $scope.dashboard.musicosAtivos = musicos.filter(function (item) { return (item.status || 'Ativo') === 'Ativo'; }).length;
+            $scope.dashboard.locaisAtivos = clinicas.filter(function (item) { return (item.status || 'Ativo') === 'Ativo'; }).length;
             $scope.dashboard.totalAtendimentos = atendimentos.length;
-            $scope.dashboard.realizados = atendimentos.filter(function (item) {
-                return (item.status || '').toUpperCase() === 'REALIZADO';
-            }).length;
-            $scope.dashboard.agendados = atendimentos.filter(function (item) {
-                return (item.status || '').toUpperCase() === 'AGENDADO';
-            }).length;
-            $scope.dashboard.atendimentosMes = atendimentos.filter(function (item) {
-                var itemDate = normalizeDateForCompare(item.data_atendimento);
-                return itemDate && itemDate.getMonth() === month && itemDate.getFullYear() === year;
-            }).length;
-            $scope.dashboard.semanais = atendimentos.filter(function (item) {
-                return item.periodicidade === 'Semanal';
-            }).length;
-            $scope.dashboard.quinzenais = atendimentos.filter(function (item) {
-                return item.periodicidade === 'Quinzenal';
-            }).length;
-            $scope.dashboard.proximaAgenda = $scope.dashboard.proximaAgenda.sort(function (a, b) {
-                return (normalizeDateForCompare(a.data_atendimento) || 0) - (normalizeDateForCompare(b.data_atendimento) || 0);
-            }).slice(0, 8);
-            $scope.dashboard.cidades = Object.keys(cityMap).map(function (key) {
-                return cityMap[key];
-            }).sort(function (a, b) {
-                return b.total - a.total;
-            });
-            $scope.dashboard.locaisRanking = Object.keys(localMap).map(function (key) {
-                return localMap[key];
-            }).sort(function (a, b) {
-                return b.total - a.total;
-            }).slice(0, 8);
+            $scope.dashboard.realizados = atendimentos.filter(function (item) { return (item.status || '').toUpperCase() === 'REALIZADO'; }).length;
+            $scope.dashboard.agendados = atendimentos.filter(function (item) { return (item.status || '').toUpperCase() === 'AGENDADO'; }).length;
+            
+            $scope.dashboard.cidades = Object.keys(cityMap).map(function (key) { return cityMap[key]; }).sort(function (a, b) { return b.total - a.total; });
+            $scope.dashboard.locaisRanking = Object.keys(localMap).map(function (key) { return localMap[key]; }).sort(function (a, b) { return b.total - a.total; }).slice(0, 8);
         }
 
         Promise.all([
@@ -781,23 +737,423 @@
             DarpeService.getAtendimentos()
         ]).then(function (results) {
             $scope.$applyAsync(function () {
-                buildDashboard(
-                    (results[0] || []).map(normalizeDisplayRecord),
-                    (results[1] || []).map(normalizeDisplayRecord),
-                    (results[2] || []).map(normalizeDisplayRecord)
-                );
+                buildDashboard(results[0], results[1], results[2]);
                 $scope.loading = false;
             });
         }).catch(function () {
-            $scope.$applyAsync(function () {
-                $scope.loading = false;
-            });
+            $scope.$applyAsync(function () { $scope.loading = false; });
         });
+    }
+
+    function darpeBatismosCtrl($scope, DarpeService, $timeout, AuthService, $rootScope) {
+        $scope.batismos = [];
+        $scope.loading = true;
+        $scope.searchText = '';
+        $scope.newBatismo = {};
+        $scope.editingBatismo = false;
+        $scope.viewOnly = false;
+        $scope.canManageCadastros = false;
+        $scope.setores = [
+            'SETOR 1 - Sistemas de Ressocialização e Socioeducativos',
+            'SETOR 2 - Clínica de Dependentes e Albergues',
+            'SETOR 3 - Forças de Segurança',
+            'SETOR 4 - Hospitais, Instituição para Idosos, Setor Educacional'
+        ];
+
+        refreshDarpePermissions($scope, $rootScope);
+
+        $scope.formatDateField = function (modelName, fieldName) {
+            if (!modelName || !fieldName) return;
+            $scope[modelName] = $scope[modelName] || {};
+            $scope[modelName][fieldName] = formatDarpeDateInput((($scope[modelName] || {})[fieldName]) || '');
+        };
+
+        $scope.loadBatismos = function () {
+            $scope.loading = true;
+            DarpeService.getBatismos().then(function (data) {
+                $scope.batismos = (data || []).map(normalizeDisplayRecord);
+                $scope.loading = false;
+            }).catch(function () {
+                $scope.loading = false;
+                $scope.batismos = [];
+            });
+        };
+
+        $scope.prepareAdd = function () {
+            $scope.newBatismo = {
+                data_batismo: formatDarpeDateInput(new Date())
+            };
+            $scope.editingBatismo = false;
+            $scope.viewOnly = false;
+            showDarpeModal('#modalAddBatismoDarpe', $timeout);
+        };
+
+        $scope.prepareEdit = function (batismo) {
+            if (!$scope.canManageCadastros) {
+                darpeRestrict('Somente coordenadores do DARPE, admin ou master podem editar cadastros.');
+                return;
+            }
+
+            $scope.newBatismo = angular.copy(batismo || {});
+            $scope.newBatismo.data_batismo = formatDarpeDateInput($scope.newBatismo.data_batismo || '');
+            $scope.editingBatismo = true;
+            $scope.viewOnly = false;
+            showDarpeModal('#modalAddBatismoDarpe', $timeout);
+        };
+
+        $scope.verDetalhes = function (batismo) {
+            $scope.newBatismo = angular.copy(batismo || {});
+            $scope.newBatismo.data_batismo = formatDarpeDateInput($scope.newBatismo.data_batismo || '');
+            $scope.editingBatismo = false;
+            $scope.viewOnly = true;
+            showDarpeModal('#modalAddBatismoDarpe', $timeout);
+        };
+
+        $scope.saveBatismo = function () {
+            if ($scope.viewOnly) {
+                $('#modalAddBatismoDarpe').modal('hide');
+                return;
+            }
+
+            if ($scope.formAddBatismoDarpe && $scope.formAddBatismoDarpe.$invalid) {
+                $scope.formAddBatismoDarpe.$setSubmitted();
+                swal('Campos obrigatórios', 'Preencha os campos obrigatórios para salvar o registro.', 'warning');
+                return;
+            }
+
+            if ($scope.editingBatismo && !$scope.canManageCadastros) {
+                darpeRestrict('Somente coordenadores do DARPE, admin ou master podem salvar alterações.');
+                return;
+            }
+
+            ($scope.editingBatismo ? DarpeService.updateBatismo($scope.newBatismo) : DarpeService.saveBatismo($scope.newBatismo)).then(function () {
+                swal({
+                    title: 'Sucesso',
+                    text: $scope.editingBatismo ? 'Registro atualizado com sucesso.' : 'Batismo registrado com sucesso.',
+                    type: 'success',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+                $timeout(function () {
+                    $('#modalAddBatismoDarpe').modal('hide');
+                    $scope.loadBatismos();
+                }, 2500);
+            }).catch(function (error) {
+                swal('Erro', 'Erro ao salvar registro: ' + (error.message || error), 'error');
+            });
+        };
+
+        $scope.confirmDelete = function (batismo) {
+            if (!$scope.canManageCadastros) {
+                darpeRestrict('Somente coordenadores do DARPE, admin ou master podem excluir registros.');
+                return;
+            }
+
+            swal({
+                title: 'Remover Registro?',
+                text: 'Deseja excluir o registro de ' + (batismo.nome_batizado || '') + '?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, excluir!',
+                closeOnConfirm: false
+            }, function () {
+                DarpeService.deleteBatismo(batismo.id).then(function () {
+                    swal('Removido!', 'Registro removido com sucesso.', 'success');
+                    $scope.loadBatismos();
+                });
+            });
+        };
+
+        $scope.loadBatismos();
+    }
+
+    function darpeDashboardConsolidadoCtrl($scope, DarpeService, VisitasService, $timeout) {
+        $scope.loading = true;
+        $scope.stats = {
+            totalBatismos: 0,
+            batismosPorSetor: {},
+            evolucaoMes: [],
+            visitas: { totalGeral: 0, tendencia: 'up' },
+            darpe: { musicosAtivos: 0, clinicasAtendidas: 0, agendamentosFuturos: 0 },
+            recentes: []
+        };
+
+        function processStats(musicos, clinicas, atendimentos, batismos, visitasLancamentos) {
+            var sectorStats = {};
+            var monthlyVisits = {};
+            var monthlyBaptisms = {};
+            var currentMonth = new Date().getMonth();
+            var currentYear = new Date().getFullYear();
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Batismos por Setor
+            batismos.forEach(function (b) {
+                var s = b.setor || 'NÃO INFORMADO';
+                sectorStats[s] = (sectorStats[s] || 0) + 1;
+                
+                var d = parseDarpeDate(b.data_batismo);
+                if (d) {
+                    var key = d.getFullYear() + '-' + (d.getMonth() + 1);
+                    monthlyBaptisms[key] = (monthlyBaptisms[key] || 0) + 1;
+                }
+            });
+
+            // Visitas por Mês (Consolidação de lançamentos)
+            visitasLancamentos.forEach(function (v) {
+                var key = v.referencia_ano + '-' + v.referencia_mes;
+                var totalVisitas = (v.gvi || 0) + (v.gvm || 0) + (v.gvmu || 0) + (v.rf || 0) + (v.re || 0);
+                monthlyVisits[key] = (monthlyVisits[key] || 0) + totalVisitas;
+            });
+
+            // Evolução Combinada (últimos 6 meses)
+            var evolution = [];
+            for (var i = 5; i >= 0; i--) {
+                var targetDate = new Date(currentYear, currentMonth - i, 1);
+                var m = targetDate.getMonth() + 1;
+                var y = targetDate.getFullYear();
+                var key = y + '-' + m;
+                
+                evolution.push({
+                    mes: m + '/' + y,
+                    visitas: monthlyVisits[key] || 0,
+                    batismos: monthlyBaptisms[key] || 0
+                });
+            }
+
+            $scope.stats.totalBatismos = batismos.length;
+            $scope.stats.batismosPorSetor = sectorStats;
+            $scope.stats.evolucaoMes = evolution;
+            
+            $scope.stats.visitas.totalGeral = Object.values(monthlyVisits).reduce(function(a, b) { return a + b; }, 0);
+            
+            $scope.stats.darpe.musicosAtivos = musicos.filter(function(m) { return m.status === 'Ativo'; }).length;
+            $scope.stats.darpe.clinicasAtendidas = clinicas.filter(function(c) { return c.status === 'Ativo'; }).length;
+            
+            $scope.stats.darpe.agendamentosFuturos = atendimentos.filter(function(a) { 
+                var d = parseDarpeDate(a.data_atendimento);
+                return d && d >= today && (a.status || '').toUpperCase() === 'AGENDADO';
+            }).length;
+
+            $scope.stats.recentes = atendimentos.slice(0, 5);
+        }
+
+        $scope.init = function () {
+            $scope.loading = true;
+            Promise.all([
+                DarpeService.getMusicos(),
+                DarpeService.getClinicas(),
+                DarpeService.getAtendimentos(),
+                DarpeService.getBatismos(),
+                VisitasService.getLancamentos()
+            ]).then(function (results) {
+                $scope.$applyAsync(function () {
+                    processStats(
+                        results[0], results[1], results[2], results[3],
+                        results[4]
+                    );
+                    $scope.loading = false;
+                });
+            }).catch(function (error) {
+                console.error('Erro ao carregar dados do dashboard DARPE:', error);
+                $scope.$applyAsync(function () { $scope.loading = false; });
+            });
+        };
+
+        $scope.init();
+    }
+
+    function darpeCalendarioCtrl($scope, DarpeService, $timeout, $rootScope, uiCalendarConfig) {
+        $scope.loading = true;
+        if (window.moment) moment.locale('pt-br');
+        refreshDarpePermissions($scope, $rootScope);
+        
+        $scope.atendimentos = [];
+        $scope.musicos = [];
+        $scope.clinicas = [];
+        $scope.currentAtendimento = {};
+        
+        // Modal State
+        $scope.editingAtendimento = false;
+        $scope.viewOnly = false;
+
+        $scope.formatDateField = function (modelName, fieldName) {
+            if (!modelName || !fieldName) return;
+            $scope[modelName] = $scope[modelName] || {};
+            $scope[modelName][fieldName] = formatDarpeDateInput((($scope[modelName] || {})[fieldName]) || '');
+        };
+
+        // Calendário Config
+        $scope.uiConfig = {
+            calendar: {
+                height: 700,
+                editable: true,
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                lang: 'pt-br',
+                locale: 'pt-br',
+                timezone: 'local',
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                editable: true,
+                droppable: true,
+                eventStartEditable: true,
+                eventDurationEditable: true,
+                eventClick: function(event) {
+                    $scope.prepareEdit(event.originalData);
+                },
+                eventDrop: function(event, delta, revertFunc) {
+                    updateEventDate(event, revertFunc);
+                },
+                eventResize: function(event, delta, revertFunc) {
+                    updateEventDate(event, revertFunc);
+                }
+            }
+        };
+
+        function updateEventDate(event, revertFunc) {
+            var original = event.originalData;
+            var newDate = event.start.toDate();
+            
+            // Fix timezone / format
+            var formattedDate = moment(newDate).format('YYYY-MM-DD');
+            
+            var payload = angular.copy(original);
+            payload.data_atendimento = formattedDate;
+
+            DarpeService.updateAtendimento(payload).then(function() {
+                toastr.success('Atendimento reagendado para ' + moment(newDate).format('DD/MM/YYYY'));
+                $scope.loadData();
+            }).catch(function(err) {
+                if (revertFunc) revertFunc();
+                swal('Erro ao atualizar', err.message || 'Erro inesperado', 'error');
+            });
+        }
+
+        function mapToCalendarEvents(data) {
+            return data.map(function(item) {
+                var d = parseDarpeDate(item.data_atendimento);
+                if (!d) return null;
+
+                // Sector Mapping (Matching dashboard colors)
+                var sectorClasses = {
+                    'SETOR 1': 'sector-1',
+                    'SETOR 2': 'sector-2',
+                    'SETOR 3': 'sector-3',
+                    'SETOR 4': 'sector-4'
+                };
+                
+                var sectorKey = (item.setor || '').split(' - ')[0];
+                var sectorClass = sectorClasses[sectorKey] || '';
+
+                // Status Mapping
+                var statusClass = 'status-' + (item.status || 'agendado').toLowerCase();
+
+                return {
+                    id: item.id,
+                    title: (item.local_nome || 'Local não informado'),
+                    start: d,
+                    allDay: true,
+                    className: [sectorClass, statusClass],
+                    originalData: item
+                };
+            }).filter(function(e) { return e !== null; });
+        }
+
+        $scope.eventSources = [];
+
+        $scope.loadData = function () {
+            $scope.loading = true;
+            Promise.all([
+                DarpeService.getAtendimentos(),
+                DarpeService.getMusicos(),
+                DarpeService.getClinicas()
+            ]).then(function (results) {
+                $scope.$applyAsync(function () {
+                    var rawAtendimentos = results[0] || [];
+                    $scope.atendimentos = rawAtendimentos.map(normalizeDisplayRecord);
+                    $scope.musicos = (results[1] || []).map(normalizeDisplayRecord).filter(function(m) { return m.status === 'Ativo'; });
+                    $scope.clinicas = (results[2] || []).map(normalizeDisplayRecord).filter(function(c) { return c.status === 'Ativo'; });
+                    
+                    var events = mapToCalendarEvents($scope.atendimentos);
+                    $scope.eventSources.length = 0;
+                    $scope.eventSources.push(events);
+                    
+                    $scope.loading = false;
+                });
+            }).catch(function (error) {
+                console.error('Erro ao carregar calendário DARPE:', error);
+                $scope.$applyAsync(function () { $scope.loading = false; });
+            });
+        };
+
+        // Modal Helpers (Replicated from darpeAtendimentosCtrl for scope independence)
+        $scope.isMusicoSelected = function (id) {
+            return ($scope.currentAtendimento.musicos_ids || []).indexOf(id) > -1;
+        };
+
+        $scope.toggleMusicoSelection = function (id) {
+            $scope.currentAtendimento.musicos_ids = $scope.currentAtendimento.musicos_ids || [];
+            var idx = $scope.currentAtendimento.musicos_ids.indexOf(id);
+            if (idx > -1) $scope.currentAtendimento.musicos_ids.splice(idx, 1);
+            else $scope.currentAtendimento.musicos_ids.push(id);
+        };
+
+        $scope.handleLocalChange = function () {
+            var localId = $scope.currentAtendimento.local_id;
+            var local = $scope.clinicas.find(function (c) { return c.id == localId; });
+            if (local) {
+                $scope.currentAtendimento.local_nome = local.nome_local;
+                $scope.currentAtendimento.tipo_local = local.tipo;
+                $scope.currentAtendimento.cidade = local.cidade;
+                $scope.currentAtendimento.setor = local.setor;
+            }
+        };
+
+        $scope.prepareEdit = function (item) {
+            if (!$scope.canManageCadastros) {
+                darpeRestrict('Somente coordenadores podem editar.');
+                return;
+            }
+            $scope.currentAtendimento = angular.copy(item || {});
+            $scope.currentAtendimento.data_atendimento = formatDarpeDateInput($scope.currentAtendimento.data_atendimento || '');
+            $scope.currentAtendimento.proxima_visita = formatDarpeDateInput($scope.currentAtendimento.proxima_visita || '');
+            syncAtendimentoSelections($scope.currentAtendimento);
+            $scope.editingAtendimento = true;
+            $scope.viewOnly = false;
+            showDarpeModal('#modalAddAtendimentoDarpe', $timeout);
+        };
+
+        $scope.saveAtendimento = function () {
+            normalizeAtendimentoForm($scope.currentAtendimento);
+            DarpeService.updateAtendimento($scope.currentAtendimento).then(function () {
+                swal('Sucesso', 'Atualizado com sucesso.', 'success');
+                $('#modalAddAtendimentoDarpe').modal('hide');
+                $scope.loadData();
+            });
+        };
+
+        $scope.loadData();
     }
 
     angular.module('inspinia')
         .controller('darpeMusicosCtrl', darpeMusicosCtrl)
         .controller('darpeClinicasCtrl', darpeClinicasCtrl)
         .controller('darpeAtendimentosCtrl', darpeAtendimentosCtrl)
-        .controller('darpeDashboardCtrl', darpeDashboardCtrl);
+        .controller('darpeDashboardCtrl', darpeDashboardCtrl)
+        .controller('darpeBatismosCtrl', darpeBatismosCtrl)
+        .controller('darpeDashboardConsolidadoCtrl', darpeDashboardConsolidadoCtrl)
+        .controller('darpeCalendarioCtrl', darpeCalendarioCtrl);
 })();

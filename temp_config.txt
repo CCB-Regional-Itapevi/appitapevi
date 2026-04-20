@@ -1,0 +1,5 @@
+                        {
+                            insertBefore: '#loadBefore',
+                            files: ['css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/gcal.js']
+                        },
+                        {

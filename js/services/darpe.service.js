@@ -50,6 +50,15 @@
             'status',
             'proxima_visita'
         ];
+        var BATISMO_FIELDS = [
+            'nome_batizado',
+            'comum_batizado',
+            'data_batismo',
+            'setor',
+            'local_evento',
+            'cidade',
+            'observacoes'
+        ];
         var UPPERCASE_FIELDS = [
             'nome_completo',
             'comum_congregacao',
@@ -66,7 +75,10 @@
             'local_nome',
             'responsavel_ministerio',
             'musicos_nomes',
-            'repertorio'
+            'repertorio',
+            'nome_batizado',
+            'comum_batizado',
+            'local_evento'
         ];
 
         var supabase = window.__appSupabaseClient
@@ -85,6 +97,12 @@
             municipioField: 'cidade',
             municipioFields: ['cidade']
         };
+        var DARPE_BATISMOS_SCOPE = {
+            commonField: 'comum_batizado',
+            municipioField: 'cidade',
+            commonFields: ['comum_batizado'],
+            municipioFields: ['cidade']
+        };
 
         return {
             getMusicos: getMusicos,
@@ -98,7 +116,11 @@
             getAtendimentos: getAtendimentos,
             saveAtendimento: saveAtendimento,
             updateAtendimento: updateAtendimento,
-            deleteAtendimento: deleteAtendimento
+            deleteAtendimento: deleteAtendimento,
+            getBatismos: getBatismos,
+            saveBatismo: saveBatismo,
+            updateBatismo: updateBatismo,
+            deleteBatismo: deleteBatismo
         };
 
         function auditDarpe(action, details) {
@@ -429,6 +451,107 @@
                     }
                 });
             return deferred.promise;
+        }
+    
+        function getBatismos() {
+            var deferred = $q.defer();
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_batismos').select('*'),
+                DARPE_BATISMOS_SCOPE
+            ).order('data_batismo', { ascending: false })
+                .then(function (response) {
+                    if (response.error) deferred.reject(response.error);
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(
+                            (response.data || []).map(normalizeBatismoRecord),
+                            DARPE_BATISMOS_SCOPE
+                        )
+                    );
+                });
+            return deferred.promise;
+        }
+
+        function saveBatismo(data) {
+            var deferred = $q.defer();
+            var payload = AuthService.applyDataScopeToPayload(normalizeBatismoPayload(data), DARPE_BATISMOS_SCOPE);
+            runWithMissingColumnRetry(function (currentPayload) {
+                return supabase.from('darpe_batismos').insert([currentPayload]);
+            }, payload, deferred);
+            deferred.promise.then(function (result) {
+                var record = angular.isArray(result) ? result[0] : result;
+                auditDarpe('DARPE_BATISMO_CREATE', {
+                    entity: 'darpe_batismos',
+                    record_id: record && record.id,
+                    nome_batizado: payload.nome_batizado,
+                    setor: payload.setor
+                });
+            }, angular.noop);
+            return deferred.promise;
+        }
+
+        function updateBatismo(data) {
+            var deferred = $q.defer();
+            var payload = AuthService.applyDataScopeToPayload(normalizeBatismoPayload(data), DARPE_BATISMOS_SCOPE);
+            runWithMissingColumnRetry(function (currentPayload) {
+                return AuthService.applyDataScopeToQuery(
+                    supabase.from('darpe_batismos').update(currentPayload).eq('id', data.id),
+                    DARPE_BATISMOS_SCOPE
+                );
+            }, payload, deferred);
+            deferred.promise.then(function () {
+                auditDarpe('DARPE_BATISMO_UPDATE', {
+                    entity: 'darpe_batismos',
+                    record_id: data.id,
+                    nome_batizado: payload.nome_batizado,
+                    setor: payload.setor
+                });
+            }, angular.noop);
+            return deferred.promise;
+        }
+
+        function deleteBatismo(id) {
+            var deferred = $q.defer();
+            AuthService.applyDataScopeToQuery(
+                supabase.from('darpe_batismos').delete().eq('id', id),
+                DARPE_BATISMOS_SCOPE
+            )
+                .then(function (response) {
+                    if (response.error) deferred.reject(response.error);
+                    else {
+                        auditDarpe('DARPE_BATISMO_DELETE', {
+                            entity: 'darpe_batismos',
+                            record_id: id
+                        });
+                        deferred.resolve(response.data);
+                    }
+                });
+            return deferred.promise;
+        }
+
+        function normalizeBatismoPayload(item) {
+            var source = angular.copy(item || {});
+            var payload = {};
+
+            BATISMO_FIELDS.forEach(function (field) {
+                if (Object.prototype.hasOwnProperty.call(source, field)) {
+                    payload[field] = source[field];
+                }
+            });
+
+            payload.data_batismo = normalizeDateOnly(payload.data_batismo);
+
+            repairRecordStrings(payload);
+            applyUppercaseFields(payload, UPPERCASE_FIELDS);
+            return payload;
+        }
+
+        function normalizeBatismoRecord(item) {
+            var record = angular.copy(item || {});
+
+            repairRecordStrings(record);
+            applyUppercaseFields(record, UPPERCASE_FIELDS);
+
+            return record;
         }
 
         function normalizeMusicoPayload(item) {

@@ -1,107 +1,125 @@
-﻿<nav class="navbar-default navbar-static-side" role="navigation">
+<!--
+*
+* INSPINIA - Responsive Admin Theme
+* Version 2.7.1
+*
+-->
+
+<nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul side-navigation class="nav metismenu" id="side-menu">
             <li class="nav-header">
 
-                <div class="profile-element" uib-dropdown>
-                    <img alt="image"
-                         class="img-circle"
-                         ng-src="{{main.currentUserReady ? (main.userAvatar || main.getUserAvatar()) : 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?_=20150327203541'}}"
-                         style="width: 48px; height: 48px; object-fit: cover; object-position: center; display: block; margin: 0 0 10px 0;" />
-                    <a uib-dropdown-toggle href>
+                <div class="dropdown profile-element">
+                    <img alt="image" class="img-circle" src="img/profile_small.jpg" />
+                    <a class="dropdown-toggle" href="">
                         <span class="clear">
                             <span class="block m-t-xs">
-                                <strong class="font-bold">{{main.userDisplayName || main.getUserDisplayName()}}</strong>
+                                <strong class="font-bold">{{main.userName}}</strong>
                             </span>
-                            <span class="text-muted text-xs block">{{main.userRoleLabel || main.getUserRoleLabel()}} <b class="caret"></b></span>
+                            <span class="text-muted block text-xs">{{main.userRole}} <b class="caret"></b></span>
                         </span>
                     </a>
-                    <ul uib-dropdown-menu class="animated fadeInRight m-t-xs">
-                        <li><a ui-sref="app.profile">Perfil</a></li>
-                        <li><a ui-sref="app.contacts">Contatos</a></li>
-                        <li><a ui-sref="mailbox.inbox">Caixa de Entrada</a></li>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a ui-sref="profile">Meu Perfil</a></li>
+                        <li><a ui-sref="contacts">Contatos</a></li>
+                        <li><a ui-sref="mailbox.inbox">Mensagens</a></li>
                         <li class="divider"></li>
-                        <li><a ng-click="main.logout()" href="javascript:void(0)">Sair</a></li>
+                        <li><a href="" ng-click="main.logout()">Sair</a></li>
                     </ul>
                 </div>
                 <div class="logo-element">
-                    CCB
+                    IN+
                 </div>
-            </li>
-            <li ng-class="{active: $state.includes('dashboards')}" ng-if="main.canAccessMainDashboard()">
-                <a ui-sref="dashboards.dashboard_2"><i class="fa-solid fa-gauge"></i> <span class="nav-label">{{
-                        'Dashboard' | translate }}</span> </a>
-            </li>
 
-            
-            <li ng-class="{active: $state.includes('admin')}" ng-if="main.canAccessAdminModule()">
-                <a href="" data-mobile-sref="admin.congregacoes"><i class="fa fa-files-o"></i> <span class="nav-label">{{ 'ADMIN' | translate }}</span><span
-                        class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('admin')}">
-                    <li ui-sref-active="active"><a ui-sref="admin.congregacoes">Congrega&ccedil;&otilde;es</a></li>
-                    <li ui-sref-active="active"><a ui-sref="admin.ministerio">Minist&eacute;rio</a></li>
-                    <li ui-sref-active="active"><a ui-sref="admin.user_approvals">Libera&ccedil;&atilde;o de Usu&aacute;rios</a></li>
-                    <li ui-sref-active="active"><a ui-sref="admin.usuarios">Usu&aacute;rios</a></li>                                        
-                    <li ui-sref-active="active"><a ui-sref="admin.audit_logs">Auditoria</a></li>
-                    <li ui-sref-active="active"><a ui-sref="admin.santa_ceia">Santa Ceia</a></li>
+            </li>
+            <li ng-class="{active: $state.includes('dashboards')}">
+                <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">{{ 'DASHBOARDS' | translate }}</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('dashboards')}">
+                    <li ui-sref-active="active"><a ui-sref="dashboards.dashboard_1">Resumo Executivo</a></li>
+                    <li ui-sref-active="active"><a ui-sref="dashboards.dashboard_2">Geral Local</a></li>
+                    <li ui-sref-active="active"><a ui-sref="dashboards.dashboard_3">Atividades Recentes</a></li>
+                    <li ui-sref-active="active"><a ui-sref="dashboards.dashboard_4_1">Mapa Regional</a></li>
                 </ul>
             </li>
 
-            <li ng-class="{active: $state.includes('musicalizacao')}"
-                ng-if="main.canAccessModule('Musicalizacao')">
-                <a href="" data-mobile-sref="musicalizacao.dashboard"><i class="fa fa-music"></i> <span class="nav-label">{{ 'MUSICALIZACAO' | translate
+            <li ng-class="{active: $state.includes('financeiro')}"
+                ng-if="main.canAccessModule('Financeiro')">
+                <a href="" data-mobile-sref="financeiro.dashboard"><i class="fa fa-money"></i> <span class="nav-label">{{ 'FINANCEIRO' | translate
                         }}</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('musicalizacao')}">
-                    <li ui-sref-active="active"><a ui-sref="musicalizacao.dashboard">Dashboard</a></li>
-                    <li ui-sref-active="active"><a ui-sref="musicalizacao.aulas">Hist&oacute;rico Participa&ccedil;&atilde;o</a></li>
-                    <li ui-sref-active="active"><a ui-sref="musicalizacao.criancas">Crian&ccedil;as</a></li>                    
-                    <li ui-sref-active="active"><a ui-sref="musicalizacao.instrutores">Colaboradores</a></li>
-                    <li ui-sref-active="active"><a ui-sref="musicalizacao.polos">Polos</a></li>
+                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('financeiro')}">
+                    <li ui-sref-active="active"><a ui-sref="financeiro.dashboard">Consolidado Regional</a></li>
+                    <li ui-sref-active="active"><a ui-sref="financeiro.fluxo">Fluxo de Caixa</a></li>
+                    <li ui-sref-active="active"><a ui-sref="financeiro.extratos">Extratos Comuns</a></li>
+                    <li ui-sref-active="active"><a ui-sref="financeiro.ajustes">Ajustes / Lan&ccedil;amentos</a></li>
                 </ul>
             </li>
 
-            <li ng-class="{active: $state.includes('ebi')}"
-                ng-if="main.canAccessModule('EBI')">
-                <a href="" data-mobile-sref="ebi.dashboard"><i class="fa fa-children"></i> <span class="nav-label">{{ 'EBI' | translate
+            <li ng-class="{active: $state.includes('secretaria')}"
+                ng-if="main.canAccessModule('Secretaria')">
+                <a href="" data-mobile-sref="secretaria.dashboard"><i class="fa fa-building"></i> <span class="nav-label">{{ 'SECRETARIA' | translate
                         }}</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('ebi')}">
-                    <li ui-sref-active="active"><a ui-sref="ebi.dashboard">Dashboard EBI</a></li>
-                    <li ui-sref-active="active"><a ui-sref="ebi.presenca">Histórico Atividade</a></li>
-                    <li ui-sref-active="active"><a ui-sref="ebi.alunos">Crianças EBI</a></li>
-                    <li ui-sref-active="active"><a ui-sref="ebi.instrutores">Colaboradores EBI</a></li>
+                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('secretaria')}">
+                    <li ui-sref-active="active"><a ui-sref="secretaria.dashboard">Estat&iacute;sticas Gerais</a></li>
+                    <li ui-sref-active="active"><a ui-sref="secretaria.cartoes">Cart&otilde;es de Minist&eacute;rio</a></li>
+                    <li ui-sref-active="active"><a ui-sref="secretaria.atas">Livro de Atas Online</a></li>
+                    <li ui-sref-active="active"><a ui-sref="secretaria.comuns">Gest&atilde;o de Comuns</a></li>
                 </ul>
+            </li>
+
+            <li ng-class="{active: $state.includes('irmandade')}"
+                ng-if="main.canAccessModule('Irmandade')">
+                <a href="" data-mobile-sref="irmandade.list"><i class="fa fa-users"></i> <span class="nav-label">{{ 'IRMANDADE' | translate
+                        }}</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('irmandade')}">
+                    <li ui-sref-active="active"><a ui-sref="irmandade.list">Cadastro Geral</a></li>
+                    <li ui-sref-active="active"><a ui-sref="irmandade.ministerio">Fichas Ministeriais</a></li>
+                    <li ui-sref-active="active"><a ui-sref="irmandade.nascimentos">Nascimentos / Apresentados</a></li>
+                    <li ui-sref-active="active"><a ui-sref="irmandade.obitos">Registro de &Oacute;bitos</a></li>
+                </ul>
+            </li>
+
+            <li ui-sref-active="active" ng-if="main.canAccessModule('Musicalizacao')">
+                <a ui-sref="musicalizacao.dashboard">
+                    <i class="fa fa-music"></i> 
+                    <span class="nav-label">Musicalização</span>
+                    <span class="label label-primary pull-right">NEW</span>
+                </a>
+            </li>
+
+            <li ui-sref-active="active" ng-if="main.canAccessModule('Ebi')">
+                <a ui-sref="ebi.dashboard">
+                    <i class="fa-solid fa-child"></i> 
+                    <span class="nav-label">E.B.I</span>
+                </a>
             </li>
 
             <li ng-class="{active: $state.includes('visitas')}"
                 ng-if="main.canAccessModule('Visitas')">
-                <a href="" data-mobile-sref="visitas.dashboard"><i class="fa fa-door-open"></i> <span class="nav-label">{{ 'VISITAS' | translate
+                <a href="" data-mobile-sref="visitas.dashboard"><i class="fa fa-walking"></i> <span class="nav-label">{{ 'VISITAS' | translate
                         }}</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('visitas')}">
-                    <li ui-sref-active="active"><a ui-sref="visitas.dashboard">Dashboard Visitas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="visitas.lancamentos">Lan&ccedil;amentos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="visitas.visitados">Visitados</a></li>
-                    <li ui-sref-active="active"><a ui-sref="visitas.grupos">Grupos de Visita</a></li>
+                    <li ui-sref-active="active"><a ui-sref="visitas.dashboard">Gest&atilde;o de Visitas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="visitas.agenda">Agenda Ministerial</a></li>
+                    <li ui-sref-active="active"><a ui-sref="visitas.relatorios">Relat&oacute;rios de Campo</a></li>
+                    <li ui-sref-active="active"><a ui-sref="visitas.mapa">Geolocaliza&ccedil;&atilde;o</a></li>
                 </ul>
             </li>
 
             <li ui-sref-active="active" ng-if="main.canAccessModule('RJM')">
-                <a href="" data-mobile-sref="rjm.dashboard"><i class="fa fa-book"></i> <span class="nav-label">{{ 'RJM' | translate
-                        }}</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('rjm')}">
-                    <li ui-sref-active="active"><a ui-sref="rjm.dashboard">Dashboard RJM</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.analytics">Hist&oacute;rico Atividade</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.administrativo">Administrativo</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.auxiliares">Auxiliares</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.recitativos">Recitativos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.mocidade">Cadastro da Mocidade</a></li>
-                </ul>
+                <a ui-sref="rjm.dashboard">
+                    <i class="fa fa-book"></i> 
+                    <span class="nav-label">Reunião de Jovens</span>
+                </a>
             </li>
 
             <li ng-class="{active: $state.includes('darpe')}"
                 ng-if="main.canAccessModule('Darpe')">
-                <a href="" data-mobile-sref="darpe.musicos"><i class="fa fa-medkit"></i> <span class="nav-label">{{ 'D.A.R.P.E' | translate }}
+                <a href="" data-mobile-sref="darpe.dashboard"><i class="fa fa-medkit"></i> <span class="nav-label">{{ 'D.A.R.P.E' | translate }}
                     </span><span class="label label-info pull-right">NOVO</span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('darpe')}">
+                    <li ui-sref-active="active"><a ui-sref="darpe.dashboard">Dashboard</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.calendario">Calendário</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.musicos">Músicos</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.clinicas">Clínicas</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.ministerio">Ministério</a></li>
@@ -110,6 +128,7 @@
                     <li ui-sref-active="active"><a ui-sref="darpe.batismos">Batismos</a></li>
                 </ul>
             </li>
+
             <li ng-class="{active: $state.includes('depac')}"
                 ng-if="main.canAccessModule('Depac')">
                 <a href="" data-mobile-sref="depac.musicos"><i class="fa-solid fa-hands"></i> <span class="nav-label">{{ 'D.E.P.A.C' | translate }}
@@ -123,6 +142,7 @@
                     <li ui-sref-active="active"><a ui-sref="depac.batismos">Batismos</a></li>
                 </ul>
             </li>
+
             <li ng-class="{active: $state.includes('forms')}"
                 ng-if="main.canAccessModule('Gem')">
                 <a href="" data-mobile-sref="forms.basic_form"><i class="fa fa-edit"></i> <span class="nav-label">{{ 'G.E.M' | translate }}</span><span
@@ -158,40 +178,7 @@
             </li>         
            
 
-            <li ng-class="{active: $state.includes('tables')}" ng-if="main.canAccessGlobalMenu()">
-                <a href=""><i class="fa fa-file-pdf-o"></i> <span class="nav-label">{{ 'RELATORIOS' | translate
-                        }}</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('tables')}">
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Ensaios Regionais</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.data_tables">Exames / Testes</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.foo_table">Instrutores (as)</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.nggrid">Candidatos</a></li>
-                </ul>
-            </li>
-            <li ng-class="{active: $state.includes('tables')}" ng-if="main.canAccessGlobalMenu()">
-                <a href=""><i class="fa fa-music"></i> <span class="nav-label">{{ 'INSTRUMENTOS' | translate
-                        }}</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('tables')}">
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Entrada</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de Serviços</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de Compra</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Inventário</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Manutenção</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.data_tables">Saída</a></li>
-                </ul>
-            </li>
-
-            <li ui-sref-active="active" ng-if="main.canAccessDownloads()">
-                <a ui-sref="downloads"><i class="fa fa-download"></i> <span class="nav-label">{{ 'DOWNLOADS' | translate
-                        }}</span><span class="label label-info pull-right">32</span></a>
-            </li>
-            <li class="landing_link">
-                <a ng-click="main.logout()" href="javascript:void(0)"><i class="fa fa-sign-out"></i> <span
-                        class="nav-label">{{ 'LANDING' | translate
-                        }}</span></a>
-            </li>
         </ul>
 
     </div>
 </nav>
-

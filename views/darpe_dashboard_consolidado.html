@@ -1,0 +1,278 @@
+<style>
+    .darpe-dashboard-card {
+        border-radius: 16px;
+        padding: 24px;
+        color: #fff;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .darpe-dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+    .darpe-card-blue { background: linear-gradient(135deg, #1c84c6 0%, #23c6c8 100%); }
+    .darpe-card-green { background: linear-gradient(135deg, #1ab394 0%, #17a689 100%); }
+    .darpe-card-yellow { background: linear-gradient(135deg, #f8ac59 0%, #f7b267 100%); }
+    .darpe-card-purple { background: linear-gradient(135deg, #673ab7 0%, #9c27b0 100%); }
+
+    .darpe-dashboard-value {
+        font-size: 38px;
+        font-weight: 800;
+        line-height: 1;
+        margin: 12px 0 4px;
+    }
+    .darpe-dashboard-label {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+    }
+    .darpe-dashboard-icon {
+        font-size: 48px;
+        opacity: 0.2;
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+    }
+    .sector-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-right: 5px;
+    }
+    .sector-1 { background: #e3f2fd; color: #1976d2; }
+    .sector-2 { background: #f1f8e9; color: #388e3c; }
+    .sector-3 { background: #fff3e0; color: #f57c00; }
+    .sector-4 { background: #ede7f6; color: #512da8; }
+
+    .chart-container {
+        height: 300px;
+        width: 100%;
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+        padding: 20px 0;
+    }
+    .chart-bar-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+    }
+    .chart-bar-stack {
+        width: 30px;
+        background: #f3f3f4;
+        border-radius: 5px 5px 0 0;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: calc(100% - 30px);
+    }
+    .bar-visitas { background: #1ab394; border-radius: 5px 5px 0 0; }
+    .bar-batismos { background: #f8ac59; border-radius: 5px 5px 0 0; margin-top: -5px; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
+    
+    .chart-label {
+        font-size: 10px;
+        color: #676a6c;
+        margin-top: 8px;
+        font-weight: bold;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+        font-size: 12px;
+    }
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        margin-right: 6px;
+    }
+</style>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Dashboard Executivo DARPE</h2>
+        <ol class="breadcrumb">
+            <li class="active"><strong>D.A.R.P.E</strong></li>
+            <li>Gestão de Assistência Religiosa Institucional</li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Main KPI Cards -->
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="darpe-dashboard-card darpe-card-blue">
+                <i class="fa fa-water darpe-dashboard-icon"></i>
+                <div class="darpe-dashboard-label">Batismos Realizados</div>
+                <div class="darpe-dashboard-value">{{ stats.totalBatismos || 0 }}</div>
+                <div class="m-t-xs"><small>Sectores 1 e 4 (Prisões/Hospitais)</small></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="darpe-dashboard-card darpe-card-green">
+                <i class="fa fa-hands-praying darpe-dashboard-icon"></i>
+                <div class="darpe-dashboard-label">Reuniões / Atendimentos</div>
+                <div class="darpe-dashboard-value">{{ stats.visitas.totalGeral || 0 }}</div>
+                <div class="m-t-xs"><small>Total acumulado em unidades</small></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="darpe-dashboard-card darpe-card-yellow">
+                <i class="fa fa-music darpe-dashboard-icon"></i>
+                <div class="darpe-dashboard-label">Músicos Colaboradores</div>
+                <div class="darpe-dashboard-value">{{ stats.darpe.musicosAtivos || 0 }}</div>
+                <div class="m-t-xs"><small>Aptos para atendimentos DARPE</small></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="darpe-dashboard-card darpe-card-purple">
+                <i class="fa fa-calendar-check darpe-dashboard-icon"></i>
+                <div class="darpe-dashboard-label">Próximos Agendamentos</div>
+                <div class="darpe-dashboard-value">{{ stats.darpe.agendamentosFuturos || 0 }}</div>
+                <div class="m-t-xs"><small>Visitas programadas este mês</small></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Charts Section -->
+    <div class="row m-t-lg">
+        <div class="col-lg-8">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Evolução de Atendimentos vs Batismos <small>Últimos 6 meses</small></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="chart-container">
+                        <div class="chart-bar-group" ng-repeat="item in stats.evolucaoMes">
+                            <div class="chart-bar-stack">
+                                <div class="bar-visitas" ng-style="{ height: (item.visitas > 0 ? (item.visitas / 100 * 100) : 0) + '%' }" uib-tooltip="Atendimentos: {{item.visitas}}"></div>
+                                <div class="bar-batismos" ng-style="{ height: (item.batismos > 0 ? (item.batismos * 10) : 0) + '%' }" uib-tooltip="Batismos: {{item.batismos}}"></div>
+                            </div>
+                            <div class="chart-label">{{ item.mes }}</div>
+                        </div>
+                    </div>
+                    <div class="row m-t-sm">
+                        <div class="col-xs-12" style="display: flex;">
+                            <div class="legend-item"><div class="legend-color bar-visitas"></div> Reuniões Institucionais</div>
+                            <div class="legend-item"><div class="legend-color bar-batismos"></div> Batismos Realizados</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Distribuição Setorial (Reestrutura 2025)</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="list-group">
+                        <div class="list-group-item" style="border: none; padding: 12px 0;">
+                            <span class="pull-right"><strong>{{ stats.batismosPorSetor['SETOR 1 - Sistemas de Ressocialização e Socioeducativos'] || 0 }}</strong></span>
+                            <span class="sector-badge sector-1">SETOR 1</span> Ressocialização e Socioeducativos
+                        </div>
+                        <div class="list-group-item" style="border: none; padding: 12px 0;">
+                            <span class="pull-right"><strong>{{ stats.batismosPorSetor['SETOR 2 - Clínica de Dependentes e Albergues'] || 0 }}</strong></span>
+                            <span class="sector-badge sector-2">SETOR 2</span> Clínicas e Albergues
+                        </div>
+                        <div class="list-group-item" style="border: none; padding: 12px 0;">
+                            <span class="pull-right"><strong>{{ stats.batismosPorSetor['SETOR 3 - Forças de Segurança'] || 0 }}</strong></span>
+                            <span class="sector-badge sector-3">SETOR 3</span> Forças de Segurança
+                        </div>
+                        <div class="list-group-item" style="border: none; padding: 12px 0;">
+                            <span class="pull-right"><strong>{{ stats.batismosPorSetor['SETOR 4 - Hospitais, Instituição para Idosos, Setor Educacional'] || 0 }}</strong></span>
+                            <span class="sector-badge sector-4">SETOR 4</span> Hospitais, Idosos e Educação
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Próximos Atendimentos / Úitimas Atividade</h5>
+                </div>
+                <div class="ibox-content no-padding">
+                    <table class="table table-hover no-margins">
+                        <thead>
+                            <tr>
+                                <th>Local / Unidade</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in stats.recentes">
+                                <td><i class="fa fa-hospital-o"></i> {{ item.local_nome }}</td>
+                                <td>{{ item.data_atendimento }}</td>
+                                <td>
+                                    <span class="label" ng-class="{'label-primary': item.status === 'Realizado', 'label-warning': item.status === 'Agendado'}">
+                                        {{ item.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr ng-if="!stats.recentes.length">
+                                <td colspan="3" class="text-center text-muted p-md">Nenhum atendimento recente registrado.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Resumo de Infraestrutura</h5>
+                </div>
+                <div class="ibox-content no-padding">
+                    <table class="table table-hover no-margins">
+                        <thead>
+                            <tr>
+                                <th>Recurso</th>
+                                <th>Status</th>
+                                <th class="text-center">Ativo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Músicos Selecionados</td>
+                                <td>Aptos para Atendimentos Institucionais</td>
+                                <td class="text-center text-navy font-bold">{{ stats.darpe.musicosAtivos }}</td>
+                            </tr>
+                            <tr>
+                                <td>Unidades Cadastradas</td>
+                                <td>Clínicas, Hospitais e Prisões</td>
+                                <td class="text-center text-navy font-bold">{{ stats.darpe.clinicasAtendidas }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="p-m text-right">
+                        <a ui-sref="darpe.batismos" class="btn btn-primary btn-sm"><i class="fa fa-water"></i> Gestão de Batismos</a>
+                        <a ui-sref="darpe.atendimentos" class="btn btn-white btn-sm"><i class="fa fa-calendar"></i> Ver Agenda Completa</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+     </div>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+<div id="modalAddAtendimentoDarpe" class="modal inmodal fade" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header" style="background:#1ab394; color:#fff;">
+                <button type="button" class="close" data-dismiss="modal" style="color:#fff; opacity:1;">
+                    <span aria-hidden="true">&times;</span><span class="sr-only">Fechar</span>
+                </button>
+                <h4 class="modal-title">
+                    <i class="fa" ng-class="viewOnly ? 'fa-folder-open' : (editingAtendimento ? 'fa-calendar' : 'fa-stethoscope')"></i>
+                    {{viewOnly ? 'Detalhes do Atendimento' : (editingAtendimento ? 'Editar Atendimento' : 'Cadastrar Atendimento')}}
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form name="formAddAtendimentoDarpe" novalidate>
+                    <div class="row">
+                        <div class="col-sm-4 form-group">
+                            <label>Data do Atendimento *</label>
+                            <input type="text" class="form-control" ng-model="currentAtendimento.data_atendimento" ng-change="formatDateField('currentAtendimento','data_atendimento')" placeholder="dd/mm/aaaa" ng-disabled="viewOnly" tabindex="1" required>
+                        </div>
+                        <div class="col-sm-4 form-group">
+                            <label>Periodicidade *</label>
+                            <select class="form-control" ng-model="currentAtendimento.periodicidade" ng-disabled="viewOnly" tabindex="2" required>
+                                <option value="">Selecione</option>
+                                <option>Semanal</option>
+                                <option>Quinzenal</option>
+                                <option>Mensal</option>
+                                <option>Sob Escala</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4 form-group">
+                            <label>Status *</label>
+                            <select class="form-control" ng-model="currentAtendimento.status" ng-disabled="viewOnly" tabindex="3" required>
+                                <option>Agendado</option>
+                                <option>Realizado</option>
+                                <option>Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 form-group">
+                            <label>Local de Atendimento *</label>
+                            <select class="form-control" ng-model="currentAtendimento.local_id" ng-change="handleLocalChange()" ng-disabled="viewOnly" tabindex="4" required>
+                                <option value="">Selecione</option>
+                                <option ng-repeat="local in clinicas" value="{{local.id}}">{{local.nome_local}} - {{local.cidade}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label>Tipo</label>
+                            <input type="text" class="form-control" ng-model="currentAtendimento.tipo_local" ng-disabled="true" tabindex="5">
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label>Cidade</label>
+                            <input type="text" class="form-control" ng-model="currentAtendimento.cidade" ng-disabled="true" tabindex="6">
+                        </div>
+                        <div class="col-sm-6 form-group">
+                            <label>Responsável do Ministério</label>
+                            <input type="text" class="form-control" ng-model="currentAtendimento.responsavel_ministerio" ng-disabled="viewOnly" tabindex="7">
+                        </div>
+                        <div class="col-sm-6 form-group">
+                            <label>Próxima Visita</label>
+                            <input type="text" class="form-control" ng-model="currentAtendimento.proxima_visita" ng-change="formatDateField('currentAtendimento','proxima_visita')" placeholder="dd/mm/aaaa" ng-disabled="viewOnly" tabindex="8">
+                        </div>
+                        <div class="col-sm-12 form-group">
+                            <label>Músicos Selecionados *</label>
+                            <div class="darpe-musicos-selector" style="max-height: 150px; overflow-y: auto; border: 1px solid #e5e6e7; padding: 10px; border-radius: 4px;">
+                                <div class="checkbox" ng-repeat="musico in musicos">
+                                    <label>
+                                        <input type="checkbox" ng-checked="isMusicoSelected(musico.id)" ng-click="toggleMusicoSelection(musico.id)" ng-disabled="viewOnly">
+                                        {{musico.nome_completo}} <span class="text-muted">| {{musico.instrumento || 'Sem instrumento'}}</span>
+                                    </label>
+                                </div>
+                                <div class="text-muted" ng-if="!musicos.length">Nenhum músico ativo disponível.</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 form-group">
+                            <label>Repertório / Observações Musicais</label>
+                            <textarea class="form-control" rows="2" ng-model="currentAtendimento.repertorio" ng-disabled="viewOnly" tabindex="9"></textarea>
+                        </div>
+                        <div class="col-sm-12 form-group">
+                            <label>Observações Gerais</label>
+                            <textarea class="form-control" rows="2" ng-model="currentAtendimento.observacoes" ng-disabled="viewOnly" tabindex="10"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="saveAtendimento()"><i class="fa fa-floppy-o"></i> {{viewOnly ? 'Fechar' : 'Salvar'}}</button>
+            </div>
+        </div>
+    </div>
+</div>

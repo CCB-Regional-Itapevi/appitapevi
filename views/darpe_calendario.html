@@ -1,0 +1,83 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Calendário Institucional D.A.R.P.E.</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="darpe.dashboard">D.A.R.P.E</a></li>
+            <li class="active"><strong>Calendário</strong></li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <!-- Sidebar Legend -->
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Legenda de Setores</h5>
+                </div>
+                <div class="ibox-content">
+                    <p class="text-muted small">A cor de fundo indica o setor institucional.</p>
+                    <div class="m-b-sm">
+                        <span class="label" style="background-color: #1c84c6; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 1 - Ressocialização</span>
+                        <span class="label" style="background-color: #1ab394; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 2 - Clínicas/Albergues</span>
+                        <span class="label" style="background-color: #f8ac59; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 3 - Segurança</span>
+                        <span class="label" style="background-color: #673ab7; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 4 - Hospitais/Idosos/Edu</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Status do Atendimento</h5>
+                </div>
+                <div class="ibox-content">
+                    <p class="text-muted small">A barra lateral indica a situação atual.</p>
+                    <div class="m-b-sm">
+                        <div style="border-left: 5px solid #1ab394; padding: 5px 10px; margin-bottom: 5px; background: #f3f3f4;">Realizado</div>
+                        <div style="border-left: 5px solid #1c84c6; padding: 5px 10px; margin-bottom: 5px; background: #f3f3f4;">Agendado</div>
+                        <div style="border-left: 5px solid #ed5565; padding: 5px 10px; margin-bottom: 5px; background: #f3f3f4;">Cancelado</div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i> Arraste os eventos para remarcar datas.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Container -->
+        <div class="col-lg-9">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div ng-if="loading" class="text-center p-xl">
+                        <div class="sk-spinner sk-spinner-double-bounce">
+                            <div class="sk-double-bounce1"></div>
+                            <div class="sk-double-bounce2"></div>
+                        </div>
+                        <p>Carregando agenda institucional...</p>
+                    </div>
+                    <div id="calendar" ui-calendar="uiConfig.calendar" ng-model="eventSources" calendar="darpeCalendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Status-based Border colors */
+    .fc-event.status-realizado { border-left: 5px solid #1ab394 !important; }
+    .fc-event.status-agendado { border-left: 5px solid #1c84c6 !important; }
+    .fc-event.status-cancelado { border-left: 5px solid #ed5565 !important; }
+
+    /* Sector-based Background colors */
+    .fc-event.sector-1 { background-color: #1c84c6 !important; color: white !important; }
+    .fc-event.sector-2 { background-color: #1ab394 !important; color: white !important; }
+    .fc-event.sector-3 { background-color: #f8ac59 !important; color: white !important; }
+    .fc-event.sector-4 { background-color: #673ab7 !important; color: white !important; }
+
+    .fc-event {
+        cursor: pointer;
+        padding: 5px;
+        border: none;
+    }
+</style>
