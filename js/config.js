@@ -284,9 +284,30 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('darpe.dashboard', {
             url: "/dashboard",
-            templateUrl: 'views/darpe_dashboard_consolidado.html?v=2.2.0',
-            data: { pageTitle: 'D.A.R.P.E - Dashboard Executivo' },
-            controller: 'darpeDashboardConsolidadoCtrl'
+            templateUrl: 'views/darpe_dashboard.html?v=2.2.0',
+            data: { pageTitle: 'D.A.R.P.E - Dashboard' },
+            controller: 'darpeDashboardCtrl'
+        })
+        .state('darpe.calendario', {
+            url: "/calendario",
+            templateUrl: 'views/darpe_calendario.html?v=2.2.0',
+            data: { pageTitle: 'D.A.R.P.E - Calendário' },
+            controller: 'darpeCalendarioCtrl',
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            insertBefore: '#loadBefore',
+                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/gcal.js'],
+                            serie: true
+                        },
+                        {
+                            name: 'ui.calendar',
+                            files: ['js/plugins/fullcalendar/calendar.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('darpe.musicos', {
             url: '/musicos',
@@ -301,8 +322,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('darpe.ministerio', {
             url: "/ministerio",
             templateUrl: 'views/darpe_ministerio.html?v=2.1.0',
-            data: { pageTitle: 'D.A.R.P.E - Dashboard Ministerial' },
-            controller: 'darpeDashboardCtrl'
+            data: { pageTitle: 'D.A.R.P.E - Dashboard Administrativo' }
         })
         .state('darpe.atendimentos', {
             url: "/atendimentos",
@@ -316,29 +336,8 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('darpe.batismos', {
             url: "/batismos",
-            templateUrl: 'views/darpe_batismos.html?v=2.2.0',
-            data: { pageTitle: 'D.A.R.P.E - Batismos' },
-            controller: 'darpeBatismosCtrl'
-        })
-        .state('darpe.calendario', {
-            url: "/calendario",
-            templateUrl: 'views/darpe_calendario.html?v=2.2.0',
-            data: { pageTitle: 'D.A.R.P.E - Calendário' },
-            controller: 'darpeCalendarioCtrl',
-            resolve: {
-                loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            insertBefore: '#loadBefore',
-                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/lang/pt-br.js', 'js/plugins/fullcalendar/gcal.js'], serie: true
-                        },
-                        {
-                            name: 'ui.calendar',
-                            files: ['js/plugins/fullcalendar/calendar.js']
-                        }
-                    ]);
-                }
-            }
+            templateUrl: 'views/darpe_batismos.html?v=2.1.0',
+            data: { pageTitle: 'D.A.R.P.E - Batismos' }
         })
 
         .state('depac', {
@@ -701,7 +700,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
                         {
-                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js']
+                            files: ['js/plugins/moment/moment.min.js']
                         },
                         {
                             name: 'ui.knob',
@@ -921,7 +920,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
                     return $ocLazyLoad.load([
                         {
                             insertBefore: '#loadBefore',
-                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/lang/pt-br.js', 'js/plugins/fullcalendar/gcal.js'], serie: true
+                            files: ['css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/gcal.js']
                         },
                         {
                             name: 'ui.calendar',

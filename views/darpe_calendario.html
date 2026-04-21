@@ -9,6 +9,9 @@
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Modal de Atendimento Compartilhado (Carregado antecipadamente) -->
+    <div ng-include="'views/darpe_modal_atendimento.html'"></div>
+
     <div class="row">
         <!-- Sidebar Legend -->
         <div class="col-lg-3">
@@ -16,13 +19,13 @@
                 <div class="ibox-title">
                     <h5>Legenda de Setores</h5>
                 </div>
-                <div class="ibox-content">
+                <div class="ibox-content" id="external-events">
                     <p class="text-muted small">A cor de fundo indica o setor institucional.</p>
                     <div class="m-b-sm">
-                        <span class="label" style="background-color: #1c84c6; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 1 - Ressocialização</span>
-                        <span class="label" style="background-color: #1ab394; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 2 - Clínicas/Albergues</span>
-                        <span class="label" style="background-color: #f8ac59; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 3 - Segurança</span>
-                        <span class="label" style="background-color: #673ab7; color: white; display: block; padding: 10px; margin-bottom: 5px;">SETOR 4 - Hospitais/Idosos/Edu</span>
+                        <div class="external-event fc-event label" data-sector-id="1" data-event='{"title":"Agenda Setor 1", "stick": true}' style="background-color: #1c84c6; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 1 - Ressocialização</div>
+                        <div class="external-event fc-event label" data-sector-id="2" data-event='{"title":"Agenda Setor 2", "stick": true}' style="background-color: #1ab394; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 2 - Clínicas/Albergues</div>
+                        <div class="external-event fc-event label" data-sector-id="3" data-event='{"title":"Agenda Setor 3", "stick": true}' style="background-color: #f8ac59; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 3 - Segurança</div>
+                        <div class="external-event fc-event label" data-sector-id="4" data-event='{"title":"Agenda Setor 4", "stick": true}' style="background-color: #673ab7; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 4 - Hospitais/Idosos/Edu</div>
                     </div>
                 </div>
             </div>
@@ -60,6 +63,8 @@
                 </div>
             </div>
         </div>
+    </div>
+
     </div>
 </div>
 

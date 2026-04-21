@@ -39,7 +39,7 @@
                             <label>Local de Atendimento *</label>
                             <select class="form-control" ng-model="currentAtendimento.local_id" ng-change="handleLocalChange()" ng-disabled="viewOnly" tabindex="4" required>
                                 <option value="">Selecione</option>
-                                <option ng-repeat="local in clinicas" value="{{local.id}}">{{local.nome_local}} - {{local.cidade}}</option>
+                                <option ng-repeat="local in clinicas" ng-value="local.id">{{local.nome_local}} - {{local.cidade}}</option>
                             </select>
                         </div>
                         <div class="col-sm-3 form-group">

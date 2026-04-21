@@ -1,139 +1,26 @@
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
-        <h2>Gerenciamento de Batismos</h2>
+        <h2>Batismos D.A.R.P.E</h2>
         <ol class="breadcrumb">
-            <li><a href="#/darpe/dashboard">D.A.R.P.E</a></li>
+            <li><a href="#/darpe/musicos">D.A.R.P.E</a></li>
             <li class="active"><strong>Batismos</strong></li>
         </ol>
-    </div>
-    <div class="col-lg-2">
-        <div class="title-action">
-            <button class="btn btn-primary" ng-click="prepareAdd()">
-                <i class="fa fa-plus"></i> Novo Registro
-            </button>
-        </div>
     </div>
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
-            <div class="ibox float-e-margins">
+            <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Lista de Batizados <small>Acompanhamento individual por setor</small></h5>
-                    <div class="ibox-tools">
-                        <span class="label label-primary">{{ batismos.length }} registros</span>
-                    </div>
+                    <h5>Área preparada para expansão</h5>
                 </div>
                 <div class="ibox-content">
-                    <div class="row m-b-sm">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" placeholder="Buscar por nome ou comum..." class="input-sm form-control" ng-model="searchText">
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-sm btn-primary"> <i class="fa fa-search"></i></button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Nome do Batizado</th>
-                                    <th>Comum de Origem</th>
-                                    <th class="text-center">Data</th>
-                                    <th>Setor</th>
-                                    <th>Local do Batismo</th>
-                                    <th class="text-center">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="item in batismos | filter:searchText">
-                                    <td><strong>{{ item.nome_batizado }}</strong></td>
-                                    <td>{{ item.comum_batizado }}</td>
-                                    <td class="text-center">{{ item.data_batismo | date:'dd/MM/yyyy' }}</td>
-                                    <td><span class="label label-info">{{ item.setor.split(' - ')[0] }}</span> <small>{{ item.setor.split(' - ')[1] }}</small></td>
-                                    <td>{{ item.local_evento }}</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-white btn-xs" ng-click="verDetalhes(item)" uib-tooltip="Ver Detalhes"><i class="fa fa-eye"></i></button>
-                                        <button class="btn btn-primary btn-xs" ng-click="prepareEdit(item)" uib-tooltip="Editar" ng-if="canManageCadastros"><i class="fa fa-pencil"></i></button>
-                                        <button class="btn btn-danger btn-xs" ng-click="confirmDelete(item)" uib-tooltip="Excluir" ng-if="canManageCadastros"><i class="fa fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr ng-if="!batismos.length && !loading">
-                                    <td colspan="6" class="text-center text-muted">Nenhum registro encontrado.</td>
-                                </tr>
-                                <tr ng-if="loading">
-                                    <td colspan="6" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando registros...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="alert alert-info">
+                        A rota de batismos do DARPE já está criada e sem quebra de navegação. Quando você quiser, seguimos com um fluxo próprio para esse acompanhamento.
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Adicionar/Editar Batismo -->
-<div class="modal fade" id="modalAddBatismoDarpe" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form name="formAddBatismoDarpe" ng-submit="saveBatismo()" novalidate>
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">{{ editingBatismo ? 'Editar Registro' : (viewOnly ? 'Detalhes do Registro' : 'Novo Registro de Batismo') }}</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label>Nome Completo do Batizado *</label>
-                                <input type="text" ng-model="newBatismo.nome_batizado" class="form-control" required ng-disabled="viewOnly" placeholder="Ex: JOÃO DA SILVA">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Comum Congregação (Origem) *</label>
-                                <input type="text" ng-model="newBatismo.comum_batizado" class="form-control" required ng-disabled="viewOnly" placeholder="Ex: CENTRAL ITAPEVI">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label>Data do Batismo *</label>
-                                <input type="text" ng-model="newBatismo.data_batismo" class="form-control" required ng-disabled="viewOnly" placeholder="DD/MM/AAAA" ng-change="formatDateField('newBatismo', 'data_batismo')">
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label>Setor de Atendimento *</label>
-                                <select class="form-control" ng-model="newBatismo.setor" required ng-disabled="viewOnly">
-                                    <option value="">Selecione o Setor...</option>
-                                    <option ng-repeat="setor in setores" value="{{setor}}">{{setor}}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label>Local onde ocorreu o Batismo *</label>
-                                <input type="text" ng-model="newBatismo.local_evento" class="form-control" required ng-disabled="viewOnly" placeholder="Ex: SEDE REGIONAL / CLÍNICA ESPERANÇA">
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label>Observações</label>
-                                <textarea ng-model="newBatismo.observacoes" class="form-control" rows="3" ng-disabled="viewOnly"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-white" data-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary" ng-if="!viewOnly">Salvar Registro</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
