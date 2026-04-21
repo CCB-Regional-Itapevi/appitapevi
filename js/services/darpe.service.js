@@ -32,7 +32,8 @@
             'telefone_contato',
             'periodicidade_preferencial',
             'observacoes',
-            'status'
+            'status',
+            'setor'
         ];
         var ATENDIMENTO_FIELDS = [
             'data_atendimento',
@@ -48,7 +49,8 @@
             'repertorio',
             'observacoes',
             'status',
-            'proxima_visita'
+            'proxima_visita',
+            'setor'
         ];
         var UPPERCASE_FIELDS = [
             'nome_completo',
@@ -66,7 +68,8 @@
             'local_nome',
             'responsavel_ministerio',
             'musicos_nomes',
-            'repertorio'
+            'repertorio',
+            'setor'
         ];
 
         var supabase = window.__appSupabaseClient
@@ -481,6 +484,14 @@
                 payload.status = 'Ativo';
             }
 
+            if (payload.setor) {
+                var currentObs = payload.observacoes || '';
+                currentObs = currentObs.replace(/\[SETOR:.*?\]\s*/g, '').trim();
+                payload.observacoes = '[SETOR:' + payload.setor + ']' + (currentObs ? '\n' + currentObs : '');
+            } else if (payload.observacoes) {
+                payload.observacoes = payload.observacoes.replace(/\[SETOR:.*?\]\s*/g, '').trim();
+            }
+
             repairRecordStrings(payload);
             applyUppercaseFields(payload, UPPERCASE_FIELDS);
             return payload;
@@ -488,6 +499,14 @@
 
         function normalizeClinicaRecord(item) {
             var record = angular.copy(item || {});
+
+            if (record.observacoes && record.observacoes.indexOf('[SETOR:') !== -1) {
+                var match = record.observacoes.match(/\[SETOR:(.*?)\]/);
+                if (match && match[1]) {
+                    record.setor = match[1];
+                    record.observacoes = record.observacoes.replace(/\[SETOR:.*?\]\s*/g, '').trim();
+                }
+            }
 
             repairRecordStrings(record);
             applyUppercaseFields(record, UPPERCASE_FIELDS);

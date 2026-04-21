@@ -13,6 +13,16 @@
             <div class="modal-body">
                 <form name="formAddAtendimentoDarpe" novalidate>
                     <div class="row">
+                        <div class="col-sm-12 form-group">
+                            <label>Modalidade (Setor Institucional) *</label>
+                            <select class="form-control" ng-model="currentAtendimento.setor" ng-disabled="viewOnly" tabindex="1" required>
+                                <option value="">Selecione a Modalidade</option>
+                                <option value="SETOR 1 - Sistemas de Ressocialização">SETOR 1 - Sistemas de Ressocialização</option>
+                                <option value="SETOR 2 - Clínica de Dependentes">SETOR 2 - Clínicas e Albergues</option>
+                                <option value="SETOR 3 - Forças de Segurança">SETOR 3 - Forças de Segurança</option>
+                                <option value="SETOR 4 - Hospitais/Idosos">SETOR 4 - Hospitais / Idosos / Educacional</option>
+                            </select>
+                        </div>
                         <div class="col-sm-4 form-group">
                             <label>Data do Atendimento *</label>
                             <input type="text" class="form-control" ng-model="currentAtendimento.data_atendimento" ng-change="formatDateField('currentAtendimento','data_atendimento')" placeholder="dd/mm/aaaa" ng-disabled="viewOnly" tabindex="1" required>
@@ -37,9 +47,8 @@
                         </div>
                         <div class="col-sm-6 form-group">
                             <label>Local de Atendimento *</label>
-                            <select class="form-control" ng-model="currentAtendimento.local_id" ng-change="handleLocalChange()" ng-disabled="viewOnly" tabindex="4" required>
-                                <option value="">Selecione</option>
-                                <option ng-repeat="local in clinicas" ng-value="local.id">{{local.nome_local}} - {{local.cidade}}</option>
+                            <select class="form-control" ng-model="currentAtendimento.local_id" ng-change="handleLocalChange()" ng-options="local.id as (local.nome_local + ' - ' + local.cidade) for local in clinicas | filter:{setor: (currentAtendimento.setor || undefined)}" ng-disabled="viewOnly || !currentAtendimento.setor" tabindex="4" required>
+                                <option value="">{{currentAtendimento.setor ? 'Selecione' : 'Escolha a Modalidade 1º'}}</option>
                             </select>
                         </div>
                         <div class="col-sm-3 form-group">
@@ -58,18 +67,7 @@
                             <label>Próxima Visita</label>
                             <input type="text" class="form-control" ng-model="currentAtendimento.proxima_visita" ng-change="formatDateField('currentAtendimento','proxima_visita')" placeholder="dd/mm/aaaa" ng-disabled="viewOnly" tabindex="8">
                         </div>
-                        <div class="col-sm-12 form-group">
-                            <label>Músicos Selecionados *</label>
-                            <div class="darpe-musicos-selector" style="max-height: 150px; overflow-y: auto; border: 1px solid #e5e6e7; padding: 10px; border-radius: 4px;">
-                                <div class="checkbox" ng-repeat="musico in musicos">
-                                    <label>
-                                        <input type="checkbox" ng-checked="isMusicoSelected(musico.id)" ng-click="toggleMusicoSelection(musico.id)" ng-disabled="viewOnly">
-                                        {{musico.nome_completo}} <span class="text-muted">| {{musico.instrumento || 'Sem instrumento'}}</span>
-                                    </label>
-                                </div>
-                                <div class="text-muted" ng-if="!musicos.length">Nenhum músico ativo disponível.</div>
-                            </div>
-                        </div>
+
                         <div class="col-sm-12 form-group">
                             <label>Repertório / Observações Musicais</label>
                             <textarea class="form-control" rows="2" ng-model="currentAtendimento.repertorio" ng-disabled="viewOnly" tabindex="9"></textarea>

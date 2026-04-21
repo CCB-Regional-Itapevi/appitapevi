@@ -10,7 +10,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
 
     // Configure Idle settings
     IdleProvider.idle(1800); // 30 minutos de inatividade
-    IdleProvider.timeout(1); // timeout imediato após entrar em idle
+    IdleProvider.timeout(1); // timeout imediato ap??s entrar em idle
 
     $urlRouterProvider.otherwise("/login");
 
@@ -188,13 +188,13 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('musicalizacao.dashboard', {
             url: "/dashboard",
             templateUrl: "views/musicalizacao_dashboard.html?v=1.3.2",
-            data: { pageTitle: 'Dashboard Musicalização' },
+            data: { pageTitle: 'Dashboard Musicaliza????o' },
             controller: 'musicalizacaoCtrl'
         })
         .state('musicalizacao.criancas', {
             url: "/criancas",
             templateUrl: "views/musicalizacao_alunos.html?v=1.3.13",
-            data: { pageTitle: 'Crianças' },
+            data: { pageTitle: 'Crian??as' },
             controller: 'musicalizacaoAlunosCtrl'
         })
         .state('musicalizacao.polos', {
@@ -218,14 +218,14 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('musicalizacao.nova_aula', {
             url: "/nova_aula/:id",
             templateUrl: "views/musicalizacao_nova_aula.html?v=1.3.5",
-            data: { pageTitle: 'Novo Lançamento' },
+            data: { pageTitle: 'Novo Lan??amento' },
             params: { id: { value: null, squash: true } },
             controller: 'musicalizacaoNovaAulaCtrl'
         })
         .state('musicalizacao.presenca', {
             url: "/presenca/:id",
             templateUrl: "views/musicalizacao_presenca.html?v=1.3.5",
-            data: { pageTitle: 'Presença' },
+            data: { pageTitle: 'Presen??a' },
             params: { id: { value: null, squash: true } },
             controller: 'musicalizacaoPresencaCtrl'
         })
@@ -284,13 +284,13 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('darpe.dashboard', {
             url: "/dashboard",
-            templateUrl: 'views/darpe_dashboard.html?v=2.2.0',
+            templateUrl: 'views/darpe_dashboard_consolidado.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Dashboard' },
             controller: 'darpeDashboardCtrl'
         })
         .state('darpe.calendario', {
             url: "/calendario",
-            templateUrl: 'views/darpe_calendario.html?v=2.2.0',
+            templateUrl: 'views/darpe_calendario.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Calendário' },
             controller: 'darpeCalendarioCtrl',
             resolve: {
@@ -311,32 +311,32 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('darpe.musicos', {
             url: '/musicos',
-            templateUrl: 'views/darpe_musicos.html?v=2.1.0',
+            templateUrl: 'views/darpe_musicos.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Músicos' }
         })
         .state('darpe.clinicas', {
             url: "/clinicas",
-            templateUrl: 'views/darpe_clinicas.html?v=2.1.0',
+            templateUrl: 'views/darpe_clinicas.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Locais de Atendimento' }
         })
         .state('darpe.ministerio', {
             url: "/ministerio",
-            templateUrl: 'views/darpe_ministerio.html?v=2.1.0',
+            templateUrl: 'views/darpe_ministerio.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Dashboard Administrativo' }
         })
         .state('darpe.atendimentos', {
             url: "/atendimentos",
-            templateUrl: 'views/darpe_atendimentos.html?v=2.1.0',
+            templateUrl: 'views/darpe_atendimentos.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Atendimentos' }
         })
         .state('darpe.membros', {
             url: "/membros",
-            templateUrl: 'views/darpe_membros.html?v=2.1.0',
+            templateUrl: 'views/darpe_membros.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Membros' }
         })
         .state('darpe.batismos', {
             url: "/batismos",
-            templateUrl: 'views/darpe_batismos.html?v=2.1.0',
+            templateUrl: 'views/darpe_batismos.html?v=2.4.0',
             data: { pageTitle: 'D.A.R.P.E - Batismos' }
         })
 
@@ -348,17 +348,17 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('depac.musicos', {
             url: "/musicos",
             templateUrl: 'views/depac_musicos.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Músicos' }
+            data: { pageTitle: 'D.E.P.A.C - M??sicos' }
         })
         .state('depac.clinicas', {
             url: "/clinicas",
             templateUrl: 'views/depac_clinicas.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Clínicas' }
+            data: { pageTitle: 'D.E.P.A.C - Cl??nicas' }
         })
         .state('depac.ministerio', {
             url: "/ministerio",
             templateUrl: 'views/depac_ministerio.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Ministério' }
+            data: { pageTitle: 'D.E.P.A.C - Minist??rio' }
         })
         .state('depac.atendimentos', {
             url: "/atendimentos",
@@ -390,7 +390,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('rjm.analytics', {
             url: "/analytics",
             templateUrl: "views/rjm_analytics.html?v=1.1.0",
-            data: { pageTitle: 'Histórico de Atividades - RJM' },
+            data: { pageTitle: 'Hist??rico de Atividades - RJM' },
             controller: 'rjmAnalyticsCtrl',
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
@@ -442,7 +442,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('ebi.presenca', {
             url: "/presenca",
             templateUrl: "views/ebi_presenca.html?v=1.4.22",
-            data: { pageTitle: 'Presença EBI' },
+            data: { pageTitle: 'Presen??a EBI' },
             controller: 'ebiRecitativosCtrl',
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
@@ -463,7 +463,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('ebi.alunos', {
             url: "/alunos",
             templateUrl: "views/ebi_alunos.html?v=1.3.15",
-            data: { pageTitle: 'Crianças EBI' },
+            data: { pageTitle: 'Crian??as EBI' },
             controller: 'ebiAlunosCtrl'
         })
         .state('ebi.instrutores', {
@@ -539,7 +539,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('music.foo_table', {
             url: "/foo_table",
             templateUrl: "views/foo_table.html",
-            data: { pageTitle: 'Músicos' },
+            data: { pageTitle: 'M??sicos' },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
@@ -582,7 +582,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('visitas.lancamentos', {
             url: "/lancamentos",
             templateUrl: "views/visitas_lancamentos.html?v=2.0.0",
-            data: { pageTitle: 'Lançamentos de Visitas' },
+            data: { pageTitle: 'Lan??amentos de Visitas' },
             controller: 'visitasLancamentosCtrl'
         })
         .state('visitas.visitados', {
@@ -1764,7 +1764,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             url: "/user_approvals",
             templateUrl: "views/admin_pending_users.html",
             controller: 'pendingUsersAdminCtrl',
-            data: { pageTitle: 'Liberação de Usuários' }
+            data: { pageTitle: 'Libera????o de Usu??rios' }
         })
         .state('admin.usuarios', {
             url: "/usuarios",
@@ -1782,25 +1782,25 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             url: "/user_management",
             templateUrl: "views/admin_users_management.html?v=1.0.2",
             controller: 'userManagementAdminCtrl',
-            data: { pageTitle: 'Usuários' }
+            data: { pageTitle: 'Usu??rios' }
         })
         .state('admin.user_menagement', {
             url: "/user_menagement",
             templateUrl: "views/admin_users_management.html?v=1.0.2",
             controller: 'userManagementAdminCtrl',
-            data: { pageTitle: 'Gerenciamento de Usuários' }
+            data: { pageTitle: 'Gerenciamento de Usu??rios' }
         })
         .state('admin.congregacoes', {
             url: "/congregacoes",
             templateUrl: "views/admin_congregacoes.html?v=1.0.1",
             controller: 'congregacoesAdminCtrl',
-            data: { pageTitle: 'Congregações' }
+            data: { pageTitle: 'Congrega????es' }
         })
         .state('admin.search_results', {
             url: "/search_results",
             templateUrl: "views/admin_congregacoes.html?v=1.0.1",
             controller: 'congregacoesAdminCtrl',
-            data: { pageTitle: 'Congregações' }
+            data: { pageTitle: 'Congrega????es' }
         })
         .state('admin.santa_ceia', {
             url: "/santa_ceia",
@@ -1858,7 +1858,7 @@ angular
         var sessionKey = 'sb-sqamxlhfazulrisiptud-auth-token';
         var activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
 
-        // Restaura a sessão do Supabase ao carregar a página
+        // Restaura a sess??o do Supabase ao carregar a p??gina
         function normalizeAccessKey(value) {
             return String(value || '')
                 .normalize('NFD')
@@ -1927,7 +1927,7 @@ angular
                 case 'visitas':
                     return 'visitas.dashboard';
                 case 'darpe':
-                    return 'darpe.musicos';
+                    return 'darpe.dashboard';
                 case 'gem':
                     return 'forms.basic_form';
                 case 'musica':
@@ -2111,8 +2111,8 @@ angular
             $rootScope.currentUserResolved = true;
         });
 
-        // Protege as rotas - verificação SOMENTE síncrona (localStorage)
-        // para evitar loop de navegação causado por chamadas async dentro de $stateChangeStart
+        // Protege as rotas - verifica????o SOMENTE s??ncrona (localStorage)
+        // para evitar loop de navega????o causado por chamadas async dentro de $stateChangeStart
         $rootScope.$on('$stateChangeStart', function (event, toState) {
             if (typeof $window.cleanupBootstrapModalState === 'function') {
                 $window.cleanupBootstrapModalState();
@@ -2123,7 +2123,7 @@ angular
                                 toState.name === 'forgot_password' ||
                                 toState.name === 'landing';
 
-            if (isPublicState) return; // Sempre permite páginas públicas
+            if (isPublicState) return; // Sempre permite p??ginas p??blicas
 
             var hasCurrentUser = !!$rootScope.currentUser;
             var hasLocalSession = !!localStorage.getItem(sessionKey);

@@ -99,7 +99,7 @@
 
             <li ng-class="{active: $state.includes('darpe')}"
                 ng-if="main.canAccessModule('Darpe')">
-                <a href="" data-mobile-sref="darpe.musicos"><i class="fa fa-medkit"></i> <span class="nav-label">{{ 'D.A.R.P.E' | translate }}
+                <a href="" data-mobile-sref="darpe.dashboard"><i class="fa fa-medkit"></i> <span class="nav-label">{{ 'D.A.R.P.E' | translate }}
                     </span><span class="label label-info pull-right">NOVO</span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('darpe')}">
                     <li ui-sref-active="active"><a ui-sref="darpe.dashboard">Dashboard</a></li>

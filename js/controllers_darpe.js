@@ -257,7 +257,7 @@
         $scope.handleLocalChange = function () { syncLocalFields($scope.currentAtendimento, $scope.clinicas); };
 
         $scope.prepareAdd = function () {
-            $scope.currentAtendimento = { status: 'Agendado', periodicidade: 'Quinzenal', musicosSelecionadosIds: [] };
+            $scope.currentAtendimento = { status: 'Agendado', periodicidade: 'Quinzenal', musicosSelecionadosIds: [], setor: '' };
             $scope.editingAtendimento = false; $scope.viewOnly = false;
             showDarpeModal('#modalAddAtendimentoDarpe', $timeout);
         };
@@ -274,6 +274,9 @@
 
         $scope.saveAtendimento = function () {
             if ($scope.viewOnly) return $('#modalAddAtendimentoDarpe').modal('hide');
+            if (!$scope.currentAtendimento.setor) return swal('Preenchimento Obrigatório', 'Selecione a Modalidade (Setor).', 'warning');
+            if (!$scope.currentAtendimento.local_id) return swal('Preenchimento Obrigatório', 'Selecione o Local de Atendimento.', 'warning');
+
             normalizeAtendimentoForm($scope.currentAtendimento, $scope.musicos, $scope.clinicas);
             
             if ($scope.editingAtendimento) {
@@ -361,10 +364,9 @@
                 header: { left: 'prev,next today', center: 'title', right: 'month,agendaWeek,agendaDay' },
                 eventClick: function(e) { $scope.prepareEdit(e.originalData); },
                 dayClick: function(d) { $scope.prepareAdd(d); },
-                eventReceive: function(e) {
-                    var cal = uiCalendarConfig.calendars['darpeCalendar'];
-                    if (cal) cal.fullCalendar('removeEvents', e._id || e.id);
-                    $scope.$apply(function() { $scope.prepareAdd(e.start, e.sector_id || $(e.el).data('sector-id')); });
+                drop: function(date, jsEvent, ui) {
+                    var sectorId = $(this).data('sector-id');
+                    $scope.$apply(function() { $scope.prepareAdd(date, String(sectorId)); });
                 }
             }
         };
@@ -374,7 +376,7 @@
             return data.map(function(item) {
                 var d = parseDarpeDate(item.data_atendimento); if (!d) return null;
                 var sk = (item.setor || '').split(' - ')[0];
-                return { id: item.id, title: (item.local_nome || 'Local') + ' (' + (item.musicos_nomes || '') + ')', start: d, allDay: true, className: [sc[sk] || '', 'status-' + (item.status || 'agendado').toLowerCase()], originalData: item };
+                return { id: item.id, title: (item.local_nome || 'Local') + ' (' + (item.musicos_nomes || '') + ')', start: d, allDay: true, className: [sc[sk] || '', 'status-' + (item.status || 'agendado').toLowerCase()], textColor: '#ffffff', originalData: item };
             }).filter(Boolean);
         }
 
@@ -401,9 +403,17 @@
         };
         $scope.handleLocalChange = function () { syncLocalFields($scope.currentAtendimento, $scope.clinicas); };
 
-        $scope.prepareAdd = function (date) {
+        var sectorMap = {
+            '1': 'SETOR 1 - Sistemas de Ressocialização',
+            '2': 'SETOR 2 - Clínica de Dependentes',
+            '3': 'SETOR 3 - Forças de Segurança',
+            '4': 'SETOR 4 - Hospitais/Idosos'
+        };
+
+        $scope.prepareAdd = function (date, sectorId) {
             if (!$scope.canManageCadastros) return darpeRestrict('Acesso restrito.');
-            $scope.currentAtendimento = { status: 'Agendado', periodicidade: 'Quinzenal', musicosSelecionadosIds: [], data_atendimento: formatDarpeDateInput(date || new Date()) };
+            var preSelectedSector = sectorId ? (sectorMap[sectorId] || '') : '';
+            $scope.currentAtendimento = { status: 'Agendado', periodicidade: 'Quinzenal', musicosSelecionadosIds: [], data_atendimento: formatDarpeDateInput(date || new Date()), setor: preSelectedSector };
             $scope.editingAtendimento = false; $scope.viewOnly = false; showDarpeModal('#modalAddAtendimentoDarpe', $timeout);
         };
 
@@ -417,6 +427,10 @@
         };
 
         $scope.saveAtendimento = function () {
+            if ($scope.viewOnly) return $('#modalAddAtendimentoDarpe').modal('hide');
+            if (!$scope.currentAtendimento.setor) return swal('Preenchimento Obrigatório', 'Selecione a Modalidade (Setor).', 'warning');
+            if (!$scope.currentAtendimento.local_id) return swal('Preenchimento Obrigatório', 'Selecione o Local de Atendimento.', 'warning');
+
             normalizeAtendimentoForm($scope.currentAtendimento, $scope.musicos, $scope.clinicas);
             if ($scope.editingAtendimento) {
                 DarpeService.updateAtendimento($scope.currentAtendimento).then(function () {
