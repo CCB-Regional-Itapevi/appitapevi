@@ -207,18 +207,20 @@
 
         function getMusicos() {
             var deferred = $q.defer();
+            console.log('[DarpeService] Fetching musicos...');
             AuthService.applyDataScopeToQuery(
                 supabase.from('darpe_musicos').select('*'),
                 DARPE_MUSICOS_SCOPE
             ).order('nome_completo', { ascending: true })
                 .then(function (response) {
-                    if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(
-                        AuthService.filterCollectionByDataScope(
-                            (response.data || []).map(normalizeMusicoRecord),
-                            DARPE_MUSICOS_SCOPE
-                        )
-                    );
+                    if (response.error) {
+                        console.error('[DarpeService] Error fetching musicos:', response.error);
+                        deferred.reject(response.error);
+                    } else {
+                        var data = (response.data || []).map(normalizeMusicoRecord);
+                        console.log('[DarpeService] Musicos fetched:', data.length);
+                        deferred.resolve(data);
+                    }
                 });
             return deferred.promise;
         }
@@ -282,18 +284,20 @@
 
         function getClinicas() {
             var deferred = $q.defer();
+            console.log('[DarpeService] Fetching clinicas...');
             AuthService.applyDataScopeToQuery(
                 supabase.from('darpe_clinicas').select('*'),
                 DARPE_CLINICAS_SCOPE
             ).order('nome_local', { ascending: true })
                 .then(function (response) {
-                    if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(
-                        AuthService.filterCollectionByDataScope(
-                            (response.data || []).map(normalizeClinicaRecord),
-                            DARPE_CLINICAS_SCOPE
-                        )
-                    );
+                    if (response.error) {
+                        console.error('[DarpeService] Error fetching clinicas:', response.error);
+                        deferred.reject(response.error);
+                    } else {
+                        var data = (response.data || []).map(normalizeClinicaRecord);
+                        console.log('[DarpeService] Clinicas fetched:', data.length);
+                        deferred.resolve(data);
+                    }
                 });
             return deferred.promise;
         }

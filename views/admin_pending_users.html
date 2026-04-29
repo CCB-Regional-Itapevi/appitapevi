@@ -451,7 +451,7 @@
                                                     </div>
                                                     <div class="pending-user-field">
                                                         <span class="pending-user-field-label">Status</span>
-                                                        <span class="label label-warning">{{user.status || 'pending'}}</span>
+                                                        <span class="label label-warning">{{formatPendingStatus(user.status)}}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -496,7 +496,7 @@
                                         <span class="pending-list-name">{{formatPendingDisplayName(user.full_name || 'Sem nome')}}</span>
                                         <small class="pending-list-secondary">{{user.username || '-'}}</small>
                                         <div class="pending-list-badges">
-                                            <span class="label" ng-class="getPendingStatusLabelClass(user)">{{user.status || 'pending'}}</span>
+                                            <span class="label" ng-class="getPendingStatusLabelClass(user)">{{formatPendingStatus(user.status)}}</span>
                                             <span class="label label-info">{{getPendingRoleName(user.review.role_id)}}</span>
                                             <span class="label label-default">{{user.review.comum || 'Sem comum informado'}}</span>
                                         </div>

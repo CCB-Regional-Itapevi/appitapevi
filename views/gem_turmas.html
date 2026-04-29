@@ -1,0 +1,63 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Turmas</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="gem.dashboard">G.E.M</a></li>
+            <li class="active"><strong>Turmas cadastradas</strong></li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+    <div class="alert alert-warning" ng-if="!errorMessage && turmasState.indisponivel">
+        <i class="fa fa-info-circle"></i> {{ turmasState.mensagem }}
+    </div>
+
+    <div class="ibox">
+        <div class="ibox-title">
+            <h5>Lista de todas as turmas</h5>
+            <div class="ibox-tools">
+                <span class="label label-info">{{ (turmasState.turmas || []).length }} registros</span>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Congrega&ccedil;&atilde;o</th>
+                            <th>Curso</th>
+                            <th>Turma</th>
+                            <th class="text-center">Matriculados</th>
+                            <th>In&iacute;cio</th>
+                            <th>T&eacute;rmino</th>
+                            <th>Dia e hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="turma in turmasState.turmas">
+                            <td>
+                                <span class="label" ng-class="{'label-primary': (turma.status || '').toLowerCase() === 'ativo', 'label-default': (turma.status || '').toLowerCase() !== 'ativo'}">
+                                    {{ turma.status || 'Ativo' }}
+                                </span>
+                            </td>
+                            <td>{{ turma.congregacao_nome || '-' }}</td>
+                            <td>{{ turma.curso_nome || '-' }}</td>
+                            <td>{{ turma.nome || turma.turma || '-' }}</td>
+                            <td class="text-center"><span class="badge badge-primary">{{ turma.matriculados || 0 }}</span></td>
+                            <td>{{ turma.data_inicio | date:'dd/MM/yyyy' }}</td>
+                            <td>{{ turma.data_fim | date:'dd/MM/yyyy' }}</td>
+                            <td>{{ turma.periodo_label || '-' }}</td>
+                        </tr>
+                        <tr ng-if="!(turmasState.turmas || []).length && !loading">
+                            <td colspan="8" class="text-center text-muted">Nenhuma turma encontrada neste ambiente.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

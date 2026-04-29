@@ -132,7 +132,7 @@
 
             var nextEvent = angular.copy(baseEvent);
             nextEvent.data_atendimento = formatDarpeDateInput(currentDate);
-            // Calcula a próxima visita do próximo evento também
+            // Calcula a prÃ³xima visita do prÃ³ximo evento tambÃ©m
             nextEvent.proxima_visita = nextVisitFromPeriod(nextEvent.data_atendimento, baseEvent.periodicidade);
             series.push(nextEvent);
         }
@@ -149,6 +149,7 @@
        CONTROLADORES
        ========================================================================== */
 
+    darpeMusicosCtrl.$inject = ['$scope', 'DarpeService', '$timeout', 'AuthService', '$rootScope'];
     function darpeMusicosCtrl($scope, DarpeService, $timeout, AuthService, $rootScope) {
         $scope.musicos = []; $scope.loading = true; $scope.newMusico = {}; $scope.editingMusico = false; $scope.viewOnly = false;
         refreshDarpePermissions($scope, $rootScope);
@@ -180,7 +181,17 @@
         $scope.saveNewMusico = function () {
             if ($scope.viewOnly) return $('#modalAddMusicoDarpe').modal('hide');
             ($scope.editingMusico ? DarpeService.updateMusico($scope.newMusico) : DarpeService.saveMusico($scope.newMusico)).then(function () {
-                swal('Sucesso', '', 'success'); $('#modalAddMusicoDarpe').modal('hide'); $scope.loadMusicos();
+                swal({
+                    title: "Sucesso",
+                    text: "Registro salvo com sucesso",
+                    type: "success",
+                    confirmButtonColor: "#214e7a",
+                    confirmButtonText: "OK",
+                    showConfirmButton: true,
+                    customClass: "app-swal-auto-close",
+                    timer: 3000
+                });
+                $('#modalAddMusicoDarpe').modal('hide'); $scope.loadMusicos();
             }).catch(function (e) { swal('Erro', e.message || e, 'error'); });
         };
 
@@ -194,19 +205,36 @@
         $scope.loadMusicos();
     }
 
+    darpeClinicasCtrl.$inject = ['$scope', 'DarpeService', '$timeout', '$rootScope'];
     function darpeClinicasCtrl($scope, DarpeService, $timeout, $rootScope) {
         $scope.clinicas = []; $scope.loading = true; $scope.newClinica = {}; $scope.editingClinica = false; $scope.viewOnly = false;
         refreshDarpePermissions($scope, $rootScope);
 
+        $scope.formatPhoneField = function (m, f) { $scope[m][f] = formatDarpePhone($scope[m][f] || ''); };
+
         $scope.loadClinicas = function () {
             $scope.loading = true;
-            DarpeService.getClinicas().then(function (d) { $scope.clinicas = (d || []).map(normalizeDisplayRecord); $scope.loading = false; })
-                .catch(function () { $scope.loading = false; $scope.clinicas = []; });
+            console.log('[DARPE] Carregando clinicas...');
+            DarpeService.getClinicas().then(function (d) {
+                console.log('[DARPE] Clinicas carregadas:', (d || []).length);
+                $scope.clinicas = (d || []).map(normalizeDisplayRecord);
+                $scope.loading = false;
+            }).catch(function (e) {
+                console.error('[DARPE] Erro ao carregar clinicas:', e);
+                $scope.loading = false;
+                $scope.clinicas = [];
+            });
         };
 
         $scope.prepareAdd = function () {
             $scope.newClinica = { status: 'Ativo', tipo_local: 'Clínica', periodicidade_preferencial: 'Quinzenal' };
             $scope.editingClinica = false; $scope.viewOnly = false;
+            showDarpeModal('#modalAddClinicaDarpe', $timeout);
+        };
+
+        $scope.verDetalhes = function (c) {
+            $scope.newClinica = angular.copy(c || {});
+            $scope.editingClinica = false; $scope.viewOnly = true;
             showDarpeModal('#modalAddClinicaDarpe', $timeout);
         };
 
@@ -219,13 +247,43 @@
 
         $scope.saveNewClinica = function () {
             ($scope.editingClinica ? DarpeService.updateClinica($scope.newClinica) : DarpeService.saveClinica($scope.newClinica)).then(function () {
-                swal('Sucesso', '', 'success'); $('#modalAddClinicaDarpe').modal('hide'); $scope.loadClinicas();
+                swal({
+                    title: "Sucesso",
+                    text: "Registro salvo com sucesso",
+                    type: "success",
+                    confirmButtonColor: "#214e7a",
+                    confirmButtonText: "OK",
+                    showConfirmButton: true,
+                    customClass: "app-swal-auto-close",
+                    timer: 3000
+                });
+                $('#modalAddClinicaDarpe').modal('hide'); $scope.loadClinicas();
             }).catch(function (e) { swal('Erro', e.message || e, 'error'); });
+        };
+
+        $scope.confirmDelete = function (c) {
+            if (!$scope.canManageCadastros) return darpeRestrict('Acesso restrito.');
+            swal({
+                title: "Tem certeza?",
+                text: "Deseja realmente apagar o registro da clínica " + (c.nome_local || '') + "?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Sim, apagar!",
+                cancelButtonText: "Cancelar",
+                closeOnConfirm: false
+            }, function () {
+                DarpeService.deleteClinica(c.id).then(function () {
+                    swal("Apagado!", "O registro foi removido com sucesso.", "success");
+                    $scope.loadClinicas();
+                }).catch(function (e) { swal("Erro", e.message || e, "error"); });
+            });
         };
 
         $scope.loadClinicas();
     }
 
+    darpeAtendimentosCtrl.$inject = ['$scope', 'DarpeService', '$timeout', '$rootScope'];
     function darpeAtendimentosCtrl($scope, DarpeService, $timeout, $rootScope) {
         $scope.atendimentos = []; $scope.musicos = []; $scope.clinicas = []; $scope.loading = true; $scope.currentAtendimento = {};
         $scope.editingAtendimento = false; $scope.viewOnly = false;
@@ -281,20 +339,67 @@
             
             if ($scope.editingAtendimento) {
                 DarpeService.updateAtendimento($scope.currentAtendimento).then(function () {
-                    swal('Sucesso', '', 'success'); $('#modalAddAtendimentoDarpe').modal('hide'); $scope.loadData();
+                                        swal({
+                        title: "Sucesso",
+                        text: "Registro salvo com sucesso",
+                        type: "success",
+                        confirmButtonColor: "#214e7a",
+                        confirmButtonText: "OK",
+                        showConfirmButton: true,
+                        customClass: "app-swal-auto-close",
+                        timer: 3000
+                    });
+ $('#modalAddAtendimentoDarpe').modal('hide'); $scope.loadData();
                 }).catch(function (e) { swal('Erro', e.message || e, 'error'); });
             } else {
-                // Novo atendimento - criar série recorrente
-                var series = generateRecurrenceSeries($scope.currentAtendimento, 4);
+                // Novo atendimento - criar série recorrente (Apenas 1 próxima ocorrência para evitar confusão)
+                var series = generateRecurrenceSeries($scope.currentAtendimento, 1);
                 var promises = [DarpeService.saveAtendimento($scope.currentAtendimento)];
                 series.forEach(function (occ) { promises.push(DarpeService.saveAtendimento(occ)); });
 
                 Promise.all(promises).then(function () {
-                    swal('Sucesso', 'Série de agendamentos criada.', 'success'); 
+                    swal({
+                        title: "Sucesso",
+                        text: "Série de agendamentos criada com sucesso",
+                        type: "success",
+                        confirmButtonColor: "#214e7a",
+                        confirmButtonText: "OK",
+                        showConfirmButton: true,
+                        customClass: "app-swal-auto-close",
+                        timer: 3000
+                    }); 
                     $('#modalAddAtendimentoDarpe').modal('hide'); 
                     $scope.loadData();
                 }).catch(function (e) { swal('Erro ao criar série', e.message || e, 'error'); });
             }
+        };
+
+        $scope.deleteAtendimento = function (item) {
+            if (!item.id) return;
+            swal({
+                title: "Excluir Registro?",
+                text: "Deseja realmente remover este agendamento?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ed5565",
+                confirmButtonText: "Sim, excluir",
+                cancelButtonText: "Cancelar"
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    DarpeService.deleteAtendimento(item.id).then(function () {
+                        swal({
+                            title: "Excluído",
+                            text: "Registro removido com sucesso",
+                            type: "success",
+                            confirmButtonColor: "#214e7a",
+                            timer: 2000,
+                            showConfirmButton: true
+                        });
+                        $('#modalAddAtendimentoDarpe').modal('hide');
+                        $scope.loadData();
+                    }).catch(function (e) { swal("Erro", e.message || e, "error"); });
+                }
+            });
         };
 
         $scope.loadData();
@@ -315,6 +420,7 @@
         }).catch(function () { $scope.$applyAsync(function () { $scope.loading = false; }); });
     }
 
+    darpeBatismosCtrl.$inject = ['$scope', 'DarpeService', '$timeout', '$rootScope'];
     function darpeBatismosCtrl($scope, DarpeService, $timeout, $rootScope) {
         $scope.batismos = []; $scope.loading = true; $scope.newBatismo = {};
         refreshDarpePermissions($scope, $rootScope);
@@ -323,7 +429,19 @@
         };
         $scope.prepareAdd = function () { $scope.newBatismo = { data_batismo: formatDarpeDateInput(new Date()) }; showDarpeModal('#modalAddBatismoDarpe', $timeout); };
         $scope.saveBatismo = function () {
-            DarpeService.saveBatismo($scope.newBatismo).then(function () { swal('Sucesso', '', 'success'); $('#modalAddBatismoDarpe').modal('hide'); $scope.loadBatismos(); });
+            DarpeService.saveBatismo($scope.newBatismo).then(function () {
+                swal({
+                    title: "Sucesso",
+                    text: "Registro salvo com sucesso",
+                    type: "success",
+                    confirmButtonColor: "#214e7a",
+                    confirmButtonText: "OK",
+                    showConfirmButton: true,
+                    customClass: "app-swal-auto-close",
+                    timer: 3000
+                });
+                $('#modalAddBatismoDarpe').modal('hide'); $scope.loadBatismos();
+            });
         };
         $scope.loadBatismos();
     }
@@ -341,6 +459,7 @@
         $scope.init();
     }
 
+    darpeCalendarioCtrl.$inject = ['$scope', 'DarpeService', '$timeout', '$rootScope', 'uiCalendarConfig'];
     function darpeCalendarioCtrl($scope, DarpeService, $timeout, $rootScope, uiCalendarConfig) {
         $scope.loading = true; if (window.moment) moment.locale('pt-br'); refreshDarpePermissions($scope, $rootScope);
         $scope.atendimentos = []; $scope.musicos = []; $scope.clinicas = []; $scope.currentAtendimento = {};
@@ -360,8 +479,24 @@
 
         $scope.uiConfig = {
             calendar: {
-                height: 700, editable: true, droppable: true,
-                header: { left: 'prev,next today', center: 'title', right: 'month,agendaWeek,agendaDay' },
+                height: 700,
+                editable: true,
+                droppable: true,
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                buttonText: {
+                    today: 'hoje',
+                    month: 'mês',
+                    week: 'semana',
+                    day: 'dia'
+                },
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
                 eventClick: function(e) { $scope.prepareEdit(e.originalData); },
                 dayClick: function(d) { $scope.prepareAdd(d); },
                 drop: function(date, jsEvent, ui) {
@@ -371,12 +506,50 @@
             }
         };
 
-        function mapToCalendarEvents(data) {
-            var sc = { 'SETOR 1': 'sector-1', 'SETOR 2': 'sector-2', 'SETOR 3': 'sector-3', 'SETOR 4': 'sector-4' };
+        function mapToCalendarEvents(data, clinicas) {
+            var colorMap = {
+                'sector-1': { bg: '#cde4f7', text: '#1c84c6' },
+                'sector-2': { bg: '#c8efeb', text: '#1ab394' },
+                'sector-3': { bg: '#fee8ca', text: '#f8ac59' },
+                'sector-4': { bg: '#e9dbf7', text: '#673ab7' }
+            };
+
             return data.map(function(item) {
                 var d = parseDarpeDate(item.data_atendimento); if (!d) return null;
-                var sk = (item.setor || '').split(' - ')[0];
-                return { id: item.id, title: (item.local_nome || 'Local') + ' (' + (item.musicos_nomes || '') + ')', start: d, allDay: true, className: [sc[sk] || '', 'status-' + (item.status || 'agendado').toLowerCase()], textColor: '#ffffff', originalData: item };
+                
+                var sectorStr = String(item.setor || '').trim();
+                
+                // Fallback: Se o setor estiver vazio, busca na lista de clinicas pelo local_id
+                if (!sectorStr && item.local_id && clinicas) {
+                    var local = clinicas.find(function(c) { return String(c.id) === String(item.local_id); });
+                    if (local && local.setor) sectorStr = local.setor;
+                }
+
+                var sk = sectorStr.toUpperCase();
+                var sectorClass = '';
+
+                // Matching inteligente - removendo acentos e normalizando
+                var cleanSk = sk.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                if (cleanSk.indexOf('SETOR 1') > -1 || cleanSk.indexOf('RESSOCIALIZA') > -1) sectorClass = 'sector-1';
+                else if (cleanSk.indexOf('SETOR 2') > -1 || cleanSk.indexOf('CLINICA') > -1 || cleanSk.indexOf('ALBERGUE') > -1) sectorClass = 'sector-2';
+                else if (cleanSk.indexOf('SETOR 3') > -1 || cleanSk.indexOf('SEGURANCA') > -1 || cleanSk.indexOf('FORCA') > -1) sectorClass = 'sector-3';
+                else if (cleanSk.indexOf('SETOR 4') > -1 || cleanSk.indexOf('HOSPITA') > -1 || cleanSk.indexOf('IDOSO') > -1 || cleanSk.indexOf('EDUCACIONAL') > -1 || cleanSk.indexOf('EDU') > -1) sectorClass = 'sector-4';
+
+                var colors = colorMap[sectorClass] || { bg: '#f8f9fa', text: '#676a6c' };
+
+                return {
+                    id: item.id,
+                    title: (item.local_nome || 'Local') + ' (' + (item.musicos_nomes || '') + ')',
+                    start: d,
+                    allDay: true,
+                    className: [sectorClass, 'status-' + (item.status || 'agendado').toLowerCase()],
+                    color: colors.bg,
+                    backgroundColor: colors.bg,
+                    textColor: colors.text,
+                    borderColor: colors.bg,
+                    originalData: item
+                };
             }).filter(Boolean);
         }
 
@@ -387,7 +560,7 @@
                     $scope.atendimentos = (res[0] || []).map(normalizeDisplayRecord);
                     $scope.musicos = (res[1] || []).map(normalizeDisplayRecord).filter(function(m) { return (m.status || 'Ativo') === 'Ativo'; });
                     $scope.clinicas = (res[2] || []).map(normalizeDisplayRecord).filter(function(c) { return (c.status || 'Ativo') === 'Ativo'; });
-                    $scope.eventSources.length = 0; $scope.eventSources.push(mapToCalendarEvents($scope.atendimentos));
+                    $scope.eventSources.length = 0; $scope.eventSources.push(mapToCalendarEvents($scope.atendimentos, $scope.clinicas));
                     $scope.loading = false; initializeExternalEvents();
                 });
             }).catch(function () { $scope.$applyAsync(function () { $scope.loading = false; }); });
@@ -407,7 +580,7 @@
             '1': 'SETOR 1 - Sistemas de Ressocialização',
             '2': 'SETOR 2 - Clínica de Dependentes',
             '3': 'SETOR 3 - Forças de Segurança',
-            '4': 'SETOR 4 - Hospitais/Idosos'
+            '4': 'SETOR 4 - Hospitais/Idosos/Educacional'
         };
 
         $scope.prepareAdd = function (date, sectorId) {
@@ -434,17 +607,66 @@
             normalizeAtendimentoForm($scope.currentAtendimento, $scope.musicos, $scope.clinicas);
             if ($scope.editingAtendimento) {
                 DarpeService.updateAtendimento($scope.currentAtendimento).then(function () {
-                    swal('Sucesso', '', 'success'); $('#modalAddAtendimentoDarpe').modal('hide'); $scope.loadData();
+                                        swal({
+                        title: "Sucesso",
+                        text: "Registro salvo com sucesso",
+                        type: "success",
+                        confirmButtonColor: "#214e7a",
+                        confirmButtonText: "OK",
+                        showConfirmButton: true,
+                        customClass: "app-swal-auto-close",
+                        timer: 3000
+                    });
+ $('#modalAddAtendimentoDarpe').modal('hide'); $scope.loadData();
                 }).catch(function (e) { swal('Erro', e.message || e, 'error'); });
             } else {
                 var series = generateRecurrenceSeries($scope.currentAtendimento, 4);
                 var promises = [DarpeService.saveAtendimento($scope.currentAtendimento)];
                 series.forEach(function (occ) { promises.push(DarpeService.saveAtendimento(occ)); });
                 Promise.all(promises).then(function () {
-                    swal('Sucesso', 'Eventos criados.', 'success'); $('#modalAddAtendimentoDarpe').modal('hide'); $scope.loadData();
+                    swal({
+                        title: "Sucesso",
+                        text: "Registro salvo com sucesso",
+                        type: "success",
+                        confirmButtonColor: "#214e7a",
+                        confirmButtonText: "OK",
+                        showConfirmButton: true,
+                        customClass: "app-swal-auto-close",
+                        timer: 3000
+                    });
+                    $('#modalAddAtendimentoDarpe').modal('hide'); $scope.loadData();
                 }).catch(function (e) { swal('Erro', e.message || e, 'error'); });
             }
         };
+
+        $scope.deleteAtendimento = function (item) {
+            if (!item.id) return;
+            swal({
+                title: "Excluir Registro?",
+                text: "Deseja realmente remover este agendamento?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ed5565",
+                confirmButtonText: "Sim, excluir",
+                cancelButtonText: "Cancelar"
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    DarpeService.deleteAtendimento(item.id).then(function () {
+                        swal({
+                            title: "Excluído",
+                            text: "Registro removido com sucesso",
+                            type: "success",
+                            confirmButtonColor: "#214e7a",
+                            timer: 2000,
+                            showConfirmButton: true
+                        });
+                        $('#modalAddAtendimentoDarpe').modal('hide');
+                        $scope.loadData();
+                    }).catch(function (e) { swal("Erro", e.message || e, "error"); });
+                }
+            });
+        };
+
         $scope.loadData();
     }
 

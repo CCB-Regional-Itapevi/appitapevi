@@ -1,0 +1,129 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-8">
+        <h2>Presen&ccedil;as dos Ensaios Regionais</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="music.dashboard">M&uacute;sica</a></li>
+            <li class="active"><strong>Presen&ccedil;as</strong></li>
+        </ol>
+    </div>
+    <div class="col-lg-4 text-right m-t-lg">
+        <button class="btn btn-primary btn-sm" ng-click="openPresencaModal()"><i class="fa fa-plus"></i> Novo lan&ccedil;amento</button>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+    <div class="ibox">
+        <div class="ibox-title"><h5>Filtro do ensaio</h5></div>
+        <div class="ibox-content">
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label>Ensaio</label>
+                    <select class="form-control input-sm" ng-model="selectedEnsaioId" ng-options="e.id as (e.titulo + ' - ' + e.data_ensaio) for e in ensaios"></select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label>Busca</label>
+                    <input class="form-control input-sm" ng-model="filters.searchText" placeholder="Comum, local ou observacao">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label>Munic&iacute;pio</label>
+                    <input class="form-control input-sm" ng-model="filters.municipio" placeholder="Filtrar municipio">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ibox">
+        <div class="ibox-title"><h5>Lan&ccedil;amentos agrupados por munic&iacute;pio</h5></div>
+        <div class="ibox-content">
+            <div class="row m-b-md" ng-if="!loading">
+                <div class="col-sm-3"><div class="well well-sm m-b-none"><strong>{{ filteredPresencas.length }}</strong><br><small>Comuns da base regional</small></div></div>
+                <div class="col-sm-3"><div class="well well-sm m-b-none"><strong>{{ visitantesResumo.totais.total || 0 }}</strong><br><small>Fora da base regional</small></div></div>
+                <div class="col-sm-3"><div class="well well-sm m-b-none"><strong>{{ visitantesResumo.totais.musicos || 0 }}</strong><br><small>M&uacute;sicos fora da base</small></div></div>
+                <div class="col-sm-3"><div class="well well-sm m-b-none"><strong>{{ visitantesResumo.totais.organistas || 0 }}</strong><br><small>Organistas fora da base</small></div></div>
+            </div>
+            <div class="sk-spinner sk-spinner-wave" ng-if="loading">
+                <div class="sk-rect1"></div><div class="sk-rect2"></div><div class="sk-rect3"></div><div class="sk-rect4"></div><div class="sk-rect5"></div>
+            </div>
+            <div ng-if="!loading">
+                <div class="ibox collapsed" ng-repeat="grupo in groupedPresencas">
+                    <div class="ibox-title">
+                        <h5>{{ grupo.municipio }}</h5>
+                        <div class="ibox-tools">
+                            <span class="label label-primary">{{ grupo.total }} presentes</span>
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </div>
+                    </div>
+                    <div class="ibox-content" style="display:block;">
+                        <div class="row m-b-sm">
+                            <div class="col-sm-2"><strong>{{ grupo.items.length }}</strong><br><small>Comuns</small></div>
+                            <div class="col-sm-2"><strong>{{ grupo.musicos }}</strong><br><small>M&uacute;sicos</small></div>
+                            <div class="col-sm-2"><strong>{{ grupo.organistas }}</strong><br><small>Organistas</small></div>
+                            <div class="col-sm-2"><strong>{{ grupo.ministerio }}</strong><br><small>Minist&eacute;rio</small></div>
+                            <div class="col-sm-2"><strong>{{ grupo.apoio }}</strong><br><small>Apoio</small></div>
+                            <div class="col-sm-2"><strong>{{ grupo.outros }}</strong><br><small>Outros</small></div>
+                        </div>
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Comum</th>
+                                    <th>Local do ensaio</th>
+                                    <th class="text-center">M&uacute;sicos</th>
+                                    <th class="text-center">Organistas</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">A&ccedil;&otilde;es</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in grupo.items | limitTo:12">
+                                    <td><strong>{{ item.comum_congregacao }}</strong></td>
+                                    <td>{{ item.local_ensaio || '-' }}</td>
+                                    <td class="text-center">{{ item.musicos }}</td>
+                                    <td class="text-center">{{ item.organistas }}</td>
+                                    <td class="text-center"><span class="label label-primary">{{ item.total_presentes }}</span></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-xs btn-white" ng-click="openPresencaModal(item)"><i class="fa fa-pencil"></i></button>
+                                        <button class="btn btn-xs btn-danger" ng-click="confirmDeletePresenca(item)"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="text-center text-muted" ng-if="!groupedPresencas.length">Nenhuma presen&ccedil;a encontrada.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="musicaPresencaModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Presen&ccedil;a por comum</h4></div>
+        <div class="modal-body">
+            <div class="form-group"><label>Ensaio</label><select class="form-control" ng-model="presencaForm.ensaio_id" ng-options="e.id as (e.titulo + ' - ' + e.data_ensaio) for e in ensaios"></select></div>
+            <div class="row">
+                <div class="col-sm-6 form-group"><label>Munic&iacute;pio</label><input class="form-control" ng-model="presencaForm.municipio"></div>
+                <div class="col-sm-6 form-group"><label>Comum</label><input class="form-control" ng-model="presencaForm.comum_congregacao"></div>
+            </div>
+            <div class="form-group"><label>Local do ensaio</label><input class="form-control" ng-model="presencaForm.local_ensaio"></div>
+            <div class="row">
+                <div class="col-sm-4 form-group"><label>M&uacute;sicos</label><input type="number" min="0" class="form-control" ng-model="presencaForm.musicos"></div>
+                <div class="col-sm-4 form-group"><label>Organistas</label><input type="number" min="0" class="form-control" ng-model="presencaForm.organistas"></div>
+                <div class="col-sm-4 form-group"><label>Irmandade</label><input type="number" min="0" class="form-control" ng-model="presencaForm.irmandade"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 form-group"><label>Minist&eacute;rio</label><input type="number" min="0" class="form-control" ng-model="presencaForm.ministerio"></div>
+                <div class="col-sm-3 form-group"><label>Apoio</label><input type="number" min="0" class="form-control" ng-model="presencaForm.apoio"></div>
+                <div class="col-sm-3 form-group"><label>Outros</label><input type="number" min="0" class="form-control" ng-model="presencaForm.outros"></div>
+                <div class="col-sm-3 form-group"><label>Aus&ecirc;ncias just.</label><input type="number" min="0" class="form-control" ng-model="presencaForm.ausentes_justificados"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 form-group"><label>Encarregado local</label><div><label class="i-checks"><input type="checkbox" ng-model="presencaForm.encarregado_local"> <i></i> Sim</label></div></div>
+                <div class="col-sm-8 form-group"><label>Nome do encarregado</label><input class="form-control" ng-model="presencaForm.nome_encarregado"></div>
+            </div>
+            <div class="form-group"><label>Observa&ccedil;&otilde;es</label><textarea rows="3" class="form-control" ng-model="presencaForm.observacoes"></textarea></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-white" data-dismiss="modal">Cancelar</button><button class="btn btn-primary" ng-click="savePresenca()" ng-disabled="saving">Salvar</button></div>
+    </div></div>
+</div>

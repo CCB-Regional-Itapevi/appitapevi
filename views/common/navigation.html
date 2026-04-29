@@ -66,8 +66,8 @@
                         }}</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('ebi')}">
                     <li ui-sref-active="active"><a ui-sref="ebi.dashboard">Dashboard EBI</a></li>
-                    <li ui-sref-active="active"><a ui-sref="ebi.presenca">Histórico Atividade</a></li>
-                    <li ui-sref-active="active"><a ui-sref="ebi.alunos">Crianças EBI</a></li>
+                    <li ui-sref-active="active"><a ui-sref="ebi.presenca">Hist&oacute;rico Atividade</a></li>
+                    <li ui-sref-active="active"><a ui-sref="ebi.alunos">Crian&ccedil;as EBI</a></li>
                     <li ui-sref-active="active"><a ui-sref="ebi.instrutores">Colaboradores EBI</a></li>
                 </ul>
             </li>
@@ -97,16 +97,41 @@
                 </ul>
             </li>
 
+            <li ui-sref-active="active" ng-if="main.canAccessModule('Musica')">
+                <a href="" data-mobile-sref="music.dashboard"><i class="fa fa-music"></i> <span class="nav-label">{{ 'MUSICA' | translate
+                        }}</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('music')}">
+                    <li ui-sref-active="active"><a ui-sref="music.dashboard">Dashboard</a></li>
+                    <li ui-sref-active="active"><a ui-sref="music.ensaios">Ensaios Regionais</a></li>
+                    <li ui-sref-active="active"><a ui-sref="music.presencas">Presen&ccedil;as</a></li>
+                    <li ui-sref-active="active"><a ui-sref="music.justificativas">Justificativas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="music.relatorios">Relat&oacute;rio Unificado</a></li>                    
+                </ul>
+            </li>
+
+            <li ng-class="{active: $state.includes('gem')}"
+                ng-if="main.canAccessModule('Gem')">
+                <a href="" data-mobile-sref="gem.dashboard"><i class="fa fa-edit"></i> <span class="nav-label">{{ 'G.E.M' | translate }}</span><span
+                        class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('gem')}">
+                    <li ui-sref-active="active"><a ui-sref="gem.dashboard">Dashboard</a></li>
+                    <li ui-sref-active="active"><a ui-sref="gem.alunos">Alunos</a></li>
+                    <li ui-sref-active="active"><a ui-sref="gem.historico">Hist&oacute;rico de Aula</a></li>
+                    <li ui-sref-active="active"><a ui-sref="gem.planos">Plano de Aulas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="gem.turmas">Turmas</a></li>
+                </ul>
+            </li>
+
             <li ng-class="{active: $state.includes('darpe')}"
                 ng-if="main.canAccessModule('Darpe')">
                 <a href="" data-mobile-sref="darpe.dashboard"><i class="fa fa-medkit"></i> <span class="nav-label">{{ 'D.A.R.P.E' | translate }}
                     </span><span class="label label-info pull-right">NOVO</span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('darpe')}">
                     <li ui-sref-active="active"><a ui-sref="darpe.dashboard">Dashboard</a></li>
-                    <li ui-sref-active="active"><a ui-sref="darpe.calendario">Calendário</a></li>
-                    <li ui-sref-active="active"><a ui-sref="darpe.musicos">Músicos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="darpe.clinicas">Clínicas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="darpe.ministerio">Ministério</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.calendario">Calend&aacute;rio</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.musicos">M&uacute;sicos</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.clinicas">Cl&iacute;nicas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="darpe.ministerio">Minist&eacute;rio</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.atendimentos">Atendimentos</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.membros">Membros</a></li>
                     <li ui-sref-active="active"><a ui-sref="darpe.batismos">Batismos</a></li>
@@ -117,25 +142,15 @@
                 <a href="" data-mobile-sref="depac.musicos"><i class="fa-solid fa-hands"></i> <span class="nav-label">{{ 'D.E.P.A.C' | translate }}
                     </span><span class="label label-info pull-right">NOVO</span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('depac')}">
-                    <li ui-sref-active="active"><a ui-sref="depac.musicos">Músicos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.clinicas">Clínicas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.ministerio">Ministério</a></li>
+                    <li ui-sref-active="active"><a ui-sref="depac.musicos">M&uacute;sicos</a></li>
+                    <li ui-sref-active="active"><a ui-sref="depac.clinicas">Cl&iacute;nicas</a></li>
+                    <li ui-sref-active="active"><a ui-sref="depac.ministerio">Minist&eacute;rio</a></li>
                     <li ui-sref-active="active"><a ui-sref="depac.atendimentos">Atendimentos</a></li>
                     <li ui-sref-active="active"><a ui-sref="depac.membros">Membros</a></li>
                     <li ui-sref-active="active"><a ui-sref="depac.batismos">Batismos</a></li>
                 </ul>
             </li>
-            <li ng-class="{active: $state.includes('forms')}"
-                ng-if="main.canAccessModule('Gem')">
-                <a href="" data-mobile-sref="forms.basic_form"><i class="fa fa-edit"></i> <span class="nav-label">{{ 'G.E.M' | translate }}</span><span
-                        class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('forms')}">
-                    <li ui-sref-active="active"><a ui-sref="forms.basic_form">Alunos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="forms.advanced_plugins">Histórico de Aulas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="forms.wizard.step_one">Planos de Aula</a></li>
-                    <li ui-sref-active="active"><a ui-sref="forms.file_upload">Turmas</a></li>
-                </ul>
-            </li>            
+            
 
             <li ui-sref-active="active" ng-if="main.canAccessGlobalMenu()">
                 <a href=""><i class="fa fa-cogs"></i> <span class="nav-label">{{ 'MANUTENCAO' | translate
@@ -146,19 +161,6 @@
                 <a href=""><i class="fa fa-bucket"></i> <span class="nav-label">{{ 'CNS' | translate }}</span>
                 </a>
             </li>
-
-            <li ui-sref-active="active" ng-if="main.canAccessModule('Musica')">
-                <a href="" data-mobile-sref="music.static_table"><i class="fa fa-music"></i> <span class="nav-label">{{ 'MUSICA' | translate
-                        }}</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('music')}">
-                    <li ui-sref-active="active"><a ui-sref="music.static_table">Ensaios Regionais</a></li>
-                    <li ui-sref-active="active"><a ui-sref="music.data_tables">Exames / Testes</a></li>
-                    <li ui-sref-active="active"><a ui-sref="music.foo_table">Músicos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="music.nggrid">Organistas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="music.nggrid">Candidatos</a></li>
-                </ul>
-            </li>         
-           
 
             <li ng-class="{active: $state.includes('tables')}" ng-if="main.canAccessGlobalMenu()">
                 <a href=""><i class="fa fa-file-pdf-o"></i> <span class="nav-label">{{ 'RELATORIOS' | translate
@@ -175,11 +177,11 @@
                         }}</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('tables')}">
                     <li ui-sref-active="active"><a ui-sref="tables.static_table">Entrada</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de Serviços</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de Servi&ccedil;os</a></li>
                     <li ui-sref-active="active"><a ui-sref="tables.static_table">Ordem de Compra</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Inventário</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Manutenção</a></li>
-                    <li ui-sref-active="active"><a ui-sref="tables.data_tables">Saída</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Invent&aacute;rio</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.static_table">Manuten&ccedil;&atilde;o</a></li>
+                    <li ui-sref-active="active"><a ui-sref="tables.data_tables">Sa&iacute;da</a></li>
                 </ul>
             </li>
 
@@ -196,4 +198,3 @@
 
     </div>
 </nav>
-

@@ -1,0 +1,430 @@
+<style>
+    :root {
+        --music-brand: #1e4b7a;
+        --music-brand-dark: #15355a;
+        --music-bg: #f1f5f9;
+        --music-line: #e2e8f0;
+        --music-text: #1e293b;
+        --music-muted: #64748b;
+    }
+
+    .music-public-page {
+        min-height: 100vh;
+        background: #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--music-text);
+    }
+
+    .music-public-card {
+        width: min(560px, 95%);
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        overflow: visible;
+        text-align: center;
+        border: 1px solid var(--music-line);
+    }
+
+    .music-public-header {
+        background: var(--music-brand);
+        padding: 40px 30px;
+        color: #fff;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .music-public-logo {
+        max-width: 190px;
+        height: auto;
+        margin: 0 auto 15px;
+        display: block;
+        filter: brightness(0) invert(1);
+    }
+
+    .music-public-title {
+        color: #fff;
+        font-size: 25px;
+        font-weight: 700;
+        margin: 0 0 8px;
+        line-height: 1.2;
+    }
+
+    .music-public-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 15px;
+        line-height: 1.4;
+        margin: 0 auto;
+    }
+
+    .music-public-body {
+        padding: 34px 40px 38px;
+        background: #fff;
+        border-radius: 0 0 16px 16px;
+    }
+
+    .music-public-feedback {
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        text-align: left;
+    }
+
+    .music-public-feedback.info {
+        background: #e0f2fe;
+        color: #075985;
+        border: 1px solid #bae6fd;
+    }
+
+    .music-public-feedback.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .music-public-field {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: stretch;
+        border: 1px solid var(--music-line);
+        border-radius: 10px;
+        background: #fff;
+        position: relative;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        overflow: visible;
+        text-align: left;
+    }
+
+    .music-public-field:focus-within {
+        border-color: var(--music-brand);
+        box-shadow: 0 0 0 3px rgba(30, 75, 122, 0.08);
+        z-index: 50;
+    }
+
+    .music-public-icon {
+        width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        border-right: 1px solid var(--music-line);
+        color: var(--music-brand);
+        border-radius: 10px 0 0 10px;
+        flex-shrink: 0;
+        font-size: 18px;
+    }
+
+    .music-public-control {
+        flex: 1;
+        min-width: 0;
+        border: none !important;
+        height: 52px;
+        padding: 0 15px !important;
+        font-size: 15px;
+        color: #334155;
+        background: transparent;
+        outline: none;
+        box-shadow: none !important;
+    }
+
+    select.music-public-control {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 40px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231e4b7a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        background-size: 12px;
+    }
+
+    textarea.music-public-control {
+        height: auto;
+        min-height: 96px;
+        padding-top: 14px !important;
+        padding-bottom: 14px !important;
+        resize: vertical;
+    }
+
+    .music-public-list {
+        position: absolute;
+        left: 50px;
+        right: 0;
+        top: calc(100% + 2px);
+        z-index: 70;
+        background: #fff;
+        border: 1px solid var(--music-line);
+        border-radius: 10px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+        max-height: 250px;
+        overflow: auto;
+    }
+
+    .music-public-option {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        text-align: left;
+        padding: 11px 13px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+    }
+
+    .music-public-option:hover,
+    .music-public-option:focus,
+    .music-public-option.is-active {
+        background: #f8fafc;
+        outline: none;
+    }
+
+    .music-public-option strong {
+        display: block;
+        color: #1e293b;
+        font-size: 14px;
+    }
+
+    .music-public-option small {
+        color: var(--music-muted);
+        font-size: 12px;
+    }
+
+    .music-public-hint {
+        margin: -8px 0 14px 50px;
+        color: var(--music-muted);
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .music-public-autofill {
+        margin: -2px 0 15px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--music-line);
+        background: #f8fafc;
+        text-align: left;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    .music-public-autofill span {
+        display: block;
+        margin: 3px 0;
+    }
+
+    .music-public-btn {
+        width: 100%;
+        height: 52px;
+        background: linear-gradient(135deg, var(--music-brand) 0%, var(--music-brand-dark) 100%);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+        transition: all 0.25s;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .music-public-btn:hover {
+        background: linear-gradient(135deg, #255c94 0%, var(--music-brand) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(30, 75, 122, 0.3);
+    }
+
+    .music-public-btn:disabled {
+        opacity: 0.72;
+        cursor: wait;
+        transform: none;
+    }
+
+    .music-public-success {
+        padding: 8px 0 4px;
+    }
+
+    .music-public-success > i {
+        color: #059669;
+        font-size: 46px;
+        margin-bottom: 12px;
+    }
+
+    .music-public-success .music-public-btn i {
+        color: #fff;
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .music-public-footer {
+        margin-top: 22px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--music-muted);
+        line-height: 1.45;
+    }
+
+    .music-public-footer span,
+    .music-public-footer a {
+        display: block;
+    }
+
+    .music-public-footer a {
+        color: var(--music-brand);
+        text-decoration: underline;
+    }
+
+    .music-public-footer strong {
+        color: #334155;
+        font-weight: 700;
+    }
+
+    @media (max-width: 480px) {
+        .music-public-page {
+            padding: 14px;
+            justify-content: flex-start;
+        }
+        .music-public-header {
+            padding: 30px 20px;
+        }
+        .music-public-logo {
+            max-width: 145px;
+            margin-bottom: 12px;
+        }
+        .music-public-title {
+            font-size: 22px;
+        }
+        .music-public-body {
+            padding: 22px 18px 26px;
+        }
+        .music-public-icon {
+            width: 46px;
+        }
+        .music-public-list {
+            left: 46px;
+        }
+        .music-public-hint {
+            margin-left: 46px;
+        }
+    }
+</style>
+
+<div class="music-public-page">
+    <div class="music-public-card">
+        <div class="music-public-header">
+            <img src="img/logo-ccb-light.png" alt="CCB" class="music-public-logo">
+            <h1 class="music-public-title">Justificativa de Aus&ecirc;ncia</h1>
+            <p class="music-public-subtitle">M&uacute;sica - Regional Itapevi</p>
+        </div>
+
+        <div class="music-public-body" ng-if="sent">
+            <div class="music-public-success">
+                <i class="fa fa-check-circle"></i>
+                <h2>Justificativa enviada</h2>
+                <p class="text-muted">Deus aben&ccedil;oe. O registro foi recebido pela Secret&aacute;ria da M&uacute;sica.</p>
+                <button type="button" class="music-public-btn" ng-click="resetForm()">
+                    <i class="fa fa-paper-plane"></i> Enviar outra
+                </button>
+            </div>
+        </div>
+
+        <form class="music-public-body" ng-if="!sent" ng-submit="submitJustificativa()" novalidate>
+            <div class="music-public-feedback info" ng-if="infoMessage">{{ infoMessage }}</div>
+            <div class="music-public-feedback error" ng-if="errorMessage">{{ errorMessage }}</div>
+
+            <div class="music-public-field">
+                <div class="music-public-icon"><i class="fa fa-calendar-check-o"></i></div>
+                <select class="music-public-control" ng-model="form.tipo_evento" required>
+                    <option value="Ensaio Regional">Ensaio Regional</option>
+                    <option value="Reunião do Ministério">Reuni&atilde;o do Minist&eacute;rio</option>
+                    <option value="Reunião Técnica">Reuni&atilde;o T&eacute;cnica</option>
+                    <option value="Outros eventos da Música">Outros eventos da M&uacute;sica</option>
+                </select>
+            </div>
+
+            <div class="music-public-field">
+                <div class="music-public-icon"><i class="fa fa-calendar"></i></div>
+                <input type="date" class="music-public-control" ng-model="form.data_evento" aria-label="Data do evento">
+            </div>
+
+            <div class="music-public-field">
+                <div class="music-public-icon"><i class="fa fa-map-marker"></i></div>
+                <input type="text" class="music-public-control" ng-model="form.comum_display" ng-change="onComumSearchChange()" ng-keydown="handleComumKeydown($event)" placeholder="Pesquise sua Comum..." autocomplete="off" required>
+                <div class="music-public-list" ng-if="comuns.length && form.comum_display">
+                    <button type="button" class="music-public-option" ng-class="{'is-active': $index === activeComumIndex}" ng-repeat="comum in comuns" ng-mousedown="$event.preventDefault(); selectComum(comum)" ng-touchstart="selectComum(comum)" ng-click="selectComum(comum)">
+                        <strong>{{ comum.displayName }}</strong>
+                        <small>{{ comum.nome }}</small>
+                    </button>
+                </div>
+            </div>
+            <div class="music-public-hint" ng-if="loadingComuns"><i class="fa fa-spinner fa-spin"></i> Buscando comuns...</div>
+
+            <div class="music-public-field">
+                <div class="music-public-icon"><i class="fa fa-user"></i></div>
+                <input type="text" class="music-public-control" ng-model="form.nome" ng-change="onNomeSearchChange()" ng-keydown="handlePessoaKeydown($event)" placeholder="Pesquise o nome ou digite manualmente" autocomplete="off" required>
+                <div class="music-public-list" ng-if="pessoas.length && form.nome">
+                    <button type="button" class="music-public-option" ng-class="{'is-active': $index === activePessoaIndex}" ng-repeat="pessoa in pessoas" ng-mousedown="$event.preventDefault(); selectPessoa(pessoa)" ng-touchstart="selectPessoa(pessoa)" ng-click="selectPessoa(pessoa)">
+                        <strong>{{ pessoa.nome }}</strong>
+                        <small>{{ pessoa.cargo || form.cargo }} <span ng-if="pessoa.instrumento">- {{ pessoa.instrumento }}</span></small>
+                    </button>
+                </div>
+            </div>
+            <div class="music-public-hint" ng-if="loadingPessoas"><i class="fa fa-spinner fa-spin"></i> Buscando nomes...</div>
+
+            <div class="music-public-field" ng-if="shouldShowPublicCargoField()">
+                <div class="music-public-icon"><i class="fa fa-id-badge"></i></div>
+                <select class="music-public-control" ng-model="form.cargo" ng-change="onCargoChange()" required>
+                    <option value="">Nome n&atilde;o encontrado. Selecione o cargo / minist&eacute;rio</option>
+                    <option ng-repeat="cargo in cargos" value="{{ cargo }}">{{ cargo }}</option>
+                </select>
+            </div>
+
+            <div class="music-public-field" ng-if="shouldShowPublicInstrumentoField()">
+                <div class="music-public-icon"><i class="fa fa-music"></i></div>
+                <input type="text" class="music-public-control" ng-model="form.instrumento" ng-change="onInstrumentoSearchChange()" ng-focus="onInstrumentoFocus()" ng-keydown="handleInstrumentoKeydown($event)" placeholder="Pesquise o instrumento..." autocomplete="off" required>
+                <div class="music-public-list" ng-if="instrumentosFiltrados.length && !instrumentoSelecionado">
+                    <button type="button" class="music-public-option" ng-class="{'is-active': $index === activeInstrumentoIndex}" ng-repeat="instrumento in instrumentosFiltrados" ng-mousedown="$event.preventDefault(); selectInstrumento(instrumento)" ng-touchstart="selectInstrumento(instrumento)" ng-click="selectInstrumento(instrumento)">
+                        <strong>{{ instrumento }}</strong>
+                    </button>
+                </div>
+            </div>
+
+            <div class="music-public-autofill" ng-if="form.municipio || (form.instrumento && !shouldShowPublicInstrumentoField()) || form.nivel">
+                <span ng-if="form.municipio"><strong>Munic&iacute;pio:</strong> {{ form.municipio }}</span>
+                <span ng-if="form.instrumento && !shouldShowPublicInstrumentoField()"><strong>Instrumento:</strong> {{ form.instrumento }}</span>
+                <span ng-if="form.nivel"><strong>N&iacute;vel:</strong> {{ form.nivel }}</span>
+            </div>
+
+            <div class="music-public-field">
+                <div class="music-public-icon"><i class="fa fa-commenting-o"></i></div>
+                <select class="music-public-control" ng-model="form.motivo" required>
+                    <option value="">Selecione o motivo da aus&ecirc;ncia</option>
+                    <option ng-repeat="motivo in motivosAusencia" value="{{ motivo }}">{{ motivo }}</option>
+                </select>
+            </div>
+
+            <div class="music-public-field" ng-if="form.motivo === 'Outros'">
+                <div class="music-public-icon"><i class="fa fa-sticky-note-o"></i></div>
+                <textarea class="music-public-control" ng-model="form.observacoes" placeholder="Observa&ccedil;&otilde;es sobre o motivo"></textarea>
+            </div>
+
+            <button type="submit" class="music-public-btn" ng-disabled="sending">
+                <i class="fa" ng-class="sending ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+                Enviar justificativa
+            </button>
+        </form>
+    </div>
+
+    <div class="music-public-footer">
+        <span>&copy; Secretaria da M&uacute;sica - Regional Itapevi</span>
+        <a href="">Congrega&ccedil;&atilde;o Crist&atilde; no Brasil</a>
+        <strong>Regional Itapevi</strong>
+    </div>
+</div>

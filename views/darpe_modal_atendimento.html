@@ -80,6 +80,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger pull-left" ng-show="editingAtendimento && !viewOnly" ng-click="deleteAtendimento(currentAtendimento)"><i class="fa fa-trash"></i> Excluir</button>
                 <button type="button" class="btn btn-white" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                 <button type="button" class="btn btn-primary" ng-click="saveAtendimento()"><i class="fa fa-floppy-o"></i> {{viewOnly ? 'Fechar' : 'Salvar'}}</button>
             </div>

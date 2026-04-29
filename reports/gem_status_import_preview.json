@@ -1,0 +1,167 @@
+{
+  "linhas_planilha_unicas": 2390,
+  "candidatos_banco": 2484,
+  "casamentos_seguros": 2234,
+  "nao_casados": 156,
+  "regras_de_casamento": {
+    "par_exato": 1957,
+    "par_sem_codigo": 243,
+    "nome_unico": 34
+  },
+  "status_previstos": {
+    "Excluir": 1256,
+    "Alerta": 474,
+    "Inativo": 504
+  },
+  "amostra_nao_casados": [
+    {
+      "nome": "ANDRÉ DA ROCHA ANDRADE",
+      "localidade": "BR-22-0418 - GRANJA VIANA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_COTIA.xlsx",
+      "aba": "COTIA",
+      "sugestoes": []
+    },
+    {
+      "nome": "ARTHUR DE MATOS FAUSTINO",
+      "localidade": "BR-22-1581 - JARDIM OURO VERDE",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_JANDIRA.xlsx",
+      "aba": "JANDIRA",
+      "sugestoes": []
+    },
+    {
+      "nome": "DAVI",
+      "localidade": "BR-22-3061 - JARDIM RUTH",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_ITAPEVI.xlsx",
+      "aba": "ITAPEVI",
+      "sugestoes": [
+        {
+          "id": "002e872f-aa46-4e6d-840e-47d691862ad1",
+          "nome_aluno": "DAVI RODRIGUES FERREIRA",
+          "comum_congregacao": "BR-22-3061 - JARDIM RUTH",
+          "status": "Ativo",
+          "nivel": "CANDIDATO(A)"
+        }
+      ]
+    },
+    {
+      "nome": "JOSÉ ADEVALDO SILVA DOS SANTOS",
+      "localidade": "JARDIM ITAPUÃ - STNA DE PARNAÍBA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01.xlsx",
+      "aba": "DADOS GERAIS",
+      "sugestoes": []
+    },
+    {
+      "nome": "KAUÊ MORAES DA HORA",
+      "localidade": "BR-22-1980 - VILA SANTA RITA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_ITAPEVI.xlsx",
+      "aba": "ITAPEVI",
+      "sugestoes": []
+    },
+    {
+      "nome": "MARCELO FERREIRA ROCHA",
+      "localidade": "BR-21-1311 - VILA LUNARDA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_SANTANA.xlsx",
+      "aba": "SANTANA",
+      "sugestoes": []
+    },
+    {
+      "nome": "MARCOS HENRY NEVES SILVA FERREIRA",
+      "localidade": "BR-22-3396 - MORADAS SANTA FÉ",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_COTIA.xlsx",
+      "aba": "COTIA",
+      "sugestoes": []
+    },
+    {
+      "nome": "MIGUEL BENEDICTOR NEVES SILVA DE OLIVEIRA",
+      "localidade": "BR-22-3396 - MORADAS SANTA FÉ",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_COTIA.xlsx",
+      "aba": "COTIA",
+      "sugestoes": []
+    },
+    {
+      "nome": "OLAVIO SILVA VIANA",
+      "localidade": "BR-22-2292 - PARQUE SUBURBANO I",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_ITAPEVI.xlsx",
+      "aba": "ITAPEVI",
+      "sugestoes": []
+    },
+    {
+      "nome": "RAFAEL FERREIRA DA SILV",
+      "localidade": "JARDIM ITAPUÃ - STNA DE PARNAÍBA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01.xlsx",
+      "aba": "DADOS GERAIS",
+      "sugestoes": []
+    },
+    {
+      "nome": "ABNER DE SOUZA MENDES",
+      "localidade": "BR-21-1039 - ITAPEVI CENTRAL",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_ITAPEVI.xlsx",
+      "aba": "ITAPEVI",
+      "sugestoes": []
+    },
+    {
+      "nome": "ALVINO DIAS DE OLIVEIRA",
+      "localidade": "BR-22-3033 - CHÁCARA SANTA CECÍLIA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_ITAPEVI.xlsx",
+      "aba": "ITAPEVI",
+      "sugestoes": []
+    },
+    {
+      "nome": "ANDESON DA SILVA SANTIAGO",
+      "localidade": "BR-22-2596 - JARDIM NOVA AMADOR BUENO",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_ITAPEVI.xlsx",
+      "aba": "ITAPEVI",
+      "sugestoes": []
+    },
+    {
+      "nome": "ARTHUR BERTOLLO GONÇALVES",
+      "localidade": "BR-22-1598 - JARDIM DO ENGENHO",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_COTIA.xlsx",
+      "aba": "COTIA",
+      "sugestoes": []
+    },
+    {
+      "nome": "ARTHUR LOBO LEITE",
+      "localidade": "BR-22-2521 - COLINAS DA ANHANGUERA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_SANTANA.xlsx",
+      "aba": "SANTANA",
+      "sugestoes": []
+    },
+    {
+      "nome": "ARTHUR SAMUEL DE LIMA AMORIM",
+      "localidade": "BR-22-0430 - ROSELÂNDIA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_COTIA.xlsx",
+      "aba": "COTIA",
+      "sugestoes": []
+    },
+    {
+      "nome": "BERNARDO BOSCHETTI",
+      "localidade": "BR-21-1528 - PARQUE PAIOL II",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_PIRAPORA.xlsx",
+      "aba": "PIRAPORA",
+      "sugestoes": []
+    },
+    {
+      "nome": "BRYAN DA LUZ",
+      "localidade": "BR-22-1980 - VILA SANTA RITA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_ITAPEVI.xlsx",
+      "aba": "ITAPEVI",
+      "sugestoes": []
+    },
+    {
+      "nome": "CARLOS DANIEL OLIVEIRA GONCALVES",
+      "localidade": "BR-22-0427 - JARDIM MARGARIDA",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_VGP.xlsx",
+      "aba": "VGP",
+      "sugestoes": []
+    },
+    {
+      "nome": "CARLOS EDUARDO CAMILO",
+      "localidade": "BR-21-1528 - PARQUE PAIOL II",
+      "arquivo": "EVOLUCAO_ALUNOS_SAM_DEZEMBRO_2025_v01_PIRAPORA.xlsx",
+      "aba": "PIRAPORA",
+      "sugestoes": []
+    }
+  ],
+  "modo": "dry-run"
+}

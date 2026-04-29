@@ -5010,7 +5010,8 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
         ADMIN: 'Administra\u00e7\u00e3o',
         USER_MANAGEMENT: 'Usu\u00e1rios',
         USERS: 'Usu\u00e1rios',
-        MINISTERIO_REGIONAL: 'Ministerio Regional'
+        MINISTERIO_REGIONAL: 'Ministerio Regional',
+        GEM: 'G.E.M'
     };
     defaultFromDate.setDate(defaultFromDate.getDate() - 30);
 
@@ -6265,6 +6266,20 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         return getPendingRoleName(roleId);
     };
 
+    $scope.formatPendingStatus = function (status) {
+        var s = normalizePendingText(status);
+        if (s === 'pending' || !s) {
+            return 'Pendente';
+        }
+        if (s === 'approved' || s === 'liberado') {
+            return 'Liberado';
+        }
+        if (s === 'rejected' || s === 'recusado') {
+            return 'Recusado';
+        }
+        return status;
+    };
+
     $scope.getPendingStatusLabelClass = function (user) {
         var status = normalizePendingText(user && user.status);
 
@@ -6589,7 +6604,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
     $scope.statusFilter = '';
     $scope.comumFilter = '';
     $scope.viewMode = 'grouped';
-    $scope.groupBy = 'comum';
+    $scope.groupBy = 'municipio';
     $scope.collapsedUserGroups = {};
     $scope.commonOptions = [];
     $scope.accessLevels = angular.copy(defaultAccessLevels);
@@ -6730,6 +6745,10 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             return user.sector || 'sem-setor';
         }
 
+        if ($scope.groupBy === 'municipio') {
+            return resolveUserMunicipio(user);
+        }
+
         return user.comum || 'sem-comum';
     }
 
@@ -6742,7 +6761,42 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             return $scope.formatSectorLabel(groupKey === 'sem-setor' ? '' : groupKey);
         }
 
+        if ($scope.groupBy === 'municipio') {
+            return groupKey;
+        }
+
         return groupKey === 'sem-comum' ? 'Sem comum' : groupKey;
+    }
+
+    function resolveUserMunicipio(user) {
+        var comum = user && user.comum ? user.comum : 'Sem comum informado';
+        var normalizedComum = normalizeAdminSearchText(comum);
+        var match = String(comum).toUpperCase().match(/(BR-\d{2}-\d{3,4})/);
+        var comumCode = match && match[1] ? match[1] : '';
+        var catalogEntry = null;
+
+        if (comumCode) {
+            catalogEntry = ($scope.comunsCatalog || []).find(function (item) {
+                return String(item && item.codigo || '').toUpperCase() === comumCode;
+            });
+        }
+
+        if (!catalogEntry && normalizedComum) {
+            catalogEntry = ($scope.comunsCatalog || []).find(function (item) {
+                var name = String(item.nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+                return name === normalizedComum;
+            });
+        }
+
+        return (catalogEntry && catalogEntry.cidade) || 'Sem município';
+    }
+
+    function normalizeAdminSearchText(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
     }
 
     function refreshGroupedUsers() {
@@ -7102,6 +7156,15 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         }).catch(function () {
             $scope.sectors = angular.copy(defaultSectors);
         });
+
+        if (AuthService.listComunsCatalog) {
+            AuthService.listComunsCatalog().then(function (catalog) {
+                $scope.comunsCatalog = catalog || [];
+                if ($scope.groupBy === 'municipio') {
+                    refreshFilteredUsers();
+                }
+            });
+        }
     };
 
     $scope.$watch(function () {
@@ -22643,8 +22706,1023 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
         return $rootScope.currentUser;
     }, syncHistoricalImportAccess, true);
 
-    loadDashboard();
+loadDashboard();
 }
 
+(function () {
+    'use strict';
 
+    angular.module('inspinia')
+        .controller('gemDashboardCtrl', gemDashboardCtrl)
+        .controller('gemAlunosCtrl', gemAlunosCtrl)
+        .controller('gemResumoCtrl', gemResumoCtrl)
+        .controller('gemHistoricoCtrl', gemHistoricoCtrl)
+        .controller('gemPlanosCtrl', gemPlanosCtrl)
+        .controller('gemTurmasCtrl', gemTurmasCtrl);
 
+    gemDashboardCtrl.$inject = ['$scope', '$state', 'GemService'];
+    gemAlunosCtrl.$inject = ['$scope', '$state', '$rootScope', '$timeout', 'GemService'];
+    gemResumoCtrl.$inject = ['$scope', '$state', '$stateParams', '$rootScope', 'GemService'];
+    gemHistoricoCtrl.$inject = ['$scope', '$state', 'GemService'];
+    gemPlanosCtrl.$inject = ['$scope', '$state', 'GemService'];
+    gemTurmasCtrl.$inject = ['$scope', '$state', 'GemService'];
+
+    function gemDashboardCtrl($scope, $state, GemService) {
+        $scope.loading = true;
+        $scope.errorMessage = '';
+        $scope.dashboard = {
+            metrics: {},
+            alunos: [],
+            rankingComuns: [],
+            rankingMunicipios: [],
+            rankingInstrumentos: [],
+            timeline: []
+        };
+        $scope.filters = {
+            searchText: '',
+            comum: '',
+            instrumento: ''
+        };
+        $scope.filteredRanking = [];
+        $scope.filteredAlunos = [];
+        $scope.expandedMunicipios = {};
+
+        $scope.openResumo = function (aluno) {
+            if (aluno && aluno.id) {
+                $state.go('gem.resumo', { id: aluno.id });
+            }
+        };
+
+        $scope.toggleMunicipio = function (municipioNome) {
+            $scope.expandedMunicipios[municipioNome] = !$scope.expandedMunicipios[municipioNome];
+        };
+
+        $scope.$watchGroup(['filters.searchText', 'filters.comum', 'filters.instrumento'], applyFilters);
+
+        GemService.getDashboardData().then(function (data) {
+            $scope.dashboard = data || $scope.dashboard;
+            applyFilters();
+        }).catch(function (error) {
+            $scope.errorMessage = 'Nao foi possivel carregar o dashboard: ' + resolveErrorMessage(error);
+        }).finally(function () {
+            $scope.loading = false;
+        });
+
+        function applyFilters() {
+            var search = normalizeText($scope.filters.searchText);
+            var comum = normalizeText($scope.filters.comum);
+            var instrumento = normalizeText($scope.filters.instrumento);
+
+            $scope.filteredRanking = ($scope.dashboard.rankingMunicipios || []).map(function (municipioItem) {
+                var filteredComuns = (municipioItem.comuns || []).filter(function (comumItem) {
+                    if (comum && normalizeText(comumItem.nome).indexOf(comum) === -1) {
+                        return false;
+                    }
+
+                    if (search) {
+                        var commonHaystack = normalizeText([
+                            municipioItem.nome,
+                            comumItem.nome
+                        ].join(' '));
+
+                        if (commonHaystack.indexOf(search) === -1) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
+
+                if (!filteredComuns.length) {
+                    if (!search && !comum) {
+                        filteredComuns = municipioItem.comuns || [];
+                    } else {
+                        return null;
+                    }
+                }
+
+                return angular.extend({}, municipioItem, {
+                    comunsFiltradas: filteredComuns
+                });
+            }).filter(function (item) {
+                if (!item) {
+                    return false;
+                }
+                return true;
+            });
+
+            $scope.filteredAlunos = ($scope.dashboard.alunos || []).filter(function (aluno) {
+                var haystack = normalizeText([
+                    aluno.nome_aluno,
+                    aluno.comum_congregacao,
+                    aluno.instrumento,
+                    aluno.nivel,
+                    aluno.status
+                ].join(' '));
+
+                if (search && haystack.indexOf(search) === -1) {
+                    return false;
+                }
+
+                if (comum && normalizeText(aluno.comum_congregacao).indexOf(comum) === -1) {
+                    return false;
+                }
+
+                if (instrumento && normalizeText(aluno.instrumento).indexOf(instrumento) === -1) {
+                    return false;
+                }
+
+                return true;
+            }).slice(0, 12);
+        }
+    }
+
+    function gemAlunosCtrl($scope, $state, $rootScope, $timeout, GemService) {
+        var requestToken = 0;
+        var filtersInitialized = false;
+
+        $scope.loading = false;
+        $scope.savingAluno = false;
+        $scope.importingStatus = false;
+        $scope.errorMessage = '';
+        $scope.alunos = [];
+        $scope.filteredAlunos = [];
+        $scope.visibleAlunos = [];
+        $scope.totalAlunos = 0;
+        $scope.statusImport = {
+            files: [],
+            preview: null
+        };
+        $scope.filters = {
+            searchText: '',
+            comum: '',
+            instrumento: ''
+        };
+        $scope.pagination = {
+            currentPage: 1,
+            pageSize: 50,
+            totalPages: 1
+        };
+        $scope.editingAluno = buildAlunoPayload();
+
+        $scope.prepareNovo = function () {
+            $scope.editingAluno = buildAlunoPayload();
+            openGemModal('#gemAlunoModal');
+        };
+
+        $scope.prepareEdit = function (aluno) {
+            $scope.editingAluno = angular.extend(buildAlunoPayload(), angular.copy(aluno || {}));
+            openGemModal('#gemAlunoModal');
+        };
+
+        $scope.openStatusImportModal = function () {
+            $scope.statusImport = {
+                files: [],
+                preview: null
+            };
+            if (document.getElementById('gemStatusWorkbookInput')) {
+                document.getElementById('gemStatusWorkbookInput').value = '';
+            }
+            openGemModal('#gemStatusImportModal');
+        };
+
+        $scope.handleStatusWorkbookSelection = function (element) {
+            $scope.$applyAsync(function () {
+                $scope.statusImport.files = Array.prototype.slice.call((element && element.files) || []);
+                $scope.statusImport.preview = null;
+            });
+        };
+
+        $scope.previewStatusImport = function () {
+            if (!($scope.statusImport.files || []).length) {
+                showGemAlert('Planilha obrigatoria', 'Selecione ao menos uma planilha para gerar a previa.', 'warning');
+                return;
+            }
+
+            $scope.importingStatus = true;
+
+            GemService.previewStatusWorkbookImport($scope.statusImport.files).then(function (preview) {
+                $scope.statusImport.preview = preview;
+            }).catch(function (error) {
+                showGemAlert('Erro', 'Nao foi possivel analisar a planilha: ' + resolveErrorMessage(error), 'error');
+            }).finally(function () {
+                $scope.importingStatus = false;
+            });
+        };
+
+        $scope.exportStatusReviewCsv = function () {
+            var rows = (($scope.statusImport || {}).preview || {}).reviewRows || [];
+            var csvLines;
+            var blob;
+            var url;
+            var link;
+
+            if (!rows.length) {
+                showGemAlert('Sem revisao pendente', 'A previa atual nao gerou sugestoes para revisao manual.', 'warning');
+                return;
+            }
+
+            csvLines = ['Nome;Localidade;Arquivo;Aba;Sugestoes'];
+            rows.forEach(function (row) {
+                var suggestions = (row.sugestoes || []).map(function (item) {
+                    return (item.nome_aluno || '') + ' => ' + (item.comum_congregacao || '');
+                }).join(' | ');
+
+                csvLines.push([
+                    row.nome || '',
+                    row.localidade || '',
+                    row.arquivo || '',
+                    row.aba || '',
+                    suggestions
+                ].map(function (value) {
+                    return '"' + String(value).replace(/"/g, '""') + '"';
+                }).join(';'));
+            });
+
+            blob = new Blob(["\ufeff" + csvLines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+            url = window.URL.createObjectURL(blob);
+            link = document.createElement('a');
+            link.href = url;
+            link.download = 'gem_status_revisao_manual.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        };
+
+        $scope.applyStatusImport = function () {
+            if (!$scope.statusImport.preview || !($scope.statusImport.preview.updates || []).length) {
+                showGemAlert('Sem atualizacoes', 'Gere a previa antes de aplicar as classificacoes.', 'warning');
+                return;
+            }
+
+            $scope.importingStatus = true;
+
+            GemService.applyStatusWorkbookImport($scope.statusImport.preview).then(function (result) {
+                angular.element('#gemStatusImportModal').modal('hide');
+                showGemAlert('Classificacao concluida', (result.updated || 0) + ' alunos foram atualizados pela planilha.', 'success');
+                loadAlunos();
+            }).catch(function (error) {
+                showGemAlert('Erro', 'Nao foi possivel aplicar a classificacao: ' + resolveErrorMessage(error), 'error');
+            }).finally(function () {
+                $scope.importingStatus = false;
+            });
+        };
+
+        $scope.openResumo = function (aluno) {
+            if (!aluno || !aluno.id) {
+                return;
+            }
+
+            $state.go('gem.resumo', { id: aluno.id });
+        };
+
+        $scope.saveAluno = function () {
+            var payload = angular.extend(buildAlunoPayload(), angular.copy($scope.editingAluno || {}));
+            var action;
+
+            if (!payload.nome_aluno) {
+                showGemAlert('Nome obrigatorio', 'Informe o nome do aluno para continuar.', 'warning');
+                return;
+            }
+
+            $scope.savingAluno = true;
+            action = payload.id ? GemService.updateAluno(payload) : GemService.saveAluno(payload);
+
+            action.then(function () {
+                angular.element('#gemAlunoModal').modal('hide');
+                showGemAlert('Sucesso', payload.id ? 'Aluno atualizado com sucesso.' : 'Aluno cadastrado com sucesso.', 'success');
+                loadAlunos();
+            }).catch(function (error) {
+                showGemAlert('Erro', 'Nao foi possivel salvar o aluno: ' + resolveErrorMessage(error), 'error');
+            }).finally(function () {
+                $scope.savingAluno = false;
+            });
+        };
+
+        $scope.confirmDelete = function (aluno) {
+            if (!aluno || !aluno.id) {
+                return;
+            }
+
+            showGemConfirm(
+                'Excluir aluno?',
+                'Todos os lancamentos vinculados a ' + (aluno.nome_aluno || 'este aluno') + ' tambem serao removidos.',
+                function () {
+                    GemService.deleteAluno(aluno.id).then(function () {
+                        showGemAlert('Removido', 'Aluno excluido com sucesso.', 'success');
+                        loadAlunos();
+                    }).catch(function (error) {
+                        showGemAlert('Erro', 'Nao foi possivel excluir o aluno: ' + resolveErrorMessage(error), 'error');
+                    });
+                }
+            );
+        };
+
+        $scope.applyFilters = applyFilters;
+        $scope.goToPage = goToPage;
+        $scope.nextPage = nextPage;
+        $scope.previousPage = previousPage;
+
+        $scope.$watchGroup(['filters.searchText', 'filters.comum', 'filters.instrumento'], function () {
+            if (!filtersInitialized) {
+                filtersInitialized = true;
+                return;
+            }
+            applyFilters();
+        });
+
+        loadAlunos();
+
+        function loadAlunos() {
+            var currentToken = ++requestToken;
+
+            $scope.loading = true;
+            $scope.errorMessage = '';
+
+            GemService.getAlunosPage($scope.filters, $scope.pagination).then(function (result) {
+                if (currentToken !== requestToken) {
+                    return;
+                }
+
+                $scope.alunos = result.rows || [];
+                $scope.filteredAlunos = result.rows || [];
+                $scope.visibleAlunos = result.rows || [];
+                $scope.totalAlunos = result.totalCount || 0;
+                $scope.pagination.currentPage = result.currentPage || 1;
+                $scope.pagination.pageSize = result.pageSize || $scope.pagination.pageSize;
+                $scope.pagination.totalPages = result.totalPages || 1;
+            }).catch(function (error) {
+                if (currentToken !== requestToken) {
+                    return;
+                }
+
+                $scope.errorMessage = 'Nao foi possivel carregar os alunos: ' + resolveErrorMessage(error);
+                $scope.alunos = [];
+                $scope.filteredAlunos = [];
+                $scope.visibleAlunos = [];
+                $scope.totalAlunos = 0;
+            }).finally(function () {
+                if (currentToken === requestToken) {
+                    $scope.loading = false;
+                }
+            });
+        }
+
+        function applyFilters() {
+            $scope.pagination.currentPage = 1;
+            loadAlunos();
+        }
+
+        function goToPage(page) {
+            if ($scope.loading) {
+                return;
+            }
+
+            $scope.pagination.currentPage = Math.max(1, Math.min(page, $scope.pagination.totalPages || 1));
+            loadAlunos();
+        }
+
+        function nextPage() {
+            goToPage(($scope.pagination.currentPage || 1) + 1);
+        }
+
+        function previousPage() {
+            goToPage(($scope.pagination.currentPage || 1) - 1);
+        }
+
+        function openGemModal(modalSelector) {
+            $timeout(function () {
+                var $modal = $(modalSelector);
+
+                $modal.off('shown.bs.modal.gemA11y hidden.bs.modal.gemA11y');
+                $modal.on('shown.bs.modal.gemA11y', function () {
+                    var $currentModal = $(this);
+                    $currentModal.attr('aria-hidden', 'false');
+
+                    $timeout(function () {
+                        var $focusTarget = $currentModal.find('input, select, textarea, button')
+                            .filter(':visible:not([disabled])')
+                            .first();
+
+                        if ($focusTarget && $focusTarget.length) {
+                            $focusTarget.trigger('focus');
+                        }
+                    }, 0);
+                });
+
+                $modal.on('hidden.bs.modal.gemA11y', function () {
+                    var activeElement = document.activeElement;
+
+                    if (activeElement && $.contains(this, activeElement) && typeof activeElement.blur === 'function') {
+                        activeElement.blur();
+                    }
+
+                    $(this).attr('aria-hidden', 'true');
+                });
+
+                if (!$modal.parent().is('body')) {
+                    $modal.appendTo('body');
+                }
+
+                $modal.modal('show');
+                $modal.attr('aria-hidden', 'false');
+            }, 0);
+        }
+
+        function buildAlunoPayload() {
+            return {
+                nome_aluno: '',
+                status: 'Ativo',
+                lancado_por: getCurrentUserName($rootScope),
+                mensagens: 0,
+                comum_congregacao: '',
+                cargo_ministerio: '',
+                nivel: '',
+                instrumento: '',
+                registro_msa: '',
+                observacoes: '',
+                municipio: '',
+                foto_url: ''
+            };
+        }
+    }
+
+    function gemResumoCtrl($scope, $state, $stateParams, $rootScope, GemService) {
+        $scope.loading = true;
+        $scope.savingModal = false;
+        $scope.savingAluno = false;
+        $scope.errorMessage = '';
+        $scope.activeTab = 'msa';
+        $scope.modalType = 'msa';
+        $scope.modalConfig = {};
+        $scope.aluno = null;
+        $scope.resumo = createResumoState();
+        $scope.forms = createDefaultForms();
+
+        $scope.setTab = function (tab) {
+            $scope.activeTab = tab;
+        };
+
+        $scope.formatDateBR = function (value) {
+            if (!value) {
+                return '-';
+            }
+
+            var date = new Date(value);
+
+            if (isNaN(date.getTime())) {
+                return value;
+            }
+
+            return date.toLocaleDateString('pt-BR', {
+                timeZone: 'UTC'
+            });
+        };
+
+        $scope.openModal = function (type) {
+            $scope.modalType = type;
+            $scope.modalConfig = getModalConfig(type);
+            $scope.forms[type] = createFormForType(type);
+            angular.element('#gemResumoModal').modal('show');
+        };
+
+        $scope.saveModal = function () {
+            var type = $scope.modalType;
+            var payload = normalizeResumoPayloadDates(type, angular.extend({}, $scope.forms[type] || {}, {
+                aluno_id: $stateParams.id
+            }));
+            var action = getSaveAction(type, payload);
+
+            if (!action) {
+                return;
+            }
+
+            if (!isValidPayload(type, payload)) {
+                return;
+            }
+
+            $scope.savingModal = true;
+
+            action.then(function () {
+                angular.element('#gemResumoModal').modal('hide');
+                showGemAlert('Sucesso', $scope.modalConfig.successMessage || 'Lancamento salvo com sucesso.', 'success');
+                loadResumo();
+            }).catch(function (error) {
+                showGemAlert('Erro', 'Nao foi possivel salvar o lancamento: ' + resolveErrorMessage(error), 'error');
+            }).finally(function () {
+                $scope.savingModal = false;
+            });
+        };
+
+        $scope.deleteItem = function (type, item) {
+            var action = getDeleteAction(type, item);
+
+            if (!item || !item.id || !action) {
+                return;
+            }
+
+            showGemConfirm(
+                'Excluir lancamento?',
+                'Essa acao removera este registro da aba ' + ($scope.modalConfig.labelMap[type] || type) + '.',
+                function () {
+                    action().then(function () {
+                        showGemAlert('Removido', 'Lancamento excluido com sucesso.', 'success');
+                        loadResumo();
+                    }).catch(function (error) {
+                        showGemAlert('Erro', 'Nao foi possivel excluir o lancamento: ' + resolveErrorMessage(error), 'error');
+                    });
+                }
+            );
+        };
+
+        $scope.openAlunoModal = function () {
+            angular.element('#gemAlunoResumoModal').modal('show');
+        };
+
+        $scope.saveAlunoResumo = function () {
+            if (!$scope.aluno || !$scope.aluno.id) {
+                return;
+            }
+
+            if (!$scope.aluno.nome_aluno) {
+                showGemAlert('Nome obrigatorio', 'Informe o nome do aluno para continuar.', 'warning');
+                return;
+            }
+
+            $scope.savingAluno = true;
+
+            GemService.updateAluno($scope.aluno).then(function () {
+                angular.element('#gemAlunoResumoModal').modal('hide');
+                showGemAlert('Sucesso', 'Dados do aluno atualizados com sucesso.', 'success');
+                loadResumo();
+            }).catch(function (error) {
+                showGemAlert('Erro', 'Nao foi possivel atualizar o aluno: ' + resolveErrorMessage(error), 'error');
+            }).finally(function () {
+                $scope.savingAluno = false;
+            });
+        };
+
+        if (!$stateParams.id) {
+            $scope.loading = false;
+            $scope.errorMessage = 'Aluno nao informado para carregar o resumo.';
+            return;
+        }
+
+        loadResumo();
+
+        function loadResumo() {
+            $scope.loading = true;
+            $scope.errorMessage = '';
+
+            GemService.getResumo($stateParams.id).then(function (data) {
+                $scope.resumo = angular.extend(createResumoState(), data || {});
+                $scope.aluno = angular.copy($scope.resumo.aluno || {});
+
+                if (!$scope.aluno.lancado_por) {
+                    $scope.aluno.lancado_por = getCurrentUserName($rootScope);
+                }
+
+                $scope.forms = createDefaultForms();
+                $scope.modalConfig = getModalConfig($scope.activeTab);
+            }).catch(function (error) {
+                $scope.errorMessage = 'Nao foi possivel carregar o resumo: ' + resolveErrorMessage(error);
+                $scope.resumo = createResumoState();
+                $scope.aluno = null;
+            }).finally(function () {
+                $scope.loading = false;
+            });
+        }
+
+        function createResumoState() {
+            return {
+                aluno: null,
+                msa: [],
+                provas: [],
+                metodo: [],
+                hinario: [],
+                escalas: [],
+                atividades: [],
+                fases: [],
+                progresso: {
+                    percentual: 0,
+                    mensagem: 'Nenhum progresso registrado ainda.'
+                }
+            };
+        }
+
+        function createDefaultForms() {
+            return {
+                msa: createFormForType('msa'),
+                provas: createFormForType('provas'),
+                metodo: createFormForType('metodo'),
+                hinario: createFormForType('hinario'),
+                escalas: createFormForType('escalas'),
+                atividades: createFormForType('atividades')
+            };
+        }
+
+        function createFormForType(type) {
+            var today = getTodayDate();
+            var autorizadoPor = getCurrentUserName($rootScope);
+
+            if (type === 'msa') {
+                return {
+                    data_aula: today,
+                    fase: (($scope.resumo.fases || [])[0] || {}).fase || '',
+                    paginas: '',
+                    licoes: '',
+                    clave: '',
+                    autorizado_por: autorizadoPor,
+                    observacoes: ''
+                };
+            }
+
+            if (type === 'provas') {
+                return {
+                    data_prova: today,
+                    modulo: '',
+                    nota: '',
+                    autorizado_por: autorizadoPor,
+                    observacoes: ''
+                };
+            }
+
+            if (type === 'metodo') {
+                return {
+                    data_inicio: today,
+                    metodo: '',
+                    pagina: '',
+                    licao: '',
+                    autorizado_por: autorizadoPor,
+                    observacoes: ''
+                };
+            }
+
+            if (type === 'hinario') {
+                return {
+                    data: today,
+                    hino: '',
+                    voz: '',
+                    autorizado_por: autorizadoPor,
+                    observacoes: ''
+                };
+            }
+
+            if (type === 'escalas') {
+                return {
+                    data: today,
+                    escala: '',
+                    autorizado_por: autorizadoPor,
+                    observacoes: ''
+                };
+            }
+
+            return {
+                tipo_atividade: '',
+                titulo: '',
+                data_atividade: today,
+                nome_documento: '',
+                documento_url: '',
+                descricao: ''
+            };
+        }
+
+        function getModalConfig(type) {
+            var labelMap = {
+                msa: 'MSA',
+                provas: 'Provas',
+                metodo: 'Metodo',
+                hinario: 'Hinario',
+                escalas: 'Escalas',
+                atividades: 'Atividades'
+            };
+            var configMap = {
+                msa: {
+                    title: 'Nova aula MSA',
+                    successMessage: 'Aula MSA salva com sucesso.'
+                },
+                provas: {
+                    title: 'Nova prova',
+                    successMessage: 'Prova salva com sucesso.'
+                },
+                metodo: {
+                    title: 'Nova licao de metodo',
+                    successMessage: 'Metodo salvo com sucesso.'
+                },
+                hinario: {
+                    title: 'Novo hino',
+                    successMessage: 'Hinario salvo com sucesso.'
+                },
+                escalas: {
+                    title: 'Nova escala',
+                    successMessage: 'Escala salva com sucesso.'
+                },
+                atividades: {
+                    title: 'Nova atividade',
+                    successMessage: 'Atividade salva com sucesso.'
+                }
+            };
+
+            return angular.extend({
+                title: 'Novo lancamento',
+                successMessage: 'Lancamento salvo com sucesso.',
+                labelMap: labelMap
+            }, configMap[type] || {});
+        }
+
+        function getSaveAction(type, payload) {
+            if (type === 'msa') {
+                return GemService.saveMsa(payload);
+            }
+
+            if (type === 'provas') {
+                return GemService.saveProva(payload);
+            }
+
+            if (type === 'metodo') {
+                return GemService.saveMetodo(payload);
+            }
+
+            if (type === 'hinario') {
+                return GemService.saveHinario(payload);
+            }
+
+            if (type === 'escalas') {
+                return GemService.saveEscala(payload);
+            }
+
+            if (type === 'atividades') {
+                return GemService.saveAtividade(payload);
+            }
+
+            return null;
+        }
+
+        function getDeleteAction(type, item) {
+            if (type === 'msa') {
+                return function () { return GemService.deleteMsa(item.id); };
+            }
+
+            if (type === 'provas') {
+                return function () { return GemService.deleteProva(item.id); };
+            }
+
+            if (type === 'metodo') {
+                return function () { return GemService.deleteMetodo(item.id); };
+            }
+
+            if (type === 'hinario') {
+                return function () { return GemService.deleteHinario(item.id); };
+            }
+
+            if (type === 'escalas') {
+                return function () { return GemService.deleteEscala(item.id); };
+            }
+
+            if (type === 'atividades') {
+                return function () { return GemService.deleteAtividade(item.id); };
+            }
+
+            return null;
+        }
+
+        function isValidPayload(type, payload) {
+            var validations = {
+                msa: !!(payload.data_aula && payload.fase),
+                provas: !!(payload.data_prova && payload.modulo),
+                metodo: !!(payload.data_inicio && payload.metodo),
+                hinario: !!(payload.data && payload.hino),
+                escalas: !!(payload.data && payload.escala),
+                atividades: !!(payload.data_atividade && (payload.titulo || payload.tipo_atividade))
+            };
+
+            if (!validations[type]) {
+                showGemAlert('Campos obrigatorios', 'Preencha os campos principais antes de salvar.', 'warning');
+                return false;
+            }
+
+            return true;
+        }
+
+        function normalizeResumoPayloadDates(type, payload) {
+            var normalized = angular.extend({}, payload || {});
+
+            if (type === 'msa') {
+                normalized.data_aula = formatDateInputValue(normalized.data_aula);
+            } else if (type === 'provas') {
+                normalized.data_prova = formatDateInputValue(normalized.data_prova);
+            } else if (type === 'metodo') {
+                normalized.data_inicio = formatDateInputValue(normalized.data_inicio);
+            } else if (type === 'hinario' || type === 'escalas') {
+                normalized.data = formatDateInputValue(normalized.data);
+            } else if (type === 'atividades') {
+                normalized.data_atividade = formatDateInputValue(normalized.data_atividade);
+            }
+
+            return normalized;
+        }
+    }
+
+    function gemHistoricoCtrl($scope, $state, GemService) {
+        $scope.loading = true;
+        $scope.errorMessage = '';
+        $scope.registros = [];
+        $scope.filteredRegistros = [];
+        $scope.filters = {
+            searchText: '',
+            comum: '',
+            instrumento: ''
+        };
+
+        $scope.openResumo = function (item) {
+            if (item && item.aluno_id) {
+                $state.go('gem.resumo', { id: item.aluno_id });
+            }
+        };
+
+        $scope.$watchGroup(['filters.searchText', 'filters.comum', 'filters.instrumento'], applyFilters);
+
+        GemService.getHistoricoAulas().then(function (data) {
+            $scope.registros = data || [];
+            applyFilters();
+        }).catch(function (error) {
+            $scope.errorMessage = 'Nao foi possivel carregar o historico: ' + resolveErrorMessage(error);
+        }).finally(function () {
+            $scope.loading = false;
+        });
+
+        function applyFilters() {
+            var search = normalizeText($scope.filters.searchText);
+            var comum = normalizeText($scope.filters.comum);
+            var instrumento = normalizeText($scope.filters.instrumento);
+
+            $scope.filteredRegistros = ($scope.registros || []).filter(function (item) {
+                var haystack = normalizeText([
+                    item.aluno_nome,
+                    item.fase,
+                    item.paginas,
+                    item.licoes,
+                    item.clave,
+                    item.autorizado_por,
+                    item.comum_congregacao,
+                    item.instrumento
+                ].join(' '));
+
+                if (search && haystack.indexOf(search) === -1) {
+                    return false;
+                }
+
+                if (comum && normalizeText(item.comum_congregacao).indexOf(comum) === -1) {
+                    return false;
+                }
+
+                if (instrumento && normalizeText(item.instrumento).indexOf(instrumento) === -1) {
+                    return false;
+                }
+
+                return true;
+            });
+        }
+    }
+
+    function gemPlanosCtrl($scope, $state, GemService) {
+        $scope.loading = true;
+        $scope.errorMessage = '';
+        $scope.planos = {
+            resumo: {},
+            fases: [],
+            alunos: []
+        };
+
+        $scope.openResumo = function (aluno) {
+            if (aluno && aluno.id) {
+                $state.go('gem.resumo', { id: aluno.id });
+            }
+        };
+
+        GemService.getPlanosAula().then(function (data) {
+            $scope.planos = data || $scope.planos;
+        }).catch(function (error) {
+            $scope.errorMessage = 'Nao foi possivel carregar o plano pedagogico: ' + resolveErrorMessage(error);
+        }).finally(function () {
+            $scope.loading = false;
+        });
+    }
+
+    function gemTurmasCtrl($scope, $state, GemService) {
+        $scope.loading = true;
+        $scope.errorMessage = '';
+        $scope.turmasState = {
+            indisponivel: false,
+            mensagem: '',
+            turmas: []
+        };
+
+        GemService.getTurmas().then(function (data) {
+            $scope.turmasState = data || $scope.turmasState;
+        }).catch(function (error) {
+            $scope.errorMessage = 'Nao foi possivel carregar as turmas: ' + resolveErrorMessage(error);
+        }).finally(function () {
+            $scope.loading = false;
+        });
+    }
+
+    function getCurrentUserName($rootScope) {
+        var currentUser = ($rootScope && $rootScope.currentUser) || {};
+        return currentUser.nome || currentUser.name || currentUser.email || '';
+    }
+
+    function getTodayIso() {
+        return new Date().toISOString().slice(0, 10);
+    }
+
+    function getTodayDate() {
+        return parseDateInputValue(getTodayIso());
+    }
+
+    function parseDateInputValue(value) {
+        var parts;
+        var parsed;
+
+        if (!value) {
+            return null;
+        }
+
+        if (Object.prototype.toString.call(value) === '[object Date]') {
+            return isNaN(value.getTime()) ? null : new Date(value.getFullYear(), value.getMonth(), value.getDate());
+        }
+
+        if (typeof value === 'string') {
+            parts = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (parts) {
+                parsed = new Date(parseInt(parts[1], 10), parseInt(parts[2], 10) - 1, parseInt(parts[3], 10));
+                return isNaN(parsed.getTime()) ? null : parsed;
+            }
+
+            parts = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (parts) {
+                parsed = new Date(parseInt(parts[3], 10), parseInt(parts[2], 10) - 1, parseInt(parts[1], 10));
+                return isNaN(parsed.getTime()) ? null : parsed;
+            }
+        }
+
+        parsed = new Date(value);
+        return isNaN(parsed.getTime()) ? null : new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+    }
+
+    function formatDateInputValue(value) {
+        var parsed = parseDateInputValue(value);
+
+        if (!parsed) {
+            return '';
+        }
+
+        return [
+            parsed.getFullYear(),
+            ('0' + (parsed.getMonth() + 1)).slice(-2),
+            ('0' + parsed.getDate()).slice(-2)
+        ].join('-');
+    }
+
+    function normalizeText(value) {
+        return String(value || '').toLowerCase();
+    }
+
+    function resolveErrorMessage(error) {
+        return (error && (error.message || error.error_description || error.details)) || 'Erro desconhecido';
+    }
+
+    function showGemAlert(title, text, type) {
+        if (window.swal) {
+            window.swal(title, text, type);
+            return;
+        }
+
+        window.alert(title + ': ' + text);
+    }
+
+    function showGemConfirm(title, text, onConfirm) {
+        if (window.swal) {
+            window.swal({
+                title: title,
+                text: text,
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ed5565',
+                confirmButtonText: 'Sim, excluir',
+                cancelButtonText: 'Cancelar',
+                closeOnConfirm: true
+            }, function (isConfirm) {
+                if (isConfirm && typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            });
+            return;
+        }
+
+        if (window.confirm(text) && typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    }
+})();

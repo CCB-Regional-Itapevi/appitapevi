@@ -1,0 +1,300 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-8">
+        <h2>M&uacute;sica - Painel Executivo</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li class="active"><strong>Dashboard da M&uacute;sica</strong></li>
+        </ol>
+    </div>
+    <div class="col-lg-4 text-right m-t-lg">
+        <button class="btn btn-primary btn-sm" ng-click="goToEnsaios()"><i class="fa fa-calendar"></i> Ensaios</button>
+        <button class="btn btn-success btn-sm" ng-click="goToPresencas()"><i class="fa fa-check"></i> Presen&ccedil;as</button>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+    <div class="sk-spinner sk-spinner-wave" ng-if="loading && !dashboardReady">
+        <div class="sk-rect1"></div><div class="sk-rect2"></div><div class="sk-rect3"></div><div class="sk-rect4"></div><div class="sk-rect5"></div>
+    </div>
+
+    <div ng-if="dashboardReady">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Relat&oacute;rios e Filtros R&aacute;pidos - M&uacute;sica</h5>
+                <div class="ibox-tools" ng-if="refreshingDashboard">
+                    <span class="text-muted"><i class="fa fa-refresh fa-spin"></i> Atualizando</span>
+                </div>
+            </div>
+            <div class="ibox-content" style="padding:18px 20px 22px;">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 form-group">
+                        <label class="m-b-xs">Ensaio analisado</label>
+                        <div class="dropdown">
+                            <button class="btn btn-white btn-block dropdown-toggle text-left" type="button" data-toggle="dropdown">
+                                {{ getEnsaioShortLabel(dashboard.ultimoEnsaio) }}
+                                <span class="caret pull-right" style="margin-top:8px;"></span>
+                            </button>
+                            <ul class="dropdown-menu" style="max-height:260px; overflow:auto; width:100%;">
+                                <li ng-repeat="ensaio in dashboard.ensaios" ng-class="{active: selectedEnsaioId === ensaio.id}">
+                                    <a href="" ng-click="selectDashboardEnsaio(ensaio.id)">{{ getEnsaioShortLabel(ensaio) }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-6 form-group">
+                        <label class="m-b-xs">Local do Ensaio</label>
+                        <div class="dropdown">
+                            <button class="btn btn-white btn-block dropdown-toggle text-left" type="button" data-toggle="dropdown">
+                                {{ selectedLocalidade || 'Todos' }}
+                                <span class="caret pull-right" style="margin-top:8px;"></span>
+                            </button>
+                            <ul class="dropdown-menu" style="max-height:260px; overflow:auto; width:100%;">
+                                <li ng-class="{active: !selectedLocalidade}">
+                                    <a href="" ng-click="selectDashboardLocalidade('')">Todos</a>
+                                </li>
+                                <li ng-repeat="local in dashboard.locaisResumo" ng-class="{active: selectedLocalidade === local.nome}">
+                                    <a href="" ng-click="selectDashboardLocalidade(local.nome)">{{ local.nome }} <span class="badge pull-right">{{ local.total }}</span></a>
+                                </li>
+                                <li class="disabled" ng-if="!dashboard.locaisResumo.length"><a href="">Sem polos com presen&ccedil;a nesta data</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 form-group text-right">
+                        <div class="btn-toolbar pull-right" role="toolbar" style="margin-top:25px; white-space:nowrap;">
+                            <button type="button" class="btn btn-primary btn-sm m-r-xs" ng-click="exportDashboardExcel()"><i class="fa fa-file-excel-o"></i> Excel</button>
+                            <button type="button" class="btn btn-danger btn-sm m-r-xs" ng-click="exportDashboardPdf()"><i class="fa fa-file-pdf-o"></i> PDF</button>
+                            <button type="button" class="btn btn-white btn-sm" ng-click="clearDashboardFilters()"><i class="fa fa-eraser"></i> Limpar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 lazur-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-users fa-3x"></i></div>
+                        <div class="col-xs-8 text-right"><span>Presentes</span><h2 class="font-bold">{{ dashboard.metrics.participantes || 0 }}</h2></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 navy-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-map-marker fa-3x"></i></div>
+                        <div class="col-xs-8 text-right"><span>Munic&iacute;pios</span><h2 class="font-bold">{{ dashboard.metrics.municipiosRepresentados || 0 }}</h2></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 navy-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-home fa-3x"></i></div>
+                        <div class="col-xs-8 text-right"><span>Congrega&ccedil;&otilde;es</span><h2 class="font-bold">{{ dashboard.totaisUltimoEnsaio.comuns || 0 }}</h2></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 yellow-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-random fa-3x"></i></div>
+                        <div class="col-xs-8 text-right"><span>Municípios</span><h2 class="font-bold">{{ dashboard.locaisDisponiveis.length || 0 }}</h2></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 bg-primary">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-music fa-3x"></i></div>
+                        <div class="col-xs-8 text-right"><span>M&uacute;sicos</span><h2 class="font-bold">{{ dashboard.metrics.musicos || 0 }}</h2></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 yellow-bg">
+                    <div class="row">
+                        <div class="col-xs-4"><i class="fa fa-female fa-3x"></i></div>
+                        <div class="col-xs-8 text-right"><span>Organistas</span><h2 class="font-bold">{{ dashboard.metrics.organistas || 0 }}</h2></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Leitura executiva</h5></div>
+                    <div class="ibox-content">
+                        <table class="table table-condensed m-b-none">
+                            <tbody>
+                                <tr><td>Total de presentes</td><td class="text-right"><strong>{{ dashboard.metrics.totalUltimoEnsaio || 0 }}</strong></td></tr>
+                                <tr><td>Munic&iacute;pios representados</td><td class="text-right"><strong>{{ dashboard.metrics.municipiosRepresentados || 0 }}</strong></td></tr>
+                                <tr><td>Congrega&ccedil;&otilde;es consolidadas</td><td class="text-right"><strong>{{ dashboard.totaisUltimoEnsaio.comuns || 0 }}</strong></td></tr>
+                                <tr><td>Polos dispon&iacute;veis</td><td class="text-right"><strong>{{ dashboard.locaisDisponiveis.length || 0 }}</strong></td></tr>
+                                <tr><td>M&uacute;sicos</td><td class="text-right"><strong>{{ dashboard.metrics.musicos || 0 }}</strong></td></tr>
+                                <tr><td>Organistas</td><td class="text-right"><strong>{{ dashboard.metrics.organistas || 0 }}</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Resumo do recorte</h5></div>
+                    <div class="ibox-content">
+                        <table class="table table-condensed m-b-none">
+                            <tbody>
+                                <tr><td>Data selecionada</td><td class="text-right">{{ (dashboard.ultimoEnsaio || {}).data_ensaio | date:'dd/MM/yyyy':'UTC' }}</td></tr>
+                                <tr><td>Polo selecionado</td><td class="text-right">{{ selectedLocalidade || 'Todos' }}</td></tr>
+                                <tr><td>Munic&iacute;pio em foco</td><td class="text-right">{{ selectedMunicipio || 'Todos' }}</td></tr>
+                                <tr><td>Participantes</td><td class="text-right"><strong>{{ dashboard.metrics.participantes || 0 }}</strong></td></tr>
+                                <tr><td>Congrega&ccedil;&otilde;es</td><td class="text-right"><strong>{{ dashboard.totaisUltimoEnsaio.comuns || 0 }}</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Principais congrega&ccedil;&otilde;es</h5></div>
+                    <div class="ibox-content">
+                        <table class="table table-condensed m-b-none">
+                            <thead>
+                                <tr><th>Congrega&ccedil;&atilde;o</th><th>Munic&iacute;pio</th><th class="text-center">Total</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in dashboard.rankingComuns | limitTo:5">
+                                    <td><strong>{{ item.comum }}</strong></td>
+                                    <td>{{ item.municipio }}</td>
+                                    <td class="text-center">{{ item.total || 0 }}</td>
+                                </tr>
+                                <tr ng-if="!dashboard.rankingComuns.length"><td colspan="3" class="text-center text-muted">Sem dados suficientes.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Participantes por munic&iacute;pio</h5>
+                        <div class="ibox-tools" ng-if="selectedMunicipio">
+                            <button type="button" class="btn btn-xs btn-white" ng-click="clearDashboardMunicipio()">Ver todos</button>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-condensed table-hover m-b-none">
+                                <thead>
+                                    <tr>
+                                        <th>Munic&iacute;pio</th>
+                                        <th class="text-center">Presentes</th>
+                                        <th class="text-center">M&uacute;sicos</th>
+                                        <th class="text-center">Organistas</th>
+                                        <th class="text-center">Congrega&ccedil;&otilde;es</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in dashboard.rankingMunicipios | limitTo:8" ng-click="selectDashboardMunicipio(item)" ng-class="{'info': selectedMunicipio === item.nome}" style="cursor:pointer;">
+                                        <td>
+                                            <strong>{{ item.nome }}</strong>
+                                            <div class="text-muted">{{ item.comuns.length || 0 }} congrega&ccedil;&otilde;es</div>
+                                        </td>
+                                        <td class="text-center"><strong>{{ item.total || 0 }}</strong></td>
+                                        <td class="text-center">{{ item.musicos || 0 }}</td>
+                                        <td class="text-center">{{ item.organistas || 0 }}</td>
+                                        <td class="text-center">{{ item.comuns.length || 0 }}</td>
+                                    </tr>
+                                    <tr ng-if="!dashboard.rankingMunicipios.length">
+                                        <td colspan="5" class="text-center text-muted">Nenhum lan&ccedil;amento consolidado neste ensaio.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Munic&iacute;pios do recorte</h5></div>
+                    <div class="ibox-content">
+                        <table class="table table-condensed m-b-none">
+                            <thead>
+                                <tr><th>Munic&iacute;pio</th><th class="text-center">Comuns</th><th class="text-center">Total</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in dashboard.municipiosCriticos">
+                                    <td><strong>{{ item.nome }}</strong></td>
+                                    <td class="text-center">{{ item.comuns.length || 0 }}</td>
+                                    <td class="text-center">{{ item.total || 0 }}</td>
+                                </tr>
+                                <tr ng-if="!dashboard.municipiosCriticos.length"><td colspan="3" class="text-center text-muted">Sem dados suficientes.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Congrega&ccedil;&otilde;es do recorte</h5></div>
+                    <div class="ibox-content">
+                        <table class="table table-condensed m-b-none">
+                            <thead>
+                                <tr><th>Munic&iacute;pio</th><th>Congrega&ccedil;&atilde;o</th><th class="text-center">Total</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in dashboard.rankingComuns | limitTo:8">
+                                    <td><strong>{{ item.municipio }}</strong></td>
+                                    <td>{{ item.comum }}</td>
+                                    <td class="text-center"><strong>{{ item.total || 0 }}</strong></td>
+                                </tr>
+                                <tr ng-if="!dashboard.rankingComuns.length">
+                                    <td colspan="3" class="text-center text-muted">Nenhuma congrega&ccedil;&atilde;o consolidada neste recorte.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Tabela por munic&iacute;pio e comum</h5></div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-condensed table-hover m-b-none">
+                                <thead>
+                                    <tr>
+                                        <th>Munic&iacute;pio</th>
+                                        <th>Congrega&ccedil;&atilde;o</th>
+                                        <th class="text-center">Presentes</th>
+                                        <th class="text-center">M&uacute;sicos</th>
+                                        <th class="text-center">Organistas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in dashboard.rankingComuns">
+                                        <td><strong>{{ item.municipio }}</strong></td>
+                                        <td>{{ item.comum }}</td>
+                                        <td class="text-center">{{ item.total || 0 }}</td>
+                                        <td class="text-center">{{ item.musicos || 0 }}</td>
+                                        <td class="text-center">{{ item.organistas || 0 }}</td>
+                                    </tr>
+                                    <tr ng-if="!dashboard.rankingComuns.length">
+                                        <td colspan="5" class="text-center text-muted">Sem congrega&ccedil;&otilde;es consolidadas neste recorte.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

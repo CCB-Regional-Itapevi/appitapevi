@@ -1,0 +1,399 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Resumo do Aluno</h2>
+        <ol class="breadcrumb">
+            <li><a href="#/gem/alunos">G.E.M</a></li>
+            <li><a href="#/gem/alunos">Alunos</a></li>
+            <li class="active"><strong>Resumo</strong></li>
+        </ol>
+    </div>
+    <div class="col-lg-2"></div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight" ng-if="!loading">
+    <div class="row" ng-if="errorMessage">
+        <div class="col-lg-12">
+            <div class="alert alert-danger">{{errorMessage}}</div>
+        </div>
+    </div>
+
+    <div class="row" ng-if="aluno">
+        <div class="col-lg-9">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Acompanhamento dos Estudos MSA</h5>
+                    <div class="ibox-tools">
+                        <button class="btn btn-primary btn-xs" ng-click="openAlunoModal()">
+                            <i class="fa fa-pencil"></i> Editar
+                        </button>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <dl class="dl-horizontal">
+                                <dt>Status:</dt>
+                                <dd><span class="label label-primary">{{aluno.status || 'Ativo'}}</span></dd>
+                                <dt>Lançado por:</dt>
+                                <dd>{{aluno.lancado_por || '-'}}</dd>
+                                <dt>Mensagens:</dt>
+                                <dd>{{aluno.mensagens || 0}}</dd>
+                                <dt>Aluno:</dt>
+                                <dd><strong class="text-info">{{aluno.nome_aluno}}</strong></dd>
+                                <dt>Registro MSA:</dt>
+                                <dd>{{aluno.registro_msa || '-'}}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-sm-6">
+                            <dl class="dl-horizontal">
+                                <dt>Comum:</dt>
+                                <dd>{{aluno.comum_congregacao || '-'}}</dd>
+                                <dt>Cargo/Ministério:</dt>
+                                <dd>{{aluno.cargo_ministerio || '-'}}</dd>
+                                <dt>Nível:</dt>
+                                <dd>{{aluno.nivel || '-'}}</dd>
+                                <dt>Instrumento:</dt>
+                                <dd>{{aluno.instrumento || '-'}}</dd>
+                                <dt>Município:</dt>
+                                <dd>{{aluno.municipio || '-'}}</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="m-t-md">
+                        <div class="clearfix">
+                            <span class="pull-left"><strong>Programa Mínimo</strong></span>
+                            <span class="pull-right">{{resumo.progresso.percentual | number:0}}%</span>
+                        </div>
+                        <div class="progress progress-striped active m-b-sm">
+                            <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="{{resumo.progresso.percentual}}" aria-valuemin="0" aria-valuemax="100" style="width: {{resumo.progresso.percentual}}%;">
+                            </div>
+                        </div>
+                        <p class="text-muted">{{resumo.progresso.mensagem}}</p>
+                    </div>
+
+                    <div class="m-t-lg">
+                        <ul class="nav nav-tabs">
+                            <li ng-class="{active: activeTab === 'msa'}"><a href="" ng-click="setTab('msa')">MSA</a></li>
+                            <li ng-class="{active: activeTab === 'provas'}"><a href="" ng-click="setTab('provas')">Provas</a></li>
+                            <li ng-class="{active: activeTab === 'metodo'}"><a href="" ng-click="setTab('metodo')">Método</a></li>
+                            <li ng-class="{active: activeTab === 'hinario'}"><a href="" ng-click="setTab('hinario')">Hinário</a></li>
+                            <li ng-class="{active: activeTab === 'escalas'}"><a href="" ng-click="setTab('escalas')">Escalas</a></li>
+                            <li ng-class="{active: activeTab === 'atividades'}"><a href="" ng-click="setTab('atividades')">Últimas Atividades</a></li>
+                        </ul>
+
+                        <div class="tab-content" style="padding-top: 20px;">
+                            <div class="tab-pane active" ng-if="activeTab === 'msa'">
+                                <div class="text-right m-b-sm">
+                                    <button class="btn btn-primary btn-xs" ng-click="openModal('msa')"><i class="fa fa-plus"></i> Nova aula</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Fase</th>
+                                                <th>Páginas</th>
+                                                <th>Lições</th>
+                                                <th>Clave</th>
+                                                <th>Autorizado por</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in resumo.msa">
+                                                <td>{{formatDateBR(item.data_aula)}}</td>
+                                                <td>{{item.fase}}</td>
+                                                <td>{{item.paginas || '-'}}</td>
+                                                <td>{{item.licoes || '-'}}</td>
+                                                <td>{{item.clave || '-'}}</td>
+                                                <td>{{item.autorizado_por || '-'}}</td>
+                                                <td><button class="btn btn-danger btn-xs" ng-click="deleteItem('msa', item)"><i class="fa fa-trash"></i></button></td>
+                                            </tr>
+                                            <tr ng-if="!resumo.msa.length"><td colspan="7" class="text-center">Nenhum lançamento MSA.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane active" ng-if="activeTab === 'provas'">
+                                <div class="text-right m-b-sm">
+                                    <button class="btn btn-primary btn-xs" ng-click="openModal('provas')"><i class="fa fa-plus"></i> Nova prova</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Módulo</th>
+                                                <th>Nota</th>
+                                                <th>Observações</th>
+                                                <th>Autorizado por</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in resumo.provas">
+                                                <td>{{formatDateBR(item.data_prova)}}</td>
+                                                <td>{{item.modulo}}</td>
+                                                <td>{{item.nota || '-'}}</td>
+                                                <td>{{item.observacoes || '-'}}</td>
+                                                <td>{{item.autorizado_por || '-'}}</td>
+                                                <td><button class="btn btn-danger btn-xs" ng-click="deleteItem('provas', item)"><i class="fa fa-trash"></i></button></td>
+                                            </tr>
+                                            <tr ng-if="!resumo.provas.length"><td colspan="6" class="text-center">Nenhuma prova registrada.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane active" ng-if="activeTab === 'metodo'">
+                                <div class="text-right m-b-sm">
+                                    <button class="btn btn-primary btn-xs" ng-click="openModal('metodo')"><i class="fa fa-plus"></i> Nova lição</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Método</th>
+                                                <th>Página</th>
+                                                <th>Lição</th>
+                                                <th>Autorizado por</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in resumo.metodo">
+                                                <td>{{formatDateBR(item.data_inicio)}}</td>
+                                                <td>{{item.metodo}}</td>
+                                                <td>{{item.pagina || '-'}}</td>
+                                                <td>{{item.licao || '-'}}</td>
+                                                <td>{{item.autorizado_por || '-'}}</td>
+                                                <td><button class="btn btn-danger btn-xs" ng-click="deleteItem('metodo', item)"><i class="fa fa-trash"></i></button></td>
+                                            </tr>
+                                            <tr ng-if="!resumo.metodo.length"><td colspan="6" class="text-center">Nenhum método registrado.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane active" ng-if="activeTab === 'hinario'">
+                                <div class="text-right m-b-sm">
+                                    <button class="btn btn-primary btn-xs" ng-click="openModal('hinario')"><i class="fa fa-plus"></i> Novo hino</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Hino</th>
+                                                <th>Voz</th>
+                                                <th>Autorizado por</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in resumo.hinario">
+                                                <td>{{formatDateBR(item.data)}}</td>
+                                                <td>{{item.hino}}</td>
+                                                <td>{{item.voz || '-'}}</td>
+                                                <td>{{item.autorizado_por || '-'}}</td>
+                                                <td><button class="btn btn-danger btn-xs" ng-click="deleteItem('hinario', item)"><i class="fa fa-trash"></i></button></td>
+                                            </tr>
+                                            <tr ng-if="!resumo.hinario.length"><td colspan="5" class="text-center">Nenhum hino registrado.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane active" ng-if="activeTab === 'escalas'">
+                                <div class="text-right m-b-sm">
+                                    <button class="btn btn-primary btn-xs" ng-click="openModal('escalas')"><i class="fa fa-plus"></i> Nova escala</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Escala</th>
+                                                <th>Autorizado por</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in resumo.escalas">
+                                                <td>{{formatDateBR(item.data)}}</td>
+                                                <td>{{item.escala}}</td>
+                                                <td>{{item.autorizado_por || '-'}}</td>
+                                                <td><button class="btn btn-danger btn-xs" ng-click="deleteItem('escalas', item)"><i class="fa fa-trash"></i></button></td>
+                                            </tr>
+                                            <tr ng-if="!resumo.escalas.length"><td colspan="4" class="text-center">Nenhuma escala registrada.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane active" ng-if="activeTab === 'atividades'">
+                                <div class="text-right m-b-sm">
+                                    <button class="btn btn-primary btn-xs" ng-click="openModal('atividades')"><i class="fa fa-plus"></i> Nova atividade</button>
+                                </div>
+                                <div class="feed-activity-list">
+                                    <div class="feed-element" ng-repeat="item in resumo.atividades">
+                                        <div class="media-body">
+                                            <small class="pull-right text-navy">{{formatDateBR(item.data_atividade)}}</small>
+                                            <strong>{{item.titulo}}</strong>
+                                            <div>{{item.descricao || '-'}}</div>
+                                            <div class="m-t-xs" ng-if="item.documento_url || item.documento_path">
+                                                <a class="btn btn-white btn-xs" ng-href="{{item.documento_url || item.documento_path}}" target="_blank">
+                                                    <i class="fa fa-file"></i> {{item.nome_documento || 'Abrir documento'}}
+                                                </a>
+                                                <button class="btn btn-danger btn-xs" ng-click="deleteItem('atividades', item)">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center text-muted" ng-if="!resumo.atividades.length">Nenhuma atividade registrada.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Arquivos de Aulas</h5>
+                </div>
+                <div class="ibox-content">
+                    <p class="text-muted">Espaço dedicado para documentos e marcos do aluno.</p>
+                    <div class="m-b-sm">
+                        <span class="label label-warning">Alta Prioridade</span>
+                    </div>
+                    <div class="m-b-sm">
+                        <span class="label label-default">MSA</span>
+                        <span class="label label-default">Provas</span>
+                        <span class="label label-default">Métodos</span>
+                        <span class="label label-default">Hinário</span>
+                    </div>
+                    <ul class="list-unstyled small">
+                        <li ng-repeat="item in resumo.atividades | limitTo: 8">
+                            <i class="fa fa-file-text-o"></i> {{item.nome_documento || item.titulo}}
+                        </li>
+                        <li ng-if="!resumo.atividades.length" class="text-muted">Nenhum arquivo lançado.</li>
+                    </ul>
+                    <div class="m-t-md">
+                        <button class="btn btn-primary btn-sm btn-block" ng-click="openModal('atividades')">Adicionar atividade</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center m-t-lg" ng-if="loading">
+    <div class="sk-spinner sk-spinner-double-bounce">
+        <div class="sk-double-bounce1"></div>
+        <div class="sk-double-bounce2"></div>
+    </div>
+    <p>Carregando resumo do aluno...</p>
+</div>
+
+<div class="modal inmodal" id="gemResumoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeInDown">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">{{modalConfig.title}}</h4>
+            </div>
+            <div class="modal-body">
+                <form novalidate>
+                    <div ng-if="modalType === 'msa'">
+                        <div class="form-group"><label>Data</label><input type="date" class="form-control" ng-model="forms.msa.data_aula"></div>
+                        <div class="form-group"><label>Fase</label><select class="form-control" ng-model="forms.msa.fase" ng-options="fase.fase as fase.fase for fase in resumo.fases"></select></div>
+                        <div class="form-group"><label>Páginas</label><input type="text" class="form-control" ng-model="forms.msa.paginas"></div>
+                        <div class="form-group"><label>Lições</label><input type="text" class="form-control" ng-model="forms.msa.licoes"></div>
+                        <div class="form-group"><label>Clave</label><input type="text" class="form-control" ng-model="forms.msa.clave"></div>
+                        <div class="form-group"><label>Autorizado por</label><input type="text" class="form-control" ng-model="forms.msa.autorizado_por"></div>
+                        <div class="form-group"><label>Observações</label><textarea class="form-control" ng-model="forms.msa.observacoes"></textarea></div>
+                    </div>
+                    <div ng-if="modalType === 'provas'">
+                        <div class="form-group"><label>Data</label><input type="date" class="form-control" ng-model="forms.provas.data_prova"></div>
+                        <div class="form-group"><label>Módulo</label><input type="text" class="form-control" ng-model="forms.provas.modulo"></div>
+                        <div class="form-group"><label>Nota</label><input type="number" step="0.1" class="form-control" ng-model="forms.provas.nota"></div>
+                        <div class="form-group"><label>Autorizado por</label><input type="text" class="form-control" ng-model="forms.provas.autorizado_por"></div>
+                        <div class="form-group"><label>Observações</label><textarea class="form-control" ng-model="forms.provas.observacoes"></textarea></div>
+                    </div>
+                    <div ng-if="modalType === 'metodo'">
+                        <div class="form-group"><label>Data</label><input type="date" class="form-control" ng-model="forms.metodo.data_inicio"></div>
+                        <div class="form-group"><label>Método</label><input type="text" class="form-control" ng-model="forms.metodo.metodo"></div>
+                        <div class="form-group"><label>Página</label><input type="text" class="form-control" ng-model="forms.metodo.pagina"></div>
+                        <div class="form-group"><label>Lição</label><input type="text" class="form-control" ng-model="forms.metodo.licao"></div>
+                        <div class="form-group"><label>Autorizado por</label><input type="text" class="form-control" ng-model="forms.metodo.autorizado_por"></div>
+                        <div class="form-group"><label>Observações</label><textarea class="form-control" ng-model="forms.metodo.observacoes"></textarea></div>
+                    </div>
+                    <div ng-if="modalType === 'hinario'">
+                        <div class="form-group"><label>Data</label><input type="date" class="form-control" ng-model="forms.hinario.data"></div>
+                        <div class="form-group"><label>Hino</label><input type="text" class="form-control" ng-model="forms.hinario.hino"></div>
+                        <div class="form-group"><label>Voz</label><input type="text" class="form-control" ng-model="forms.hinario.voz"></div>
+                        <div class="form-group"><label>Autorizado por</label><input type="text" class="form-control" ng-model="forms.hinario.autorizado_por"></div>
+                        <div class="form-group"><label>Observações</label><textarea class="form-control" ng-model="forms.hinario.observacoes"></textarea></div>
+                    </div>
+                    <div ng-if="modalType === 'escalas'">
+                        <div class="form-group"><label>Data</label><input type="date" class="form-control" ng-model="forms.escalas.data"></div>
+                        <div class="form-group"><label>Escala</label><input type="text" class="form-control" ng-model="forms.escalas.escala"></div>
+                        <div class="form-group"><label>Autorizado por</label><input type="text" class="form-control" ng-model="forms.escalas.autorizado_por"></div>
+                        <div class="form-group"><label>Observações</label><textarea class="form-control" ng-model="forms.escalas.observacoes"></textarea></div>
+                    </div>
+                    <div ng-if="modalType === 'atividades'">
+                        <div class="form-group"><label>Tipo de atividade</label><input type="text" class="form-control" ng-model="forms.atividades.tipo_atividade"></div>
+                        <div class="form-group"><label>Título</label><input type="text" class="form-control" ng-model="forms.atividades.titulo"></div>
+                        <div class="form-group"><label>Data</label><input type="date" class="form-control" ng-model="forms.atividades.data_atividade"></div>
+                        <div class="form-group"><label>Nome do documento</label><input type="text" class="form-control" ng-model="forms.atividades.nome_documento"></div>
+                        <div class="form-group"><label>URL do documento</label><input type="text" class="form-control" ng-model="forms.atividades.documento_url"></div>
+                        <div class="form-group"><label>Descrição</label><textarea class="form-control" ng-model="forms.atividades.descricao"></textarea></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="saveModal()" ng-disabled="savingModal">
+                    {{savingModal ? 'Salvando...' : 'Salvar'}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal" id="gemAlunoResumoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated fadeInDown">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Editar aluno</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6 form-group"><label>Aluno</label><input type="text" class="form-control" ng-model="aluno.nome_aluno"></div>
+                    <div class="col-sm-3 form-group"><label>Status</label><select class="form-control" ng-model="aluno.status"><option value="Ativo">Ativo</option><option value="Inativo">Inativo</option></select></div>
+                    <div class="col-sm-3 form-group"><label>Mensagens</label><input type="number" class="form-control" ng-model="aluno.mensagens"></div>
+                    <div class="col-sm-6 form-group"><label>Comum</label><input type="text" class="form-control" ng-model="aluno.comum_congregacao"></div>
+                    <div class="col-sm-3 form-group"><label>Município</label><input type="text" class="form-control" ng-model="aluno.municipio"></div>
+                    <div class="col-sm-3 form-group"><label>Instrumento</label><input type="text" class="form-control" ng-model="aluno.instrumento"></div>
+                    <div class="col-sm-4 form-group"><label>Cargo / Ministério</label><input type="text" class="form-control" ng-model="aluno.cargo_ministerio"></div>
+                    <div class="col-sm-2 form-group"><label>Nível</label><input type="text" class="form-control" ng-model="aluno.nivel"></div>
+                    <div class="col-sm-3 form-group"><label>Registro MSA</label><input type="text" class="form-control" ng-model="aluno.registro_msa"></div>
+                    <div class="col-sm-3 form-group"><label>Lançado por</label><input type="text" class="form-control" ng-model="aluno.lancado_por"></div>
+                    <div class="col-sm-12 form-group"><label>Observações</label><textarea class="form-control" rows="3" ng-model="aluno.observacoes"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="saveAlunoResumo()" ng-disabled="savingAluno">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>

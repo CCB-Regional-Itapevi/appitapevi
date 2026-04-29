@@ -188,13 +188,13 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('musicalizacao.dashboard', {
             url: "/dashboard",
             templateUrl: "views/musicalizacao_dashboard.html?v=1.3.2",
-            data: { pageTitle: 'Dashboard Musicaliza????o' },
+            data: { pageTitle: 'Dashboard Musicaliza\u00e7\u00e3o' },
             controller: 'musicalizacaoCtrl'
         })
         .state('musicalizacao.criancas', {
             url: "/criancas",
             templateUrl: "views/musicalizacao_alunos.html?v=1.3.13",
-            data: { pageTitle: 'Crian??as' },
+            data: { pageTitle: 'Crian\u00e7as' },
             controller: 'musicalizacaoAlunosCtrl'
         })
         .state('musicalizacao.polos', {
@@ -218,16 +218,58 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('musicalizacao.nova_aula', {
             url: "/nova_aula/:id",
             templateUrl: "views/musicalizacao_nova_aula.html?v=1.3.5",
-            data: { pageTitle: 'Novo Lan??amento' },
+            data: { pageTitle: 'Novo Lan\u00e7amento' },
             params: { id: { value: null, squash: true } },
             controller: 'musicalizacaoNovaAulaCtrl'
         })
         .state('musicalizacao.presenca', {
             url: "/presenca/:id",
             templateUrl: "views/musicalizacao_presenca.html?v=1.3.5",
-            data: { pageTitle: 'Presen??a' },
+            data: { pageTitle: 'Presen\u00e7a' },
             params: { id: { value: null, squash: true } },
             controller: 'musicalizacaoPresencaCtrl'
+        })
+        .state('gem', {
+            abstract: true,
+            url: "/gem",
+            templateUrl: "views/common/content.html"
+        })
+        .state('gem.dashboard', {
+            url: "/dashboard",
+            templateUrl: "views/gem_dashboard.html?v=1.0.0",
+            data: { pageTitle: 'G.E.M - Dashboard' },
+            controller: 'gemDashboardCtrl'
+        })
+        .state('gem.alunos', {
+            url: "/alunos",
+            templateUrl: "views/gem_alunos.html?v=1.0.0",
+            data: { pageTitle: 'G.E.M - Alunos' },
+            controller: 'gemAlunosCtrl'
+        })
+        .state('gem.resumo', {
+            url: "/resumo/:id",
+            templateUrl: "views/gem_resumo.html?v=1.0.0",
+            data: { pageTitle: 'G.E.M - Resumo' },
+            params: { id: { value: null, squash: true } },
+            controller: 'gemResumoCtrl'
+        })
+        .state('gem.historico', {
+            url: "/historico-aula",
+            templateUrl: "views/gem_historico.html?v=1.0.0",
+            data: { pageTitle: 'G.E.M - Hist\u00f3rico de Aula' },
+            controller: 'gemHistoricoCtrl'
+        })
+        .state('gem.planos', {
+            url: "/planos-aula",
+            templateUrl: "views/gem_planos.html?v=1.0.0",
+            data: { pageTitle: 'G.E.M - Plano de Aulas' },
+            controller: 'gemPlanosCtrl'
+        })
+        .state('gem.turmas', {
+            url: "/turmas",
+            templateUrl: "views/gem_turmas.html?v=1.0.0",
+            data: { pageTitle: 'G.E.M - Turmas' },
+            controller: 'gemTurmasCtrl'
         })
         .state('mailbox', {
             abstract: true,
@@ -291,14 +333,20 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('darpe.calendario', {
             url: "/calendario",
             templateUrl: 'views/darpe_calendario.html?v=2.4.0',
-            data: { pageTitle: 'D.A.R.P.E - Calendário' },
+            data: { pageTitle: 'D.A.R.P.E - Calend\u00e1rio' },
             controller: 'darpeCalendarioCtrl',
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
                         {
                             insertBefore: '#loadBefore',
-                            files: ['js/plugins/jquery-ui/jquery-ui.min.js', 'js/plugins/moment/moment.min.js', 'css/plugins/fullcalendar/fullcalendar.css', 'js/plugins/fullcalendar/fullcalendar.min.js', 'js/plugins/fullcalendar/gcal.js'],
+                            files: [
+                                'js/plugins/jquery-ui/jquery-ui.min.js',
+                                'js/plugins/moment/moment.min.js',
+                                'css/plugins/fullcalendar/fullcalendar.css',
+                                'js/plugins/fullcalendar/fullcalendar.min.js',
+                                'js/plugins/fullcalendar/gcal.js'
+                            ],
                             serie: true
                         },
                         {
@@ -312,7 +360,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('darpe.musicos', {
             url: '/musicos',
             templateUrl: 'views/darpe_musicos.html?v=2.4.0',
-            data: { pageTitle: 'D.A.R.P.E - Músicos' }
+            data: { pageTitle: 'D.A.R.P.E - M\u00fasicos' }
         })
         .state('darpe.clinicas', {
             url: "/clinicas",
@@ -348,17 +396,17 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('depac.musicos', {
             url: "/musicos",
             templateUrl: 'views/depac_musicos.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - M??sicos' }
+            data: { pageTitle: 'D.E.P.A.C - M\u00fasicos' }
         })
         .state('depac.clinicas', {
             url: "/clinicas",
             templateUrl: 'views/depac_clinicas.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Cl??nicas' }
+            data: { pageTitle: 'D.E.P.A.C - Cl\u00ednicas' }
         })
         .state('depac.ministerio', {
             url: "/ministerio",
             templateUrl: 'views/depac_ministerio.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Minist??rio' }
+            data: { pageTitle: 'D.E.P.A.C - Minist\u00e9rio' }
         })
         .state('depac.atendimentos', {
             url: "/atendimentos",
@@ -390,7 +438,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('rjm.analytics', {
             url: "/analytics",
             templateUrl: "views/rjm_analytics.html?v=1.1.0",
-            data: { pageTitle: 'Hist??rico de Atividades - RJM' },
+            data: { pageTitle: 'Hist\u00f3rico de Atividades - RJM' },
             controller: 'rjmAnalyticsCtrl',
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
@@ -442,7 +490,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('ebi.presenca', {
             url: "/presenca",
             templateUrl: "views/ebi_presenca.html?v=1.4.22",
-            data: { pageTitle: 'Presen??a EBI' },
+            data: { pageTitle: 'Presen\u00e7a EBI' },
             controller: 'ebiRecitativosCtrl',
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
@@ -463,7 +511,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('ebi.alunos', {
             url: "/alunos",
             templateUrl: "views/ebi_alunos.html?v=1.3.15",
-            data: { pageTitle: 'Crian??as EBI' },
+            data: { pageTitle: 'Crian\u00e7as EBI' },
             controller: 'ebiAlunosCtrl'
         })
         .state('ebi.instrutores', {
@@ -490,8 +538,48 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('music', {
             abstract: true,
-            url: "/music",
+            url: "/musica",
             templateUrl: "views/common/content.html",
+        })
+        .state('music.dashboard', {
+            url: "/dashboard",
+            templateUrl: "views/musica_dashboard.html?v=1.2.3",
+            data: { pageTitle: 'M\u00fasica - Dashboard' },
+            controller: 'musicaDashboardCtrl',
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'angles',
+                            files: ['js/plugins/chartJs/angles.js', 'js/plugins/chartJs/Chart.min.js']
+                        }
+                    ]);
+                }
+            }
+        })
+        .state('music.ensaios', {
+            url: "/ensaios",
+            templateUrl: "views/musica_ensaios.html?v=1.1.4",
+            data: { pageTitle: 'M\u00fasica - Ensaios Regionais' },
+            controller: 'musicaEnsaiosCtrl'
+        })
+        .state('music.presencas', {
+            url: "/presencas",
+            templateUrl: "views/musica_presencas.html?v=1.1.2",
+            data: { pageTitle: 'M\u00fasica - Presen\u00e7as' },
+            controller: 'musicaPresencasCtrl'
+        })
+        .state('music.justificativas', {
+            url: "/justificativas",
+            templateUrl: "views/musica_justificativas.html?v=1.0.0",
+            data: { pageTitle: 'M\u00fasica - Justificativas' },
+            controller: 'musicaJustificativasCtrl'
+        })
+        .state('music.relatorios', {
+            url: "/relatorios",
+            templateUrl: "views/musica_relatorios.html?v=1.1.2",
+            data: { pageTitle: 'M\u00fasica - Relat\u00f3rios' },
+            controller: 'musicaRelatoriosCtrl'
         })
         .state('music.static_table', {
             url: "/static_table",
@@ -539,7 +627,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('music.foo_table', {
             url: "/foo_table",
             templateUrl: "views/foo_table.html",
-            data: { pageTitle: 'M??sicos' },
+            data: { pageTitle: 'M\u00fasicos' },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
@@ -582,7 +670,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         .state('visitas.lancamentos', {
             url: "/lancamentos",
             templateUrl: "views/visitas_lancamentos.html?v=2.0.0",
-            data: { pageTitle: 'Lan??amentos de Visitas' },
+            data: { pageTitle: 'Lan\u00e7amentos de Visitas' },
             controller: 'visitasLancamentosCtrl'
         })
         .state('visitas.visitados', {
@@ -1024,6 +1112,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             url: "/forgot_password",
             templateUrl: "views/forgot_password.html",
             data: { pageTitle: 'Forgot password', specialClass: 'gray-bg' }
+        })
+        .state('musica_justificar_publico', {
+            url: "/musica/justificar",
+            templateUrl: "views/musica_justificativa_publica.html?v=1.0.0",
+            data: { pageTitle: 'Justificativa de Ausencia - Musica', specialClass: 'gray-bg' },
+            controller: 'musicaJustificativaPublicaCtrl'
         })
         .state('errorOne', {
             url: "/errorOne",
@@ -1764,7 +1858,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             url: "/user_approvals",
             templateUrl: "views/admin_pending_users.html",
             controller: 'pendingUsersAdminCtrl',
-            data: { pageTitle: 'Libera????o de Usu??rios' }
+            data: { pageTitle: 'Libera\u00e7\u00e3o de Usu\u00e1rios' }
         })
         .state('admin.usuarios', {
             url: "/usuarios",
@@ -1782,25 +1876,25 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             url: "/user_management",
             templateUrl: "views/admin_users_management.html?v=1.0.2",
             controller: 'userManagementAdminCtrl',
-            data: { pageTitle: 'Usu??rios' }
+            data: { pageTitle: 'Usu\u00e1rios' }
         })
         .state('admin.user_menagement', {
             url: "/user_menagement",
             templateUrl: "views/admin_users_management.html?v=1.0.2",
             controller: 'userManagementAdminCtrl',
-            data: { pageTitle: 'Gerenciamento de Usu??rios' }
+            data: { pageTitle: 'Gerenciamento de Usu\u00e1rios' }
         })
         .state('admin.congregacoes', {
             url: "/congregacoes",
             templateUrl: "views/admin_congregacoes.html?v=1.0.1",
             controller: 'congregacoesAdminCtrl',
-            data: { pageTitle: 'Congrega????es' }
+            data: { pageTitle: 'Congrega\u00e7\u00f5es' }
         })
         .state('admin.search_results', {
             url: "/search_results",
             templateUrl: "views/admin_congregacoes.html?v=1.0.1",
             controller: 'congregacoesAdminCtrl',
-            data: { pageTitle: 'Congrega????es' }
+            data: { pageTitle: 'Congrega\u00e7\u00f5es' }
         })
         .state('admin.santa_ceia', {
             url: "/santa_ceia",
@@ -1931,7 +2025,7 @@ angular
                 case 'gem':
                     return 'forms.basic_form';
                 case 'musica':
-                    return 'music.static_table';
+                    return 'music.dashboard';
                 case 'rjm':
                     return 'rjm.dashboard';
                 default:
@@ -2018,6 +2112,12 @@ angular
                 return false;
             }
 
+            console.warn('[Security] Acesso negado para o estado:', stateName, {
+                userSector: $rootScope.currentUser && $rootScope.currentUser.sector,
+                userRoleId: resolveRouteAccessRoleId($rootScope.currentUser),
+                stateSector: resolveProtectedSectorByState(stateName)
+            });
+
             fallbackState = resolveAuthorizedHomeState();
 
             if (event) {
@@ -2025,14 +2125,25 @@ angular
             }
 
             if (fallbackState && stateName !== fallbackState && $state.current.name !== fallbackState) {
+                console.log('[Security] Redirecionando para home autorizada:', fallbackState);
                 $state.go(fallbackState);
             }
             return true;
         }
 
+        var isRefreshingProfile = false;
         function refreshAccessProfileOnResume() {
+            var stateName = $state.current && $state.current.name;
+            var isPublicState = stateName === 'login' || stateName === 'register' || stateName === 'forgot_password' || stateName === 'landing' || stateName === 'musica_justificar_publico';
+
+            if (isPublicState || isRefreshingProfile) {
+                return;
+            }
+
+            isRefreshingProfile = true;
             AuthService.enforceInactivityTimeout().then(function (sessionExpired) {
                 if (sessionExpired) {
+                    isRefreshingProfile = false;
                     return;
                 }
 
@@ -2040,8 +2151,14 @@ angular
                     redirectOnAccessChange: true
                 }).then(function () {
                     enforceStateAccess($state.current && $state.current.name);
-                }).catch(angular.noop);
-            }).catch(angular.noop);
+                }).catch(function (err) {
+                    console.warn('Falha ao atualizar perfil no resume:', err);
+                }).finally(function () {
+                    isRefreshingProfile = false;
+                });
+            }).catch(function () {
+                isRefreshingProfile = false;
+            });
         }
 
         function registerUserActivity() {
@@ -2049,7 +2166,8 @@ angular
             var isPublicState = stateName === 'login' ||
                                 stateName === 'register' ||
                                 stateName === 'forgot_password' ||
-                                stateName === 'landing';
+                                stateName === 'landing' ||
+                                stateName === 'musica_justificar_publico';
 
             if (isPublicState) {
                 return;
@@ -2121,7 +2239,8 @@ angular
             var isPublicState = toState.name === 'login' ||
                                 toState.name === 'register' ||
                                 toState.name === 'forgot_password' ||
-                                toState.name === 'landing';
+                                toState.name === 'landing' ||
+                                toState.name === 'musica_justificar_publico';
 
             if (isPublicState) return; // Sempre permite p??ginas p??blicas
 
@@ -2154,7 +2273,8 @@ angular
             var isPublicState = toState.name === 'login' ||
                                 toState.name === 'register' ||
                                 toState.name === 'forgot_password' ||
-                                toState.name === 'landing';
+                                toState.name === 'landing' ||
+                                toState.name === 'musica_justificar_publico';
 
             if (isPublicState) {
                 return;

@@ -1,0 +1,109 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-8">
+        <h2>Relat&oacute;rio Unificado - Ensaio Regional</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="music.dashboard">M&uacute;sica</a></li>
+            <li class="active"><strong>Relat&oacute;rios</strong></li>
+        </ol>
+    </div>
+    <div class="col-lg-4 text-right m-t-lg">
+        <button class="btn btn-primary btn-sm" ng-click="exportExcel()"><i class="fa fa-file-excel-o"></i> Excel</button>
+        <button class="btn btn-danger btn-sm" ng-click="exportPdf()"><i class="fa fa-file-pdf-o"></i> PDF</button>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+    <div class="ibox">
+        <div class="ibox-title"><h5>Base do relat&oacute;rio</h5></div>
+        <div class="ibox-content">
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label>Ensaio</label>
+                    <select class="form-control input-sm" ng-model="selectedEnsaioId" ng-options="e.id as (e.titulo + ' - ' + e.data_ensaio) for e in ensaios" ng-change="loadRelatorio()"></select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label>Munic&iacute;pio</label>
+                    <select class="form-control input-sm" ng-model="selectedMunicipio" ng-options="m as m for m in getMunicipioOptions()">
+                        <option value="">Todos os munic&iacute;pios</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="well well-sm m-b-none">
+                        <strong>Total geral:</strong>
+                        {{ getTotaisVisiveis().total || 0 }} presentes,
+                        {{ getTotaisVisiveis().musicos || 0 }} m&uacute;sicos e
+                        {{ getTotaisVisiveis().organistas || 0 }} organistas.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sk-spinner sk-spinner-wave" ng-if="loading">
+        <div class="sk-rect1"></div><div class="sk-rect2"></div><div class="sk-rect3"></div><div class="sk-rect4"></div><div class="sk-rect5"></div>
+    </div>
+
+    <div class="row" ng-if="!loading">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Presen&ccedil;a por munic&iacute;pio e comum</h5>
+                    <div class="ibox-tools"><span class="label label-primary">Regional Itapevi</span></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Munic&iacute;pio</th>
+                                    <th>Comum</th>
+                                    <th class="text-center">M&uacute;sicos</th>
+                                    <th class="text-center">Organistas</th>
+                                    <th class="text-center">Minist&eacute;rio</th>
+                                    <th class="text-center">Apoio</th>
+                                    <th class="text-center">Outros</th>
+                                    <th class="text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="municipio in relatorio.municipios | filter:{ nome: selectedMunicipio || undefined }">
+                                <tr class="active">
+                                    <td colspan="2"><strong>{{ municipio.nome }}</strong></td>
+                                    <td class="text-center"><strong>{{ municipio.musicos }}</strong></td>
+                                    <td class="text-center"><strong>{{ municipio.organistas }}</strong></td>
+                                    <td class="text-center"><strong>{{ municipio.ministerio || 0 }}</strong></td>
+                                    <td class="text-center"><strong>{{ municipio.apoio || 0 }}</strong></td>
+                                    <td class="text-center"><strong>{{ municipio.outros || 0 }}</strong></td>
+                                    <td class="text-center"><span class="badge badge-primary">{{ municipio.total }}</span></td>
+                                </tr>
+                                <tr ng-repeat="comum in municipio.comuns">
+                                    <td>{{ comum.municipio }}</td>
+                                    <td>{{ comum.comum }}</td>
+                                    <td class="text-center">{{ comum.musicos }}</td>
+                                    <td class="text-center">{{ comum.organistas }}</td>
+                                    <td class="text-center">{{ comum.ministerio || 0 }}</td>
+                                    <td class="text-center">{{ comum.apoio || 0 }}</td>
+                                    <td class="text-center">{{ comum.outros || 0 }}</td>
+                                    <td class="text-center"><strong>{{ comum.total }}</strong></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background:#f3f3f4;font-weight:bold;">
+                                    <td colspan="2">TOTAL GERAL</td>
+                                    <td class="text-center">{{ getTotaisVisiveis().musicos || 0 }}</td>
+                                    <td class="text-center">{{ getTotaisVisiveis().organistas || 0 }}</td>
+                                    <td class="text-center">{{ getTotaisVisiveis().ministerio || 0 }}</td>
+                                    <td class="text-center">{{ getTotaisVisiveis().apoio || 0 }}</td>
+                                    <td class="text-center">{{ getTotaisVisiveis().outros || 0 }}</td>
+                                    <td class="text-center">{{ getTotaisVisiveis().total || 0 }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="text-center text-muted" ng-if="!relatorio.municipios.length">Nenhum lan&ccedil;amento para este ensaio.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

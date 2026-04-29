@@ -137,7 +137,13 @@
             }
 
             // Priority 2: Fallback to name-based mapping ONLY if ID is missing
-            return roleMap[normalizedRoleName] || 7;
+            if (normalizedRoleName && roleMap[normalizedRoleName]) {
+                return roleMap[normalizedRoleName];
+            }
+
+            // Safety: Return the original ID if it was valid but not in map, or null if truly missing
+            // to avoid defaulting to "Member" (7) during network glitches or partial data loads.
+            return roleId || null;
         }
 
         function normalizeStatus(status) {
@@ -1306,7 +1312,7 @@
                     $state.go('darpe.musicos');
                     break;
                 case 'GEM':
-                    $state.go('forms.basic_form');
+                    $state.go('gem.dashboard');
                     break;
                 case 'RJM':
                     $state.go('rjm.dashboard');
@@ -2525,13 +2531,19 @@
                 .single()
                 .then(function (response) {
                     if (response.error) {
-                        console.warn('Perfil não encontrado, usando dados temporários', response.error);
-                        deferred.resolve(normalizeProfile({
-                            user_id: userId,
-                            role_id: 6,
-                            sector: 'Inscrição',
-                            status: 'pending'
-                        }));
+                        // If the profile is truly missing, return a minimal pending profile
+                        // but do not resolve if it's a network/database error that shouldn't
+                        // result in access downgrade.
+                        if (response.error.code === 'PGRST116' || response.error.message.indexOf('0 rows') !== -1) {
+                            deferred.resolve(normalizeProfile({
+                                user_id: userId,
+                                role_id: 6,
+                                sector: 'Inscrição',
+                                status: 'pending'
+                            }));
+                        } else {
+                            deferred.reject(response.error);
+                        }
                     } else {
                         deferred.resolve(normalizeProfile(response.data));
                     }
@@ -2575,6 +2587,10 @@
                         deferred.resolve(syncCurrentUserProfile(profile, options || {}));
                     });
                 }).catch(function (error) {
+                    // Critical improvement: If profile fetch fails but we already have a user in session,
+                    // do NOT clear the existing $rootScope.currentUser right away if this was a refresh attempt.
+                    // This prevents the UI from "blinking" into a logged-out or unprivileged state.
+                    $rootScope.currentUserResolved = true;
                     deferred.reject(error);
                 });
             }).catch(function (error) {

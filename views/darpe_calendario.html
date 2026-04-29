@@ -25,7 +25,7 @@
                         <div class="external-event fc-event label" data-sector-id="1" data-event='{"title":"Agenda Setor 1", "stick": true}' style="background-color: #1c84c6; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 1 - Ressocialização</div>
                         <div class="external-event fc-event label" data-sector-id="2" data-event='{"title":"Agenda Setor 2", "stick": true}' style="background-color: #1ab394; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 2 - Clínicas/Albergues</div>
                         <div class="external-event fc-event label" data-sector-id="3" data-event='{"title":"Agenda Setor 3", "stick": true}' style="background-color: #f8ac59; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 3 - Segurança</div>
-                        <div class="external-event fc-event label" data-sector-id="4" data-event='{"title":"Agenda Setor 4", "stick": true}' style="background-color: #673ab7; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 4 - Hospitais/Idosos/Edu</div>
+                        <div class="external-event fc-event label" data-sector-id="4" data-event='{"title":"Agenda Setor 4", "stick": true}' style="background-color: #673ab7; color: white; display: block; padding: 10px; margin-bottom: 5px; cursor: move;">SETOR 4 - Hospitais/Idosos/Educacional</div>
                     </div>
                 </div>
             </div>
@@ -69,25 +69,31 @@
 </div>
 
 <style>
-    /* Status-based Border colors */
+    /* Status-based Border colors (Left stripe) */
     .fc-event.status-realizado { border-left: 5px solid #1ab394 !important; }
     .fc-event.status-agendado { border-left: 5px solid #1c84c6 !important; }
     .fc-event.status-cancelado { border-left: 5px solid #ed5565 !important; }
+    .fc-event.status-atendido { border-left: 5px solid #1ab394 !important; }
 
-    /* Sector-based Background colors */
-    .fc-event.sector-1 { background-color: #1c84c6 !important; color: white !important; }
-    .fc-event.sector-2 { background-color: #1ab394 !important; color: white !important; }
-    .fc-event.sector-3 { background-color: #f8ac59 !important; color: white !important; }
-    .fc-event.sector-4 { background-color: #673ab7 !important; color: white !important; }
-
-    .fc-event {
+    .fc-view-container .fc-event {
         cursor: pointer;
-        padding: 5px;
-        border: none;
-        color: #ffffff !important;
+        padding: 0 !important; /* Retira padding para a faixa encostar no topo/fundo */
+        border: 1px solid transparent !important;
+        background-image: none !important;
     }
+    
+    .fc-view-container .fc-event-inner {
+        padding: 2px 5px !important;
+        background-color: inherit !important;
+        color: inherit !important;
+        border: none !important;
+        width: 100%;
+        height: 100%;
+    }
+
     .fc-event .fc-title, .fc-event .fc-content, .fc-event .fc-time {
-        color: #ffffff !important;
+        color: inherit !important;
         font-weight: 600;
+        text-shadow: none !important;
     }
 </style>

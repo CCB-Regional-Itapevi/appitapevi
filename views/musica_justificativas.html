@@ -1,0 +1,242 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-8">
+        <h2>Justificativas de Aus&ecirc;ncia - M&uacute;sica</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="music.dashboard">M&uacute;sica</a></li>
+            <li class="active"><strong>Justificativas</strong></li>
+        </ol>
+    </div>
+    <div class="col-lg-4 text-right m-t-lg"></div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+
+    <div class="row">
+        <div class="col-sm-2">
+            <div class="widget style1 navy-bg">
+                <div class="row">
+                    <div class="col-xs-4"><i class="fa fa-list fa-3x"></i></div>
+                    <div class="col-xs-8 text-right">
+                        <span>Total</span>
+                        <h2 class="font-bold">{{ resumo.total || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="widget style1 lazur-bg">
+                <div class="row">
+                    <div class="col-xs-4"><i class="fa fa-calendar fa-3x"></i></div>
+                    <div class="col-xs-8 text-right">
+                        <span>Eventos</span>
+                        <h2 class="font-bold">{{ resumo.eventos || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="widget style1 yellow-bg">
+                <div class="row">
+                    <div class="col-xs-4"><i class="fa fa-home fa-3x"></i></div>
+                    <div class="col-xs-8 text-right">
+                        <span>Comuns</span>
+                        <h2 class="font-bold">{{ resumo.comuns || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="widget style1 blue-bg">
+                <div class="row">
+                    <div class="col-xs-4"><i class="fa fa-music fa-3x"></i></div>
+                    <div class="col-xs-8 text-right">
+                        <span>M&uacute;sicos</span>
+                        <h2 class="font-bold">{{ resumo.musicos || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="widget style1 red-bg">
+                <div class="row">
+                    <div class="col-xs-4"><i class="fa fa-female fa-3x"></i></div>
+                    <div class="col-xs-8 text-right">
+                        <span>Organistas</span>
+                        <h2 class="font-bold">{{ resumo.organistas || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="widget style1 gray-bg">
+                <div class="row">
+                    <div class="col-xs-4"><i class="fa fa-users fa-3x"></i></div>
+                    <div class="col-xs-8 text-right">
+                        <span>Minist&eacute;rio</span>
+                        <h2 class="font-bold">{{ resumo.ministerio || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ibox">
+        <div class="ibox-title">
+            <h5>Relat&oacute;rios e Filtros R&aacute;pidos</h5>
+            <div class="ibox-tools">
+                <button class="btn btn-white btn-sm" type="button" ng-click="loadJustificativas()">
+                    <i class="fa fa-refresh"></i> Atualizar
+                </button>
+                <button class="btn btn-primary btn-sm" type="button" ng-click="exportJustificativasExcel()" style="background:#19bb9b;border-color:#19bb9b;">
+                    <i class="fa fa-file-excel-o"></i> Excel
+                </button>
+                <button class="btn btn-danger btn-sm" type="button" ng-click="exportJustificativasPdf()" style="background:#ed5565;border-color:#ed5565;">
+                    <i class="fa fa-file-pdf-o"></i> PDF
+                </button>
+                <button class="btn btn-white btn-sm" type="button" ng-click="clearJustificativaFilters()">
+                    <i class="fa fa-eraser"></i> Limpar
+                </button>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="row">
+                <div class="col-md-3 form-group">
+                    <label>Per&iacute;odo</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control input-sm" ng-model="filters.data_inicio">
+                        <span class="input-group-addon">at&eacute;</span>
+                        <input type="date" class="form-control input-sm" ng-model="filters.data_fim">
+                    </div>
+                </div>
+                <div class="col-md-2 form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-white btn-sm btn-block" ng-click="filterJustificativasToday()">
+                        <i class="fa fa-calendar-check-o"></i> Hoje
+                    </button>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label>Buscar</label>
+                    <input type="text" class="form-control input-sm" ng-model="filters.searchText" placeholder="Nome, comum, cargo, instrumento ou motivo">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label>Tipo de evento</label>
+                    <select class="form-control input-sm" ng-model="filters.tipo_evento" ng-options="item as item for item in tipoEventoOptions">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sk-spinner sk-spinner-wave" ng-if="loading">
+        <div class="sk-rect1"></div><div class="sk-rect2"></div><div class="sk-rect3"></div><div class="sk-rect4"></div><div class="sk-rect5"></div>
+    </div>
+
+    <div class="ibox" ng-if="!loading">
+        <div class="ibox-title">
+            <h5>Detalhamento por evento</h5>
+            <div class="ibox-tools"><span class="label label-primary">{{ filteredJustificativas.length || 0 }} registros</span></div>
+        </div>
+        <div class="ibox-content">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Evento</th>
+                            <th>Data</th>
+                            <th>Nome</th>
+                            <th>Comum</th>
+                            <th>Munic&iacute;pio</th>
+                            <th>Cargo</th>
+                            <th>Instrumento</th>
+                            <th>Motivo</th>
+                            <th>Status</th>
+                            <th class="text-center">A&ccedil;&otilde;es</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="grupo in groupedJustificativas">
+                        <tr class="active">
+                            <td colspan="10">
+                                <strong>{{ formatJustificativaTipoEvento(grupo.tipo_evento) }}</strong>
+                                <span ng-if="grupo.nome_evento"> - {{ grupo.nome_evento }}</span>
+                                <span class="label label-info pull-right">{{ grupo.total }} justificativa(s)</span>
+                            </td>
+                        </tr>
+                        <tr ng-repeat="item in grupo.items">
+                            <td>{{ formatJustificativaTipoEvento(item.tipo_evento) }}</td>
+                            <td>
+                                <strong>{{ formatJustificativaDate(item.data_evento) }}</strong>
+                                <small class="text-muted" style="display:block;">Recebido &agrave;s {{ formatJustificativaTime(item.created_at) }}</small>
+                            </td>
+                            <td>{{ item.nome }}</td>
+                            <td>{{ item.comum }}</td>
+                            <td>{{ item.municipio || '-' }}</td>
+                            <td>{{ item.cargo || '-' }}</td>
+                            <td>{{ item.instrumento || '-' }}</td>
+                            <td>{{ item.motivo }}</td>
+                            <td><span class="label label-primary" style="background:#1ab394;">Recebida</span></td>
+                            <td class="text-center">
+                                <button class="btn btn-white btn-xs" ng-click="openJustificativaModal(item)"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-danger btn-xs" ng-click="confirmDeleteJustificativa(item)"><i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center text-muted" ng-if="!filteredJustificativas.length">Nenhuma justificativa encontrada.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="musicaJustificativaModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Justificativa de Aus&ecirc;ncia</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6 form-group">
+                        <label>Tipo de evento</label>
+                        <select class="form-control" ng-model="justificativaForm.tipo_evento" ng-options="item as item for item in tipoEventoOptions"></select>
+                    </div>
+                    <div class="col-sm-6 form-group">
+                        <label>Data do evento</label>
+                        <input type="date" class="form-control" ng-model="justificativaForm.data_evento">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 form-group"><label>Nome</label><input type="text" class="form-control" ng-model="justificativaForm.nome"></div>
+                    <div class="col-sm-4 form-group"><label>Comum</label><input type="text" class="form-control" ng-model="justificativaForm.comum"></div>
+                    <div class="col-sm-4 form-group"><label>Munic&iacute;pio</label><input type="text" class="form-control" ng-model="justificativaForm.municipio"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 form-group"><label>Cargo</label><input type="text" class="form-control" ng-model="justificativaForm.cargo"></div>
+                    <div class="col-sm-4 form-group"><label>Instrumento</label><input type="text" class="form-control" ng-model="justificativaForm.instrumento"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 form-group"><label>Motivo</label><textarea class="form-control" rows="3" ng-model="justificativaForm.motivo"></textarea></div>
+                    <div class="col-sm-4 form-group"><label>Contato</label><input type="text" class="form-control" ng-model="justificativaForm.contato"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 form-group"><label>Origem</label><input type="text" class="form-control" ng-model="justificativaForm.origem_aplicacao"></div>
+                    <div class="col-sm-4 form-group"><label>Refer&ecirc;ncia externa</label><input type="text" class="form-control" ng-model="justificativaForm.referencia_externa"></div>
+                    <div class="col-sm-4 form-group"><label>Registrado por</label><input type="text" class="form-control" ng-model="justificativaForm.registrado_por"></div>
+                </div>
+                <div class="form-group">
+                    <label>Observa&ccedil;&otilde;es internas</label>
+                    <textarea class="form-control" rows="2" ng-model="justificativaForm.observacoes"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="saveJustificativa()" ng-disabled="saving">
+                    <i class="fa fa-save"></i> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

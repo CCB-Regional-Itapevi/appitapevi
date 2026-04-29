@@ -1,0 +1,224 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-8">
+        <h2>Ensaios Regionais</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="music.dashboard">M&uacute;sica</a></li>
+            <li class="active"><strong>Ensaios</strong></li>
+        </ol>
+    </div>
+    <div class="col-lg-4 text-right m-t-lg">
+        <button class="btn btn-success btn-sm" ng-click="openImportModal()"><i class="fa fa-upload"></i> Importar planilha</button>
+        <button class="btn btn-white btn-sm" ng-click="openLocalModal()"><i class="fa fa-map-marker"></i> Novo polo</button>
+        <button class="btn btn-primary btn-sm" ng-click="openEnsaioModal()"><i class="fa fa-plus"></i> Novo ensaio</button>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="ibox">
+                <div class="ibox-title"><h5>Agenda operacional</h5></div>
+                <div class="ibox-content">
+                    <div class="m-b-md" ng-repeat="item in calendario">
+                        <strong>{{ item.meses }}</strong>
+                        <div>{{ item.locais }}</div>
+                        <small class="text-muted">{{ item.ciclo }}</small>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group m-b-sm">
+                        <label class="m-b-xs">Ensaio em foco</label>
+                        <select class="form-control input-sm" ng-model="selectedEnsaioId" ng-options="e.id as (e.titulo + ' - ' + (e.data_ensaio | date:'dd/MM/yyyy':'UTC')) for e in ensaios"></select>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-xs-6">
+                            <h3 class="m-t-none m-b-xs">{{ groupedLocais.length || 0 }}</h3>
+                            <small>Munic&iacute;pios</small>
+                        </div>
+                        <div class="col-xs-6">
+                            <h3 class="m-t-none m-b-xs">{{ filteredLocais.length || 0 }}</h3>
+                            <small>Polos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="ibox">
+                <div class="ibox-title"><h5>Ensaios cadastrados</h5></div>
+                <div class="ibox-content">
+                    <div class="sk-spinner sk-spinner-wave" ng-if="loading">
+                        <div class="sk-rect1"></div><div class="sk-rect2"></div><div class="sk-rect3"></div><div class="sk-rect4"></div><div class="sk-rect5"></div>
+                    </div>
+                    <div class="table-responsive" ng-if="!loading">
+                        <table class="table table-striped table-hover">
+                            <thead><tr><th>Ensaio</th><th>Data</th><th>Ciclo</th><th>Sede</th><th>Status</th><th class="text-center">A&ccedil;&otilde;es</th></tr></thead>
+                            <tbody>
+                                <tr ng-repeat="ensaio in ensaios" ng-class="{ info: selectedEnsaioId == ensaio.id }" ng-click="selectedEnsaioId = ensaio.id" style="cursor:pointer;">
+                                    <td><strong>{{ ensaio.titulo }}</strong><br><small>{{ ensaio.relatorio_modelo }}</small></td>
+                                    <td>{{ ensaio.data_ensaio | date:'dd/MM/yyyy':'UTC' }}</td>
+                                    <td>{{ ensaio.ciclo || '-' }}</td>
+                                    <td>{{ ensaio.sede_principal || '-' }}</td>
+                                    <td><span class="label label-info">{{ ensaio.status }}</span></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-xs btn-white" ng-click="openEnsaioModal(ensaio)"><i class="fa fa-pencil"></i></button>
+                                        <button class="btn btn-xs btn-danger" ng-click="confirmDeleteEnsaio(ensaio)"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr ng-if="!ensaios.length"><td colspan="6" class="text-center text-muted">Nenhum ensaio cadastrado.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ibox">
+                <div class="ibox-title"><h5>Polos e destinos do ensaio regional selecionado</h5></div>
+                <div class="ibox-content p-sm">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4" ng-repeat="row in groupedLocais">
+                            <div class="panel panel-default m-b-sm">
+                                <div class="panel-body" style="padding:12px;">
+                                    <div class="clearfix m-b-xs">
+                                        <strong class="pull-left">{{ row.municipio }}</strong>
+                                        <span class="label label-info pull-right">{{ row.quantidade }}</span>
+                                    </div>
+                                    <div>{{ row.localidades.join(', ') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 text-center text-muted" ng-if="!filteredLocais.length">Nenhum polo cadastrado para este ensaio regional.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="musicaEnsaioModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg"><div class="modal-content">
+        <div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Ensaio Regional</h4></div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-6 form-group"><label>T&iacute;tulo</label><input class="form-control" ng-model="ensaioForm.titulo"></div>
+                <div class="col-sm-3 form-group"><label>Data</label><input type="date" class="form-control" ng-model="ensaioForm.data_ensaio"></div>
+                <div class="col-sm-3 form-group"><label>Status</label><select class="form-control" ng-model="ensaioForm.status"><option>Planejado</option><option>Em confer&ecirc;ncia</option><option>Finalizado</option><option>Arquivado</option></select></div>
+                <div class="col-sm-4 form-group"><label>M&ecirc;s refer&ecirc;ncia</label><input class="form-control" ng-model="ensaioForm.mes_referencia"></div>
+                <div class="col-sm-4 form-group"><label>Ciclo</label><input class="form-control" ng-model="ensaioForm.ciclo" placeholder="Itapevi / Pirapora"></div>
+                <div class="col-sm-4 form-group"><label>Sede principal</label><input class="form-control" ng-model="ensaioForm.sede_principal"></div>
+                <div class="col-sm-12 form-group"><label>Observa&ccedil;&otilde;es</label><textarea class="form-control" rows="3" ng-model="ensaioForm.observacoes"></textarea></div>
+            </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-white" data-dismiss="modal">Cancelar</button><button class="btn btn-primary" ng-click="saveEnsaio()" ng-disabled="saving">Salvar</button></div>
+    </div></div>
+</div>
+
+<div class="modal fade" id="musicaLocalModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Polo do ensaio regional</h4></div>
+        <div class="modal-body">
+            <div class="form-group"><label>Ensaio</label><select class="form-control" ng-model="localForm.ensaio_id" ng-options="e.id as (e.titulo + ' - ' + e.data_ensaio) for e in ensaios"></select></div>
+            <div class="form-group"><label>Munic&iacute;pio</label><input class="form-control" ng-model="localForm.municipio"></div>
+            <div class="form-group"><label>Polo / destino</label><input class="form-control" ng-model="localForm.localidade"></div>
+            <div class="form-group"><label>Comum refer&ecirc;ncia</label><input class="form-control" ng-model="localForm.comum_referencia"></div>
+            <div class="form-group"><label>Endere&ccedil;o</label><input class="form-control" ng-model="localForm.endereco"></div>
+            <div class="form-group"><label>Ordem</label><input type="number" class="form-control" ng-model="localForm.ordem"></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-white" data-dismiss="modal">Cancelar</button><button class="btn btn-primary" ng-click="saveLocal()">Salvar</button></div>
+    </div></div>
+</div>
+
+<div class="modal fade" id="musicaImportModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">Importar planilhas de contagem</h4></div>
+        <div class="modal-body">
+            <p class="text-muted">Selecione a planilha de ensaios regionais. A importa&ccedil;&atilde;o usa a data do ensaio e preserva o polo/localidade de cada registro.</p>
+            <div class="form-group">
+                <input id="musicaWorkbookInput" type="file" accept=".xlsx,.xls" style="display:none;" onchange="angular.element(this).scope().handleImportSelection(this)">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-white" ng-click="chooseImportFile()">Escolher arquivo</button>
+                    </span>
+                    <input type="text" class="form-control" ng-value="importFileName || ''" placeholder="Nenhuma planilha selecionada" readonly>
+                </div>
+            </div>
+            <ul class="list-unstyled m-b-none" ng-if="importFiles.length">
+                <li ng-repeat="file in importFiles"><i class="fa fa-file-excel-o text-success"></i> {{ file.name }}</li>
+            </ul>
+            <div class="m-t-md" ng-if="importPreview">
+                <div class="well well-sm">
+                    <strong>Pr&eacute;via:</strong>
+                    {{ importPreview.datasCount || 1 }} data(s) de ensaio |
+                    {{ importPreview.ensaio.data_ensaio | date:'dd/MM/yyyy':'UTC' }} |
+                    {{ importPreview.participantesCount }} participantes |
+                    {{ importPreview.presencasConsolidadasCount }} comuns/polos consolidados |
+                    {{ importPreview.duplicatesMerged }} duplicidades mescladas
+                </div>
+                <div class="table-responsive m-t-sm" ng-if="importPreview.datas.length > 1">
+                    <table class="table table-condensed">
+                        <thead><tr><th>Data</th><th class="text-center">Participantes</th><th>Polos</th></tr></thead>
+                        <tbody>
+                            <tr ng-repeat="item in importPreview.datas">
+                                <td>{{ item.data_ensaio | date:'dd/MM/yyyy':'UTC' }}</td>
+                                <td class="text-center">{{ item.participantes }}</td>
+                                <td>{{ item.locais.join(', ') || '-' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-responsive m-t-md" ng-if="importPreview.locaisPorData.length">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Polo</th>
+                                <th class="text-center">Participantes</th>
+                                <th class="text-center">Munic&iacute;pios</th>
+                                <th class="text-center">Comuns</th>
+                                <th class="text-center">M&uacute;sicos</th>
+                                <th class="text-center">Organistas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in importPreview.locaisPorData">
+                                <td>{{ item.data_ensaio | date:'dd/MM/yyyy':'UTC' }}</td>
+                                <td><strong>{{ item.local_ensaio }}</strong></td>
+                                <td class="text-center">{{ item.participantes }}</td>
+                                <td class="text-center">{{ item.municipios }}</td>
+                                <td class="text-center">{{ item.comuns }}</td>
+                                <td class="text-center">{{ item.musicos || 0 }}</td>
+                                <td class="text-center">{{ item.organistas || 0 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4"><div class="stat-percent text-primary">{{ importPreview.totais.total || 0 }}</div><small>Total geral</small></div>
+                    <div class="col-sm-4"><div class="stat-percent text-success">{{ importPreview.totais.musicos || 0 }}</div><small>M&uacute;sicos</small></div>
+                    <div class="col-sm-4"><div class="stat-percent text-info">{{ importPreview.totais.organistas || 0 }}</div><small>Organistas</small></div>
+                </div>
+                <div class="table-responsive m-t-md" ng-if="importPreview.municipiosPorLocal.length">
+                    <table class="table table-condensed table-hover">
+                        <thead><tr><th>Data</th><th>Polo</th><th>Munic&iacute;pio</th><th>Comum</th><th class="text-center">Total</th></tr></thead>
+                        <tbody>
+                            <tr ng-repeat="item in importPreview.municipiosPorLocal | limitTo:20">
+                                <td>{{ item.data_ensaio | date:'dd/MM/yyyy':'UTC' }}</td>
+                                <td>{{ item.local_ensaio }}</td>
+                                <td>{{ item.municipio || '-' }}</td>
+                                <td>{{ item.comum }}</td>
+                                <td class="text-center">{{ item.total }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="text-muted" ng-if="importPreview.municipiosPorLocal.length > 20">Exibindo as 20 primeiras consolida&ccedil;&otilde;es por data, polo, munic&iacute;pio e comum.</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-white" data-dismiss="modal" ng-disabled="importing || previewingImport">Cancelar</button>
+            <button class="btn btn-primary" ng-click="previewImport()" ng-disabled="importing || previewingImport">{{ previewingImport ? 'Analisando...' : 'Analisar' }}</button>
+            <button class="btn btn-success" ng-click="importWorkbooks()" ng-disabled="importing || !importPreview">{{ importing ? 'Importando...' : 'Importar' }}</button>
+        </div>
+    </div></div>
+</div>

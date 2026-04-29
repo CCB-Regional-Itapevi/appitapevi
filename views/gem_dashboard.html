@@ -1,0 +1,308 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-9">
+        <h2>Dashboard G.E.M</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="gem.alunos">G.E.M</a></li>
+            <li class="active"><strong>Painel executivo</strong></li>
+        </ol>
+    </div>
+    <div class="col-lg-3 text-right m-t-lg">
+        <a ui-sref="gem.alunos" class="btn btn-primary btn-sm">
+            <i class="fa fa-graduation-cap"></i> Gerenciar alunos
+        </a>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+
+    <div class="sk-spinner sk-spinner-wave" ng-if="loading">
+        <div class="sk-rect1"></div>
+        <div class="sk-rect2"></div>
+        <div class="sk-rect3"></div>
+        <div class="sk-rect4"></div>
+        <div class="sk-rect5"></div>
+    </div>
+
+    <div ng-if="!loading">
+        <div class="row">
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 lazur-bg">
+                    <div class="row">
+                        <div class="col-xs-4 text-center"><i class="fa fa-users fa-2x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Alunos</span>
+                            <h2 class="font-bold">{{ dashboard.metrics.totalAlunos || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 navy-bg">
+                    <div class="row">
+                        <div class="col-xs-4 text-center"><i class="fa fa-check-circle fa-2x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Ativos</span>
+                            <h2 class="font-bold">{{ dashboard.metrics.ativos || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 yellow-bg">
+                    <div class="row">
+                        <div class="col-xs-4 text-center"><i class="fa fa-map-signs fa-2x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Comuns</span>
+                            <h2 class="font-bold">{{ dashboard.metrics.comunsAtivas || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 bg-primary">
+                    <div class="row">
+                        <div class="col-xs-4 text-center"><i class="fa fa-music fa-2x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Instrumentos</span>
+                            <h2 class="font-bold">{{ dashboard.metrics.instrumentosAtivos || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 red-bg">
+                    <div class="row">
+                        <div class="col-xs-4 text-center"><i class="fa fa-line-chart fa-2x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Progresso m&eacute;dio</span>
+                            <h2 class="font-bold">{{ dashboard.metrics.mediaProgresso || 0 }}%</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="widget style1 lazur-bg">
+                    <div class="row">
+                        <div class="col-xs-4 text-center"><i class="fa fa-certificate fa-2x"></i></div>
+                        <div class="col-xs-8 text-right">
+                            <span>Aptos ao culto</span>
+                            <h2 class="font-bold">{{ dashboard.metrics.aptosCulto || 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Leitura administrativa do aprendizado</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Busca r&aacute;pida</label>
+                                    <input type="text" class="form-control input-sm" ng-model="filters.searchText" placeholder="Aluno, comum, instrumento ou n&iacute;vel">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Comum</label>
+                                    <input type="text" class="form-control input-sm" ng-model="filters.comum" placeholder="Filtrar por comum">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Instrumento</label>
+                                    <input type="text" class="form-control input-sm" ng-model="filters.instrumento" placeholder="Filtrar por instrumento">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="well well-sm m-b-none">
+                            <strong>Resumo executivo:</strong>
+                            {{ dashboard.metrics.totalAlunos || 0 }} alunos acompanhados, {{ dashboard.metrics.lancamentosMsa || 0 }} lan&ccedil;amentos MSA,
+                            {{ dashboard.metrics.provas || 0 }} provas registradas e {{ dashboard.metrics.aptosOficializacao || 0 }} alunos aptos &agrave; oficializa&ccedil;&atilde;o.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Ranking por munic&iacute;pio e comum</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Munic&iacute;pio</th>
+                                        <th class="text-center">Comuns</th>
+                                        <th class="text-center">Alunos</th>
+                                        <th class="text-center">Ativos</th>
+                                        <th class="text-center">Progresso</th>
+                                        <th class="text-center">Culto</th>
+                                        <th class="text-center">Detalhe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat-start="item in filteredRanking">
+                                        <td><strong>{{ item.nome }}</strong></td>
+                                        <td class="text-center"><span class="label label-default">{{ item.totalComuns }}</span></td>
+                                        <td class="text-center">{{ item.alunos }}</td>
+                                        <td class="text-center">{{ item.ativos }}</td>
+                                        <td class="text-center"><span class="label label-primary">{{ item.progressoMedio }}%</span></td>
+                                        <td class="text-center"><span class="label label-success">{{ item.aptosCulto }}</span></td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-xs btn-white" ng-click="toggleMunicipio(item.nome)">
+                                                <i class="fa" ng-class="expandedMunicipios[item.nome] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                                                {{ expandedMunicipios[item.nome] ? 'Ocultar' : 'Ver comuns' }}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr ng-repeat-end ng-if="expandedMunicipios[item.nome]">
+                                        <td colspan="7" style="background: #fafafa;">
+                                            <div class="table-responsive">
+                                                <table class="table table-condensed m-b-none">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Comum</th>
+                                                            <th class="text-center">Alunos</th>
+                                                            <th class="text-center">Ativos</th>
+                                                            <th class="text-center">Progresso</th>
+                                                            <th class="text-center">Culto</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="comumItem in item.comunsFiltradas">
+                                                            <td>{{ comumItem.nome }}</td>
+                                                            <td class="text-center">{{ comumItem.alunos }}</td>
+                                                            <td class="text-center">{{ comumItem.ativos }}</td>
+                                                            <td class="text-center"><span class="label label-info">{{ comumItem.progressoMedio }}%</span></td>
+                                                            <td class="text-center"><span class="label label-success">{{ comumItem.aptosCulto }}</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="!filteredRanking.length">
+                                        <td colspan="7" class="text-center text-muted">Nenhum dado encontrado para os filtros atuais.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Distribui&ccedil;&atilde;o por instrumento</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Instrumento</th>
+                                        <th class="text-center">Alunos</th>
+                                        <th class="text-center">M&eacute;dia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in dashboard.rankingInstrumentos | limitTo:8">
+                                        <td>{{ item.nome }}</td>
+                                        <td class="text-center">{{ item.alunos }}</td>
+                                        <td class="text-center">{{ item.progressoMedio }}%</td>
+                                    </tr>
+                                    <tr ng-if="!dashboard.rankingInstrumentos.length">
+                                        <td colspan="3" class="text-center text-muted">Nenhum instrumento registrado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>Alunos com maior evolu&ccedil;&atilde;o</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Aluno</th>
+                                        <th>Comum</th>
+                                        <th>Instrumento</th>
+                                        <th class="text-center">Progresso</th>
+                                        <th class="text-center">A&ccedil;&otilde;es</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="aluno in filteredAlunos">
+                                        <td>
+                                            <strong>{{ aluno.nome_aluno }}</strong><br>
+                                            <small class="text-muted">{{ aluno.nivel || 'N&iacute;vel n&atilde;o informado' }}</small>
+                                        </td>
+                                        <td>{{ aluno.comum_congregacao || '-' }}</td>
+                                        <td>{{ aluno.instrumento || '-' }}</td>
+                                        <td class="text-center">
+                                            <div class="progress progress-mini m-b-xs">
+                                                <div class="progress-bar" role="progressbar" aria-valuenow="{{ aluno.progresso.percentual }}" aria-valuemin="0" aria-valuemax="100" ng-style="{ width: aluno.progresso.percentual + '%' }"></div>
+                                            </div>
+                                            <small>{{ aluno.progresso.percentual | number:0 }}%</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-xs btn-primary" ng-click="openResumo(aluno)">
+                                                <i class="fa fa-folder-open"></i> Resumo
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="!filteredAlunos.length">
+                                        <td colspan="5" class="text-center text-muted">Nenhum aluno encontrado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>&Uacute;ltimas movimenta&ccedil;&otilde;es</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="feed-activity-list">
+                            <div class="feed-element" ng-repeat="evento in dashboard.timeline">
+                                <div class="media-body">
+                                    <small class="pull-right">{{ evento.data | date:'dd/MM/yyyy' }}</small>
+                                    <strong>{{ evento.titulo }}</strong>
+                                    <div>{{ evento.descricao }}</div>
+                                    <small class="text-muted">{{ evento.tipo }}</small>
+                                </div>
+                            </div>
+                            <div class="text-center text-muted" ng-if="!dashboard.timeline.length">
+                                Nenhuma movimenta&ccedil;&atilde;o recente encontrada.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

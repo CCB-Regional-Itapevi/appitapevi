@@ -1,0 +1,78 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Hist&oacute;rico de Aula</h2>
+        <ol class="breadcrumb">
+            <li><a ui-sref="dashboards.dashboard_2">Home</a></li>
+            <li><a ui-sref="gem.dashboard">G.E.M</a></li>
+            <li class="active"><strong>Hist&oacute;rico</strong></li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInUp">
+    <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
+
+    <div class="ibox">
+        <div class="ibox-title">
+            <h5>Hist&oacute;rico de aulas MSA</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="row m-b-md">
+                <div class="col-md-4">
+                    <input type="text" class="form-control input-sm" ng-model="filters.searchText" placeholder="Pesquisar por aluno, fase, clave ou autorizador">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control input-sm" ng-model="filters.comum" placeholder="Filtrar por comum">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control input-sm" ng-model="filters.instrumento" placeholder="Filtrar por instrumento">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Aluno</th>
+                            <th>Fase</th>
+                            <th>P&aacute;ginas</th>
+                            <th>Li&ccedil;&otilde;es</th>
+                            <th>Clave</th>
+                            <th>Comum</th>
+                            <th class="text-center">Progresso</th>
+                            <th class="text-center">A&ccedil;&otilde;es</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in filteredRegistros">
+                            <td>{{ item.data_aula | date:'dd/MM/yyyy' }}</td>
+                            <td>
+                                <strong>{{ item.aluno_nome }}</strong><br>
+                                <small class="text-muted">{{ item.instrumento }}</small>
+                            </td>
+                            <td>{{ item.fase }}</td>
+                            <td>{{ item.paginas || '-' }}</td>
+                            <td>{{ item.licoes || '-' }}</td>
+                            <td>{{ item.clave || '-' }}</td>
+                            <td>{{ item.comum_congregacao || '-' }}</td>
+                            <td class="text-center">
+                                <span class="label" ng-class="{'label-danger': item.progresso_percentual < 30, 'label-warning': item.progresso_percentual >= 30 && item.progresso_percentual < 70, 'label-primary': item.progresso_percentual >= 70}">
+                                    {{ item.progresso_percentual | number:0 }}%
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-xs btn-primary" ng-click="openResumo(item)">
+                                    <i class="fa fa-folder-open"></i> Resumo
+                                </button>
+                            </td>
+                        </tr>
+                        <tr ng-if="!filteredRegistros.length && !loading">
+                            <td colspan="9" class="text-center text-muted">Nenhum registro encontrado.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

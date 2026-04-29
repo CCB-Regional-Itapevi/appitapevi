@@ -1,4 +1,4 @@
-﻿<style>
+<style>
     .usuarios-table > thead > tr > th,
     .usuarios-table > tbody > tr > td {
         vertical-align: middle !important;
@@ -107,6 +107,7 @@
     .usuarios-group-title strong {
         font-size: 16px;
         color: #2f4050;
+        text-transform: uppercase;
     }
 
     .usuarios-group-meta,
@@ -309,6 +310,7 @@
                         </div>
                         <div class="col-md-3">
                             <select class="input-sm form-control" ng-model="groupBy">
+                                <option value="municipio">Agrupar: município</option>
                                 <option value="comum">Agrupar: comum</option>
                                 <option value="status">Agrupar: status</option>
                                 <option value="sector">Agrupar: setor</option>
