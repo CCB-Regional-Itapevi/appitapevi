@@ -1380,6 +1380,11 @@
 
             $scope.errorMessage = '';
 
+            if (!$scope.form.tipo_evento) {
+                $scope.errorMessage = 'Selecione o tipo de evento.';
+                return;
+            }
+
             if (!$scope.form.comum) {
                 $scope.errorMessage = 'Selecione a comum na lista antes de continuar.';
                 return;
@@ -1404,7 +1409,7 @@
                 nome: ($scope.form.nome || '').toUpperCase(),
                 cargo: ($scope.form.cargo || '').toUpperCase(),
                 instrumento: ($scope.form.instrumento || '').toUpperCase(),
-                tipo_evento: $scope.form.tipo_evento || 'Ensaio Regional',
+                tipo_evento: $scope.form.tipo_evento,
                 data_evento: $scope.form.data_evento || null,
                 origem_aplicacao: 'FORMULARIO_PUBLICO_MUSICA',
                 referencia_externa: buildPublicJustificativaReference($scope.form),
@@ -1425,8 +1430,42 @@
                 $scope.comuns = [];
                 $scope.activeComumIndex = 0;
                 $scope.activePessoaIndex = 0;
+                window.scrollTo(0, 0);
             }).catch(function (error) {
-                $scope.errorMessage = 'Nao foi possivel enviar a justificativa: ' + resolveMusicError(error);
+                if (error && String(error.code) === '23505') {
+                    if (window.swal) {
+                        var nomeStr = ($scope.form.nome || '').toUpperCase();
+                        var comumStr = ($scope.form.comum_display || $scope.form.comum || '').toUpperCase();
+                        var msg = '<div style="font-size:15px;line-height:1.5;color:#555;">' +
+                                  '<strong>' + nomeStr + '</strong> de <strong>' + comumStr + '</strong><br>' +
+                                  'já foi cadastrado(a) hoje!' +
+                                  '</div>';
+                        window.swal({
+                            title: 'Cadastro Duplicado!',
+                            text: msg,
+                            type: 'warning',
+                            html: true,
+                            showConfirmButton: true,
+                            confirmButtonColor: '#255ec8',
+                            confirmButtonText: 'Cancelar'
+                        });
+                        setTimeout(function () { 
+                            attachMusicAlertProgressBar(3000); 
+                            setTimeout(function () {
+                                if (window.swal && typeof window.swal.close === 'function') {
+                                    window.swal.close();
+                                } else {
+                                    var okBtn = document.querySelector('.sweet-alert .confirm');
+                                    if (okBtn) okBtn.click();
+                                }
+                            }, 3000);
+                        }, 0);
+                    } else {
+                        window.alert('Cadastro Duplicado: ' + ($scope.form.nome || '') + ' já enviou uma justificativa hoje para este evento.');
+                    }
+                } else {
+                    $scope.errorMessage = 'Ocorreu um erro ao enviar a justificativa: ' + resolveMusicError(error);
+                }
             }).finally(function () {
                 $scope.sending = false;
             });
@@ -1527,7 +1566,7 @@
 
     function buildPublicJustificativaForm() {
         return {
-            tipo_evento: 'Ensaio Regional',
+            tipo_evento: '',
             data_evento: getTodayDateObject(),
             comum: '',
             comum_display: '',
@@ -1548,9 +1587,12 @@
     }
 
     function buildPublicJustificativaReference(form) {
+        var todayStr = new Date().toISOString().slice(0, 10);
         return [
             'pub',
-            Date.now(),
+            todayStr,
+            normalizeMusicText((form && form.tipo_evento) || '').replace(/\s+/g, '-').slice(0, 20),
+            normalizeMusicText((form && form.comum) || '').replace(/\s+/g, '-').slice(0, 20),
             normalizeMusicText((form && form.nome) || '').replace(/\s+/g, '-').slice(0, 32)
         ].join('-');
     }
@@ -1867,8 +1909,9 @@
         window.alert(title + ': ' + text);
     }
 
-    function attachMusicAlertProgressBar() {
+    function attachMusicAlertProgressBar(timer) {
         var modal = document.querySelector('.sweet-alert');
+        var duration = timer || 2500;
         var existingBar;
         var bar;
 
@@ -1890,9 +1933,10 @@
         bar.style.height = '4px';
         bar.style.background = 'rgba(28, 132, 198, 0.16)';
         bar.style.overflow = 'hidden';
-        bar.innerHTML = '<span style="display:block;height:100%;width:100%;background:#1c84c6;transform-origin:left center;transform:scaleX(1);transition:transform 2.5s linear;"></span>';
+        bar.style.borderBottomLeftRadius = '4px';
+        bar.style.borderBottomRightRadius = '4px';
+        bar.innerHTML = '<span style="display:block;height:100%;width:100%;background:#1c84c6;transform-origin:left center;transform:scaleX(1);transition:transform ' + (duration / 1000) + 's linear;"></span>';
 
-        modal.style.position = 'relative';
         modal.appendChild(bar);
 
         setTimeout(function () {

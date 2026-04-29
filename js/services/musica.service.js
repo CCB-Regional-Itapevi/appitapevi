@@ -55,6 +55,7 @@
             saveJustificativa: saveJustificativa,
             updateJustificativa: updateJustificativa,
             deleteJustificativa: deleteJustificativa,
+            checkJustificativaDuplicadaHoje: checkJustificativaDuplicadaHoje,
             isCadastroExternoConfigured: isCadastroExternoConfigured,
             getPublicCargos: getPublicCargos,
             searchPublicComuns: searchPublicComuns,
@@ -227,6 +228,30 @@
 
                 return query;
             });
+        }
+
+        function checkJustificativaDuplicadaHoje(nome, comum) {
+            var deferred = $q.defer();
+            var d = new Date();
+            d.setHours(0, 0, 0, 0); // Start of today local time
+            var startOfTodayUTC = d.toISOString();
+            
+            supabase.from('musica_justificativas').select('id')
+                .ilike('nome', String(nome || '').trim())
+                .ilike('comum', String(comum || '').trim())
+                .gte('created_at', startOfTodayUTC)
+                .limit(1)
+                .then(function (response) {
+                    if (response && response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+                    deferred.resolve(response && response.data && response.data.length > 0);
+                }).catch(function (error) {
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
         }
 
         function saveJustificativa(justificativa) {
