@@ -1447,7 +1447,7 @@
                             html: true,
                             showConfirmButton: true,
                             confirmButtonColor: '#255ec8',
-                            confirmButtonText: 'Cancelar'
+                            confirmButtonText: '✔ OK'
                         });
                         setTimeout(function () { 
                             attachMusicAlertProgressBar(3000); 
