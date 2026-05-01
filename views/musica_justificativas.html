@@ -159,15 +159,14 @@
                     <tbody ng-repeat="grupo in groupedJustificativas">
                         <tr class="active">
                             <td colspan="10">
-                                <strong>{{ formatJustificativaTipoEvento(grupo.tipo_evento) }}</strong>
-                                <span ng-if="grupo.nome_evento"> - {{ grupo.nome_evento }}</span>
+                                <strong ng-bind="getJustificativaEventoDisplay(grupo)"></strong>
                                 <span class="label label-info pull-right">{{ grupo.total }} justificativa(s)</span>
                             </td>
                         </tr>
                         <tr ng-repeat="item in grupo.items">
                             <td>{{ formatJustificativaTipoEvento(item.tipo_evento) }}</td>
                             <td>
-                                <strong>{{ formatJustificativaDate(item.data_evento) }}</strong>
+                                <strong>{{ formatJustificativaRecordDate(item.created_at) }}</strong>
                                 <small class="text-muted" style="display:block;">Recebido &agrave;s {{ formatJustificativaTime(item.created_at) }}</small>
                             </td>
                             <td>{{ item.nome }}</td>
@@ -209,9 +208,12 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4 form-group"><label>Nome</label><input type="text" class="form-control" ng-model="justificativaForm.nome"></div>
-                    <div class="col-sm-4 form-group"><label>Comum</label><input type="text" class="form-control" ng-model="justificativaForm.comum"></div>
-                    <div class="col-sm-4 form-group"><label>Munic&iacute;pio</label><input type="text" class="form-control" ng-model="justificativaForm.municipio"></div>
+                    <div class="col-sm-6 form-group"><label>Identifica&ccedil;&atilde;o do evento</label><input type="text" class="form-control" ng-model="justificativaForm.nome_evento" placeholder="Ex.: Reuni&atilde;o do Minist&eacute;rio"></div>
+                    <div class="col-sm-6 form-group"><label>Nome</label><input type="text" class="form-control" ng-model="justificativaForm.nome"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group"><label>Comum</label><input type="text" class="form-control" ng-model="justificativaForm.comum"></div>
+                    <div class="col-sm-6 form-group"><label>Munic&iacute;pio</label><input type="text" class="form-control" ng-model="justificativaForm.municipio"></div>
                 </div>
                 <div class="row">
                     <div class="col-sm-4 form-group"><label>Cargo</label><input type="text" class="form-control" ng-model="justificativaForm.cargo"></div>

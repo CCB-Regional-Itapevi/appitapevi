@@ -129,6 +129,19 @@
         background: transparent;
         outline: none;
         box-shadow: none !important;
+        text-transform: none;
+    }
+
+    input.music-public-control,
+    input.music-public-control:focus,
+    textarea.music-public-control,
+    textarea.music-public-control:focus {
+        text-transform: none !important;
+    }
+
+    .music-public-control::placeholder {
+        text-transform: none;
+        opacity: 1;
     }
 
     select.music-public-control {
@@ -328,7 +341,7 @@
             <div class="music-public-success">
                 <i class="fa fa-check-circle"></i>
                 <h2>Justificativa enviada</h2>
-                <p class="text-muted">Deus aben&ccedil;oe. O registro foi recebido pela Secret&aacute;ria da M&uacute;sica.</p>
+                <p class="text-muted">Deus aben&ccedil;oe. O registro foi recebido pela Secretaria Regional da M&uacute;sica.</p>
                 <button type="button" class="music-public-btn" ng-click="resetForm()">
                     <i class="fa fa-paper-plane"></i> Enviar outra
                 </button>
@@ -341,23 +354,14 @@
 
             <div class="music-public-field">
                 <div class="music-public-icon"><i class="fa fa-calendar-check-o"></i></div>
-                <select class="music-public-control" ng-model="form.tipo_evento" required>
+                <select class="music-public-control" ng-model="form.evento_opcao" ng-change="onPublicEventoChange()" ng-options="evento.key as evento.label for evento in eventoJustificativaOptions" required>
                     <option value="">Selecione o evento</option>
-                    <option value="Ensaio Regional">Ensaio Regional</option>
-                    <option value="Reunião do Ministério">Reuni&atilde;o do Minist&eacute;rio</option>
-                    <option value="Reunião Técnica">Reuni&atilde;o T&eacute;cnica</option>
-                    <option value="Outros eventos da Música">Outros eventos da M&uacute;sica</option>
                 </select>
             </div>
 
             <div class="music-public-field">
-                <div class="music-public-icon"><i class="fa fa-calendar"></i></div>
-                <input type="date" class="music-public-control" ng-model="form.data_evento" aria-label="Data do evento">
-            </div>
-
-            <div class="music-public-field">
                 <div class="music-public-icon"><i class="fa fa-map-marker"></i></div>
-                <input type="text" class="music-public-control" ng-model="form.comum_display" ng-change="onComumSearchChange()" ng-keydown="handleComumKeydown($event)" placeholder="Pesquise sua Comum..." autocomplete="off" required>
+                <input type="text" class="music-public-control" ng-model="form.comum_display" ng-change="onComumSearchChange()" ng-keydown="handleComumKeydown($event)" placeholder="Pesquise sua Comum" autocomplete="off" required>
                 <div class="music-public-list" ng-if="comuns.length && form.comum_display">
                     <button type="button" class="music-public-option" ng-class="{'is-active': $index === activeComumIndex}" ng-repeat="comum in comuns" ng-mousedown="$event.preventDefault(); selectComum(comum)" ng-touchstart="selectComum(comum)" ng-click="selectComum(comum)">
                         <strong>{{ comum.displayName }}</strong>

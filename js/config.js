@@ -571,7 +571,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('music.justificativas', {
             url: "/justificativas",
-            templateUrl: "views/musica_justificativas.html?v=1.0.0",
+            templateUrl: "views/musica_justificativas.html?v=1.0.1",
             data: { pageTitle: 'M\u00fasica - Justificativas' },
             controller: 'musicaJustificativasCtrl'
         })
@@ -1115,7 +1115,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('musica_justificar_publico', {
             url: "/musica/justificar",
-            templateUrl: "views/musica_justificativa_publica.html?v=1.0.0",
+            templateUrl: "views/musica_justificativa_publica.html?v=1.0.1",
             data: { pageTitle: 'Justificativa de Ausencia - Musica', specialClass: 'gray-bg' },
             controller: 'musicaJustificativaPublicaCtrl'
         })

@@ -782,8 +782,10 @@
         $scope.loadJustificativas = loadJustificativas;
         $scope.applyJustificativaFilters = applyJustificativaFilters;
         $scope.formatJustificativaDate = formatJustificativaDate;
+        $scope.formatJustificativaRecordDate = formatJustificativaRecordDate;
         $scope.formatJustificativaTime = formatJustificativaTime;
         $scope.formatJustificativaTipoEvento = normalizeJustificativaTipoEventoLabel;
+        $scope.getJustificativaEventoDisplay = getJustificativaEventoDisplay;
         $scope.exportJustificativasExcel = exportJustificativasExcel;
         $scope.exportJustificativasPdf = exportJustificativasPdf;
         $scope.clearJustificativaFilters = clearJustificativaFilters;
@@ -908,6 +910,21 @@
             return [padNumber(date.getDate()), padNumber(date.getMonth() + 1), date.getFullYear()].join('/');
         }
 
+        function formatJustificativaRecordDate(value) {
+            var date;
+
+            if (!value) {
+                return '-';
+            }
+
+            date = new Date(value);
+            if (isNaN(date.getTime())) {
+                return '-';
+            }
+
+            return [padNumber(date.getDate()), padNumber(date.getMonth() + 1), date.getFullYear()].join('/');
+        }
+
         function formatJustificativaTime(value) {
             var date;
 
@@ -947,13 +964,14 @@
                 ['Impresso por', printInfo.name],
                 ['Impresso em', printInfo.date + ' às ' + printInfo.time],
                 [],
-                ['Evento', 'Data', 'Horário do registro', 'Nome', 'Comum', 'Município', 'Cargo', 'Instrumento', 'Motivo', 'Status']
+                ['Evento justificado', 'Tipo de evento', 'Data do registro', 'Horario do registro', 'Nome', 'Comum', 'Municipio', 'Cargo', 'Instrumento', 'Motivo', 'Status']
             ];
 
             $scope.filteredJustificativas.forEach(function (item) {
                 rows.push([
+                    getJustificativaEventoDisplay(item),
                     normalizeJustificativaTipoEventoLabel(item.tipo_evento),
-                    formatJustificativaDate(item.data_evento),
+                    formatJustificativaRecordDate(item.created_at),
                     formatJustificativaTime(item.created_at),
                     item.nome || '',
                     item.comum || '',
@@ -968,7 +986,7 @@
             workbook = window.XLSX.utils.book_new();
             sheet = window.XLSX.utils.aoa_to_sheet(rows);
             sheet['!cols'] = [
-                { wch: 24 }, { wch: 12 }, { wch: 18 }, { wch: 32 }, { wch: 36 },
+                { wch: 32 }, { wch: 24 }, { wch: 12 }, { wch: 18 }, { wch: 32 }, { wch: 36 },
                 { wch: 18 }, { wch: 26 }, { wch: 18 }, { wch: 16 }, { wch: 12 }
             ];
             window.XLSX.utils.book_append_sheet(workbook, sheet, 'Justificativas');
@@ -1026,7 +1044,7 @@
                         {
                             table: {
                                 headerRows: 1,
-                                widths: [75, 50, '*', '*', 70, 115, 60, 45],
+                                widths: [95, 55, '*', '*', 70, 105, 60, 45],
                                 body: body
                             },
                             layout: {
@@ -1072,10 +1090,10 @@
 
             $scope.filteredJustificativas.forEach(function (item) {
                 body.push([
-                    normalizeJustificativaTipoEventoLabel(item.tipo_evento),
+                    getJustificativaEventoDisplay(item),
                     {
                         stack: [
-                            { text: formatJustificativaDate(item.data_evento) },
+                            { text: formatJustificativaRecordDate(item.created_at) },
                             { text: formatJustificativaTime(item.created_at), fontSize: 7, color: '#666', margin: [0, 2, 0, 0] }
                         ]
                     },
@@ -1161,6 +1179,7 @@
             : 'Cadastro externo ainda nao configurado. O formulario esta pronto para modelagem; a busca sera ativada quando a URL e anon key forem informadas.';
         $scope.cargos = MusicaService.getPublicCargos();
         $scope.motivosAusencia = ['Trabalho', 'Enfermidade', 'Viagem', 'Outros'];
+        $scope.eventoJustificativaOptions = buildPublicJustificativaEventOptions();
         $scope.instrumentosOptions = [
             'Acordeon', 'Violino', 'Viola', 'Violoncelo', 'Flauta transversal',
             'Oboé', "Oboé d'amore", 'Corne inglês', 'Clarinete', 'Clarinete alto', 
@@ -1178,6 +1197,21 @@
         $scope.activePessoaIndex = 0;
         $scope.selectedPessoa = null;
         $scope.form = buildPublicJustificativaForm();
+
+        $scope.onPublicEventoChange = function () {
+            var selected = findPublicJustificativaEvent($scope.form.evento_opcao);
+
+            if (!selected) {
+                $scope.form.tipo_evento = '';
+                $scope.form.nome_evento = '';
+                $scope.form.data_evento = getTodayDateObject();
+                return;
+            }
+
+            $scope.form.tipo_evento = selected.tipo_evento;
+            $scope.form.nome_evento = selected.nome_evento;
+            $scope.form.data_evento = parseDateKeyToDate(selected.data_evento) || getTodayDateObject();
+        };
 
         $scope.onComumSearchChange = function () {
             $scope.form.nome = '';
@@ -1380,8 +1414,8 @@
 
             $scope.errorMessage = '';
 
-            if (!$scope.form.tipo_evento) {
-                $scope.errorMessage = 'Selecione o tipo de evento.';
+            if (!$scope.form.evento_opcao || !$scope.form.tipo_evento || !$scope.form.nome_evento || !$scope.form.data_evento) {
+                $scope.errorMessage = 'Selecione o evento da justificativa.';
                 return;
             }
 
@@ -1407,9 +1441,13 @@
 
             payload = angular.extend({}, $scope.form, {
                 nome: ($scope.form.nome || '').toUpperCase(),
+                comum: ($scope.form.comum || '').toUpperCase(),
+                municipio: ($scope.form.municipio || '').toUpperCase(),
                 cargo: ($scope.form.cargo || '').toUpperCase(),
                 instrumento: ($scope.form.instrumento || '').toUpperCase(),
+                motivo: ($scope.form.motivo || '').toUpperCase(),
                 tipo_evento: $scope.form.tipo_evento,
+                nome_evento: $scope.form.nome_evento,
                 data_evento: $scope.form.data_evento || null,
                 origem_aplicacao: 'FORMULARIO_PUBLICO_MUSICA',
                 referencia_externa: buildPublicJustificativaReference($scope.form),
@@ -1438,7 +1476,7 @@
                         var comumStr = ($scope.form.comum_display || $scope.form.comum || '').toUpperCase();
                         var msg = '<div style="font-size:15px;line-height:1.5;color:#555;">' +
                                   '<strong>' + nomeStr + '</strong> de <strong>' + comumStr + '</strong><br>' +
-                                  'já foi cadastrado(a) hoje!' +
+                                  'ja foi cadastrado(a) para este evento!' +
                                   '</div>';
                         window.swal({
                             title: 'Cadastro Duplicado!',
@@ -1461,7 +1499,7 @@
                             }, 3000);
                         }, 0);
                     } else {
-                        window.alert('Cadastro Duplicado: ' + ($scope.form.nome || '') + ' já enviou uma justificativa hoje para este evento.');
+                        window.alert('Cadastro Duplicado: ' + ($scope.form.nome || '') + ' ja enviou uma justificativa para este evento.');
                     }
                 } else {
                     $scope.errorMessage = 'Ocorreu um erro ao enviar a justificativa: ' + resolveMusicError(error);
@@ -1566,7 +1604,9 @@
 
     function buildPublicJustificativaForm() {
         return {
+            evento_opcao: '',
             tipo_evento: '',
+            nome_evento: '',
             data_evento: getTodayDateObject(),
             comum: '',
             comum_display: '',
@@ -1587,14 +1627,59 @@
     }
 
     function buildPublicJustificativaReference(form) {
-        var todayStr = new Date().toISOString().slice(0, 10);
+        var dataEvento = parseJustificativaDateKey(form && form.data_evento) || new Date().toISOString().slice(0, 10);
         return [
             'pub',
-            todayStr,
+            dataEvento,
             normalizeMusicText((form && form.tipo_evento) || '').replace(/\s+/g, '-').slice(0, 20),
+            normalizeMusicText((form && form.nome_evento) || '').replace(/\s+/g, '-').slice(0, 28),
             normalizeMusicText((form && form.comum) || '').replace(/\s+/g, '-').slice(0, 20),
             normalizeMusicText((form && form.nome) || '').replace(/\s+/g, '-').slice(0, 32)
         ].join('-');
+    }
+
+    function buildPublicJustificativaEventOptions() {
+        return [
+            {
+                key: '2026-05-03-reuniao-ministerio',
+                label: '03/05/2026 - Reuni\u00e3o do Minist\u00e9rio',
+                tipo_evento: 'Reuni\u00e3o do Minist\u00e9rio',
+                nome_evento: 'Reuni\u00e3o do Minist\u00e9rio',
+                data_evento: '2026-05-03'
+            },
+            {
+                key: '2026-05-17-ensaio-regional',
+                label: '17/05/2026 - Ensaio Regional',
+                tipo_evento: 'Ensaio Regional',
+                nome_evento: 'Ensaio Regional',
+                data_evento: '2026-05-17'
+            }
+        ];
+    }
+
+    function findPublicJustificativaEvent(key) {
+        var options = buildPublicJustificativaEventOptions();
+        var i;
+
+        for (i = 0; i < options.length; i += 1) {
+            if (options[i].key === key) {
+                return options[i];
+            }
+        }
+
+        return null;
+    }
+
+    function parseDateKeyToDate(value) {
+        var parts = String(value || '').split('-');
+        var date;
+
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        date = new Date(parseInt(parts[0], 10), (parseInt(parts[1], 10) || 1) - 1, parseInt(parts[2], 10) || 1);
+        return isNaN(date.getTime()) ? null : date;
     }
 
     function openMusicModal(selector, $timeout) {
@@ -1762,6 +1847,36 @@
         }).sort(function (a, b) {
             return String(b.data_evento || '').localeCompare(String(a.data_evento || ''));
         });
+    }
+
+    function getJustificativaEventoDisplay(item) {
+        var nomeEvento;
+        var dataEvento;
+
+        item = item || {};
+        nomeEvento = item.nome_evento || normalizeJustificativaTipoEventoLabel(item.tipo_evento);
+        dataEvento = formatJustificativaEventDate(item.data_evento);
+
+        if (dataEvento && dataEvento !== '-') {
+            return dataEvento + ' - ' + nomeEvento;
+        }
+
+        return nomeEvento;
+    }
+
+    function formatJustificativaEventDate(value) {
+        var date;
+
+        if (!value) {
+            return '-';
+        }
+
+        date = new Date(String(value).slice(0, 10) + 'T00:00:00');
+        if (isNaN(date.getTime())) {
+            return '-';
+        }
+
+        return [padNumber(date.getDate()), padNumber(date.getMonth() + 1), date.getFullYear()].join('/');
     }
 
     function compareJustificativasByHierarchy(a, b) {
