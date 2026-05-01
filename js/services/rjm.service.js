@@ -184,34 +184,53 @@
 
         function updateRecitativo(data) {
             var deferred = $q.defer();
-            AuthService.applyDataScopeToQuery(
-                supabase.from('rjm_recitativos').update(
-                    AuthService.applyDataScopeToPayload(normalizeRecitativoPayload(data), RJM_RECITATIVOS_SCOPE)
-                ).eq('id', data.id),
-                RJM_RECITATIVOS_SCOPE
-            ).then(function (response) {
+            var payload;
+
+            if (!data || !data.id) {
+                deferred.reject(new Error('Recitativo sem identificador para atualizacao.'));
+                return deferred.promise;
+            }
+
+            payload = AuthService.applyDataScopeToPayload(normalizeRecitativoPayload(data), RJM_RECITATIVOS_SCOPE);
+
+            ensureRecitativoCanMutate(data.id).then(function () {
+                return supabase.from('rjm_recitativos').update(payload).eq('id', data.id).select('*');
+            }).then(function (response) {
                 if (response.error) deferred.reject(response.error);
+                else if (!response.data || !response.data.length) {
+                    deferred.reject(new Error('Nenhum recitativo foi atualizado. Verifique as politicas RLS de UPDATE da tabela rjm_recitativos.'));
+                }
                 else {
                     auditRjm('RJM_RECITATIVO_UPDATE', {
                         entity: 'rjm_recitativos',
                         record_id: data.id,
-                        comum: data.comum,
-                        municipio: data.municipio,
-                        data_reuniao: data.data_reuniao
+                        comum: payload.comum,
+                        municipio: payload.municipio,
+                        data_reuniao: payload.data_reuniao
                     });
                     deferred.resolve(response.data);
                 }
+            }).catch(function (error) {
+                deferred.reject(error);
             });
             return deferred.promise;
         }
 
         function deleteRecitativo(id) {
             var deferred = $q.defer();
-            AuthService.applyDataScopeToQuery(
-                supabase.from('rjm_recitativos').delete().eq('id', id),
-                RJM_RECITATIVOS_SCOPE
-            ).then(function (response) {
+
+            if (!id) {
+                deferred.reject(new Error('Recitativo sem identificador para exclusao.'));
+                return deferred.promise;
+            }
+
+            ensureRecitativoCanMutate(id).then(function () {
+                return supabase.from('rjm_recitativos').delete().eq('id', id).select('id');
+            }).then(function (response) {
                 if (response.error) deferred.reject(response.error);
+                else if (!response.data || !response.data.length) {
+                    deferred.reject(new Error('Nenhum recitativo foi excluido. Verifique as politicas RLS de DELETE da tabela rjm_recitativos.'));
+                }
                 else {
                     auditRjm('RJM_RECITATIVO_DELETE', {
                         entity: 'rjm_recitativos',
@@ -219,7 +238,44 @@
                     });
                     deferred.resolve(response.data);
                 }
+            }).catch(function (error) {
+                deferred.reject(error);
             });
+            return deferred.promise;
+        }
+
+        function ensureRecitativoCanMutate(id) {
+            var deferred = $q.defer();
+
+            ensureSessionReady()
+                .then(function () {
+                    return supabase.from('rjm_recitativos').select('*').eq('id', id).maybeSingle();
+                })
+                .then(function (response) {
+                    var scopedRecords;
+
+                    if (response.error) {
+                        deferred.reject(response.error);
+                        return;
+                    }
+
+                    if (!response.data) {
+                        deferred.reject(new Error('Recitativo nao encontrado para alteracao.'));
+                        return;
+                    }
+
+                    scopedRecords = AuthService.filterCollectionByDataScope([response.data], RJM_RECITATIVOS_SCOPE);
+                    if (!scopedRecords.length) {
+                        deferred.reject(new Error('Este recitativo nao pertence ao seu escopo de acesso.'));
+                        return;
+                    }
+
+                    deferred.resolve(response.data);
+                })
+                .catch(function (error) {
+                    deferred.reject(error);
+                });
+
             return deferred.promise;
         }
 

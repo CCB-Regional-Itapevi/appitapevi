@@ -3,7 +3,7 @@ create extension if not exists "pgcrypto";
 create table if not exists public.musica_justificativas (
     id uuid primary key default gen_random_uuid(),
     ensaio_id uuid null references public.musica_ensaios_regionais(id) on delete set null,
-    tipo_evento text not null default 'Ensaio Regional',
+    tipo_evento text not null default 'Ensaio regional',
     nome_evento text null,
     data_evento date null,
     nome text not null,
@@ -22,13 +22,13 @@ create table if not exists public.musica_justificativas (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
     constraint musica_justificativas_status_check
-        check (status = 'Recebida'),
+        check (status in ('Recebida', 'Em analise', 'Aprovada', 'Recusada')),
     constraint musica_justificativas_tipo_evento_check
-        check (tipo_evento in ('Ensaio Regional', 'Reunião do Ministério', 'Reunião Técnica', 'Outros eventos da Música'))
+        check (tipo_evento in ('Ensaio regional', 'Reunião do ministério', 'Reunião técnica', 'Outro evento da música'))
 );
 
 alter table public.musica_justificativas add column if not exists ensaio_id uuid null references public.musica_ensaios_regionais(id) on delete set null;
-alter table public.musica_justificativas add column if not exists tipo_evento text not null default 'Ensaio Regional';
+alter table public.musica_justificativas add column if not exists tipo_evento text not null default 'Ensaio regional';
 alter table public.musica_justificativas add column if not exists nome_evento text null;
 alter table public.musica_justificativas add column if not exists data_evento date null;
 alter table public.musica_justificativas add column if not exists nome text not null default '';
@@ -49,21 +49,11 @@ alter table public.musica_justificativas add column if not exists updated_at tim
 
 alter table public.musica_justificativas drop constraint if exists musica_justificativas_status_check;
 alter table public.musica_justificativas add constraint musica_justificativas_status_check
-    check (status = 'Recebida');
+    check (status in ('Recebida', 'Em analise', 'Aprovada', 'Recusada'));
 
 alter table public.musica_justificativas drop constraint if exists musica_justificativas_tipo_evento_check;
-update public.musica_justificativas
-set tipo_evento = case
-    when lower(translate(tipo_evento, 'ãáâàéêíóôõúçÃÁÂÀÉÊÍÓÔÕÚÇ', 'aaaaeeioooucAAAAEEIOOOUC')) = 'reuniao do ministerio' then 'Reunião do Ministério'
-    when lower(translate(tipo_evento, 'ãáâàéêíóôõúçÃÁÂÀÉÊÍÓÔÕÚÇ', 'aaaaeeioooucAAAAEEIOOOUC')) = 'reuniao tecnica' then 'Reunião Técnica'
-    when lower(translate(tipo_evento, 'ãáâàéêíóôõúçÃÁÂÀÉÊÍÓÔÕÚÇ', 'aaaaeeioooucAAAAEEIOOOUC')) in ('outro evento da musica', 'outros eventos da musica') then 'Outros eventos da Música'
-    else 'Ensaio Regional'
-end
-where tipo_evento is null
-   or tipo_evento not in ('Ensaio Regional', 'Reunião do Ministério', 'Reunião Técnica', 'Outros eventos da Música');
-
 alter table public.musica_justificativas add constraint musica_justificativas_tipo_evento_check
-    check (tipo_evento in ('Ensaio Regional', 'Reunião do Ministério', 'Reunião Técnica', 'Outros eventos da Música'));
+    check (tipo_evento in ('Ensaio regional', 'Reuniao do ministerio', 'Reuniao tecnica', 'Outro evento da musica'));
 
 create index if not exists idx_musica_justificativas_data on public.musica_justificativas (data_evento desc, tipo_evento);
 create index if not exists idx_musica_justificativas_comum on public.musica_justificativas (municipio, comum);

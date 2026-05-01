@@ -18,6 +18,50 @@
     min-width: 12px;
 }
 
+.rjm-recitative-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.sweet-alert.swal-auto-close {
+    padding-bottom: 30px;
+}
+
+.sweet-alert.swal-auto-close::before,
+.sweet-alert.swal-auto-close::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    border-radius: 0;
+}
+
+.sweet-alert.swal-auto-close::before {
+    background: rgba(120, 130, 140, 0.18);
+}
+
+.sweet-alert.swal-auto-close::after {
+    background: rgba(120, 130, 140, 0.42);
+    transform-origin: left center;
+    animation: swal-countdown-regress 3s linear forwards;
+}
+
+@keyframes swal-countdown-regress {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+}
+
 .btn.app-action-view,
 .btn.app-action-view:focus,
 .btn.app-action-view:active {

@@ -141,15 +141,15 @@
                                             <div style="width: 100%;" class="progress-bar"></div>
                                         </div>
                                     </td>
-                                    <td class="text-center" style="vertical-align: middle;">
-                                        <div class="btn-group btn-group-xs" role="group" aria-label="Ações do recitativo">
-                                            <button class="btn btn-info" ng-click="verDetalhesRjm(item)" title="Ver">
+                                    <td class="text-center project-actions" style="vertical-align: middle;">
+                                        <div class="rjm-recitative-actions" role="group" aria-label="Ações do recitativo">
+                                            <button class="btn btn-xs app-action-btn app-action-view" ng-click="verDetalhesRjm(item)" title="Ver">
                                                 <i class="fa fa-eye"></i> Ver
                                             </button>
-                                            <button class="btn btn-warning" ng-click="editarRecitativoRjm(item)" title="Editar">
+                                            <button class="btn btn-xs app-action-btn app-action-edit" ng-click="editarRecitativoRjm(item)" title="Editar">
                                                 <i class="fa fa-pencil-square-o"></i> Editar
                                             </button>
-                                            <button class="btn btn-danger" ng-click="excluirRecitativoRjm(item)" title="Excluir">
+                                            <button class="btn btn-xs app-action-btn app-action-delete" ng-click="excluirRecitativoRjm(item)" title="Excluir">
                                                 <i class="fa fa-trash-o"></i> Excluir
                                             </button>
                                         </div>
@@ -169,13 +169,40 @@
     <div id="modalRecitativoRjm" class="modal inmodal fade" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content animated bounceInRight">
-                <div class="modal-header" style="background:#1c84c6; color:#fff;">
-                    <button type="button" class="close" data-dismiss="modal" style="color:#fff; opacity:1;">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">{{ recitativoViewOnly ? 'Detalhes do recitativo' : 'Editar recitativo' }}</h4>
+                <div class="modal-header" style="background: #1ab394; padding: 15px 20px; border-radius: 5px 5px 0 0;">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true" style="color:#fff; opacity:1; font-size:22px;">&times;</span><span class="sr-only">Fechar</span></button>
+                    <h4 class="modal-title" style="color:#fff; font-weight:600;">
+                        <i class="fa fa-check-square" style="margin-right:8px;"></i>
+                        {{ recitativoViewOnly ? 'Detalhes do recitativo' : 'Editar recitativo' }}
+                    </h4>
+                    <div style="color:#eafaf6; margin-top:6px;">Comum: {{activeRecitativo.comum || '-'}} | Data: {{activeRecitativo.data_reuniao || '-'}}</div>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding: 25px 30px;">
+                    <div class="row">
+                        <div class="col-lg-12"><h4>Resumo do Recitativo</h4></div>
+                        <div class="col-sm-4">
+                            <div style="border:1px solid #e7eaec; border-radius:6px; padding:16px 18px; background:#f8fffd;">
+                                <div style="font-size:12px; text-transform:uppercase; color:#7f8c8d; letter-spacing:.4px;">Meninas</div>
+                                <div style="font-size:28px; font-weight:700; color:#1ab394; line-height:1.2; margin-top:6px;">{{activeRecitativo.meninas || 0}}</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div style="border:1px solid #e7eaec; border-radius:6px; padding:16px 18px; background:#fffaf4;">
+                                <div style="font-size:12px; text-transform:uppercase; color:#7f8c8d; letter-spacing:.4px;">Meninos</div>
+                                <div style="font-size:28px; font-weight:700; color:#f8ac59; line-height:1.2; margin-top:6px;">{{activeRecitativo.meninos || 0}}</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div style="border:1px solid #e7eaec; border-radius:6px; padding:16px 18px; background:#f8fbff;">
+                                <div style="font-size:12px; text-transform:uppercase; color:#7f8c8d; letter-spacing:.4px;">Total</div>
+                                <div style="font-size:28px; font-weight:700; color:#23a6d5; line-height:1.2; margin-top:6px;">{{calculateTotal(activeRecitativo)}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+
                     <div class="row">
                         <div class="col-md-4 form-group">
                             <label>Data da reunião</label>
@@ -209,16 +236,21 @@
                             <label>Moços</label>
                             <input type="number" class="form-control" ng-model="activeRecitativo.mocos" ng-disabled="recitativoViewOnly">
                         </div>
-                        <div class="col-md-12">
-                            <div class="well well-sm m-b-none">
+                        <div class="col-md-12 m-t-xs">
+                            <div style="border:1px solid #e7eaec; border-radius:4px; padding:10px; background:#fff;">
                                 <strong>Total calculado:</strong> {{ calculateTotal(activeRecitativo) }}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-white" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" ng-if="!recitativoViewOnly" ng-click="salvarRecitativoRjm()">Salvar alterações</button>
+                <div class="modal-footer" style="background:#f5f5f5; padding: 14px 20px;">
+                    <button type="button" class="btn btn-white" data-dismiss="modal"><i class="fa fa-times"></i> Voltar</button>
+                    <button type="button" class="btn btn-primary" ng-if="recitativoViewOnly" data-dismiss="modal" style="background:#1ab394; border-color:#1ab394;">
+                        <i class="fa fa-check"></i> Fechar
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-if="!recitativoViewOnly" ng-click="salvarRecitativoRjm()" style="background:#1ab394; border-color:#1ab394;">
+                        <i class="fa fa-check"></i> Salvar alterações
+                    </button>
                 </div>
             </div>
         </div>

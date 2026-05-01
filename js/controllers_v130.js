@@ -502,7 +502,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
     $rootScope.$on('$stateChangeStart', function (event, toState) {
         var user = $rootScope.currentUser;
         var role = AuthService && typeof AuthService.getCurrentUserRole === 'function' ? AuthService.getCurrentUserRole() : null;
-        var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'profile';
+        var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'profile' || toState.name === 'musica_justificar_publico';
 
         if (user && !user.comum && !isPublic && role !== null && role >= 3) {
             event.preventDefault();
@@ -9067,14 +9067,15 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
             return;
         }
 
-        $scope.activeRecitativo.total_comparecimento = $scope.calculateTotal($scope.activeRecitativo);
+        $scope.activeRecitativo.total_recitativos = $scope.calculateTotal($scope.activeRecitativo);
+        $scope.activeRecitativo.total_comparecimento = $scope.activeRecitativo.total_recitativos;
 
         RjmService.updateRecitativo($scope.activeRecitativo).then(function () {
-            swal('Sucesso', 'Recitativo atualizado com sucesso.', 'success');
+            showTimedRecitativoAlert('Sucesso', 'Recitativo atualizado com sucesso.', 'success');
             $('#modalRecitativoRjm').modal('hide');
             $scope.loadData();
         }).catch(function (error) {
-            swal('Erro', 'Não foi possível atualizar o recitativo: ' + ((error && error.message) || error), 'error');
+            showTimedRecitativoAlert('Erro', 'Não foi possível atualizar o recitativo: ' + ((error && error.message) || error), 'error');
         });
     };
 
@@ -9090,14 +9091,24 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
             if (!confirmed) return;
             $scope.$applyAsync(function () {
                 RjmService.deleteRecitativo(item.id).then(function () {
-                    swal('Excluído', 'Recitativo removido com sucesso.', 'success');
+                    showTimedRecitativoAlert('Excluído', 'Recitativo removido com sucesso.', 'success');
                     $scope.loadData();
                 }).catch(function (error) {
-                    swal('Erro', 'Não foi possível excluir o recitativo: ' + ((error && error.message) || error), 'error');
+                    showTimedRecitativoAlert('Erro', 'Não foi possível excluir o recitativo: ' + ((error && error.message) || error), 'error');
                 });
             });
         });
     };
+
+    function showTimedRecitativoAlert(title, message, type) {
+        swal({
+            title: title,
+            text: message,
+            type: type,
+            timer: 3000,
+            customClass: 'swal-auto-close'
+        });
+    }
 
     // Export to Excel
     $scope.exportToExcel = function () {
