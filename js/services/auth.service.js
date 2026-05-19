@@ -215,6 +215,99 @@
             return repairCatalogText(sector) || '';
         }
 
+        function getCadastroOriginDefinitions() {
+            return [
+                { key: 'ebi', label: 'EBI', sector: 'EBI', patterns: ['ebi'] },
+                { key: 'visitas', label: 'Visitas', sector: 'Visitas', patterns: ['visitas'] },
+                { key: 'musica', label: 'Musica', sector: 'Musica', patterns: ['musica', 'music'] },
+                { key: 'musicalizacao', label: 'Musicalizacao', sector: 'Musicalizacao', patterns: ['musicalizacao'] },
+                { key: 'darpe', label: 'DARPE', sector: 'Darpe', patterns: ['darpe'] },
+                { key: 'depac', label: 'DEPAC', sector: 'Depac', patterns: ['depac'] },
+                { key: 'gem', label: 'G.E.M', sector: 'Gem', patterns: ['gem'] },
+                { key: 'rjm', label: 'RJM', sector: 'RJM', patterns: ['rjm'] },
+                { key: 'administrativo', label: 'Administrativo', sector: 'Administrativo', patterns: ['admin', 'administrativo'] }
+            ];
+        }
+
+        function readCadastroOriginFromUrlPart(urlPart) {
+            var text = String(urlPart || '');
+            var match;
+
+            if (!text) {
+                return '';
+            }
+
+            match = text.match(/[?&#](?:origem|origin|setor|sector|app)=([^&#]+)/i);
+            if (!match || !match[1]) {
+                return '';
+            }
+
+            try {
+                return decodeURIComponent(match[1].replace(/\+/g, ' '));
+            } catch (error) {
+                return match[1];
+            }
+        }
+
+        function resolveCadastroOrigin(value, fallbackText) {
+            var definitions = getCadastroOriginDefinitions();
+            var normalizedValue = normalizeText(value);
+            var normalizedFallback = normalizeText(fallbackText);
+            var index;
+            var patternIndex;
+            var definition;
+            var pattern;
+
+            for (index = 0; index < definitions.length; index += 1) {
+                definition = definitions[index];
+
+                if (normalizedValue && (
+                    normalizedValue === definition.key ||
+                    normalizedValue === normalizeText(definition.label) ||
+                    normalizedValue === normalizeText(definition.sector)
+                )) {
+                    return angular.extend({}, definition);
+                }
+            }
+
+            for (index = 0; index < definitions.length; index += 1) {
+                definition = definitions[index];
+
+                for (patternIndex = 0; patternIndex < definition.patterns.length; patternIndex += 1) {
+                    pattern = normalizeText(definition.patterns[patternIndex]);
+                    if (normalizedFallback && normalizedFallback.indexOf(pattern) !== -1) {
+                        return angular.extend({}, definition);
+                    }
+                }
+            }
+
+            return {
+                key: normalizedValue || 'cadastro_publico',
+                label: value ? titleCaseWords(value) : 'Cadastro publico',
+                sector: '',
+                patterns: []
+            };
+        }
+
+        function inferCadastroOrigin(userData) {
+            var currentHash = (window.location && window.location.hash) || '';
+            var currentSearch = (window.location && window.location.search) || '';
+            var currentPath = (window.location && window.location.pathname) || '';
+            var referrer = document.referrer || '';
+            var explicitOrigin = userData && (userData.cadastro_origem || userData.origin || userData.origem || userData.sector || userData.setor);
+            var urlOrigin = readCadastroOriginFromUrlPart(currentSearch) || readCadastroOriginFromUrlPart(currentHash) || readCadastroOriginFromUrlPart(referrer);
+            var routeText = [currentPath, currentHash, referrer].join(' ');
+            var resolved = resolveCadastroOrigin(explicitOrigin || urlOrigin, routeText);
+
+            return {
+                key: resolved.key,
+                label: resolved.label,
+                sector: resolved.sector,
+                route: currentHash || currentPath || '',
+                url: (window.location && window.location.href) || ''
+            };
+        }
+
         function titleCaseWords(value) {
             return repairCatalogText(value)
                 .toLowerCase()
@@ -418,6 +511,9 @@
             normalizedProfile.role = normalizeRoleLabel(normalizedProfile.role_id, normalizedProfile.role);
             normalizedProfile.sector = normalizeSector(normalizedProfile.sector, normalizedProfile.role_id, normalizedProfile.role);
             normalizedProfile.status = normalizeStatus(normalizedProfile.status);
+            normalizedProfile.cadastro_origem = normalizedProfile.cadastro_origem || normalizedProfile.origem_cadastro || normalizedProfile.registration_origin || '';
+            normalizedProfile.cadastro_origem_label = normalizedProfile.cadastro_origem_label || normalizedProfile.origem_cadastro_label || '';
+            normalizedProfile.cadastro_origem_rota = normalizedProfile.cadastro_origem_rota || normalizedProfile.origem_cadastro_rota || '';
             normalizedProfile.contador_logins = parseInt(normalizedProfile.contador_logins, 10) || 0;
             normalizedProfile.contador_logouts = parseInt(normalizedProfile.contador_logouts, 10) || 0;
             normalizedComum = repairCatalogText(
@@ -1391,13 +1487,27 @@
         function register(userData) {
             var deferred = $q.defer();
 
+            // Se o usuário selecionou explicitamente o setor no formulário, usar diretamente.
+            // Caso contrário, tentar inferir pela URL (comportamento legado).
+            var explicitSetor = (userData.setor || userData.origem || '').trim();
+            var cadastroOrigin;
+            if (explicitSetor) {
+                cadastroOrigin = resolveCadastroOrigin(explicitSetor, explicitSetor);
+            } else {
+                cadastroOrigin = inferCadastroOrigin(userData || {});
+            }
+
             supabase.auth.signUp({
                 email: userData.email,
                 password: userData.password,
                 options: {
                     data: {
                         full_name: userData.name,
-                        comum: userData.comum
+                        comum: userData.comum,
+                        cadastro_origem: cadastroOrigin.key,
+                        cadastro_origem_label: cadastroOrigin.label,
+                        cadastro_origem_setor_sugerido: cadastroOrigin.sector,
+                        cadastro_origem_rota: cadastroOrigin.route
                     }
                 }
             }).then(function (response) {
@@ -1408,7 +1518,12 @@
                     logAudit(response.data.user.id, 'REGISTER', 'AUTH', {
                         email: userData.email,
                         full_name: userData.name,
-                        comum: userData.comum
+                        comum: userData.comum,
+                        cadastro_origem: cadastroOrigin.key,
+                        cadastro_origem_label: cadastroOrigin.label,
+                        cadastro_origem_setor_sugerido: cadastroOrigin.sector,
+                        cadastro_origem_rota: cadastroOrigin.route,
+                        cadastro_origem_url: cadastroOrigin.url
                     });
                     deferred.resolve(response.data);
                 }
@@ -2368,7 +2483,10 @@
                             role: normalizedRole,
                             sector: normalizedSector,
                             cargo: payload.cargo,
-                            comum: payload.comum
+                            comum: payload.comum,
+                            cadastro_origem: updatedRecord.cadastro_origem || null,
+                            cadastro_origem_label: updatedRecord.cadastro_origem_label || null,
+                            cadastro_origem_setor_sugerido: updatedRecord.cadastro_origem_setor_sugerido || null
                         }).catch(function (auditError) {
                             console.warn('Falha ao registrar auditoria de revisao de usuario.', auditError);
                             return null;
@@ -2462,7 +2580,10 @@
                             role: normalizedRole,
                             sector: normalizedSector,
                             cargo: payload.cargo,
-                            comum: payload.comum
+                            comum: payload.comum,
+                            cadastro_origem: updatedRecord.cadastro_origem || (userRef && userRef.cadastro_origem) || null,
+                            cadastro_origem_label: updatedRecord.cadastro_origem_label || (userRef && userRef.cadastro_origem_label) || null,
+                            cadastro_origem_setor_sugerido: updatedRecord.cadastro_origem_setor_sugerido || (userRef && userRef.cadastro_origem_setor_sugerido) || null
                         }).catch(function (auditError) {
                             console.warn('Falha ao registrar auditoria de aprovacao/revisao legada.', auditError);
                             return null;

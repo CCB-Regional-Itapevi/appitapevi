@@ -234,6 +234,29 @@
         padding: 5px 8px;
     }
 
+    .pending-origin-badge {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 5px 8px;
+        border-radius: 3px;
+        background: #eef6ff;
+        color: #1f6fb2;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .pending-origin-public { background: #e8eef2; color: #4e5f6d; }
+    .pending-origin-ebi { background: #e8f7ef; color: #11824d; }
+    .pending-origin-darpe { background: #fff2df; color: #b96b00; }
+    .pending-origin-depac { background: #eef0ff; color: #4d55b8; }
+    .pending-origin-musica { background: #edf7ff; color: #176ea6; }
+    .pending-origin-musicalizacao { background: #f0eaff; color: #6c3dbb; }
+    .pending-origin-gem { background: #eaf8f7; color: #087f78; }
+    .pending-origin-rjm { background: #fff0f5; color: #b52f65; }
+    .pending-origin-visitas { background: #eef8e8; color: #4f8123; }
+    .pending-origin-admin { background: #f1f3f5; color: #2f4050; }
+
     @media (max-width: 1199px) {
         .pending-user-fields {
             grid-template-columns: repeat(2, minmax(180px, 1fr));
@@ -381,6 +404,12 @@
                                     ng-options="option.value as option.label for option in pendingFilterOptions">
                             </select>
                         </div>
+                        <div class="col-md-3 col-sm-6">
+                            <select class="form-control input-sm"
+                                    ng-model="pendingFilters.origin"
+                                    ng-options="option.value as option.label for option in pendingOriginOptions">
+                            </select>
+                        </div>
                         <div class="col-md-4 col-sm-6" ng-if="viewMode === 'list'">
                             <input type="text" class="form-control input-sm" ng-model="pendingFilters.search" placeholder="Buscar nome, usuário, comum ou município...">
                         </div>
@@ -421,6 +450,7 @@
                                                 <small class="pending-user-subline">
                                                     {{user.username || '-'}}
                                                     <span ng-if="user.created_at"> | Cadastro: {{user.created_at | date:'dd/MM/yyyy HH:mm'}}</span>
+                                                    <span class="pending-origin-badge" ng-class="getPendingOriginBadgeClass(user)">{{getPendingOriginLabel(user)}}</span>
                                                 </small>
 
                                                 <div class="pending-user-fields">
@@ -441,7 +471,7 @@
                                                         <span class="pending-user-field-label">Setor</span>
                                                         <select class="form-control input-sm"
                                                                 ng-model="user.review.sector"
-                                                                ng-options="sector.name as sector.name for sector in sectors"
+                                                                ng-options="sector.name as sector.label for sector in sectors"
                                                                 ng-disabled="user.review.role_id === 1 || user.review.role_id === 2">
                                                         </select>
                                                     </div>
@@ -482,6 +512,7 @@
                             <thead>
                                 <tr>
                                     <th style="min-width: 260px;">Usuário</th>
+                                    <th style="min-width: 130px;">Origem</th>
                                     <th style="min-width: 220px;">Comum</th>
                                     <th style="min-width: 180px;">Município</th>
                                     <th style="min-width: 170px;">Permissão</th>
@@ -502,6 +533,9 @@
                                         </div>
                                     </td>
                                     <td>
+                                        <span class="pending-origin-badge" ng-class="getPendingOriginBadgeClass(user)">{{getPendingOriginLabel(user)}}</span>
+                                    </td>
+                                    <td>
                                         <span class="label label-default">{{user.review.comum || 'Sem comum informado'}}</span>
                                     </td>
                                     <td>
@@ -518,7 +552,7 @@
                                     <td>
                                         <select class="form-control input-sm"
                                                 ng-model="user.review.sector"
-                                                ng-options="sector.name as sector.name for sector in sectors"
+                                                ng-options="sector.name as sector.label for sector in sectors"
                                                 ng-disabled="user.review.role_id === 1 || user.review.role_id === 2">
                                         </select>
                                     </td>

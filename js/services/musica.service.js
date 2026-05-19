@@ -722,7 +722,7 @@
                 cargo: source.cargo || '',
                 instrumento: source.instrumento || '',
                 motivo: source.motivo || source.justificativa || '',
-                status: source.status || 'Recebida',
+                status: source.status || 'Justificado',
                 contato: source.contato || '',
                 registrado_por: source.registrado_por || '',
                 origem_aplicacao: source.origem_aplicacao || 'APP_GLOBAL',

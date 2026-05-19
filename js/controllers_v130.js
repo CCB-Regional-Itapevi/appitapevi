@@ -502,11 +502,11 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
     $rootScope.$on('$stateChangeStart', function (event, toState) {
         var user = $rootScope.currentUser;
         var role = AuthService && typeof AuthService.getCurrentUserRole === 'function' ? AuthService.getCurrentUserRole() : null;
-        var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'profile' || toState.name === 'musica_justificar_publico';
+        var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'app.profile' || toState.name === 'musica_justificar_publico';
 
         if (user && !user.comum && !isPublic && role !== null && role >= 3) {
             event.preventDefault();
-            $state.go('profile');
+            $state.go('app.profile');
 
             if (typeof swal === 'function') {
                 swal({
@@ -4608,8 +4608,34 @@ function registerCtrl($scope, AuthService, ValidationService, $state, $timeout, 
         password: '',
         confirmPassword: '',
         comum: '',
+        setor: '',
         agreeTerms: false
     };
+
+    try {
+        var params = $state.params || {};
+        var urlSetor = params.origem || params.origin || params.setor || params.sector || '';
+        
+        if (!urlSetor && window.location && window.location.hash) {
+            var match = window.location.hash.match(/[?&#](?:origem|origin|setor|sector)=([^&#]+)/i);
+            if (match && match[1]) {
+                urlSetor = decodeURIComponent(match[1].replace(/\+/g, ' '));
+            }
+        }
+        
+        if (urlSetor) {
+            var normUrlSetor = String(urlSetor).toLowerCase().trim();
+            if (normUrlSetor === 'musica' || normUrlSetor === 'music') {
+                $scope.user.setor = 'musica';
+            } else if (normUrlSetor === 'admin' || normUrlSetor === 'administrativo') {
+                $scope.user.setor = 'administrativo';
+            } else {
+                $scope.user.setor = normUrlSetor;
+            }
+        }
+    } catch (e) {
+        console.warn('Could not parse initial setor from URL', e);
+    }
 
     $scope.errors = {};
     $scope.loading = false;
@@ -4744,6 +4770,12 @@ function registerCtrl($scope, AuthService, ValidationService, $state, $timeout, 
             isValid = false;
         }
 
+        // Valida setor
+        if (!$scope.user.setor) {
+            $scope.errors.setor = 'Selecione o seu ministério/setor de origem.';
+            isValid = false;
+        }
+
         // Valida termos
         if (!$scope.user.agreeTerms) {
             $scope.errors.agreeTerms = 'Voc\u00ea deve concordar com os termos e pol\u00edticas';
@@ -4778,7 +4810,8 @@ function registerCtrl($scope, AuthService, ValidationService, $state, $timeout, 
             name: $scope.user.name.trim(),
             email: $scope.user.email.trim().toLowerCase(),
             password: $scope.user.password,
-            comum: $scope.user.comum.trim()
+            comum: $scope.user.comum.trim(),
+            origem: $scope.user.setor
         };
 
         // Chama servi\u00e7o de autentica\u00e7\u00e3o
@@ -5011,6 +5044,13 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
         USER_MANAGEMENT: 'Usu\u00e1rios',
         USERS: 'Usu\u00e1rios',
         MINISTERIO_REGIONAL: 'Ministerio Regional',
+        EBI: 'EBI',
+        VISITAS: 'Visitas',
+        MUSICA: 'Musica',
+        MUSICALIZACAO: 'Musicalizacao',
+        DARPE: 'DARPE',
+        DEPAC: 'DEPAC',
+        RJM: 'RJM',
         GEM: 'G.E.M'
     };
     defaultFromDate.setDate(defaultFromDate.getDate() - 30);
@@ -5196,7 +5236,7 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
 
         if (action === 'LOGIN') return 'Usuario autenticou no sistema.';
         if (action === 'LOGOUT') return 'Usuario encerrou a sessao.';
-        if (action === 'REGISTER') return 'Novo cadastro realizado no sistema.';
+        if (action === 'REGISTER') return 'Novo cadastro realizado no sistema' + (details.cadastro_origem_label ? ' via ' + details.cadastro_origem_label : '') + '.';
         if (action === 'VIEW_PAGE') return 'Acessou a pagina ' + (details.page_title || stateName || 'sem identificacao') + '.';
         if (action === 'USER_APPROVAL_APPROVED') return 'Aprovou o cadastro de um usuario e liberou o acesso ao sistema.';
         if (action === 'USER_APPROVAL_REJECTED') return 'Rejeitou o cadastro de um usuario durante a analise administrativa.';
@@ -5408,6 +5448,9 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
             normalized.details.page_title,
             normalized.details.state_name,
             normalized.details.email,
+            normalized.details.cadastro_origem,
+            normalized.details.cadastro_origem_label,
+            normalized.details.cadastro_origem_setor_sugerido,
             normalized.details.status,
             normalized.details.current_hash,
             normalized.details.current_path
@@ -5971,6 +6014,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
     $scope.viewMode = 'grouped';
     $scope.pendingFilters = {
         comum: '',
+        origin: '',
         search: ''
     };
     $scope.filteredPendingUsers = [];
@@ -5978,6 +6022,9 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
     $scope.pendingFilterOptions = [
         { value: '', label: 'Comum' },
         { value: '__SEM_COMUM__', label: 'Sem comum' }
+    ];
+    $scope.pendingOriginOptions = [
+        { value: '', label: 'Origem' }
     ];
     $scope.collapsedPendingMunicipioGroups = {};
     $scope.collapsedPendingComumGroups = {};
@@ -5994,17 +6041,16 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         { id: 7, name: 'Membro', description: 'Membro padrão (legado)', level_order: 7 }
     ];
     var defaultSectors = [
-        { name: 'Global' },
-        { name: 'Administrativo' },
-        { name: 'Musicalizacao' },
-        { name: 'Musica' },
-        { name: 'Ebi' },
-        { name: 'RJM' },
-        { name: 'Visitas' },
-        { name: 'Darpe' },
-        { name: 'Depac' },
-        { name: 'Gem' },
-        { name: 'Inscrição' }
+        { name: 'Global', label: 'GLOBAL' },
+        { name: 'Administrativo', label: 'ADMINISTRATIVO' },
+        { name: 'Musicalizacao', label: 'MUSICALIZAÇÃO' },
+        { name: 'Musica', label: 'MÚSICA' },
+        { name: 'Ebi', label: 'EBI' },
+        { name: 'RJM', label: 'RJM' },
+        { name: 'Visitas', label: 'VISITAS' },
+        { name: 'Darpe', label: 'DARPE' },
+        { name: 'Depac', label: 'DEPAC' },
+        { name: 'Gem', label: 'GEM' }
     ];
 
     function getDefaultSector(roleId, fallbackSector) {
@@ -6023,6 +6069,53 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
             .trim();
+    }
+
+    function normalizePendingSectorOptionName(value) {
+        var normalized = normalizePendingText(value).replace(/\s+/g, ' ');
+        var map = {
+            global: { name: 'Global', label: 'GLOBAL', order: 1 },
+            administrativo: { name: 'Administrativo', label: 'ADMINISTRATIVO', order: 2 },
+            darpe: { name: 'Darpe', label: 'DARPE', order: 3 },
+            depac: { name: 'Depac', label: 'DEPAC', order: 4 },
+            ebi: { name: 'Ebi', label: 'EBI', order: 5 },
+            gem: { name: 'Gem', label: 'GEM', order: 6 },
+            musica: { name: 'Musica', label: 'MÚSICA', order: 7 },
+            musicalizacao: { name: 'Musicalizacao', label: 'MUSICALIZAÇÃO', order: 8 },
+            rjm: { name: 'RJM', label: 'RJM', order: 10 },
+            visitas: { name: 'Visitas', label: 'VISITAS', order: 11 }
+        };
+
+        return map[normalized] || {
+            name: value || '',
+            label: String(value || '').toUpperCase(),
+            order: 99
+        };
+    }
+
+    function normalizePendingSectorOptions(sectors) {
+        var index = {};
+
+        angular.forEach(sectors || [], function (sector) {
+            var option = normalizePendingSectorOptionName(sector && sector.name ? sector.name : sector);
+            var key = normalizePendingText(option.name);
+
+            if (!key || key === 'inscricao' || index[key]) {
+                return;
+            }
+
+            index[key] = option;
+        });
+
+        return Object.keys(index).map(function (key) {
+            return index[key];
+        }).sort(function (a, b) {
+            if (a.order !== b.order) {
+                return a.order - b.order;
+            }
+
+            return String(a.label || '').localeCompare(String(b.label || ''), 'pt-BR');
+        });
     }
 
     function resolvePendingComum(user) {
@@ -6057,14 +6150,106 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         return (catalogEntry && catalogEntry.cidade) || 'Sem município';
     }
 
+    function resolvePendingOrigin(user) {
+        // Prioridade 1: campo cadastro_origem_label direto da tabela profiles
+        var label = user && (
+            user.cadastro_origem_label ||
+            user.origem_cadastro_label ||
+            user.registration_origin_label ||
+            ''
+        );
+
+        // Prioridade 2: chave cadastro_origem
+        var key = user && (
+            user.cadastro_origem ||
+            user.origem_cadastro ||
+            user.registration_origin ||
+            ''
+        );
+
+        // Prioridade 3: sector do perfil (se não for genérico)
+        var sector = user && user.sector;
+
+        // Se a chave for explicitamente cadastro_publico, tratar como público
+        var isPublic = key && (
+            String(key).toLowerCase() === 'cadastro_publico' ||
+            String(key).toLowerCase() === 'cadastro publico'
+        );
+
+        if (label && !isPublic) {
+            return String(label);
+        }
+
+        if (key && !isPublic) {
+            return String(key)
+                .replace(/[_-]+/g, ' ')
+                .replace(/\b\w/g, function (letter) { return letter.toUpperCase(); });
+        }
+
+        if (sector && normalizePendingText(sector) !== 'inscricao' && sector !== 'Inscrição') {
+            return sector;
+        }
+
+        return 'Cadastro Público';
+    }
+
+    function formatPendingOriginLabel(value) {
+        var normalized = normalizePendingText(value);
+        var labels = {
+            ebi: 'EBI',
+            darpe: 'DARPE',
+            depac: 'DEPAC',
+            gem: 'GEM',
+            rjm: 'RJM',
+            visitas: 'VISITAS',
+            musica: 'MÚSICA',
+            musicalizacao: 'MUSICALIZAÇÃO',
+            administrativo: 'ADMINISTRATIVO',
+            'cadastro publico': 'CADASTRO PÚBLICO',
+            cadastro_publico: 'CADASTRO PÚBLICO'
+        };
+
+        return labels[normalized] || String(value || 'CADASTRO PÚBLICO').toUpperCase();
+    }
+
+    function getPendingOriginBadgeClassFromLabel(value) {
+        var normalized = normalizePendingText(value);
+
+        if (normalized.indexOf('ebi') !== -1) return 'pending-origin-ebi';
+        if (normalized.indexOf('darpe') !== -1) return 'pending-origin-darpe';
+        if (normalized.indexOf('depac') !== -1) return 'pending-origin-depac';
+        if (normalized.indexOf('gem') !== -1) return 'pending-origin-gem';
+        if (normalized.indexOf('rjm') !== -1) return 'pending-origin-rjm';
+        if (normalized.indexOf('visitas') !== -1) return 'pending-origin-visitas';
+        if (normalized.indexOf('musicalizacao') !== -1) return 'pending-origin-musicalizacao';
+        if (normalized.indexOf('musica') !== -1) return 'pending-origin-musica';
+        if (normalized.indexOf('administrativo') !== -1) return 'pending-origin-admin';
+
+        return 'pending-origin-public';
+    }
+
+    function resolvePendingSuggestedSector(user) {
+        return (user && (
+            user.cadastro_origem_setor_sugerido ||
+            user.origem_cadastro_setor_sugerido ||
+            ''
+        )) || '';
+    }
+
     function refreshPendingCommonOptions() {
         var options = {};
+        var originOptions = {};
 
         angular.forEach($scope.pendingUsers || [], function (user) {
             var comum = String(resolvePendingComum(user) || '').trim();
+            var origin = String(resolvePendingOrigin(user) || '').trim();
 
             if (comum && normalizePendingText(comum) !== 'sem comum informado') {
                 options[comum] = true;
+            }
+
+            if (origin) {
+                originOptions[origin] = true;
             }
         });
 
@@ -6073,6 +6258,12 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         });
         $scope.pendingFilterOptions = [{ value: '', label: 'Comum' }, { value: '__SEM_COMUM__', label: 'Sem comum' }]
             .concat($scope.pendingCommonOptions.map(function (item) {
+                return { value: item, label: item };
+            }));
+        $scope.pendingOriginOptions = [{ value: '', label: 'Origem' }]
+            .concat(Object.keys(originOptions).sort(function (a, b) {
+                return String(a || '').localeCompare(String(b || ''), 'pt-BR');
+            }).map(function (item) {
                 return { value: item, label: item };
             }));
     }
@@ -6129,12 +6320,17 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             var comum = resolvePendingComum(user);
             var normalizedComum = normalizePendingText(comum);
             var municipio = resolvePendingMunicipio(user);
+            var origin = resolvePendingOrigin(user);
 
             if (($scope.pendingFilters || {}).comum === '__SEM_COMUM__' && normalizedComum !== 'sem comum informado') {
                 return false;
             }
 
             if (($scope.pendingFilters || {}).comum && ($scope.pendingFilters || {}).comum !== '__SEM_COMUM__' && comum !== ($scope.pendingFilters || {}).comum) {
+                return false;
+            }
+
+            if (($scope.pendingFilters || {}).origin && origin !== ($scope.pendingFilters || {}).origin) {
                 return false;
             }
 
@@ -6147,6 +6343,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                 user.username,
                 comum,
                 municipio,
+                origin,
                 user.review && user.review.cargo,
                 user.review && user.review.sector,
                 getPendingRoleName(user.review && user.review.role_id)
@@ -6232,7 +6429,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
     function prepareReview(user) {
         user.review = {
             role_id: user.role_id || 6,
-            sector: getDefaultSector(user.role_id || 6, user.sector),
+            sector: getDefaultSector(user.role_id || 6, user.sector || resolvePendingSuggestedSector(user)),
             cargo: user.cargo || '',
             comum: user.comum || '',
             status: user.status || 'pending'
@@ -6260,6 +6457,14 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
 
     $scope.getPendingMunicipioLabel = function (user) {
         return resolvePendingMunicipio(user);
+    };
+
+    $scope.getPendingOriginLabel = function (user) {
+        return formatPendingOriginLabel(resolvePendingOrigin(user));
+    };
+
+    $scope.getPendingOriginBadgeClass = function (user) {
+        return getPendingOriginBadgeClassFromLabel(resolvePendingOrigin(user));
     };
 
     $scope.getPendingRoleName = function (roleId) {
@@ -6344,9 +6549,9 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         });
 
         AuthService.listSectors().then(function (sectors) {
-            $scope.sectors = (sectors && sectors.length) ? sectors : angular.copy(defaultSectors);
+            $scope.sectors = normalizePendingSectorOptions((sectors && sectors.length) ? sectors : angular.copy(defaultSectors));
         }).catch(function () {
-            $scope.sectors = angular.copy(defaultSectors);
+            $scope.sectors = normalizePendingSectorOptions(angular.copy(defaultSectors));
         });
 
         if (AuthService && typeof AuthService.listComunsCatalog === 'function') {
@@ -6458,6 +6663,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         var rows = [[
             'Nome',
             'Usuário',
+            'Origem',
             'Comum',
             'Município',
             'Permissão',
@@ -6483,6 +6689,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             rows.push([
                 user.full_name || '-',
                 user.username || '-',
+                formatPendingOriginLabel(resolvePendingOrigin(user)),
                 resolvePendingComum(user),
                 resolvePendingMunicipio(user),
                 getPendingRoleName(user.review && user.review.role_id),
@@ -6504,6 +6711,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         var generatedAt = new Date();
         var body = [[
             { text: 'Nome', style: 'tableHeader' },
+            { text: 'Origem', style: 'tableHeader' },
             { text: 'Comum', style: 'tableHeader' },
             { text: 'Município', style: 'tableHeader' },
             { text: 'Permissão', style: 'tableHeader' },
@@ -6524,6 +6732,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         data.forEach(function (user) {
             body.push([
                 user.full_name || 'Sem nome',
+                formatPendingOriginLabel(resolvePendingOrigin(user)),
                 resolvePendingComum(user),
                 resolvePendingMunicipio(user),
                 getPendingRoleName(user.review && user.review.role_id),
@@ -6543,7 +6752,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                     margin: [0, 12, 0, 0],
                     table: {
                         headerRows: 1,
-                        widths: ['*', '*', 110, 90, 90, 95],
+                        widths: ['*', 90, '*', 110, 90, 90, 95],
                         body: body
                     },
                     layout: 'lightHorizontalLines'
@@ -6561,7 +6770,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         }).download('Liberacao_Usuarios_' + $filter('date')(generatedAt, 'yyyy-MM-dd_HHmm') + '.pdf');
     };
 
-    $scope.$watchGroup(['pendingFilters.comum', 'pendingFilters.search'], function () {
+    $scope.$watchGroup(['pendingFilters.comum', 'pendingFilters.origin', 'pendingFilters.search'], function () {
         refreshFilteredPendingUsers();
     });
 
@@ -19733,7 +19942,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
         return repairCadastroMusicText(value || '')
             .replace(/CONGREGA[^A-Z0-9 ]*O CRIST[^A-Z0-9 ]* NO BRASIL/gi, 'CONGREGAÇÃO CRISTàNO BRASIL')
             .replace(/MUSICALIZA[^A-Z0-9 ]*O INFANTIL/gi, 'MUSICALIZAÇÃO INFANTIL')
-            .replace(/Relat[^A-Z0-9 ]*rio de Crian[^A-Z0-9 ]*as \/ Alunos/gi, 'Relatório de Crianças / Alunos')
+            .replace(/Relat[^A-Z0-9 ]*rio de Crian[^A-Z0-9 ]*as \/ Alunos/gi, 'Relatorio de Criancas')
             .replace(/Emiss[^A-Z0-9 ]*o/gi, 'Emissão')
             .replace(/Respons[^A-Z0-9 ]*vel/gi, 'Responsável')
             .replace(/Pr[^A-Z0-9 ]*xima de 12 anos/gi, 'Próxima de 12 anos');
@@ -19745,7 +19954,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
             ['CONGREGAÇÃO CRISTàNO BRASIL'],
             ['Regional Itapevi - São Paulo'],
             ['MUSICALIZAÇÃO INFANTIL'],
-            ['Relatório de Crianças / Alunos'],
+            ['Relatorio de Criancas'],
             ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
             []
         ];
@@ -19770,7 +19979,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
         });
 
         if (!grupos.length) {
-            rows.push(['Nenhum aluno encontrado.', '', '', '', '', '']);
+            rows.push(['Nenhuma crianca encontrada.', '', '', '', '', '']);
         }
 
         rows = rows.map(function (row) {
@@ -19801,7 +20010,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
             { text: 'CONGREGAÇÃO CRISTàNO BRASIL', style: 'entityName' },
             { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
             { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
-            { text: 'Relatório de Crianças / Alunos', style: 'reportTitle' },
+            { text: 'Relatorio de Criancas', style: 'reportTitle' },
             { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
@@ -19845,7 +20054,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
         });
 
         if (!grupos.length) {
-            content.push({ text: 'Nenhum aluno encontrado.', alignment: 'center', margin: [0, 20, 0, 0] });
+            content.push({ text: 'Nenhuma crianca encontrada.', alignment: 'center', margin: [0, 20, 0, 0] });
         }
 
         var docDefinition = {

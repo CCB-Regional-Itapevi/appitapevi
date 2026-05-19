@@ -546,6 +546,7 @@
                         </div>
                         <div class="col-md-6">
                             <p><strong>ID do usu&aacute;rio:</strong> {{selectedLog.user_id || '-'}}</p>
+                            <p><strong>Origem do cadastro:</strong> {{selectedLog.details.cadastro_origem_label || selectedLog.details.cadastro_origem || '-'}}</p>
                             <p><strong>Identifica&ccedil;&atilde;o do navegador:</strong> {{selectedLog.user_agent || '-'}}</p>
                             <p><strong>Fuso hor&aacute;rio:</strong> {{selectedLog.details.timezone || '-'}}</p>
                             <p><strong>Idioma:</strong> {{selectedLog.details.language || '-'}}</p>

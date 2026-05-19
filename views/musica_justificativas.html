@@ -11,6 +11,16 @@
 </div>
 
 <div class="wrapper wrapper-content animated fadeInRight">
+    <style>
+        .musica-justificativa-actions {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+    </style>
+
     <div class="alert alert-danger" ng-if="errorMessage">{{ errorMessage }}</div>
 
     <div class="row">
@@ -167,7 +177,7 @@
                             <td>{{ formatJustificativaTipoEvento(item.tipo_evento) }}</td>
                             <td>
                                 <strong>{{ formatJustificativaRecordDate(item.created_at) }}</strong>
-                                <small class="text-muted" style="display:block;">Recebido &agrave;s {{ formatJustificativaTime(item.created_at) }}</small>
+                                <small class="text-muted" style="display:block;">Justificado &agrave;s {{ formatJustificativaTime(item.created_at) }}</small>
                             </td>
                             <td>{{ item.nome }}</td>
                             <td>{{ item.comum }}</td>
@@ -175,10 +185,19 @@
                             <td>{{ item.cargo || '-' }}</td>
                             <td>{{ item.instrumento || '-' }}</td>
                             <td>{{ item.motivo }}</td>
-                            <td><span class="label label-primary" style="background:#1ab394;">Recebida</span></td>
+                            <td><span class="label label-primary" style="background:#1ab394;">Justificado</span></td>
                             <td class="text-center">
-                                <button class="btn btn-white btn-xs" ng-click="openJustificativaModal(item)"><i class="fa fa-pencil"></i></button>
-                                <button class="btn btn-danger btn-xs" ng-click="confirmDeleteJustificativa(item)"><i class="fa fa-trash"></i></button>
+                                <div class="musica-justificativa-actions">
+                                    <button class="btn btn-info btn-xs" type="button" ng-click="openJustificativaModal(item, true)" title="Ver">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-xs" type="button" ng-click="openJustificativaModal(item)" title="Editar">
+                                        <i class="fa fa-pencil-square-o"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-xs" type="button" ng-click="confirmDeleteJustificativa(item)" title="Excluir">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -200,42 +219,42 @@
                 <div class="row">
                     <div class="col-sm-6 form-group">
                         <label>Tipo de evento</label>
-                        <select class="form-control" ng-model="justificativaForm.tipo_evento" ng-options="item as item for item in tipoEventoOptions"></select>
+                        <select class="form-control" ng-model="justificativaForm.tipo_evento" ng-options="item as item for item in tipoEventoOptions" ng-disabled="justificativaViewOnly"></select>
                     </div>
                     <div class="col-sm-6 form-group">
                         <label>Data do evento</label>
-                        <input type="date" class="form-control" ng-model="justificativaForm.data_evento">
+                        <input type="date" class="form-control" ng-model="justificativaForm.data_evento" ng-disabled="justificativaViewOnly">
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-6 form-group"><label>Identifica&ccedil;&atilde;o do evento</label><input type="text" class="form-control" ng-model="justificativaForm.nome_evento" placeholder="Ex.: Reuni&atilde;o do Minist&eacute;rio"></div>
-                    <div class="col-sm-6 form-group"><label>Nome</label><input type="text" class="form-control" ng-model="justificativaForm.nome"></div>
+                    <div class="col-sm-6 form-group"><label>Identifica&ccedil;&atilde;o do evento</label><input type="text" class="form-control" ng-model="justificativaForm.nome_evento" placeholder="Ex.: Reuni&atilde;o do Minist&eacute;rio" ng-disabled="justificativaViewOnly"></div>
+                    <div class="col-sm-6 form-group"><label>Nome</label><input type="text" class="form-control" ng-model="justificativaForm.nome" ng-disabled="justificativaViewOnly"></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-6 form-group"><label>Comum</label><input type="text" class="form-control" ng-model="justificativaForm.comum"></div>
-                    <div class="col-sm-6 form-group"><label>Munic&iacute;pio</label><input type="text" class="form-control" ng-model="justificativaForm.municipio"></div>
+                    <div class="col-sm-6 form-group"><label>Comum</label><input type="text" class="form-control" ng-model="justificativaForm.comum" ng-disabled="justificativaViewOnly"></div>
+                    <div class="col-sm-6 form-group"><label>Munic&iacute;pio</label><input type="text" class="form-control" ng-model="justificativaForm.municipio" ng-disabled="justificativaViewOnly"></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4 form-group"><label>Cargo</label><input type="text" class="form-control" ng-model="justificativaForm.cargo"></div>
-                    <div class="col-sm-4 form-group"><label>Instrumento</label><input type="text" class="form-control" ng-model="justificativaForm.instrumento"></div>
+                    <div class="col-sm-4 form-group"><label>Cargo</label><input type="text" class="form-control" ng-model="justificativaForm.cargo" ng-disabled="justificativaViewOnly"></div>
+                    <div class="col-sm-4 form-group"><label>Instrumento</label><input type="text" class="form-control" ng-model="justificativaForm.instrumento" ng-disabled="justificativaViewOnly"></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-8 form-group"><label>Motivo</label><textarea class="form-control" rows="3" ng-model="justificativaForm.motivo"></textarea></div>
-                    <div class="col-sm-4 form-group"><label>Contato</label><input type="text" class="form-control" ng-model="justificativaForm.contato"></div>
+                    <div class="col-sm-8 form-group"><label>Motivo</label><textarea class="form-control" rows="3" ng-model="justificativaForm.motivo" ng-disabled="justificativaViewOnly"></textarea></div>
+                    <div class="col-sm-4 form-group"><label>Contato</label><input type="text" class="form-control" ng-model="justificativaForm.contato" ng-disabled="justificativaViewOnly"></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4 form-group"><label>Origem</label><input type="text" class="form-control" ng-model="justificativaForm.origem_aplicacao"></div>
-                    <div class="col-sm-4 form-group"><label>Refer&ecirc;ncia externa</label><input type="text" class="form-control" ng-model="justificativaForm.referencia_externa"></div>
-                    <div class="col-sm-4 form-group"><label>Registrado por</label><input type="text" class="form-control" ng-model="justificativaForm.registrado_por"></div>
+                    <div class="col-sm-4 form-group"><label>Origem</label><input type="text" class="form-control" ng-model="justificativaForm.origem_aplicacao" ng-disabled="justificativaViewOnly"></div>
+                    <div class="col-sm-4 form-group"><label>Refer&ecirc;ncia externa</label><input type="text" class="form-control" ng-model="justificativaForm.referencia_externa" ng-disabled="justificativaViewOnly"></div>
+                    <div class="col-sm-4 form-group"><label>Registrado por</label><input type="text" class="form-control" ng-model="justificativaForm.registrado_por" ng-disabled="justificativaViewOnly"></div>
                 </div>
                 <div class="form-group">
                     <label>Observa&ccedil;&otilde;es internas</label>
-                    <textarea class="form-control" rows="2" ng-model="justificativaForm.observacoes"></textarea>
+                    <textarea class="form-control" rows="2" ng-model="justificativaForm.observacoes" ng-disabled="justificativaViewOnly"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-white" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" ng-click="saveJustificativa()" ng-disabled="saving">
+                <button type="button" class="btn btn-white" data-dismiss="modal">{{ justificativaViewOnly ? 'Fechar' : 'Cancelar' }}</button>
+                <button type="button" class="btn btn-primary" ng-click="saveJustificativa()" ng-disabled="saving" ng-if="!justificativaViewOnly">
                     <i class="fa fa-save"></i> Salvar
                 </button>
             </div>

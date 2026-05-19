@@ -1,4 +1,4 @@
-﻿<link href="css/auth.css" rel="stylesheet">
+<link href="css/auth.css" rel="stylesheet">
 
 <div class="auth-page-body animated fadeIn" ng-controller="registerCtrl">
     <div class="sac-card">
@@ -116,6 +116,37 @@
                 </div>
                 <div class="help-block-fixed text-danger" ng-if="errors.comum">
                     <small>{{ errors.comum }}</small>
+                </div>
+
+                <!-- Origem / Setor -->
+                <div class="form-group" ng-class="{'has-error': errors.setor}">
+                    <div class="input-icon-box" style="color: var(--brand);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <div style="position: relative;">
+                        <select class="form-control" ng-model="user.setor" style="padding-left: 45px; height: 46px; border-radius: 8px; border: 1px solid #e2e8f0; width: 100%; background-color: #f8fafc; color: #475569; appearance: none; -webkit-appearance: none; cursor: pointer;" required>
+                            <option value="" disabled selected hidden>Qual o seu Ministério/Setor de Origem?</option>
+                            <option value="ebi">EBI (Escola Bíblica Infantil)</option>
+                            <option value="musica">Música</option>
+                            <option value="musicalizacao">Musicalização Infantil</option>
+                            <option value="visitas">Visitas (Grupo de Visitas)</option>
+                            <option value="darpe">DARPE</option>
+                            <option value="depac">DEPAC</option>
+                            <option value="gem">G.E.M (Grupo de Estudo Musical)</option>
+                            <option value="rjm">RJM (Reunião de Jovens e Menores)</option>
+                            <option value="administrativo">Administrativo / Secretaria</option>
+                            <option value="cadastro_publico">Membro / Cadastro Público</option>
+                        </select>
+                        <!-- Dropdown arrow -->
+                        <div style="position: absolute; right: 15px; top: 13px; pointer-events: none; color: #94a3b8;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="help-block-fixed text-danger" ng-if="errors.setor">
+                    <small>{{ errors.setor }}</small>
                 </div>
 
                 <!-- Termos -->

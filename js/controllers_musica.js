@@ -772,6 +772,7 @@
         $scope.resumo = buildJustificativasResumo([]);
         $scope.filters = { searchText: '', tipo_evento: '', data_inicio: null, data_fim: null };
         $scope.justificativaForm = buildJustificativaForm();
+        $scope.justificativaViewOnly = false;
         $scope.tipoEventoOptions = [
             'Ensaio Regional',
             'Reunião do Ministério',
@@ -791,7 +792,8 @@
         $scope.clearJustificativaFilters = clearJustificativaFilters;
         $scope.filterJustificativasToday = filterJustificativasToday;
 
-        $scope.openJustificativaModal = function (justificativa) {
+        $scope.openJustificativaModal = function (justificativa, viewOnly) {
+            $scope.justificativaViewOnly = !!viewOnly;
             $scope.justificativaForm = angular.extend(buildJustificativaForm(), angular.copy(justificativa || {}));
             if ($scope.justificativaForm.data_evento && Object.prototype.toString.call($scope.justificativaForm.data_evento) !== '[object Date]') {
                 $scope.justificativaForm.data_evento = new Date($scope.justificativaForm.data_evento + 'T00:00:00');
@@ -979,7 +981,7 @@
                     item.cargo || '',
                     item.instrumento || '',
                     item.motivo || '',
-                    'Recebida'
+                    'Justificado'
                 ]);
             });
 
@@ -1102,7 +1104,7 @@
                     item.municipio || '',
                     item.cargo || '',
                     item.motivo || '',
-                    { text: 'Recebida', color: '#1ab394', bold: true }
+                    { text: 'Justificado', color: '#1ab394', bold: true }
                 ]);
             });
 
@@ -1451,7 +1453,7 @@
                 data_evento: $scope.form.data_evento || null,
                 origem_aplicacao: 'FORMULARIO_PUBLICO_MUSICA',
                 referencia_externa: buildPublicJustificativaReference($scope.form),
-                status: 'Recebida',
+                status: 'Justificado',
                 payload_origem: {
                     fonte: 'url_publica',
                     pessoa_encontrada_no_cadastro: !!$scope.selectedPessoa,
@@ -1593,7 +1595,7 @@
             cargo: '',
             instrumento: '',
             motivo: '',
-            status: 'Recebida',
+            status: 'Justificado',
             contato: '',
             origem_aplicacao: 'APP_GLOBAL',
             referencia_externa: '',

@@ -193,7 +193,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('musicalizacao.criancas', {
             url: "/criancas",
-            templateUrl: "views/musicalizacao_alunos.html?v=1.3.13",
+            templateUrl: "views/musicalizacao_alunos.html?v=1.3.14",
             data: { pageTitle: 'Crian\u00e7as' },
             controller: 'musicalizacaoAlunosCtrl'
         })
@@ -571,7 +571,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('music.justificativas', {
             url: "/justificativas",
-            templateUrl: "views/musica_justificativas.html?v=1.0.1",
+            templateUrl: "views/musica_justificativas.html?v=1.0.2",
             data: { pageTitle: 'M\u00fasica - Justificativas' },
             controller: 'musicaJustificativasCtrl'
         })
@@ -1099,8 +1099,8 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             data: { pageTitle: 'Login two columns', specialClass: 'gray-bg' }
         })
         .state('register', {
-            url: "/register",
-            templateUrl: "views/register.html",
+            url: "/register?origem&origin&setor&sector",
+            templateUrl: "views/register.html?v=1.1.1",
             data: { pageTitle: 'Cadastro', specialClass: 'gray-bg' }
         })
         .state('lockscreen', {
@@ -1115,7 +1115,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('musica_justificar_publico', {
             url: "/musica/justificar",
-            templateUrl: "views/musica_justificativa_publica.html?v=1.0.1",
+            templateUrl: "views/musica_justificativa_publica.html?v=1.0.2",
             data: { pageTitle: 'Justificativa de Ausencia - Musica', specialClass: 'gray-bg' },
             controller: 'musicaJustificativaPublicaCtrl'
         })

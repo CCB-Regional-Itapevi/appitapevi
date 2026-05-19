@@ -160,18 +160,11 @@
 
         function getAlunos() {
             var deferred = $q.defer();
-            AuthService.applyDataScopeToQuery(
-                supabase.from('musicalizacao_criancas').select('*'),
-                MUSICALIZACAO_ALUNOS_SCOPE
-            ).order('nome_crianca', { ascending: true })
+            supabase.from('musicalizacao_criancas').select('*')
+                .order('nome_crianca', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(
-                        AuthService.filterCollectionByDataScope(
-                            (response.data || []).map(normalizeAlunoRecord),
-                            MUSICALIZACAO_ALUNOS_SCOPE
-                        )
-                    );
+                    else deferred.resolve((response.data || []).map(normalizeAlunoRecord));
                 });
             return deferred.promise;
         }
