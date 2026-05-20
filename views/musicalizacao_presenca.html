@@ -140,7 +140,7 @@
                 <a href="#/musicalizacao/dashboard">Musicalização</a>
             </li>
             <li>
-                <a href="#/musicalizacao/aulas">Aulas</a>
+                <a href="#/musicalizacao/aulas">Atividades</a>
             </li>
             <li class="active">
                 <strong>Presença</strong>
@@ -156,7 +156,7 @@
                 <div class="sk-double-bounce1"></div>
                 <div class="sk-double-bounce2"></div>
             </div>
-            <p>Carregando dados da aula...</p>
+            <p>Carregando dados da atividade...</p>
         </div>
     </div>
 
@@ -164,7 +164,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Lançamento de Frequência por Aula</h5>
+                    <h5>Lançamento de Frequência por Atividade</h5>
                     <div class="ibox-tools">
                         <a href="#/musicalizacao/aulas" class="btn btn-white btn-xs"><i class="fa fa-arrow-left"></i> Voltar ao Histórico</a>
                     </div>
@@ -192,7 +192,7 @@
                         <div class="col-sm-3">
                             <div style="border:1px solid #e7eaec; border-radius:6px; padding:16px 18px; background:#f8f8ff;">
                                 <div style="font-size:12px; text-transform:uppercase; color:#7f8c8d; letter-spacing:.4px;">Lição</div>
-                                <div style="font-size:22px; font-weight:700; color:#777; line-height:1.2; margin-top:6px;">Aula {{selectedAula.numero_aula}}</div>
+                                <div style="font-size:22px; font-weight:700; color:#777; line-height:1.2; margin-top:6px;">Atividade {{selectedAula.numero_aula}}</div>
                             </div>
                         </div>
                     </div>
@@ -233,7 +233,7 @@
                     </div>
 
                     <div class="alert alert-warning" ng-if="!selectedAula">
-                        Nenhuma aula foi selecionada. Volte ao histórico e use o botão <strong>Reabrir</strong>.
+                        Nenhuma atividade foi selecionada. Volte ao histórico e use o botão <strong>Reabrir</strong>.
                     </div>
 
                     <div class="table-responsive musicalizacao-presenca-table" ng-if="selectedAula">

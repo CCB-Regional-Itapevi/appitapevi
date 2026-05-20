@@ -4899,7 +4899,7 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
         }
     }
 
-    // FunÃÆ’Ã†’Ãâ€š§ÃÆ’Ã†’Ãâ€š£o auxiliar para notificaÃÆ’Ã†’Ãâ€š§ÃÆ’Ã†’Ãâ€šµes
+    // Funcao auxiliar para notificacoes
     var notify = function (type, title, message) {
         if (SweetAlert && SweetAlert.swal) {
             var swalType = type === 'error' ? 'error' : (type === 'success' ? 'success' : 'warning');
@@ -9342,14 +9342,14 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         var orderedCidades = [];
         var totals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
         var rows = [
-            ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
-            ['Regional Itapevi - SÃÆ’£o Paulo'],
-            ['ESPAÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’¢âââ‚¬Å¡¬Ãâ€š¡O BÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šBLICO INFANTIL - EBI'],
-            ['RelatÃÆ’³rio Detalhado de Atividades e Comparecimento'],
-            ['EmissÃÆ’£o: ' + dataEmissao],
-            ['PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + periodoInicio + ' a ' + periodoFim],
+            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
+            ['Regional Itapevi - São Paulo'],
+            ['ESPAÇO BÍBLICO INFANTIL - EBI'],
+            ['Relatório Detalhado de Atividades e Comparecimento'],
+            ['Emissão: ' + dataEmissao],
+            ['Período: ' + periodoInicio + ' a ' + periodoFim],
             [],
-            ['Data', 'MunicÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio', 'Localidade', 'HistÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š³ria Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
+            ['Data', 'Município', 'Localidade', 'História Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
         ];
         rows = rows.map(function (row) {
             return row.map(function (cell) {
@@ -9388,7 +9388,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
             });
 
             merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 7 } });
-            rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + cidade]);
+            rows.push(['MUNICÍPIO: ' + cidade]);
 
             cityItems.forEach(function (item) {
                 var total = $scope.calculateTotal(item);
@@ -9454,7 +9454,7 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
     };
     $scope.exportToPDF = function () {
         var body = [
-            ['Data', 'Comum', 'Mnna', 'Mnno', 'MoÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§a', 'MoÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§o', 'Total']
+            ['Data', 'Comum', 'Mnna', 'Mnno', 'Moça', 'Moço', 'Total']
         ];
 
         var totals = { meninas: 0, meninos: 0, mocas: 0, mocos: 0, geral: 0 };
@@ -9491,8 +9491,8 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
 
         var docDefinition = {
             content: [
-                { text: 'RelatÃÆ’³rio de Recitativos - Regional Itapevi', style: 'header' },
-                { text: 'PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + ($scope.filters.dataInicio ? $scope.filters.dataInicio : 'InÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­cio') + ' atÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š© ' + ($scope.filters.dataFim ? $scope.filters.dataFim : 'Fim'), margin: [0, 0, 0, 10] },
+                { text: 'Relatório de Recitativos - Regional Itapevi', style: 'header' },
+                { text: 'Período: ' + ($scope.filters.dataInicio ? $scope.filters.dataInicio : 'Início') + ' até ' + ($scope.filters.dataFim ? $scope.filters.dataFim : 'Fim'), margin: [0, 0, 0, 10] },
                 {
                     table: {
                         headerRows: 1,
@@ -13466,7 +13466,24 @@ function repairCadastroMusicText(text) {
         value = window.AppUiStandards.repairText(value);
     }
 
-    return value;
+    return String(value || '')
+        .replace(/LU[\uFFFD?]+S/gi, 'LU\u00cdS')
+        .replace(/S[\uFFFD?]+O/gi, 'SÃO')
+        .replace(/JO[\uFFFD?]+O/gi, 'JOÃO')
+        .replace(/CORA[\uFFFD?]+[\uFFFD?]*O/gi, 'CORAÇÃO')
+        .replace(/PORT[\uFFFD?]+O/gi, 'PORTÃO')
+        .replace(/ITAPU[\uFFFD?]+/gi, 'ITAPUÃ')
+        .replace(/JAP[\uFFFD?]+O/gi, 'JAPÃO')
+        .replace(/PARNA[\uFFFD?]+BA/gi, 'PARNAÍBA')
+        .replace(/ROSEL[\uFFFD?]+NDIA/gi, 'ROSEL\u00c2NDIA')
+        .replace(/ROSELNDIA/gi, 'ROSEL\u00c2NDIA')
+        .replace(/SÃƒO/gi, 'SÃO')
+        .replace(/JOÃƒO/gi, 'JOÃO')
+        .replace(/CORAÃ‡ÃƒO/gi, 'CORAÇÃO')
+        .replace(/PORTÃƒO/gi, 'PORTÃO')
+        .replace(/ITAPUÃƒ/gi, 'ITAPUÃ')
+        .replace(/JAPÃƒO/gi, 'JAPÃO')
+        .replace(/PARNAÃBA/gi, 'PARNAÍBA');
 }
 
 function parseDateOnlyAsLocal(value) {
@@ -18751,7 +18768,7 @@ angular
     .controller('musicalizacaoPresencaCtrl', musicalizacaoPresencaCtrl);
 
 /**
- * musicalizacaoCtrl - Controller for MusicalizaÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š§ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Â âââ€šÂ¬ââ€žÂ¢ÃÆ’Ã†’âââ€šÂ¬Ã…Â¡ÃÆ’ââ‚¬Å¡Ãâ€š£o Dashboard
+ * musicalizacaoCtrl - Controller for Musicalizacao Dashboard
  * Fetches data from MusicalizacaoService (Supabase)
  */
 function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
@@ -19000,7 +19017,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
         var groups = {};
 
         ($scope.filteredAtividades || []).forEach(function (item) {
-            var municipio = item.cidade || 'Sem municÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio';
+            var municipio = item.cidade || 'Sem município';
             groups[municipio] = groups[municipio] || [];
             groups[municipio].push(item);
         });
@@ -19021,18 +19038,18 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     $scope.exportToExcel = function () {
         var grupos = getDashboardGroupsByMunicipio();
         var rows = [
-            ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
-            ['Regional Itapevi - SÃÆ’£o Paulo'],
-            ['MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL'],
-            ['RelatÃÆ’³rio de Atividades MusicalizaÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o'],
-            ['EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR')],
-            ['PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + getDashboardPeriodoLabel()],
+            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
+            ['Regional Itapevi - São Paulo'],
+            ['MUSICALIZAÇÃO INFANTIL'],
+            ['Relatório de Atividades Musicalização'],
+            ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
+            ['Período: ' + getDashboardPeriodoLabel()],
             []
         ];
         var totals = { meninas: 0, meninos: 0, geral: 0 };
 
         grupos.forEach(function (grupo) {
-            rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio]);
+            rows.push(['MUNICÍPIO: ' + grupo.municipio]);
             rows.push(['Data', 'Localidade', 'Polo', 'Meninas', 'Meninos', 'Total']);
 
             grupo.atividades.forEach(function (item) {
@@ -19088,12 +19105,12 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     $scope.exportToPDF = function () {
         var grupos = getDashboardGroupsByMunicipio();
         var content = [
-            { text: 'CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - SÃÆ’£o Paulo', style: 'entitySub' },
-            { text: 'MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL', style: 'moduleName' },
-            { text: 'RelatÃÆ’³rio de Atividades MusicalizaÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š§ÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o', style: 'reportTitle' },
-            { text: 'EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 5] },
-            { text: 'PerÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­odo: ' + getDashboardPeriodoLabel(), alignment: 'right', margin: [0, 0, 0, 10] }
+            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
+            { text: 'Relatório de Atividades Musicalização', style: 'reportTitle' },
+            { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 5] },
+            { text: 'Período: ' + getDashboardPeriodoLabel(), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
         if (!grupos.length) {
@@ -19135,7 +19152,7 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
                 { text: totals.geral, bold: true, fillColor: '#f3f3f3' }
             ]);
 
-            content.push({ text: 'MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio, style: 'groupTitle' });
+            content.push({ text: 'MUNICÍPIO: ' + grupo.municipio, style: 'groupTitle' });
             content.push({
                 table: {
                     headerRows: 1,
@@ -19424,7 +19441,13 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     $scope.savingNewAluno = false;
     $scope.savingEditAluno = false;
 
-    var fallbackComunsData = ((((window.CadastroMusicData || {}).comuns) || []).map(repairCadastroMusicText)).slice().sort(function (a, b) {
+    var cadastroMusicDataSource = window.CadastroMusicData || {};
+    var fallbackComunsSource = (cadastroMusicDataSource.comunsCatalog || []).length
+        ? (cadastroMusicDataSource.comunsCatalog || []).map(function (item) {
+            return item && item.nome;
+        })
+        : (cadastroMusicDataSource.comuns || []);
+    var fallbackComunsData = fallbackComunsSource.map(repairCadastroMusicText).slice().sort(function (a, b) {
         return String(a || '').localeCompare(String(b || ''), 'pt-BR');
     });
     var comunsData = fallbackComunsData.slice();
@@ -19445,7 +19468,28 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     }
 
     function getPoloMunicipioLabel(polo) {
-        return polo.localidade || 'Sem municÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio';
+        return polo.localidade || 'Sem município';
+    }
+
+    function resolveComumMunicipio(comumNome) {
+        var repaired = repairCadastroMusicText(comumNome || '');
+
+        if (!repaired) return '';
+
+        return resolveMunicipioFromCatalog($scope.comumCatalogState, [repaired])
+            || normalizeOfficialMunicipioRegionalLabel(repaired)
+            || normalizeMunicipioRegionalLabel(repaired);
+    }
+
+    function resolvePoloMunicipio(polo) {
+        if (!polo) return '';
+
+        return resolveMunicipioFromCatalog($scope.comumCatalogState, [
+            polo.localidade,
+            polo.cidade,
+            polo.nome_polo
+        ]) || normalizeOfficialMunicipioRegionalLabel(polo.localidade || polo.cidade || '')
+            || normalizeMunicipioRegionalLabel(polo.localidade || polo.cidade || polo.nome_polo || '');
     }
 
     function getGroupedPolos() {
@@ -19471,6 +19515,40 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
     $scope.groupedPolos = function () {
         return getGroupedPolos();
+    };
+
+    $scope.getPolosForComum = function (comumNome) {
+        if (!comumNome) return $scope.polos;
+        var cidade = normalizeComumCatalogLookup(resolveComumMunicipio(comumNome));
+
+        if (!cidade) return [];
+
+        return ($scope.polos || []).filter(function (polo) {
+            return normalizeComumCatalogLookup(resolvePoloMunicipio(polo)) === cidade;
+        }).sort(function (a, b) {
+            return String(a.nome_polo || '').localeCompare(String(b.nome_polo || ''), 'pt-BR');
+        });
+    };
+
+    $scope.syncPoloForComum = function (modelName) {
+        var model = modelName ? $scope[modelName] : null;
+        var polosDisponiveis;
+
+        if (!model) return;
+
+        if (model.comum_congregacao) {
+            model.cidade = resolveComumMunicipio(model.comum_congregacao) || model.cidade || '';
+            model.localidade = model.localidade || model.cidade || '';
+        }
+
+        if (!model.polo_participacao) return;
+
+        polosDisponiveis = $scope.getPolosForComum(model.comum_congregacao);
+        if (!polosDisponiveis.some(function (polo) {
+            return polo.nome_polo === model.polo_participacao;
+        })) {
+            model.polo_participacao = '';
+        }
     };
 
     function updateDeletePermission() {
@@ -19725,7 +19803,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
         AuthService.searchComunsCatalog(query, 12).then(function (results) {
             var names = (results || []).map(function (item) {
-                return item && item.nome ? item.nome : '';
+                return item && item.nome ? repairCadastroMusicText(item.nome) : '';
             }).filter(function (item) {
                 return !!item;
             });
@@ -19940,7 +20018,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
     function repairMusicalizacaoPdfText(value) {
         return repairCadastroMusicText(value || '')
-            .replace(/CONGREGA[^A-Z0-9 ]*O CRIST[^A-Z0-9 ]* NO BRASIL/gi, 'CONGREGAÇÃO CRISTàNO BRASIL')
+            .replace(/CONGREGA[^A-Z0-9 ]*O CRIST[^A-Z0-9 ]* NO BRASIL/gi, 'CONGREGAÇÃO CRISTÃ NO BRASIL')
             .replace(/MUSICALIZA[^A-Z0-9 ]*O INFANTIL/gi, 'MUSICALIZAÇÃO INFANTIL')
             .replace(/Relat[^A-Z0-9 ]*rio de Crian[^A-Z0-9 ]*as \/ Alunos/gi, 'Relatorio de Criancas')
             .replace(/Emiss[^A-Z0-9 ]*o/gi, 'Emissão')
@@ -19951,7 +20029,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     $scope.exportToExcel = function () {
         var grupos = getGroupedAlunos();
         var rows = [
-            ['CONGREGAÇÃO CRISTàNO BRASIL'],
+            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
             ['Regional Itapevi - São Paulo'],
             ['MUSICALIZAÇÃO INFANTIL'],
             ['Relatorio de Criancas'],
@@ -20007,7 +20085,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     $scope.exportToPDF = function () {
         var grupos = getGroupedAlunos();
         var content = [
-            { text: 'CONGREGAÇÃO CRISTàNO BRASIL', style: 'entityName' },
+            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
             { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
             { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
             { text: 'Relatorio de Criancas', style: 'reportTitle' },
@@ -20188,10 +20266,8 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
         }, function () {
             $scope.$applyAsync(function () {
                 MusicalizacaoService.deleteAluno(aluno.id).then(function () {
-                    $scope.alunos = ($scope.alunos || []).filter(function (item) {
-                        return item && item.id !== aluno.id;
-                    });
                     showMusicalizacaoSuccess("Excluido", "A crianca foi removida com sucesso.");
+                    $scope.getAlunos();
                 }).catch(function (error) {
                     showMusicalizacaoError('excluir a crianca', error);
                 });
@@ -20269,6 +20345,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
             cityField: 'cidade',
             localidadeField: 'localidade'
         });
+        $scope.syncPoloForComum(modelName);
         $scope.closeComumPicker();
     };
 
@@ -20316,7 +20393,13 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
         results: []
     };
 
-    var fallbackComunsData = ((((window.CadastroMusicData || {}).comuns) || []).map(repairCadastroMusicText)).slice().sort(function (a, b) {
+    var cadastroMusicDataSource = window.CadastroMusicData || {};
+    var fallbackComunsSource = (cadastroMusicDataSource.comunsCatalog || []).length
+        ? (cadastroMusicDataSource.comunsCatalog || []).map(function (item) {
+            return item && item.nome;
+        })
+        : (cadastroMusicDataSource.comuns || []);
+    var fallbackComunsData = fallbackComunsSource.map(repairCadastroMusicText).slice().sort(function (a, b) {
         return String(a || '').localeCompare(String(b || ''), 'pt-BR');
     });
     var comunsData = fallbackComunsData.slice();
@@ -20339,7 +20422,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     }
 
     function getPoloMunicipioLabel(polo) {
-        return polo.localidade || 'Sem municÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­pio';
+        return polo.localidade || 'Sem município';
     }
 
     function getGroupedPolos() {
@@ -20370,16 +20453,16 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     $scope.exportToExcel = function () {
         var grupos = getGroupedPolos();
         var rows = [
-            ['CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL'],
-            ['Regional Itapevi - SÃÆ’£o Paulo'],
-            ['MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL'],
-            ['RelatÃÆ’³rio de Polos / Regionais'],
-            ['EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR')],
+            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
+            ['Regional Itapevi - São Paulo'],
+            ['MUSICALIZAÇÃO INFANTIL'],
+            ['Relatório de Polos / Regionais'],
+            ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
             []
         ];
 
         grupos.forEach(function (grupo) {
-            rows.push(['MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio]);
+            rows.push(['MUNICÍPIO: ' + grupo.municipio]);
             rows.push(['Nome do Polo', 'Localidade', 'Encarregado Local']);
 
             grupo.polos.forEach(function (polo) {
@@ -20412,11 +20495,11 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     $scope.exportToPDF = function () {
         var grupos = getGroupedPolos();
         var content = [
-            { text: 'CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - SÃÆ’£o Paulo', style: 'entitySub' },
-            { text: 'MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL', style: 'moduleName' },
-            { text: 'RelatÃÆ’³rio de Polos / Regionais', style: 'reportTitle' },
-            { text: 'EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
+            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
+            { text: 'Relatório de Polos / Regionais', style: 'reportTitle' },
+            { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
         grupos.forEach(function (grupo) {
@@ -20434,7 +20517,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
                 ]);
             });
 
-            content.push({ text: 'MUNICÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€šPIO: ' + grupo.municipio, style: 'groupTitle' });
+            content.push({ text: 'MUNICÍPIO: ' + grupo.municipio, style: 'groupTitle' });
             content.push({
                 table: {
                     headerRows: 1,
@@ -20699,6 +20782,61 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
         return municipioEncontrado || '';
     }
 
+    function resolveInstrutorComumMunicipio(comumNome) {
+        var repaired = repairCadastroMusicText(comumNome || '');
+
+        if (!repaired) return '';
+
+        return resolveMunicipioFromCatalog($scope.comumCatalogState, [repaired])
+            || normalizeOfficialMunicipioRegionalLabel(repaired)
+            || normalizeMunicipioRegionalLabel(repaired);
+    }
+
+    function resolveInstrutorPoloMunicipio(polo) {
+        if (!polo) return '';
+
+        return resolveMunicipioFromCatalog($scope.comumCatalogState, [
+            polo.localidade,
+            polo.cidade,
+            polo.nome_polo
+        ]) || normalizeOfficialMunicipioRegionalLabel(polo.localidade || polo.cidade || '')
+            || normalizeMunicipioRegionalLabel(polo.localidade || polo.cidade || polo.nome_polo || '');
+    }
+
+    $scope.getPolosForComumInstrutor = function (comumNome) {
+        if (!comumNome) return $scope.polos;
+
+        var municipio = normalizeComumCatalogLookup(resolveInstrutorComumMunicipio(comumNome));
+
+        if (!municipio) return [];
+
+        return ($scope.polos || []).filter(function (polo) {
+            return normalizeComumCatalogLookup(resolveInstrutorPoloMunicipio(polo)) === municipio;
+        }).sort(function (a, b) {
+            return String(a.nome_polo || '').localeCompare(String(b.nome_polo || ''), 'pt-BR');
+        });
+    };
+
+    $scope.syncPoloForComumInstrutor = function (modelName) {
+        var model = modelName ? $scope[modelName] : null;
+        var polosDisponiveis;
+
+        if (!model) return;
+
+        if (model.comum_congregacao) {
+            model.localidade = resolveInstrutorComumMunicipio(model.comum_congregacao) || model.localidade || '';
+        }
+
+        if (!model.polo_auxilio) return;
+
+        polosDisponiveis = $scope.getPolosForComumInstrutor(model.comum_congregacao);
+        if (!polosDisponiveis.some(function (polo) {
+            return polo.nome_polo === model.polo_auxilio;
+        })) {
+            model.polo_auxilio = '';
+        }
+    };
+
     function getInstrutorMunicipioLabel(instrutor) {
         var localidadeDireta = instrutor.localidade || '';
         if (localidadeDireta) return localidadeDireta;
@@ -20721,7 +20859,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
         ]) ||
             inferMunicipioFromText(instrutor.polo_auxilio) ||
             inferMunicipioFromText(instrutor.comum_congregacao) ||
-            'Sem municÃÆ’­pio';
+            'Sem município';
     }
 
     function getGroupedInstrutoresByMunicipio() {
@@ -20818,19 +20956,19 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
     $scope.exportToPDF = function () {
         var grupos = getGroupedInstrutoresByMunicipio();
         var content = [
-            { text: 'CONGREGAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O CRISTÃÆ’Ã†’ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - SÃÆ’£o Paulo', style: 'entitySub' },
-            { text: 'MUSICALIZAÃÆ’ââ‚¬Â¡ÃÆ’Ã†’O INFANTIL', style: 'moduleName' },
-            { text: 'RelatÃÆ’³rio de Instrutores e Colaboradores', style: 'reportTitle' },
-            { text: 'EmissÃÆ’£o: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
+            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
+            { text: 'Relatório de Instrutores e Colaboradores', style: 'reportTitle' },
+            { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
         ];
 
         grupos.forEach(function (grupo) {
             var body = [[
                 { text: 'Nome Completo', style: 'tableHeader' },
-                { text: 'FunÃÆ’§ÃÆ’£o', style: 'tableHeader' },
+                { text: 'Função', style: 'tableHeader' },
                 { text: 'Telefone/Contato', style: 'tableHeader' },
-                { text: 'Polo de AtuaÃÆ’§ÃÆ’£o', style: 'tableHeader' },
+                { text: 'Polo de Atuação', style: 'tableHeader' },
                 { text: 'Status', style: 'tableHeader' }
             ]];
 
@@ -20844,7 +20982,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
                 ]);
             });
 
-            content.push({ text: 'MUNICÃÆ’PIO: ' + grupo.municipio, style: 'groupTitle' });
+            content.push({ text: 'MUNICÍPIO: ' + grupo.municipio, style: 'groupTitle' });
             content.push({
                 table: {
                     headerRows: 1,
@@ -20958,7 +21096,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
             if (results && results.length) {
                 mergeRemoteComunsIntoCatalog(results);
                 names = results.map(function (item) {
-                    return item && item.nome ? item.nome : '';
+                    return item && item.nome ? repairCadastroMusicText(item.nome) : '';
                 }).filter(function (item) {
                     return !!item;
                 });
@@ -21022,6 +21160,9 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
         applyMappedComumSelection($scope[modelName], targetField, value, $scope.comumCatalogState, {
             localidadeField: 'localidade'
         });
+        if (targetField === 'comum_congregacao') {
+            $scope.syncPoloForComumInstrutor(modelName);
+        }
         $scope.closeComumPicker();
     };
 
@@ -21262,7 +21403,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
 
     $scope.prepareEdit = function (aula) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem reabrir aulas.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem reabrir atividades.');
             return;
         }
         $state.go('musicalizacao.presenca', { id: aula.id });
@@ -21270,12 +21411,12 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
 
     $scope.confirmDelete = function (aula) {
         if (!$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem excluir aulas.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem excluir atividades.');
             return;
         }
         showMusicalizacaoConfirm({
             title: "Tem certeza?",
-            text: "Deseja realmente excluir este registro de aula?",
+            text: "Deseja realmente excluir este registro de atividade?",
             confirmButtonText: "Sim, excluir",
             cancelButtonText: "Cancelar"
         }, function () {
@@ -21284,7 +21425,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
                     showMusicalizacaoSuccess("Excluido", "Registro removido com sucesso.");
                     $scope.getAulas();
                 }).catch(function (error) {
-                    showMusicalizacaoError('excluir a aula', error);
+                    showMusicalizacaoError('excluir a atividade', error);
                 });
             });
         });
@@ -21331,7 +21472,7 @@ function musicalizacaoNovaAulaCtrl($scope, MusicalizacaoService, $state, $stateP
 
     $scope.init = function () {
         if ($scope.isEdit && !$scope.canManageCadastros) {
-            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem editar aulas.');
+            showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem editar atividades.');
             $state.go('musicalizacao.aulas');
             return;
         }
@@ -21348,7 +21489,7 @@ function musicalizacaoNovaAulaCtrl($scope, MusicalizacaoService, $state, $stateP
                         $scope.aula.data_aula = new Date(aulaData.data_aula + 'T12:00:00');
                     }
                 }).catch(function (error) {
-                    showMusicalizacaoError('carregar os dados da aula', error);
+                    showMusicalizacaoError('carregar os dados da atividade', error);
                 });
             }
         });
@@ -21363,25 +21504,25 @@ function musicalizacaoNovaAulaCtrl($scope, MusicalizacaoService, $state, $stateP
 
         if ($scope.isEdit) {
             if (!$scope.canManageCadastros) {
-                showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem salvar alterações de aulas.');
+                showScopedManagementRestriction('Somente coordenadores da Musicalização, admin ou master podem salvar alterações de atividades.');
                 return;
             }
             MusicalizacaoService.updateAula(aulaToSave).then(function () {
-                showMusicalizacaoSuccess("Sucesso", "Registro de aula atualizado com sucesso!");
+                showMusicalizacaoSuccess("Sucesso", "Registro de atividade atualizado com sucesso!");
                 $timeout(function () {
                     $state.go('musicalizacao.aulas');
                 }, 2000);
             }).catch(function (error) {
-                showMusicalizacaoError('atualizar o registro da aula', error);
+                showMusicalizacaoError('atualizar o registro da atividade', error);
             });
         } else {
             MusicalizacaoService.saveAula(aulaToSave).then(function () {
-                showMusicalizacaoSuccess("Sucesso", "Registro de aula enviado com sucesso!");
+                showMusicalizacaoSuccess("Sucesso", "Registro de atividade enviado com sucesso!");
                 $timeout(function () {
                     $state.go('musicalizacao.aulas');
                 }, 2000);
             }).catch(function (error) {
-                showMusicalizacaoError('salvar o registro da aula', error);
+                showMusicalizacaoError('salvar o registro da atividade', error);
             });
         }
     };

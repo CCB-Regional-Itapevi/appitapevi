@@ -224,7 +224,7 @@
                             <label>Comum Congregação *</label>
                             <input type="text"
                                    ng-model="newInstrutor.comum_congregacao"
-                                   ng-change="forceUppercase('newInstrutor', 'comum_congregacao'); filterComuns()"
+                                   ng-change="forceUppercase('newInstrutor', 'comum_congregacao'); filterComuns(); syncPoloForComumInstrutor('newInstrutor')"
                                    ng-click="openComumPicker('newInstrutor', 'comum_congregacao')"
                                    ng-focus="openComumPicker('newInstrutor', 'comum_congregacao')"
                                    ng-blur="scheduleCloseComumPicker()"
@@ -269,7 +269,7 @@
                             <label>Polo de Auxílio *</label>
                             <select class="form-control" ng-model="newInstrutor.polo_auxilio" required>
                                 <option value="">Selecione</option>
-                                <option ng-repeat="polo in polos" value="{{polo.nome_polo}}">{{polo.nome_polo}}</option>
+                                <option ng-repeat="polo in getPolosForComumInstrutor(newInstrutor.comum_congregacao)" value="{{polo.nome_polo}}">{{polo.nome_polo}}</option>
                             </select>
                         </div>
                         <div class="col-lg-12">
@@ -416,7 +416,7 @@
                             <label>Comum Congregação *</label>
                             <input type="text"
                                    ng-model="editingInstrutor.comum_congregacao"
-                                   ng-change="forceUppercase('editingInstrutor', 'comum_congregacao'); filterComuns()"
+                                   ng-change="forceUppercase('editingInstrutor', 'comum_congregacao'); filterComuns(); syncPoloForComumInstrutor('editingInstrutor')"
                                    ng-click="!viewOnly && openComumPicker('editingInstrutor', 'comum_congregacao')"
                                    ng-focus="!viewOnly && openComumPicker('editingInstrutor', 'comum_congregacao')"
                                    ng-blur="scheduleCloseComumPicker()"
@@ -469,7 +469,7 @@
                             <label>Polo de Auxílio *</label>
                             <select class="form-control" ng-model="editingInstrutor.polo_auxilio" ng-disabled="viewOnly" required>
                                 <option value="">Selecione</option>
-                                <option ng-repeat="polo in polos" value="{{polo.nome_polo}}">{{polo.nome_polo}}</option>
+                                <option ng-repeat="polo in getPolosForComumInstrutor(editingInstrutor.comum_congregacao)" value="{{polo.nome_polo}}">{{polo.nome_polo}}</option>
                             </select>
                         </div>
                         <div class="col-lg-12">

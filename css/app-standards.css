@@ -27,6 +27,11 @@
     white-space: nowrap;
 }
 
+.sweet-alert button i,
+.sweet-alert button .fa {
+    pointer-events: none !important;
+}
+
 .sweet-alert.swal-auto-close {
     padding-bottom: 30px;
 }
@@ -157,3 +162,50 @@
     min-height: 100vh !important;
     overflow-y: visible !important;
 }
+
+/* Sector Custom Badges */
+.label.label-sector-visitas {
+    background-color: #2f80ed !important;
+    color: #ffffff !important;
+}
+.label.label-sector-global {
+    background-color: #7b1fa2 !important;
+    color: #ffffff !important;
+}
+.label.label-sector-ebi {
+    background-color: #27ae60 !important;
+    color: #ffffff !important;
+}
+.label.label-sector-musicalizacao {
+    background-color: #f2994a !important;
+    color: #ffffff !important;
+}
+.label.label-sector-musica {
+    background-color: #eb5757 !important;
+    color: #ffffff !important;
+}
+.label.label-sector-rjm {
+    background-color: #2d9cdb !important;
+    color: #ffffff !important;
+}
+.label.label-sector-darpe {
+    background-color: #9b59b6 !important;
+    color: #ffffff !important;
+}
+.label.label-sector-depac {
+    background-color: #8d6e63 !important;
+    color: #ffffff !important;
+}
+.label.label-sector-gem {
+    background-color: #f2c94c !important;
+    color: #333333 !important;
+}
+.label.label-sector-inscricao {
+    background-color: #9b51e0 !important;
+    color: #ffffff !important;
+}
+.label.label-sector-administrativo {
+    background-color: #4f5d75 !important;
+    color: #ffffff !important;
+}
+
