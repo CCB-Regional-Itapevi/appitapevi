@@ -1,4 +1,4 @@
-﻿<div class="row wrapper border-bottom white-bg page-heading">
+<div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
         <h2>Instrutores e Colaboradores</h2>
         <ol class="breadcrumb">
@@ -254,7 +254,7 @@
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Data do Batismo</label>
-                            <input type="text" ng-model="newInstrutor.data_batismo" class="form-control" placeholder="dd/mm/aaaa">
+                            <input type="text" ng-model="newInstrutor.data_batismo" ng-change="formatDateField('newInstrutor', 'data_batismo')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric">
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Celular *</label>
@@ -290,7 +290,7 @@
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Data da Oficialização</label>
-                            <input type="text" ng-model="newInstrutor.data_oficializacao" class="form-control" placeholder="dd/mm/aaaa">
+                            <input type="text" ng-model="newInstrutor.data_oficializacao" ng-change="formatDateField('newInstrutor', 'data_oficializacao')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric">
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>É Instrutor(a) Atualmente?</label>
@@ -335,7 +335,7 @@
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Data da Formação</label>
-                            <input type="text" ng-model="newInstrutor.formacao_data" class="form-control" placeholder="dd/mm/aaaa">
+                            <input type="text" ng-model="newInstrutor.formacao_data" ng-change="formatDateField('newInstrutor', 'formacao_data')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric">
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>É Pedagogo(a)?</label>
@@ -345,7 +345,7 @@
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Se Sim, Desde Quando?</label>
-                            <input type="text" ng-model="newInstrutor.pedagogo_desde" class="form-control" placeholder="dd/mm/aaaa">
+                            <input type="text" ng-model="newInstrutor.pedagogo_desde" ng-change="formatDateField('newInstrutor', 'pedagogo_desde')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric">
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Atua na Área?</label>
@@ -448,7 +448,7 @@
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Data do Batismo</label>
-                            <input type="text" ng-model="editingInstrutor.data_batismo" class="form-control" placeholder="dd/mm/aaaa" ng-disabled="viewOnly">
+                            <input type="text" ng-model="editingInstrutor.data_batismo" ng-change="formatDateField('editingInstrutor', 'data_batismo')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" ng-disabled="viewOnly">
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Celular *</label>
@@ -490,7 +490,7 @@
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Data da Oficialização</label>
-                            <input type="text" ng-model="editingInstrutor.data_oficializacao" class="form-control" placeholder="dd/mm/aaaa" ng-disabled="viewOnly">
+                            <input type="text" ng-model="editingInstrutor.data_oficializacao" ng-change="formatDateField('editingInstrutor', 'data_oficializacao')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" ng-disabled="viewOnly">
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>É Instrutor(a) Atualmente?</label>
@@ -536,7 +536,7 @@
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Data da Formação</label>
-                            <input type="text" ng-model="editingInstrutor.formacao_data" class="form-control" placeholder="dd/mm/aaaa" ng-disabled="viewOnly">
+                            <input type="text" ng-model="editingInstrutor.formacao_data" ng-change="formatDateField('editingInstrutor', 'formacao_data')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" ng-disabled="viewOnly">
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>É Pedagogo(a)?</label>
@@ -546,7 +546,7 @@
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Se Sim, Desde Quando?</label>
-                            <input type="text" ng-model="editingInstrutor.pedagogo_desde" class="form-control" placeholder="dd/mm/aaaa" ng-disabled="viewOnly">
+                            <input type="text" ng-model="editingInstrutor.pedagogo_desde" ng-change="formatDateField('editingInstrutor', 'pedagogo_desde')" class="form-control" placeholder="dd/mm/aaaa" maxlength="10" inputmode="numeric" ng-disabled="viewOnly">
                         </div>
                         <div class="col-sm-4 form-group">
                             <label>Atua na Área?</label>

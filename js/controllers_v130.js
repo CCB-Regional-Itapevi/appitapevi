@@ -20924,6 +20924,20 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
         return parts.join('/');
     }
 
+    function isValidFullDate(dateString) {
+        if (!dateString) return false;
+        var parts = dateString.split('/');
+        if (parts.length !== 3) return false;
+        var day = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10);
+        var year = parseInt(parts[2], 10);
+        if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
+        if (year < 1900 || year > 2100 || month < 1 || month > 12) return false;
+        var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) monthLength[1] = 29;
+        return day > 0 && day <= monthLength[month - 1];
+    }
+
     function showInstrutorModal(modalId, focusSelector) {
         $timeout(function () {
             var $modal = $(modalId);
@@ -21203,7 +21217,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
 
     $scope.saveNewInstrutor = function () {
         if (!isValidFullDate(($scope.newInstrutor || {}).data_nascimento)) {
-            swal("Data invÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¡lida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
+            swal("Data inválida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
             return;
         }
         $scope.newInstrutor.localidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
@@ -21267,7 +21281,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
             return;
         }
         if (!isValidFullDate(($scope.editingInstrutor || {}).data_nascimento)) {
-            swal("Data invÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š¡lida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
+            swal("Data inválida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
             return;
         }
         $scope.editingInstrutor.localidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
