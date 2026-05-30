@@ -8566,3 +8566,10 @@ body.md-skin {
 }
 
 .label-pink { background-color: #f06292 !important; color: #ffffff !important; }
+
+/* Fix Modal z-index under sidebar */
+.modal { z-index: 2050 !important; }
+.modal-backdrop { z-index: 2040 !important; }
+
+body.modal-open .navbar-static-side { z-index: 10 !important; }
+body.modal-open .navbar-fixed-top { z-index: 10 !important; }

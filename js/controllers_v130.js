@@ -3671,14 +3671,14 @@ function sweetAlertCtrl($scope, SweetAlert) {
 
 
     $scope.demo1 = function () {
-        SweetAlert.swal({
+        swal({
             title: "Welcome in Alerts",
             text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
         });
     }
 
     $scope.demo2 = function () {
-        SweetAlert.swal({
+        swal({
             title: "Good job!",
             text: "You clicked the button!",
             type: "success"
@@ -3686,7 +3686,7 @@ function sweetAlertCtrl($scope, SweetAlert) {
     }
 
     $scope.demo3 = function () {
-        SweetAlert.swal({
+        swal({
             title: "Are you sure?",
             text: "Your will not be able to recover this imaginary file!",
             type: "warning",
@@ -3697,12 +3697,12 @@ function sweetAlertCtrl($scope, SweetAlert) {
             closeOnCancel: false
         },
             function () {
-                SweetAlert.swal("Ok!");
+                swal("Ok!");
             });
     }
 
     $scope.demo4 = function () {
-        SweetAlert.swal({
+        swal({
             title: "Are you sure?",
             text: "Your will not be able to recover this imaginary file!",
             type: "warning",
@@ -3715,9 +3715,9 @@ function sweetAlertCtrl($scope, SweetAlert) {
         },
             function (isConfirm) {
                 if (isConfirm) {
-                    SweetAlert.swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                    swal("Deleted!", "Your imaginary file has been deleted.", "success");
                 } else {
-                    SweetAlert.swal("Cancelled", "Your imaginary file is safe :)", "error");
+                    swal("Cancelled", "Your imaginary file is safe :)", "error");
                 }
             });
     }
@@ -4794,7 +4794,7 @@ function registerCtrl($scope, AuthService, ValidationService, $state, $timeout, 
 
         // Valida formul\u00e1rio
         if (!$scope.validateForm()) {
-            SweetAlert.swal({
+            swal({
                 title: "Erro no Formul\u00e1rio",
                 text: "Por favor, preencha todos os campos corretamente.",
                 type: "warning",
@@ -4819,7 +4819,7 @@ function registerCtrl($scope, AuthService, ValidationService, $state, $timeout, 
             .then(function (response) {
                 $scope.loading = false;
 
-                SweetAlert.swal({
+                swal({
                     title: "Conta Criada!",
                     text: "Seu registro foi realizado com sucesso. Redirecionando para o login...",
                     type: "success",
@@ -4836,7 +4836,7 @@ function registerCtrl($scope, AuthService, ValidationService, $state, $timeout, 
                 $scope.loading = false;
                 var errorMessage = error.message || 'Erro ao realizar registro. Tente novamente.';
 
-                SweetAlert.swal({
+                swal({
                     title: "Erro no Registro",
                     text: errorMessage,
                     type: "error",
@@ -4901,9 +4901,9 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
 
     // Funcao auxiliar para notificacoes
     var notify = function (type, title, message) {
-        if (SweetAlert && SweetAlert.swal) {
+        if (SweetAlert && swal) {
             var swalType = type === 'error' ? 'error' : (type === 'success' ? 'success' : 'warning');
-            SweetAlert.swal({
+            swal({
                 title: title,
                 text: message,
                 type: swalType,
@@ -5001,7 +5001,7 @@ function loginCtrl($scope, AuthService, ValidationService, $state, $injector, Sw
 
                 var errorMessage = errorMap[error.message] || error.message || 'Erro ao realizar login';
 
-                SweetAlert.swal({
+                swal({
                     title: "Erro no Login",
                     text: errorMessage,
                     type: "error",
@@ -5744,14 +5744,14 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
         var targetName = getBaselineTargetName();
 
         if (!targetKey) {
-            SweetAlert.swal('Auditoria', 'Nao foi possivel identificar o usuario para iniciar um novo marco de leitura.', 'warning');
+            swal('Auditoria', 'Nao foi possivel identificar o usuario para iniciar um novo marco de leitura.', 'warning');
             return;
         }
 
         $scope.auditBaselines[targetKey] = new Date().toISOString();
         saveAuditBaselines();
         applyFilters();
-        SweetAlert.swal('Marco atualizado', 'A auditoria agora vai considerar apenas os eventos novos de ' + targetName + '.', 'success');
+        swal('Marco atualizado', 'A auditoria agora vai considerar apenas os eventos novos de ' + targetName + '.', 'success');
     };
 
     $scope.clearAuditBaseline = function () {
@@ -5765,7 +5765,7 @@ function auditLogsAdminCtrl($scope, $rootScope, $state, AuthService, SweetAlert,
         delete $scope.auditBaselines[targetKey];
         saveAuditBaselines();
         applyFilters();
-        SweetAlert.swal('Histórico restaurado', 'A auditoria voltou a exibir todo o histórico de ' + targetName + '.', 'success');
+        swal('Histórico restaurado', 'A auditoria voltou a exibir todo o histórico de ' + targetName + '.', 'success');
     };
 
     $scope.getActiveBaselineLabel = function () {
@@ -6611,10 +6611,10 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             comum: user.review.comum,
             status: 'approved'
         }).then(function () {
-            SweetAlert.swal('Sucesso', 'Usuário liberado com sucesso.', 'success');
+            swal('Sucesso', 'Usuário liberado com sucesso.', 'success');
             removePendingUser(user);
         }).catch(function (error) {
-            SweetAlert.swal('Erro', 'Não foi possível liberar o usuário: ' + (error.message || error), 'error');
+            swal('Erro', 'Não foi possível liberar o usuário: ' + (error.message || error), 'error');
         }).finally(function () {
             user.processing = false;
         });
@@ -6625,7 +6625,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             return;
         }
 
-        SweetAlert.swal({
+        swal({
             title: 'Recusar cadastro?',
             text: 'O usuário permanecerá sem acesso até nova análise.',
             type: 'warning',
@@ -6647,10 +6647,10 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                     comum: user.review.comum,
                     status: 'rejected'
                 }).then(function () {
-                    SweetAlert.swal('Cadastro recusado', 'O usuário foi marcado como recusado.', 'success');
+                    swal('Cadastro recusado', 'O usuário foi marcado como recusado.', 'success');
                     removePendingUser(user);
                 }).catch(function (error) {
-                    SweetAlert.swal('Erro', 'Não foi possível recusar o usuário: ' + (error.message || error), 'error');
+                    swal('Erro', 'Não foi possível recusar o usuário: ' + (error.message || error), 'error');
                 }).finally(function () {
                     user.processing = false;
                 });
@@ -6676,12 +6676,12 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         var wb;
 
         if (!window.XLSX || !window.XLSX.utils) {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
             return;
         }
 
         if (!data.length) {
-            SweetAlert.swal('Excel', 'Nenhum cadastro pendente foi encontrado para exportação com os filtros atuais.', 'warning');
+            swal('Excel', 'Nenhum cadastro pendente foi encontrado para exportação com os filtros atuais.', 'warning');
             return;
         }
 
@@ -6720,12 +6720,12 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         ]];
 
         if (!window.pdfMake || typeof window.pdfMake.createPdf !== 'function') {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
             return;
         }
 
         if (!data.length) {
-            SweetAlert.swal('PDF', 'Nenhum cadastro pendente foi encontrado para exportação com os filtros atuais.', 'warning');
+            swal('PDF', 'Nenhum cadastro pendente foi encontrado para exportação com os filtros atuais.', 'warning');
             return;
         }
 
@@ -6878,7 +6878,7 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             return;
         }
 
-        SweetAlert.swal('Acesso restrito', message, 'warning');
+        swal('Acesso restrito', message, 'warning');
     }
 
     function normalizeSearchValue(value) {
@@ -7180,12 +7180,12 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         var wb;
 
         if (!window.XLSX || !window.XLSX.utils) {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
             return;
         }
 
         if (!data.length) {
-            SweetAlert.swal('Excel', 'Nenhum usuário foi encontrado para exportação com os filtros atuais.', 'warning');
+            swal('Excel', 'Nenhum usuário foi encontrado para exportação com os filtros atuais.', 'warning');
             return;
         }
 
@@ -7214,12 +7214,12 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         var body;
 
         if (!window.pdfMake || typeof window.pdfMake.createPdf !== 'function') {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
             return;
         }
 
         if (!rows.length) {
-            SweetAlert.swal('PDF', 'Nenhum usuário foi encontrado para exportação com os filtros atuais.', 'warning');
+            swal('PDF', 'Nenhum usuário foi encontrado para exportação com os filtros atuais.', 'warning');
             return;
         }
 
@@ -7433,9 +7433,9 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
             refreshCommonOptions();
             refreshFilteredUsers();
             angular.element('#modalUserManagement').modal('hide');
-            SweetAlert.swal('Sucesso', 'Usuário atualizado com sucesso.', 'success');
+            swal('Sucesso', 'Usuário atualizado com sucesso.', 'success');
         }).catch(function (error) {
-            SweetAlert.swal('Erro', 'Não foi possível atualizar o usuário: ' + (error.message || error), 'error');
+            swal('Erro', 'Não foi possível atualizar o usuário: ' + (error.message || error), 'error');
         }).finally(function () {
             $scope.savingUser = false;
         });
@@ -7448,11 +7448,11 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
         }
 
         if ($rootScope.currentUser && user.user_id === $rootScope.currentUser.user_id) {
-            SweetAlert.swal('Ação bloqueada', 'Não é permitido excluir o próprio cadastro em uso.', 'warning');
+            swal('Ação bloqueada', 'Não é permitido excluir o próprio cadastro em uso.', 'warning');
             return;
         }
 
-        SweetAlert.swal({
+        swal({
             title: 'Excluir usuário?',
             text: 'Excluir o cadastro de ' + (user.full_name || user.username || 'usuário') + '? Esta ação remove o perfil do sistema. Somente Master pode executar esta operação.',
             type: 'warning',
@@ -7473,9 +7473,9 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
                     recalculateCounts();
                     refreshCommonOptions();
                     refreshFilteredUsers();
-                    SweetAlert.swal('Excluído', 'O perfil do usuário foi removido.', 'success');
+                    swal('Excluído', 'O perfil do usuário foi removido.', 'success');
                 }).catch(function (error) {
-                    SweetAlert.swal('Erro', 'Não foi possível excluir o usuário: ' + (error.message || error), 'error');
+                    swal('Erro', 'Não foi possível excluir o usuário: ' + (error.message || error), 'error');
                 });
             });
         });
@@ -7548,7 +7548,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             return;
         }
 
-        SweetAlert.swal('Acesso restrito', message, 'warning');
+        swal('Acesso restrito', message, 'warning');
     }
 
     function mapRegistroToForm(record) {
@@ -7889,7 +7889,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
         var wb;
 
         if (!window.XLSX || !window.XLSX.utils) {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
             return;
         }
 
@@ -7939,7 +7939,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
         });
 
         if (!window.pdfMake || typeof window.pdfMake.createPdf !== 'function') {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
             return;
         }
 
@@ -8041,7 +8041,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
                     recalculateCongregacaoStats();
                     refreshFilteredRegistros();
                     angular.element('#modalCongregacao').modal('hide');
-                    SweetAlert.swal('Sucesso', 'Congregação atualizada com sucesso.', 'success');
+                    swal('Sucesso', 'Congregação atualizada com sucesso.', 'success');
                 });
             });
         }).then(function (records) {
@@ -8050,9 +8050,9 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             updateReferenceFilters();
             refreshFilteredRegistros();
             angular.element('#modalMinisterioRegional').modal('hide');
-            SweetAlert.swal('Sucesso', 'Registro do ministério salvo com sucesso.', 'success');
+            swal('Sucesso', 'Registro do ministério salvo com sucesso.', 'success');
         }).catch(function (error) {
-            SweetAlert.swal('Erro', 'Não foi possível salvar o registro do ministério: ' + (error.message || error), 'error');
+            swal('Erro', 'Não foi possível salvar o registro do ministério: ' + (error.message || error), 'error');
         }).finally(function () {
             $scope.savingRegistro = false;
         });
@@ -8064,7 +8064,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             return;
         }
 
-        SweetAlert.swal({
+        swal({
             title: 'Excluir registro?',
             text: 'Excluir o cadastro de ' + (record.nome || record.comum || 'registro do minist\u00e9rio') + '? Esta a\u00e7\u00e3o remove o registro do minist\u00e9rio regional selecionado.',
             type: 'warning',
@@ -8085,9 +8085,9 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
                     recalculateMinisterioStats();
                     updateReferenceFilters();
                     refreshFilteredRegistros();
-                    SweetAlert.swal('Excluído', 'O registro do ministério foi removido.', 'success');
+                    swal('Excluído', 'O registro do ministério foi removido.', 'success');
                 }).catch(function (error) {
-                    SweetAlert.swal('Erro', 'Não foi possível excluir o registro do ministério: ' + (error.message || error), 'error');
+                    swal('Erro', 'Não foi possível excluir o registro do ministério: ' + (error.message || error), 'error');
                 });
             });
         });
@@ -8282,7 +8282,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             return;
         }
 
-        SweetAlert.swal('Acesso restrito', message, 'warning');
+        swal('Acesso restrito', message, 'warning');
     }
 
     function buildCongregacoesFromSources(comunsCatalog, ministerioRecords) {
@@ -8637,7 +8637,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         var wb;
 
         if (!window.XLSX || !window.XLSX.utils) {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação Excel não está disponível.', 'error');
             return;
         }
 
@@ -8684,7 +8684,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         });
 
         if (!window.pdfMake || typeof window.pdfMake.createPdf !== 'function') {
-            SweetAlert.swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
+            swal('Erro', 'A biblioteca de exportação PDF não está disponível.', 'error');
             return;
         }
 
@@ -8780,7 +8780,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                 recalculateCongregacaoStats();
                 refreshFilteredRegistros();
                 angular.element('#modalCongregacao').modal('hide');
-                SweetAlert.swal('Sucesso', 'Congregação atualizada com sucesso.', 'success');
+                swal('Sucesso', 'Congregação atualizada com sucesso.', 'success');
 
                 return AuthService.listMinisterioRegional(true).then(function (records) {
                     $scope.registros = buildCongregacoesFromSources(comunsCatalog || [], records || []);
@@ -8792,7 +8792,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                 });
             });
         }).catch(function (error) {
-            SweetAlert.swal('Erro', 'N\u00e3o foi poss\u00edvel atualizar a congrega\u00e7\u00e3o: ' + (error.message || error), 'error');
+            swal('Erro', 'N\u00e3o foi poss\u00edvel atualizar a congrega\u00e7\u00e3o: ' + (error.message || error), 'error');
         }).finally(function () {
             $scope.savingCongregacao = false;
         });
@@ -8804,7 +8804,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             return;
         }
 
-        SweetAlert.swal({
+        swal({
             title: 'Excluir congrega\u00e7\u00e3o?',
             text: 'Excluir o cadastro de ' + (record.nome || 'congrega\u00e7\u00e3o') + '? Esta a\u00e7\u00e3o excluir\u00e1 todos os registros do minist\u00e9rio vinculados \u00e0 comum selecionada.',
             type: 'warning',
@@ -8823,7 +8823,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                         $scope.registros = buildCongregacoesFromSources(comunsCatalog || [], []);
                         recalculateCongregacaoStats();
                         refreshFilteredRegistros();
-                        SweetAlert.swal('Excluída', 'A congregação e seus vínculos foram removidos.', 'success');
+                        swal('Excluída', 'A congregação e seus vínculos foram removidos.', 'success');
 
                         return AuthService.listMinisterioRegional(true).then(function (records) {
                             $scope.registros = buildCongregacoesFromSources(comunsCatalog || [], records || []);
@@ -8835,7 +8835,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
                         });
                     });
                 }).catch(function (error) {
-                    SweetAlert.swal('Erro', 'N\u00e3o foi poss\u00edvel excluir a congrega\u00e7\u00e3o: ' + (error.message || error), 'error');
+                    swal('Erro', 'N\u00e3o foi poss\u00edvel excluir a congrega\u00e7\u00e3o: ' + (error.message || error), 'error');
                 });
             });
         });
@@ -13944,7 +13944,6 @@ function configureCadastroMusicForm($scope, modelName, AuthService) {
     $scope.selectComum = function (value) {
         $scope[modelName] = $scope[modelName] || {};
         applyMappedComumSelection($scope[modelName], $scope.comumPickerState.targetField, value, $scope.comumCatalogState, {
-            cityField: 'cidade',
             localidadeField: 'localidade'
         });
         $scope.closeComumPicker();
@@ -14250,6 +14249,26 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
 
         return true;
     }
+
+    $scope.$watch('newAluno.data_nascimento', function(newVal) {
+        if (newVal && newVal.length === 10) {
+            var ageInfo = getAlunoAgeInfo(newVal);
+            if (ageInfo.reachedLimit) {
+                $scope.newAluno.data_nascimento = '';
+                swal("Limite de idade", "Esta crianca ja completou 12 anos e nao se enquadra mais na faixa etaria do EBI.", "warning");
+            }
+        }
+    });
+
+    $scope.$watch('editingAluno.data_nascimento', function(newVal) {
+        if (newVal && newVal.length === 10) {
+            var ageInfo = getAlunoAgeInfo(newVal);
+            if (ageInfo.reachedLimit) {
+                $scope.editingAluno.data_nascimento = '';
+                swal("Limite de idade", "Esta crianca ja completou 12 anos e nao se enquadra mais na faixa etaria do EBI.", "warning");
+            }
+        }
+    });
 
     $scope.getAlunoAgeText = function (dateStr) {
         return getAlunoAgeInfo(dateStr).text;
@@ -14912,8 +14931,8 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             return;
         }
 
-        if (SweetAlert && typeof SweetAlert.swal === 'function') {
-            SweetAlert.swal(title, message, type || 'info');
+        if (SweetAlert && typeof swal === 'function') {
+            swal(title, message, type || 'info');
         }
     }
 
@@ -16193,8 +16212,8 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             window.toastr[type || 'info'](message, title);
             return;
         }
-        if (SweetAlert && typeof SweetAlert.swal === 'function') {
-            SweetAlert.swal(title, message, type || 'info');
+        if (SweetAlert && typeof swal === 'function') {
+            swal(title, message, type || 'info');
             return;
         }
         if (typeof swal === 'function') {
@@ -19251,7 +19270,7 @@ function getMusicalizacaoFriendlyErrorMessage(action, error) {
 }
 
 function showMusicalizacaoError(action, error, title) {
-    var alertFn = (window.SweetAlert && window.SweetAlert.swal) || window.swal;
+    var alertFn = (window.SweetAlert && window.swal) || window.swal;
     alertFn({
         title: title || "Atencao",
         text: getMusicalizacaoFriendlyErrorMessage(action, error),
@@ -19262,7 +19281,7 @@ function showMusicalizacaoError(action, error, title) {
 }
 
 function showMusicalizacaoSuccess(title, text) {
-    var alertFn = (window.SweetAlert && window.SweetAlert.swal) || window.swal;
+    var alertFn = (window.SweetAlert && window.swal) || window.swal;
     alertFn({
         title: title || "Sucesso",
         text: text || "Operacao realizada com sucesso.",
@@ -19273,7 +19292,7 @@ function showMusicalizacaoSuccess(title, text) {
 }
 
 function showMusicalizacaoConfirm(config, onConfirm) {
-    var alertFn = (window.SweetAlert && window.SweetAlert.swal) || window.swal;
+    var alertFn = (window.SweetAlert && window.swal) || window.swal;
     var options = angular.extend({
         title: "Tem certeza?",
         text: "Deseja continuar com esta operacao?",
@@ -19537,7 +19556,6 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
         if (!model) return;
 
         if (model.comum_congregacao) {
-            model.cidade = resolveComumMunicipio(model.comum_congregacao) || model.cidade || '';
             model.localidade = model.localidade || model.cidade || '';
         }
 
@@ -19982,18 +20000,47 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
         var ageInfo = getAlunoAgeInfo((aluno || {}).data_nascimento);
 
         if (ageInfo.reachedLimit) {
-            SweetAlert.swal({
-                title: "Limite de idade",
-                text: "Esta crianca ja completou 12 anos e nao se enquadra mais na faixa etaria da Musicalizacao Infantil.",
+            swal({
+                title: "Limite de idade excedido",
+                text: "Não pode ser registrada criança acima de 12 anos. O ministério deve ser consultado.",
                 type: "warning",
-                timer: 2000,
-                showConfirmButton: false
+                confirmButtonText: "Entendi"
             });
             return false;
         }
 
         return true;
     }
+
+    $scope.$watch('newAluno.data_nascimento', function(newVal) {
+        if (newVal && newVal.length === 10) {
+            var ageInfo = getAlunoAgeInfo(newVal);
+            if (ageInfo.reachedLimit) {
+                $scope.newAluno.data_nascimento = '';
+                swal({
+                    title: "Limite de idade excedido",
+                    text: "Não pode ser registrada criança acima de 12 anos. O ministério deve ser consultado.",
+                    type: "warning",
+                    confirmButtonText: "Entendi"
+                });
+            }
+        }
+    });
+
+    $scope.$watch('editingAluno.data_nascimento', function(newVal) {
+        if (newVal && newVal.length === 10) {
+            var ageInfo = getAlunoAgeInfo(newVal);
+            if (ageInfo.reachedLimit) {
+                $scope.editingAluno.data_nascimento = '';
+                swal({
+                    title: "Limite de idade excedido",
+                    text: "Não pode ser registrada criança acima de 12 anos. O ministério deve ser consultado.",
+                    type: "warning",
+                    confirmButtonText: "Entendi"
+                });
+            }
+        }
+    });
 
     $scope.getAlunoAgeText = function (dateStr) {
         return getAlunoAgeInfo(dateStr).text;
@@ -20169,17 +20216,26 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
         if ($scope.savingNewAluno) return;
         if (!validateAlunoAge($scope.newAluno)) return;
+        
+        var celularDigits = String($scope.newAluno.celular_responsavel || '').replace(/\D/g, '');
+        if (celularDigits.length === 10) {
+            var ddd = parseInt(celularDigits.substring(0, 2), 10);
+            if (ddd < 70) {
+                swal({
+                    title: "9º Dígito Obrigatório",
+                    text: "Para a sua região (DDD " + ddd + "), o 9º dígito no celular é obrigatório.",
+                    type: "warning"
+                });
+                return;
+            }
+        }
+        
         $scope.newAluno.celular_responsavel = formatBrazilPhone($scope.newAluno.celular_responsavel);
-        $scope.newAluno.cidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
-            $scope.newAluno.cidade,
-            $scope.newAluno.localidade,
-            $scope.newAluno.comum_congregacao
-        ]) || $scope.newAluno.cidade || '';
         $scope.newAluno.localidade = $scope.newAluno.localidade || $scope.newAluno.cidade || '';
         duplicateAluno = getAlunoDuplicate($scope.newAluno);
 
         if (duplicateAluno) {
-            SweetAlert.swal({
+            swal({
                 title: "Cadastro duplicado",
                 text: "Ja existe uma crianca com os mesmos dados principais neste polo. Revise antes de salvar novamente.",
                 type: "warning"
@@ -20223,17 +20279,26 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
             return;
         }
         if (!validateAlunoAge($scope.editingAluno)) return;
+        
+        var celularDigits = String($scope.editingAluno.celular_responsavel || '').replace(/\D/g, '');
+        if (celularDigits.length === 10) {
+            var ddd = parseInt(celularDigits.substring(0, 2), 10);
+            if (ddd < 70) {
+                swal({
+                    title: "9º Dígito Obrigatório",
+                    text: "Para a sua região (DDD " + ddd + "), o 9º dígito no celular é obrigatório.",
+                    type: "warning"
+                });
+                return;
+            }
+        }
+        
         $scope.editingAluno.celular_responsavel = formatBrazilPhone($scope.editingAluno.celular_responsavel);
-        $scope.editingAluno.cidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
-            $scope.editingAluno.cidade,
-            $scope.editingAluno.localidade,
-            $scope.editingAluno.comum_congregacao
-        ]) || $scope.editingAluno.cidade || '';
         $scope.editingAluno.localidade = $scope.editingAluno.localidade || $scope.editingAluno.cidade || '';
         duplicateAluno = getAlunoDuplicate($scope.editingAluno, $scope.editingAluno.id);
 
         if (duplicateAluno) {
-            SweetAlert.swal({
+            swal({
                 title: "Cadastro duplicado",
                 text: "Ja existe uma crianca com os mesmos dados principais neste polo. Revise antes de salvar novamente.",
                 type: "warning"
@@ -20342,7 +20407,6 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
         $scope[modelName] = $scope[modelName] || {};
         applyMappedComumSelection($scope[modelName], targetField, value, $scope.comumCatalogState, {
-            cityField: 'cidade',
             localidadeField: 'localidade'
         });
         $scope.syncPoloForComum(modelName);
@@ -20824,7 +20888,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
         if (!model) return;
 
         if (model.comum_congregacao) {
-            model.localidade = resolveInstrutorComumMunicipio(model.comum_congregacao) || model.localidade || '';
+            // localidade not forced to allow regional entries
         }
 
         if (!model.polo_auxilio) return;
@@ -21220,11 +21284,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
             swal("Data inválida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
             return;
         }
-        $scope.newInstrutor.localidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
-            $scope.newInstrutor.localidade,
-            $scope.newInstrutor.comum_congregacao,
-            $scope.newInstrutor.polo_auxilio
-        ]) || $scope.newInstrutor.localidade || '';
+        // Removed the forced overwrite of newInstrutor.localidade to allow any regional city
         MusicalizacaoService.saveInstrutor($scope.newInstrutor).then(function () {
             showMusicalizacaoSuccess("Sucesso", "Cadastro do monitor realizado com sucesso!");
             $('#modalAddInstrutor').modal('hide');
@@ -21284,11 +21344,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
             swal("Data inválida", "Informe a data de nascimento no formato dd/mm/aaaa.", "warning");
             return;
         }
-        $scope.editingInstrutor.localidade = resolveMunicipioFromCatalog($scope.comumCatalogState, [
-            $scope.editingInstrutor.localidade,
-            $scope.editingInstrutor.comum_congregacao,
-            $scope.editingInstrutor.polo_auxilio
-        ]) || $scope.editingInstrutor.localidade || '';
+        // Removed the forced overwrite of editingInstrutor.localidade to allow any regional city
         MusicalizacaoService.updateInstrutor($scope.editingInstrutor).then(function () {
             showMusicalizacaoSuccess("Sucesso", "Dados atualizados com sucesso!");
             $('#modalEditInstrutor').modal('hide');
