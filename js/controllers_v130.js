@@ -18831,7 +18831,8 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
         var p1 = MusicalizacaoService.getAlunos().then(function (data) {
             var stats = { meninas: 0, meninos: 0, total: 0 };
             data.forEach(function (c) {
-                if ((c.sexo || '').toUpperCase() === 'FEMININO' || (c.sexo || '').toUpperCase() === 'F') stats.meninas++;
+                var sexo = (c.sexo || '').toUpperCase();
+                if (sexo === 'FEMININO' || sexo === 'F' || sexo === 'MENINA') stats.meninas++;
                 else stats.meninos++;
                 stats.total++;
             });
@@ -20445,6 +20446,7 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $rootScope) {
     console.log('musicalizacaoPolosCtrl initialized');
     $scope.polos = [];
+    $scope.groupedPolosList = [];
     $scope.loading = true;
     $scope.canManageCadastros = false;
 
@@ -20511,7 +20513,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     }
 
     $scope.groupedPolos = function () {
-        return getGroupedPolos();
+        return $scope.groupedPolosList;
     };
 
     $scope.exportToExcel = function () {
@@ -20625,6 +20627,7 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
         $scope.loading = true;
         MusicalizacaoService.getPolos().then(function (data) {
             $scope.polos = data;
+            $scope.groupedPolosList = getGroupedPolos();
             $scope.loading = false;
         }).catch(function (error) {
             console.error('Erro ao buscar polos:', error);
