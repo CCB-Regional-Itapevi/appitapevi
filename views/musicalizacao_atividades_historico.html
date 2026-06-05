@@ -1,0 +1,254 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Gerenciador de Atividades - Escola de Música</h2>
+        <ol class="breadcrumb">
+            <li><a href="#/musicalizacao/dashboard">Musicalização</a></li>
+            <li class="active"><strong>Gerenciador de Atividades</strong></li>
+        </ol>
+    </div>
+</div>
+
+<style>
+    .music-history-table-wrap { max-height: 520px; overflow: auto; }
+    .music-history-nested { margin-bottom: 0; background: #fcfcfc; }
+    .music-history-tabs .nav-tabs > li > a { font-weight: 600; }
+    .music-history-chart-box { min-height: 420px; }
+    .music-history-chart-box .ibox-content { min-height: 360px; }
+    .music-section-header { padding-bottom: 14px; }
+    .music-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap; width: 100%; }
+    .music-section-title-block { flex: 1 1 520px; min-width: 280px; }
+    .music-section-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+    .music-section-title-row h5 { margin: 0; }
+    .music-section-subtitle { color: #7f8c8d; line-height: 1.5; max-width: 900px; }
+    .music-kpi-strip { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+    .music-kpi-mini { flex: 1 1 160px; border: 1px solid #e7eaec; border-radius: 10px; padding: 14px 16px; background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%); min-height: 96px; }
+    .music-kpi-mini .value { font-size: 28px; font-weight: 700; line-height: 1.1; color: #2f4050; }
+    .music-kpi-mini .label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: #8a97a8; margin-bottom: 8px; }
+    .music-kpi-mini .sub { font-size: 12px; color: #7f8c8d; }
+    .music-pending-scroll { max-height: 330px; overflow: auto; }
+    .music-risk-card { border: 1px solid #e7eaec; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%); min-height: 78px; }
+    .music-risk-card strong { color: #42556b; display: inline-block; }
+    .music-risk-card .music-risk-total { float: right; color: #ed5565; font-weight: 700; }
+    .music-risk-card .music-risk-detail { color: #7f8c8d; margin-top: 4px; display: block; }
+    .music-status-badge { display: inline-block; padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .2px; margin-bottom: 6px; min-width: 110px; text-align: center; }
+    .music-status-ok { background: #dff5ef; color: #17997d; }
+    .music-status-today { background: #fff4dd; color: #d18a15; }
+    .music-status-warn { background: #ffe7cf; color: #dd7b1e; }
+    .music-status-danger { background: #ed5565; color: #fff; }
+    .music-status-muted { background: #eef2f5; color: #73808c; }
+    .music-metric-intro { color: #7f8c8d; line-height: 1.55; margin-bottom: 18px; }
+    .music-metric-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    .music-metric-widget { flex: 1 1 calc(50% - 12px); min-width: 220px; margin: 0; border-radius: 10px; overflow: hidden; }
+    .music-metric-widget .row { margin: 0; }
+    .music-metric-widget .col-xs-4,
+    .music-metric-widget .col-xs-8 { padding-top: 8px; padding-bottom: 8px; }
+    .music-metric-widget .metric-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .9; margin-bottom: 4px; }
+    .music-metric-widget .metric-value { display: block; font-size: 24px; font-weight: 700; line-height: 1.1; }
+    .music-metric-widget .metric-sub { display: block; margin-top: 6px; font-size: 11px; line-height: 1.35; opacity: .92; }
+    .music-chart-note { color: #7f8c8d; line-height: 1.5; margin-bottom: 14px; }
+    .music-rank-summary { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .music-rank-pill { flex: 1 1 120px; border-radius: 10px; padding: 10px 12px; color: #fff; }
+    .music-rank-pill .label { display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.26); color: rgba(255,255,255,.96); }
+    .music-rank-pill .value { display: block; font-size: 18px; font-weight: 700; color: #fff; }
+    .music-justificativa-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #ffe7cf; color: #d9791d; font-size: 11px; font-weight: 700; letter-spacing: .2px; margin-bottom: 6px; }
+    .music-justificativa-text { display: block; color: #7f8c8d; line-height: 1.45; margin-top: 2px; }
+    .music-justificativa-help { color: #7f8c8d; font-size: 12px; margin-top: 6px; }
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="musicalizacaoAtividadesHistoricoCtrl">
+    <div class="row">
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 navy-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-book fa-4x"></i></div><div class="col-xs-8 text-right"><span>Diários Lançados</span><h2 class="font-bold">{{ musicExecutiveMetrics.lancamentos || 0 }}</h2></div></div></div></div>
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 lazur-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-child fa-4x"></i></div><div class="col-xs-8 text-right"><span>Alunos Atendidos</span><h2 class="font-bold">{{ musicExecutiveMetrics.alunos || 0 }}</h2></div></div></div></div>
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 yellow-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-line-chart fa-4x"></i></div><div class="col-xs-8 text-right"><span>Média por Aula</span><h2 class="font-bold">{{ musicExecutiveMetrics.mediaPorAula || 0 }}</h2></div></div></div></div>
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 blue-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-users fa-4x"></i></div><div class="col-xs-8 text-right"><span>Instrutores Registrados</span><h2 class="font-bold">{{ musicExecutiveMetrics.instrutores || 0 }}</h2></div></div></div></div>
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 navy-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-map-marker fa-4x"></i></div><div class="col-xs-8 text-right"><span>Municípios Ativos</span><h2 class="font-bold">{{ musicExecutiveMetrics.municipiosAtivos || 0 }}</h2></div></div></div></div>
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 bg-danger"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-pie-chart fa-4x"></i></div><div class="col-xs-8 text-right"><span>Cobertura de Polos</span><h2 class="font-bold">{{ musicExecutiveMetrics.coberturaPolos || 0 }}%</h2></div></div></div></div>
+    </div>
+
+    <div class="row m-t-md">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Filtros e Relatórios - Escola de Música</h5>
+                    <div class="ibox-tools"><a ui-sref="musicalizacao.nova_aula({id: null})" class="btn btn-primary btn-xs"><i class="fa fa-plus"></i> Novo Lançamento</a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="alert alert-danger" ng-if="error">{{ error }}</div>
+                    <div class="text-center text-muted m-b-md" ng-if="loading"><i class="fa fa-spinner fa-spin"></i> Carregando dados operacionais dos Polos...</div>
+                    <div class="row">
+                        <div class="col-md-2"><label>Mês</label><select class="form-control input-sm" ng-model="filters.mes" ng-change="applyFilters()"><option value="">Todos os meses</option><option ng-repeat="mes in meses" value="{{mes}}">{{mes}}</option></select></div>
+                        <div class="col-md-3"><label>Período</label><div class="input-group"><input type="date" class="form-control input-sm" ng-model="filters.dataInicio" ng-change="applyFilters()"><span class="input-group-addon">até</span><input type="date" class="form-control input-sm" ng-model="filters.dataFim" ng-change="applyFilters()"></div></div>
+                        <div class="col-md-3"><label>Município</label><select class="form-control input-sm" ng-model="filters.cidade" ng-change="applyFilters()" ng-options="c for c in cidades"><option value="">Todos os municípios</option></select></div>
+                        <div class="col-md-4"><label>Polo / Localidade</label><select class="form-control input-sm" ng-model="filters.polo" ng-change="applyFilters()"><option value="">Todos os Polos Cadastrados</option><option ng-repeat="p in filteredPoloOptions track by p" value="{{p}}">{{p}}</option></select></div>
+                    </div>
+                    <div class="row m-t-sm">
+                        <div class="col-md-8">
+                            <div class="well well-sm" style="margin-bottom: 0;">
+                                <strong>Leitura Executiva:</strong> {{ musicExecutiveMetrics.alunos || 0 }} alunos em {{ musicExecutiveMetrics.lancamentos || 0 }} aulas registradas, média de {{ musicExecutiveMetrics.mediaPorAula || 0 }} alunos por aula e engajamento ativo de {{ musicExecutiveMetrics.coberturaPolos || 0 }}% dos polos.
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <button class="btn btn-white btn-sm" ng-click="loadData()"><i class="fa fa-refresh"></i> Atualizar</button>
+                            <button class="btn btn-white btn-sm" ng-click="clearFilters()"><i class="fa fa-eraser"></i> Limpar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-t-md music-history-tabs">
+        <div class="col-lg-12">
+            <div class="tabs-container">
+                <ul class="nav nav-tabs">
+                    <li ng-class="{active: musicHistoryTab === 'executivo'}"><a href="" ng-click="setMusicHistoryTab('executivo')">Painel de Polos (Gestão)</a></li>
+                    <li ng-class="{active: musicHistoryTab === 'detalhado'}"><a href="" ng-click="setMusicHistoryTab('detalhado')">Todos os Lançamentos</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane" ng-class="{active: musicHistoryTab === 'executivo'}">
+                        <div class="panel-body">
+                            <div class="alert alert-warning" ng-if="musicPendingSummary.totalAlertas > 0" style="margin-bottom:18px;">
+                                <strong><i class="fa fa-bell-o"></i> Alerta Operacional:</strong>
+                                {{ musicPendingSummary.totalAlertas }} Polos exigem atenção e cobrança.
+                                <span ng-if="musicPendingSummary.pendentes > 0">{{ musicPendingSummary.pendentes }} com diário atrasado, </span>
+                                <span ng-if="musicPendingSummary.vencemHoje > 0">{{ musicPendingSummary.vencemHoje }} previstos para lançar hoje, </span>
+                                <span ng-if="musicPendingSummary.semHistorico > 0">{{ musicPendingSummary.semHistorico }} sem histórico de atividades.</span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="ibox">
+                                        <div class="ibox-title music-section-header">
+                                            <div class="music-section-heading">
+                                                <div class="music-section-title-block">
+                                                    <div class="music-section-title-row">
+                                                        <h5>Polos Cadastrados - Acompanhamento Operacional</h5>
+                                                        <span class="label label-warning" ng-if="musicPendingSummary.totalAlertas">{{ musicPendingSummary.totalAlertas || 0 }} alertas em Polos</span>
+                                                    </div>
+                                                    <div class="music-section-subtitle">
+                                                        Monitoramento em tempo real do lançamento dos diários de aula dos polos de musicalização. Polos que estão em dia ficam em verde.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <div class="music-kpi-strip">
+                                                <div class="music-kpi-mini">
+                                                    <span class="label">Polos Cadastrados</span>
+                                                    <div class="value">{{ musicPendingSummary.previstosNoCiclo || 0 }}</div>
+                                                    <div class="sub">Total de Escolas de Música ativas</div>
+                                                </div>
+                                                <div class="music-kpi-mini">
+                                                    <span class="label">Diários em Dia</span>
+                                                    <div class="value text-navy">{{ musicPendingSummary.emDia || 0 }}</div>
+                                                    <div class="sub">Lançamentos na agenda prevista</div>
+                                                </div>
+                                                <div class="music-kpi-mini">
+                                                    <span class="label">Atrasados</span>
+                                                    <div class="value text-warning">{{ musicPendingSummary.pendentes || 0 }}</div>
+                                                    <div class="sub">Polos com diários vencidos</div>
+                                                </div>
+                                                <div class="music-kpi-mini">
+                                                    <span class="label">Sem histórico</span>
+                                                    <div class="value text-danger">{{ musicPendingSummary.semHistorico || 0 }}</div>
+                                                    <div class="sub">Polos sem atividades registradas</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="table-responsive music-pending-scroll">
+                                                <table class="table table-hover table-bordered" style="margin-bottom:0;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Polo (Local)</th>
+                                                            <th>Município</th>
+                                                            <th class="text-center">Responsável</th>
+                                                            <th class="text-center">Última Aula</th>
+                                                            <th class="text-center">Status</th>
+                                                            <th class="text-center">Ações</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="item in musicPolosAtivos | orderBy:'statusIndex'">
+                                                            <td><strong>{{ item.polo }}</strong><br><small class="text-muted">{{ item.horario_aula || 'Horário não informado' }}</small></td>
+                                                            <td>{{ item.cidade }}</td>
+                                                            <td class="text-center">{{ item.responsavel_polo || 'Não informado' }}</td>
+                                                            <td class="text-center">{{ item.ultimaDataLabel || '-' }}</td>
+                                                            <td class="text-center">
+                                                                <span class="music-status-badge"
+                                                                        ng-class="{'music-status-ok': item.status === 'EM DIA', 'music-status-warn': item.status === 'PENDENTE', 'music-status-muted': item.status === 'SEM HISTORICO'}">
+                                                                    {{ item.status }}
+                                                                </span>
+                                                                <div><small class="text-muted">{{ item.statusDetail }}</small></div>
+                                                            </td>
+                                                            <td class="text-center"><a class="btn btn-xs btn-primary" ui-sref="musicalizacao.aulas"><i class="fa fa-list"></i> Ver Lançamentos</a></td>
+                                                        </tr>
+                                                        <tr ng-if="!musicPolosAtivos.length">
+                                                            <td colspan="6" class="text-center text-muted">Nenhum Polo ativo encontrado para os filtros atuais.</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" ng-class="{active: musicHistoryTab === 'detalhado'}">
+                        <div class="panel-body">
+                            <div class="row m-b-md"><div class="col-md-12 text-muted">{{ filteredAulas.length }} atividades encontradas. Redirecionando para as listagens...</div></div>
+                            <div class="table-responsive music-history-table-wrap">
+                                <table class="table table-striped table-hover table-bordered">
+                                    <thead><tr><th>Município</th><th class="text-center">Lançamentos (Aulas)</th><th class="text-right">Ações</th></tr></thead>
+                                    <tbody>
+                                        <tr ng-if="loading"><td colspan="3" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando...</td></tr>
+                                        <tr ng-repeat-start="group in musicDetailMunicipioGroups" ng-if="!loading">
+                                            <td><strong>{{ group.municipio }}</strong><br><small class="text-muted">{{ group.total }} aulas encontradas</small></td>
+                                            <td class="text-center"><span class="label label-primary">{{ group.total }}</span></td>
+                                            <td class="text-right">
+                                                <button class="btn btn-xs btn-white" ng-click="toggleMusicDetailMunicipio(group.municipio)">
+                                                    <i class="fa" ng-class="isMusicDetailMunicipioExpanded(group.municipio) ? 'fa-angle-up' : 'fa-angle-down'"></i>
+                                                    {{ isMusicDetailMunicipioExpanded(group.municipio) ? 'Ocultar aulas' : 'Ver aulas' }}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat-end ng-if="!loading && isMusicDetailMunicipioExpanded(group.municipio)">
+                                            <td colspan="3" style="padding:0;">
+                                                <table class="table table-condensed table-bordered" style="margin-bottom:0;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Data</th>
+                                                            <th>Polo</th>
+                                                            <th>Matéria / Conteúdo</th>
+                                                            <th class="text-center">Meninas</th>
+                                                            <th class="text-center">Meninos</th>
+                                                            <th class="text-center">Total</th>
+                                                            <th class="text-center" width="120">Ações</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="item in group.itens">
+                                                            <td>{{ item.data_aula | date:'dd/MM/yyyy' }}</td>
+                                                            <td><strong>{{ item.polo }}</strong><br><small class="text-muted" ng-if="item.instrutor_responsavel">{{ item.instrutor_responsavel }}</small></td>
+                                                            <td>{{ item.observacoes_materia || item.observacoes || '-' | limitTo:50 }}{{ (item.observacoes_materia || item.observacoes).length > 50 ? '...' : '' }}</td>
+                                                            <td class="text-center"><span class="label label-danger">{{ item.meninas || 0 }}</span></td>
+                                                            <td class="text-center"><span class="label label-info">{{ item.meninos || 0 }}</span></td>
+                                                            <td class="text-center"><strong>{{ calculateTotal(item) }}</strong></td>
+                                                            <td class="text-center"><button class="btn btn-info btn-xs" ng-click="verDetalhes(item)"><i class="fa fa-eye"></i></button> <a class="btn btn-warning btn-xs" ng-if="canManageCadastros" ui-sref="musicalizacao.presenca({id: item.id})"><i class="fa fa-pencil-square-o"></i></a> <button class="btn btn-danger btn-xs" ng-if="canManageCadastros" ng-click="confirmDelete(item)"><i class="fa fa-trash-o"></i></button></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="!musicDetailMunicipioGroups.length && !loading"><td colspan="3" class="text-center text-muted">Nenhuma aula encontrada.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

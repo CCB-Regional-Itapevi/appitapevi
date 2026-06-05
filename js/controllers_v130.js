@@ -4522,6 +4522,225 @@ function passwordMeterCtrl($scope) {
  * Servi\u00e7o de Autentica\u00e7\u00e3o Seguro
  * Gerencia autentica\u00e7\u00e3o, valida\u00e7\u00e3o e seguran\u00e7a
  */
+/**
+ * musicalizacaoAtividadesHistoricoCtrl
+ */
+function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $timeout, $rootScope) {
+    $scope.musicHistoryTab = 'executivo';
+    $scope.loading = true;
+    $scope.error = null;
+    
+    $scope.meses = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    
+    $scope.filters = {
+        mes: '',
+        dataInicio: null,
+        dataFim: null,
+        cidade: '',
+        polo: ''
+    };
+    
+    $scope.cidades = [];
+    $scope.filteredPoloOptions = [];
+    
+    $scope.musicPolosAtivos = [];
+    $scope.filteredAulas = [];
+    
+    $scope.musicExecutiveMetrics = {
+        lancamentos: 0,
+        alunos: 0,
+        mediaPorAula: 0,
+        instrutores: 0,
+        municipiosAtivos: 0,
+        coberturaPolos: 0
+    };
+    
+    $scope.musicPendingSummary = {
+        previstosNoCiclo: 0,
+        emDia: 0,
+        pendentes: 0,
+        semHistorico: 0,
+        vencemHoje: 0,
+        totalAlertas: 0
+    };
+    
+    var allPolos = [];
+    var allAulas = [];
+    var allInstrutores = [];
+    
+    $scope.setMusicHistoryTab = function (tab) {
+        $scope.musicHistoryTab = tab;
+    };
+    
+    function upperValue(val) {
+        return typeof val === 'string' ? val.toUpperCase().trim() : '';
+    }
+    
+    function calculateStatus(polo, ultimaAula) {
+        if (!ultimaAula) {
+            return { status: 'SEM HISTORICO', detail: 'Nenhuma aula registrada', riskIndex: 3 };
+        }
+        
+        var hoje = new Date();
+        hoje.setHours(0,0,0,0);
+        
+        var lastDate = new Date(ultimaAula.data_aula);
+        lastDate.setHours(0,0,0,0);
+        
+        var diffTime = Math.abs(hoje - lastDate);
+        var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays <= 7) {
+            return { status: 'EM DIA', detail: 'Lançamento atualizado', riskIndex: 1 };
+        } else {
+            return { status: 'PENDENTE', detail: diffDays + ' dias de atraso', riskIndex: 2 };
+        }
+    }
+    
+    $scope.loadData = function() {
+        $scope.loading = true;
+        $scope.error = null;
+        
+        Promise.all([
+            MusicalizacaoService.getPolos(),
+            MusicalizacaoService.getAulas(),
+            MusicalizacaoService.getInstrutores()
+        ]).then(function(results) {
+            allPolos = results[0] || [];
+            allAulas = results[1] || [];
+            allInstrutores = results[2] || [];
+            
+            var cidadesMap = {};
+            var polosMap = {};
+            
+            allPolos.forEach(function(p) {
+                if (p.cidade) cidadesMap[upperValue(p.cidade)] = true;
+                if (p.polo) polosMap[upperValue(p.polo)] = true;
+            });
+            
+            $scope.cidades = Object.keys(cidadesMap).sort();
+            $scope.filteredPoloOptions = Object.keys(polosMap).sort();
+            
+            $scope.applyFilters();
+            $scope.$applyAsync();
+        }).catch(function(err) {
+            $scope.error = "Erro ao carregar os dados de Musicalização.";
+            $scope.loading = false;
+            $scope.$applyAsync();
+        });
+    };
+    
+    $scope.applyFilters = function() {
+        var fCidade = upperValue($scope.filters.cidade);
+        var fPolo = upperValue($scope.filters.polo);
+        
+        var polosAtivos = allPolos.filter(function(p) {
+            if (p.status !== 'Ativo') return false;
+            if (fCidade && upperValue(p.cidade) !== fCidade) return false;
+            if (fPolo && upperValue(p.polo) !== fPolo) return false;
+            return true;
+        });
+        
+        $scope.musicPendingSummary.previstosNoCiclo = polosAtivos.length;
+        $scope.musicExecutiveMetrics.instrutores = allInstrutores.length;
+        
+        var cidSet = {};
+        polosAtivos.forEach(function(p) { if(p.cidade) cidSet[upperValue(p.cidade)] = true; });
+        $scope.musicExecutiveMetrics.municipiosAtivos = Object.keys(cidSet).length;
+        
+        var emDia = 0, pendentes = 0, semHist = 0;
+        
+        $scope.musicPolosAtivos = polosAtivos.map(function(p) {
+            var aulasDoPolo = allAulas.filter(function(a) { 
+                return upperValue(a.polo) === upperValue(p.polo); 
+            });
+            
+            aulasDoPolo.sort(function(a, b) {
+                return new Date(b.data_aula) - new Date(a.data_aula);
+            });
+            
+            var ultima = aulasDoPolo.length ? aulasDoPolo[0] : null;
+            var st = calculateStatus(p, ultima);
+            
+            if (st.status === 'EM DIA') emDia++;
+            else if (st.status === 'PENDENTE') pendentes++;
+            else semHist++;
+            
+            return angular.extend({}, p, {
+                ultimaDataLabel: ultima ? new Date(ultima.data_aula).toLocaleDateString() : '',
+                status: st.status,
+                statusDetail: st.detail,
+                statusIndex: st.riskIndex
+            });
+        });
+        
+        $scope.musicPendingSummary.emDia = emDia;
+        $scope.musicPendingSummary.pendentes = pendentes;
+        $scope.musicPendingSummary.semHistorico = semHist;
+        $scope.musicPendingSummary.totalAlertas = pendentes + semHist;
+        
+        $scope.musicExecutiveMetrics.coberturaPolos = polosAtivos.length ? Math.round((emDia / polosAtivos.length) * 100) : 0;
+        
+        // Aulas detalhadas
+        var filteredAulas = allAulas.filter(function(a) {
+            if (fCidade && upperValue(a.cidade) !== fCidade) return false;
+            if (fPolo && upperValue(a.polo) !== fPolo) return false;
+            return true;
+        });
+        $scope.filteredAulas = filteredAulas;
+        
+        var totalAlunos = 0;
+        filteredAulas.forEach(function(a) {
+            totalAlunos += (a.meninos || 0) + (a.meninas || 0);
+        });
+        
+        $scope.musicExecutiveMetrics.lancamentos = filteredAulas.length;
+        $scope.musicExecutiveMetrics.alunos = totalAlunos;
+        $scope.musicExecutiveMetrics.mediaPorAula = filteredAulas.length ? Math.round(totalAlunos / filteredAulas.length) : 0;
+        
+        var groupedAulas = {};
+        filteredAulas.forEach(function(a) {
+            var cid = upperValue(a.cidade) || 'NÃO INFORMADO';
+            if (!groupedAulas[cid]) groupedAulas[cid] = [];
+            groupedAulas[cid].push(a);
+        });
+        
+        $scope.musicDetailMunicipioGroups = Object.keys(groupedAulas).sort().map(function(k) {
+            var itens = groupedAulas[k];
+            itens.sort(function(a, b) { return new Date(b.data_aula) - new Date(a.data_aula); });
+            return {
+                municipio: k,
+                total: itens.length,
+                itens: itens
+            };
+        });
+        
+        $scope.loading = false;
+    };
+    
+    $scope.clearFilters = function() {
+        $scope.filters = { mes: '', dataInicio: null, dataFim: null, cidade: '', polo: '' };
+        $scope.applyFilters();
+    };
+    
+    $scope.expandedMunicipios = {};
+    $scope.toggleMusicDetailMunicipio = function(m) {
+        $scope.expandedMunicipios[m] = !$scope.expandedMunicipios[m];
+    };
+    $scope.isMusicDetailMunicipioExpanded = function(m) {
+        return !!$scope.expandedMunicipios[m];
+    };
+    
+    $scope.calculateTotal = function(item) {
+        return (item.meninas || 0) + (item.meninos || 0) + (item.colaboradoras || 0) + (item.instrutores || 0) + (item.responsaveis || 0);
+    };
+    
+    $scope.loadData();
+}
+
 angular
     .module('inspinia')
     .service('ValidationService', ValidationService);
@@ -18784,6 +19003,7 @@ angular
     .controller('musicalizacaoInstrutoresCtrl', musicalizacaoInstrutoresCtrl)
     .controller('musicalizacaoAulasCtrl', musicalizacaoAulasCtrl)
     .controller('musicalizacaoNovaAulaCtrl', musicalizacaoNovaAulaCtrl)
+    .controller('musicalizacaoAtividadesHistoricoCtrl', musicalizacaoAtividadesHistoricoCtrl)
     .controller('musicalizacaoPresencaCtrl', musicalizacaoPresencaCtrl);
 
 /**
@@ -21689,6 +21909,8 @@ function musicalizacaoPresencaCtrl($scope, MusicalizacaoService, $timeout, $stat
     $scope.init();
 }
 
+
+
 /**
  * santaCeiaAdminCtrl
  */
@@ -24159,4 +24381,6 @@ loadDashboard();
             onConfirm();
         }
     }
+
+
 })();

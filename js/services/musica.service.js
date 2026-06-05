@@ -63,7 +63,8 @@
             previewWorkbook: previewWorkbook,
             importWorkbook: importWorkbook,
             getRelatorioUnificado: getRelatorioUnificado,
-            getCalendarioPadrao: getCalendarioPadrao
+            getCalendarioPadrao: getCalendarioPadrao,
+            getExamesLancamentos: getExamesLancamentos
         };
 
         return service;
@@ -73,6 +74,12 @@
                 { meses: 'Janeiro, Maio e Setembro', ciclo: 'Itapevi / Pirapora', locais: 'Itapevi e Parque Laranjeira II - Pirapora do Bom Jesus' },
                 { meses: 'Marco, Julho e Novembro', ciclo: 'Polos municipais', locais: 'Caucaia, Cotia, Vargem Grande, Jandira e Fazendinha - Santana de Parnaiba' }
             ];
+        }
+
+        function getExamesLancamentos() {
+            return fetchPaged(function () {
+                return supabase.from('musica_exames_lancamentos').select('*').order('data_exame', { ascending: true });
+            });
         }
 
         function getEnsaios() {

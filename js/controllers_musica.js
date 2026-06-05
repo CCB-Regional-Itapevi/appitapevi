@@ -7,7 +7,8 @@
         .controller('musicaPresencasCtrl', musicaPresencasCtrl)
         .controller('musicaJustificativasCtrl', musicaJustificativasCtrl)
         .controller('musicaJustificativaPublicaCtrl', musicaJustificativaPublicaCtrl)
-        .controller('musicaRelatoriosCtrl', musicaRelatoriosCtrl);
+        .controller('musicaRelatoriosCtrl', musicaRelatoriosCtrl)
+        .controller('musicaExamesCtrl', musicaExamesCtrl);
 
     musicaDashboardCtrl.$inject = ['$scope', '$state', 'MusicaService'];
     musicaEnsaiosCtrl.$inject = ['$scope', '$timeout', 'MusicaService'];
@@ -15,6 +16,7 @@
     musicaJustificativasCtrl.$inject = ['$scope', '$timeout', '$rootScope', 'MusicaService'];
     musicaJustificativaPublicaCtrl.$inject = ['$scope', '$timeout', 'MusicaService'];
     musicaRelatoriosCtrl.$inject = ['$scope', 'MusicaService'];
+    musicaExamesCtrl.$inject = ['$scope', '$timeout', 'MusicaService'];
 
     function musicaDashboardCtrl($scope, $state, MusicaService) {
         $scope.loading = true;
@@ -2081,5 +2083,668 @@
             return;
         }
         if (window.confirm(text) && typeof onConfirm === 'function') onConfirm();
+    }
+
+    function musicaExamesCtrl($scope, $timeout, MusicaService) {
+        var meses = ['Janeiro', 'Fevereiro', 'Mar\u00e7o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        var mesAtual = meses[new Date().getMonth()];
+
+        $scope.lancamentos = [];
+        $scope.filteredLancamentos = [];
+        $scope.loading = true;
+        $scope.meses = meses;
+
+        $scope.filters = {
+            regiao: '',
+            dataInicio: null,
+            dataFim: null,
+            mes: mesAtual
+        };
+
+        var REGIOES_MAP = {
+            'Cotia/Caucaia/VGP': ['COTIA', 'CAUCAIA DO ALTO', 'VARGEM GRANDE PAULISTA', 'COTIA/CAUCAIA/VGP', 'COTIA/CAUCAIA/VARGEM GRANDE'],
+            'Itapevi': ['ITAPEVI'],
+            'Jandira': ['JANDIRA'],
+            'Santana/Pirapora': ['SANTANA DE PARNAIBA', 'PIRAPORA DO BOM JESUS', 'SANTANA/PIRAPORA']
+        };
+
+        $scope.regioes_lista = Object.keys(REGIOES_MAP);
+
+        $scope.examesTrendFlotData = [];
+        $scope.examesTrendFlotOptions = {
+            series: {
+                lines: { show: true, fill: true, lineWidth: 2 },
+                points: { show: true, radius: 3 }
+            },
+            xaxis: { tickDecimals: 0, tickLength: 0 },
+            yaxis: { min: 0, tickColor: "#f0f0f0" },
+            grid: { borderWidth: 1, borderColor: "#f0f0f0", hoverable: true, clickable: false },
+            colors: ["#1ab394", "#f8ac59"], // 1ab394=Músicos (Verde), f8ac59=Organistas (Laranja)
+            tooltip: true,
+            tooltipOpts: { content: "%s: %y" }
+        };
+
+        $scope.examesRankFlotData = [];
+        $scope.examesRankFlotOptions = {
+            series: {
+                bars: { show: true, horizontal: true, align: "center", barWidth: 0.5, fill: 0.9 }
+            },
+            xaxis: { min: 0, tickColor: "#f0f0f0" },
+            yaxis: { tickLength: 0 },
+            grid: { borderWidth: 1, borderColor: "#f0f0f0", hoverable: true },
+            colors: ["#23c6c8"], // Azul claro do rank
+            tooltip: true,
+            tooltipOpts: { content: "%x exames" }
+        };
+
+
+        function normalizeStr(str) {
+            return String(str || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        }
+
+        function getRegiaoDoMunicipio(municipio) {
+            var normalized = normalizeStr(municipio);
+            for (var regiao in REGIOES_MAP) {
+                if (REGIOES_MAP[regiao].some(function(m) { return normalized.indexOf(normalizeStr(m)) !== -1; })) {
+                    return regiao;
+                }
+            }
+            return 'Outros';
+        }
+
+        $scope.getMesFiltroLabel = function () {
+            var mes = String(($scope.filters || {}).mes || '').trim();
+            if (!mes) return 'Todos os Meses';
+            return mes;
+        };
+
+        function loadData() {
+            $scope.loading = true;
+            MusicaService.getExamesLancamentos().then(function (dados) {
+                $scope.lancamentos = dados || [];
+                $scope.applyFilters();
+            }).catch(function (err) {
+                console.error("Erro ao buscar lancamentos de exames:", err);
+            }).finally(function () {
+                $scope.loading = false;
+            });
+        }
+
+        $scope.applyFilters = function () {
+            if (!$scope.lancamentos) return;
+
+            $scope.filteredLancamentos = $scope.lancamentos.filter(function (item) {
+                var matchRegiao = true;
+                if ($scope.filters.regiao) {
+                    var regiaoItem = getRegiaoDoMunicipio(item.municipio);
+                    matchRegiao = (regiaoItem === $scope.filters.regiao);
+                }
+
+                var matchDate = true;
+                var usingPeriodo = false;
+                if (item.data_exame) {
+                    var itemDate = new Date(item.data_exame);
+                    if ($scope.filters.dataInicio) {
+                        usingPeriodo = true;
+                        var startDate = new Date($scope.filters.dataInicio);
+                        if (itemDate < startDate) matchDate = false;
+                    }
+                    if ($scope.filters.dataFim) {
+                        usingPeriodo = true;
+                        var endDate = new Date($scope.filters.dataFim);
+                        if (itemDate > endDate) matchDate = false;
+                    }
+                }
+
+                var matchMonth = true;
+                // Ignorar o filtro de mês se estiver buscando por um período específico (Data Início ou Data Fim)
+                if (!usingPeriodo && $scope.filters.mes && item.data_exame) {
+                    var itemMonth = meses[new Date(item.data_exame).getUTCMonth()];
+                    matchMonth = (itemMonth === $scope.filters.mes);
+                }
+
+                return matchRegiao && matchDate && matchMonth;
+            });
+
+            $scope.calculateDashboardData();
+        };
+
+        $scope.calculateDashboardData = function () {
+            var summary = {
+                totais: {
+                    musicos: { culto_oficial: 0, oficializacao: 0, troca_instrumento: 0 },
+                    organistas: { rjm: 0, culto_oficial: 0, oficializacao: 0, testes_especiais: 0 },
+                    musicos_total: 0,
+                    organistas_total: 0,
+                    geral: 0
+                },
+                regioes: {}
+            };
+
+            $scope.regioes_lista.forEach(function (reg) {
+                summary.regioes[reg] = {
+                    nome: reg,
+                    musicos: { culto_oficial: 0, oficializacao: 0, troca_instrumento: 0 },
+                    organistas: { rjm: 0, culto_oficial: 0, oficializacao: 0, testes_especiais: 0 },
+                    total: 0
+                };
+            });
+
+            $scope.filteredLancamentos.forEach(function (item) {
+                var m_co = item.musicos_culto_oficial || 0;
+                var m_of = item.musicos_oficializacao || 0;
+                var m_ti = item.musicos_troca_instrumento || 0;
+
+                var o_rjm = item.organistas_rjm || 0;
+                var o_co = item.organistas_culto_oficial || 0;
+                var o_of = item.organistas_oficializacao || 0;
+                var o_te = item.organistas_testes_especiais || 0;
+
+                var totMusicos = m_co + m_of + m_ti;
+                var totOrganistas = o_rjm + o_co + o_of + o_te;
+                var rowTotal = totMusicos + totOrganistas;
+
+                summary.totais.musicos.culto_oficial += m_co;
+                summary.totais.musicos.oficializacao += m_of;
+                summary.totais.musicos.troca_instrumento += m_ti;
+
+                summary.totais.organistas.rjm += o_rjm;
+                summary.totais.organistas.culto_oficial += o_co;
+                summary.totais.organistas.oficializacao += o_of;
+                summary.totais.organistas.testes_especiais += o_te;
+
+                summary.totais.musicos_total += totMusicos;
+                summary.totais.organistas_total += totOrganistas;
+                summary.totais.geral += rowTotal;
+
+                var regiao = getRegiaoDoMunicipio(item.municipio);
+
+                if (regiao === 'Outros') {
+                    if (!summary.regioes[regiao]) {
+                        summary.regioes[regiao] = {
+                            nome: 'Outras Localidades',
+                            musicos: { culto_oficial: 0, oficializacao: 0, troca_instrumento: 0 },
+                            organistas: { rjm: 0, culto_oficial: 0, oficializacao: 0, testes_especiais: 0 },
+                            total: 0
+                        };
+                    }
+                }
+
+                if (summary.regioes[regiao]) {
+                    summary.regioes[regiao].musicos.culto_oficial += m_co;
+                    summary.regioes[regiao].musicos.oficializacao += m_of;
+                    summary.regioes[regiao].musicos.troca_instrumento += m_ti;
+
+                    summary.regioes[regiao].organistas.rjm += o_rjm;
+                    summary.regioes[regiao].organistas.culto_oficial += o_co;
+                    summary.regioes[regiao].organistas.oficializacao += o_of;
+                    summary.regioes[regiao].organistas.testes_especiais += o_te;
+
+                    summary.regioes[regiao].total += rowTotal;
+                }
+            });
+
+            var regioesArray = Object.keys(summary.regioes).map(function (key) {
+                return summary.regioes[key];
+            }).filter(function(item) {
+                return item.total > 0 || $scope.regioes_lista.indexOf(item.nome) !== -1;
+            });
+
+            // Force sorting exactly to match the regions map order
+            var sortOrder = {
+                'Itapevi': 1,
+                'Jandira': 2,
+                'Cotia/Caucaia/VGP': 3,
+                'Santana/Pirapora': 4,
+                'Outras Localidades': 5
+            };
+
+            $scope.dashboardData = {
+                totais: summary.totais,
+                regioes: regioesArray.sort(function (a, b) {
+                    return (sortOrder[a.nome] || 99) - (sortOrder[b.nome] || 99);
+                })
+            };
+
+            // ---- Calcular Comparativo ----
+            var dataInicioOriginal = $scope.filters.dataInicio ? new Date($scope.filters.dataInicio) : null;
+            var dataFimOriginal = $scope.filters.dataFim ? new Date($scope.filters.dataFim) : null;
+            
+            var previousTotal = 0;
+            var currentTotal = summary.totais.geral;
+
+            if (dataInicioOriginal && dataFimOriginal) {
+                var diffTime = Math.abs(dataFimOriginal - dataInicioOriginal);
+                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                var prevEnd = new Date(dataInicioOriginal);
+                prevEnd.setDate(prevEnd.getDate() - 1);
+                var prevStart = new Date(prevEnd);
+                prevStart.setDate(prevStart.getDate() - diffDays);
+
+                $scope.lancamentos.forEach(function (item) {
+                    if (item.data_exame) {
+                        var itemDate = new Date(item.data_exame);
+                        if (itemDate >= prevStart && itemDate <= prevEnd) {
+                            var regiaoItem = getRegiaoDoMunicipio(item.municipio);
+                            if (!$scope.filters.regiao || regiaoItem === $scope.filters.regiao) {
+                                var m_co = item.musicos_culto_oficial || 0;
+                                var m_of = item.musicos_oficializacao || 0;
+                                var m_ti = item.musicos_troca_instrumento || 0;
+                                var o_rjm = item.organistas_rjm || 0;
+                                var o_co = item.organistas_culto_oficial || 0;
+                                var o_of = item.organistas_oficializacao || 0;
+                                var o_te = item.organistas_testes_especiais || 0;
+                                previousTotal += (m_co + m_of + m_ti + o_rjm + o_co + o_of + o_te);
+                            }
+                        }
+                    }
+                });
+
+                var deltaPercent = previousTotal > 0 ? ((currentTotal - previousTotal) / previousTotal) * 100 : 0;
+                $scope.comparativo = {
+                    currentTotal: currentTotal,
+                    previousTotal: previousTotal,
+                    delta: (currentTotal - previousTotal),
+                    deltaPercent: parseFloat(deltaPercent.toFixed(1)),
+                    label: "vs " + diffDays + " dias anteriores"
+                };
+            } else if ($scope.filters.mes) {
+                var currentMonthIdx = meses.indexOf($scope.filters.mes);
+                var prevMonthIdx = currentMonthIdx === 0 ? 11 : currentMonthIdx - 1;
+                var prevMonthName = meses[prevMonthIdx];
+                
+                $scope.lancamentos.forEach(function (item) {
+                    if (item.data_exame) {
+                        var itemMonthIdx = new Date(item.data_exame).getUTCMonth();
+                        if (itemMonthIdx === prevMonthIdx) {
+                            var regiaoItem = getRegiaoDoMunicipio(item.municipio);
+                            if (!$scope.filters.regiao || regiaoItem === $scope.filters.regiao) {
+                                var m_co = item.musicos_culto_oficial || 0;
+                                var m_of = item.musicos_oficializacao || 0;
+                                var m_ti = item.musicos_troca_instrumento || 0;
+                                var o_rjm = item.organistas_rjm || 0;
+                                var o_co = item.organistas_culto_oficial || 0;
+                                var o_of = item.organistas_oficializacao || 0;
+                                var o_te = item.organistas_testes_especiais || 0;
+                                previousTotal += (m_co + m_of + m_ti + o_rjm + o_co + o_of + o_te);
+                            }
+                        }
+                    }
+                });
+
+                var deltaPercent = previousTotal > 0 ? ((currentTotal - previousTotal) / previousTotal) * 100 : (currentTotal > 0 ? 100 : 0);
+                $scope.comparativo = {
+                    currentTotal: currentTotal,
+                    previousTotal: previousTotal,
+                    delta: (currentTotal - previousTotal),
+                    deltaPercent: parseFloat(deltaPercent.toFixed(1)),
+                    label: "vs Mês Anterior (" + prevMonthName + ")"
+                };
+            } else {
+                $scope.comparativo = {
+                    currentTotal: currentTotal,
+                    previousTotal: 0,
+                    delta: 0,
+                    deltaPercent: 0,
+                    label: "Selecione Mês ou Período"
+                };
+            }
+
+            // ---- Calcular Evolução Mensal (Flot Chart) ----
+            var dadosEvolucao = {};
+            var currentYear = new Date().getFullYear();
+            meses.forEach(function (m) {
+                dadosEvolucao[m] = { musicos: 0, organistas: 0 };
+            });
+
+            // Usaremos lancamentos originais filtrados apenas por região, ignorando mês e data para o gráfico mostrar o ano todo!
+            var lancamentosParaGrafico = $scope.lancamentos.filter(function (item) {
+                var matchRegiao = true;
+                if ($scope.filters.regiao) {
+                    matchRegiao = (getRegiaoDoMunicipio(item.municipio) === $scope.filters.regiao);
+                }
+                var itemYear = item.data_exame ? new Date(item.data_exame).getUTCFullYear() : currentYear;
+                return matchRegiao && (itemYear === currentYear);
+            });
+
+            lancamentosParaGrafico.forEach(function (item) {
+                if (item.data_exame) {
+                    var mIdx = new Date(item.data_exame).getUTCMonth();
+                    var mName = meses[mIdx];
+                    if (dadosEvolucao[mName]) {
+                        var totM = (item.musicos_culto_oficial||0) + (item.musicos_oficializacao||0) + (item.musicos_troca_instrumento||0);
+                        var totO = (item.organistas_rjm||0) + (item.organistas_culto_oficial||0) + (item.organistas_oficializacao||0) + (item.organistas_testes_especiais||0);
+                        dadosEvolucao[mName].musicos += totM;
+                        dadosEvolucao[mName].organistas += totO;
+                    }
+                }
+            });
+
+            var serieMusicos = [];
+            var serieOrganistas = [];
+            var ticksTrend = [];
+            meses.forEach(function (m, idx) {
+                serieMusicos.push([idx, dadosEvolucao[m].musicos]);
+                serieOrganistas.push([idx, dadosEvolucao[m].organistas]);
+                ticksTrend.push([idx, m.substring(0, 3) + '/' + currentYear.toString().substring(2)]);
+            });
+
+            $scope.examesTrendFlotOptions.xaxis.ticks = ticksTrend;
+            $scope.examesTrendFlotData = [
+                { label: "Músicos", data: serieMusicos },
+                { label: "Organistas", data: serieOrganistas }
+            ];
+
+            // ---- Calcular Ranking por Região (Flot Chart) ----
+            var rankingRegioes = Object.keys(summary.regioes).map(function (key) {
+                var r = summary.regioes[key];
+                var totM = r.musicos.culto_oficial + r.musicos.oficializacao + r.musicos.troca_instrumento;
+                var totO = r.organistas.rjm + r.organistas.culto_oficial + r.organistas.oficializacao + r.organistas.testes_especiais;
+                return { regiao: r.nome, total: r.total, musicos: totM, organistas: totO };
+            }).filter(function(r) { return r.total > 0; });
+
+            rankingRegioes.sort(function (a, b) { return b.total - a.total; });
+            $scope.examesTopRegioes = rankingRegioes;
+
+            var serieRank = [];
+            var ticksRank = [];
+            // Inverter para que o maior fique no topo
+            var invRank = rankingRegioes.slice().reverse();
+            invRank.forEach(function (r, idx) {
+                serieRank.push([r.total, idx]);
+                // Truncar o nome para caber no eixo Y
+                var shortName = r.regiao.length > 15 ? r.regiao.substring(0,12) + "..." : r.regiao;
+                ticksRank.push([idx, shortName]);
+            });
+
+            if (invRank.length === 0) {
+                ticksRank.push([0, "Sem dados"]);
+            }
+
+            $scope.examesRankFlotOptions.yaxis.ticks = ticksRank;
+            $scope.examesRankFlotData = [
+                { data: serieRank }
+            ];
+        };
+
+        $scope.$watch('filters', function () {
+            $scope.applyFilters();
+        }, true);
+
+        $scope.clearFilters = function () {
+            $scope.filters = {
+                regiao: '',
+                dataInicio: null,
+                dataFim: null,
+                mes: mesAtual
+            };
+        };
+
+        var formatDateBR = function (dateStr) {
+            if (!dateStr) return '';
+            var date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            var day = ("0" + date.getUTCDate()).slice(-2);
+            var month = ("0" + (date.getUTCMonth() + 1)).slice(-2);
+            var year = date.getUTCFullYear();
+            return day + "/" + month + "/" + year;
+        };
+
+        function getDashboardPeriodoLabel() {
+            var inicio = ($scope.filters || {}).dataInicio;
+            var fim = ($scope.filters || {}).dataFim;
+            var mesSelecionado = ($scope.filters || {}).mes;
+
+            if (inicio || fim) {
+                return (inicio ? formatDateBR(inicio) : 'Inicio') + ' ate ' + (fim ? formatDateBR(fim) : 'Fim');
+            }
+            if (mesSelecionado) {
+                return 'Mes vigente: ' + mesSelecionado;
+            }
+            return 'Mes vigente: ' + mesAtual;
+        }
+
+        function getDashboardGroupsByRegiao() {
+            var groups = {};
+            ($scope.filteredLancamentos || []).forEach(function (item) {
+                var regiao = getRegiaoDoMunicipio(item.municipio);
+                if (regiao === 'Outros') regiao = 'Outras Localidades';
+                groups[regiao] = groups[regiao] || [];
+                groups[regiao].push(item);
+            });
+
+            var sortOrder = {
+                'Itapevi': 1,
+                'Jandira': 2,
+                'Cotia/Caucaia/VGP': 3,
+                'Santana/Pirapora': 4,
+                'Outras Localidades': 5
+            };
+
+            return Object.keys(groups).sort(function (a, b) {
+                return (sortOrder[a] || 99) - (sortOrder[b] || 99);
+            }).map(function (regiao) {
+                return {
+                    regiao: regiao,
+                    lancamentos: groups[regiao].sort(function (a, b) {
+                        return String(a.igreja_comum || '').localeCompare(String(b.igreja_comum || ''), 'pt-BR');
+                    })
+                };
+            });
+        }
+
+        $scope.exportToExcel = function () {
+            if (!window.XLSX) {
+                alert("Biblioteca XLSX não carregada.");
+                return;
+            }
+            var grupos = getDashboardGroupsByRegiao();
+            var rows = [
+                ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
+                ['Regional Itapevi - São Paulo'],
+                ['MÚSICA'],
+                ['Relatório de Exames e Testes Detalhado'],
+                ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
+                ['Período: ' + getDashboardPeriodoLabel()],
+                []
+            ];
+            
+            var totals = { 
+                m_co: 0, m_of: 0, m_ti: 0,
+                o_rjm: 0, o_co: 0, o_of: 0, o_te: 0,
+                geral: 0 
+            };
+
+            grupos.forEach(function (grupo) {
+                rows.push(['REGIÃO: ' + grupo.regiao]);
+                rows.push(['Data', 'Comum/Igreja', 'Mús. Culto Oficial', 'Mús. Oficialização', 'Mús. Troca Instrumento', 'Org. RJM', 'Org. Culto Oficial', 'Org. Oficialização', 'Org. Teste Especial', 'Total Geral']);
+
+                grupo.lancamentos.forEach(function (item) {
+                    var m_co = item.musicos_culto_oficial || 0;
+                    var m_of = item.musicos_oficializacao || 0;
+                    var m_ti = item.musicos_troca_instrumento || 0;
+                    var o_rjm = item.organistas_rjm || 0;
+                    var o_co = item.organistas_culto_oficial || 0;
+                    var o_of = item.organistas_oficializacao || 0;
+                    var o_te = item.organistas_testes_especiais || 0;
+                    var total = m_co + m_of + m_ti + o_rjm + o_co + o_of + o_te;
+
+                    rows.push([
+                        formatDateBR(item.data_exame),
+                        item.igreja_comum || '',
+                        m_co, m_of, m_ti,
+                        o_rjm, o_co, o_of, o_te,
+                        total
+                    ]);
+                    totals.m_co += m_co;
+                    totals.m_of += m_of;
+                    totals.m_ti += m_ti;
+                    totals.o_rjm += o_rjm;
+                    totals.o_co += o_co;
+                    totals.o_of += o_of;
+                    totals.o_te += o_te;
+                    totals.geral += total;
+                });
+                rows.push([]);
+            });
+
+            if (!grupos.length) {
+                rows.push(['Nenhum exame encontrado.', '', '', '', '', '', '', '', '', '']);
+            }
+
+            rows.push(['TOTAIS GERAIS', '', totals.m_co, totals.m_of, totals.m_ti, totals.o_rjm, totals.o_co, totals.o_of, totals.o_te, totals.geral]);
+
+            var ws = XLSX.utils.aoa_to_sheet(rows);
+            ws['!cols'] = [
+                { wch: 14 },
+                { wch: 42 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 10 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 12 }
+            ];
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Exames e Testes");
+            XLSX.writeFile(wb, "Relatorio_Exames_" + new Date().toISOString().slice(0, 10) + ".xlsx");
+        };
+
+        $scope.exportToPDF = function () {
+            if (!window.pdfMake) {
+                alert("Biblioteca pdfMake não carregada.");
+                return;
+            }
+            var grupos = getDashboardGroupsByRegiao();
+            var content = [
+                { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
+                { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+                { text: 'MÚSICA', style: 'moduleName' },
+                { text: 'Relatório de Exames e Testes', style: 'reportTitle' },
+                { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 5] },
+                { text: 'Período: ' + getDashboardPeriodoLabel(), alignment: 'right', margin: [0, 0, 0, 10] }
+            ];
+
+            if (!grupos.length) {
+                content.push({ text: 'Nenhum exame encontrado.', alignment: 'center', margin: [0, 20, 0, 0] });
+            }
+
+            grupos.forEach(function (grupo) {
+                var body = [[
+                    { text: 'Data', style: 'tableHeader', rowSpan: 2 },
+                    { text: 'Comum/Igreja', style: 'tableHeader', rowSpan: 2 },
+                    { text: 'MÚSICOS', style: 'tableHeaderMusic', colSpan: 3 },
+                    {},
+                    {},
+                    { text: 'ORGANISTAS', style: 'tableHeaderOrg', colSpan: 4 },
+                    {},
+                    {},
+                    {},
+                    { text: 'Total', style: 'tableHeader', rowSpan: 2 }
+                ], [
+                    {},
+                    {},
+                    { text: 'Culto Oficial', style: 'tableSubHeader' },
+                    { text: 'Oficialização', style: 'tableSubHeader' },
+                    { text: 'Troca Instrumento', style: 'tableSubHeader' },
+                    { text: 'RJM', style: 'tableSubHeader' },
+                    { text: 'Culto Oficial', style: 'tableSubHeader' },
+                    { text: 'Oficialização', style: 'tableSubHeader' },
+                    { text: 'Teste Especial', style: 'tableSubHeader' },
+                    {}
+                ]];
+                var totals = { 
+                    m_co: 0, m_of: 0, m_ti: 0,
+                    o_rjm: 0, o_co: 0, o_of: 0, o_te: 0,
+                    geral: 0 
+                };
+
+                grupo.lancamentos.forEach(function (item) {
+                    var m_co = item.musicos_culto_oficial || 0;
+                    var m_of = item.musicos_oficializacao || 0;
+                    var m_ti = item.musicos_troca_instrumento || 0;
+                    var o_rjm = item.organistas_rjm || 0;
+                    var o_co = item.organistas_culto_oficial || 0;
+                    var o_of = item.organistas_oficializacao || 0;
+                    var o_te = item.organistas_testes_especiais || 0;
+                    var total = m_co + m_of + m_ti + o_rjm + o_co + o_of + o_te;
+
+                    body.push([
+                        formatDateBR(item.data_exame),
+                        item.igreja_comum || '',
+                        m_co, m_of, m_ti,
+                        o_rjm, o_co, o_of, o_te,
+                        total
+                    ]);
+                    
+                    totals.m_co += m_co;
+                    totals.m_of += m_of;
+                    totals.m_ti += m_ti;
+                    totals.o_rjm += o_rjm;
+                    totals.o_co += o_co;
+                    totals.o_of += o_of;
+                    totals.o_te += o_te;
+                    totals.geral += total;
+                });
+
+                body.push([
+                    { text: 'TOTAIS DA REGIÃO', colSpan: 2, bold: true, fillColor: '#f3f3f3', alignment: 'right' },
+                    {},
+                    { text: totals.m_co, bold: true, fillColor: '#f3f3f3' },
+                    { text: totals.m_of, bold: true, fillColor: '#f3f3f3' },
+                    { text: totals.m_ti, bold: true, fillColor: '#f3f3f3' },
+                    { text: totals.o_rjm, bold: true, fillColor: '#f3f3f3' },
+                    { text: totals.o_co, bold: true, fillColor: '#f3f3f3' },
+                    { text: totals.o_of, bold: true, fillColor: '#f3f3f3' },
+                    { text: totals.o_te, bold: true, fillColor: '#f3f3f3' },
+                    { text: totals.geral, bold: true, fillColor: '#f3f3f3' }
+                ]);
+
+                content.push({ text: 'MUNICÍPIO: ' + grupo.regiao, style: 'groupTitle' });
+                content.push({
+                    table: {
+                        headerRows: 2,
+                        widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                        body: body
+                    },
+                    layout: {
+                        fillColor: function (rowIndex, node, columnIndex) {
+                            if (rowIndex === 0 || rowIndex === 1) {
+                                return null;
+                            }
+                            if (rowIndex === body.length - 1) return '#f3f3f3';
+                            return rowIndex % 2 !== 0 ? '#f9f9f9' : null;
+                        }
+                    },
+                    margin: [0, 0, 0, 15]
+                });
+            });
+
+            var docDefinition = {
+                pageOrientation: 'landscape',
+                pageMargins: [30, 30, 30, 30],
+                content: content,
+                styles: {
+                    entityName: { fontSize: 16, bold: true, alignment: 'center' },
+                    entitySub: { fontSize: 11, alignment: 'center' },
+                    moduleName: { fontSize: 14, bold: true, color: '#1e4b7a', alignment: 'center', margin: [0, 8, 0, 0] },
+                    reportTitle: { fontSize: 11, alignment: 'center', margin: [0, 0, 0, 10] },
+                    groupTitle: { fontSize: 11, bold: true, color: '#1e4b7a', margin: [0, 8, 0, 4] },
+                    tableHeader: { color: '#ffffff', bold: true, alignment: 'center', fillColor: '#1e4b7a', margin: [2, 5, 2, 5] },
+                    tableHeaderMusic: { color: '#ffffff', bold: true, alignment: 'center', fillColor: '#1ab394', margin: [2, 2, 2, 2] },
+                    tableHeaderOrg: { color: '#ffffff', bold: true, alignment: 'center', fillColor: '#f8ac59', margin: [2, 2, 2, 2] },
+                    tableSubHeader: { color: '#333333', bold: true, alignment: 'center', fillColor: '#e5e6e7', margin: [2, 2, 2, 2], fontSize: 8 }
+                },
+                defaultStyle: {
+                    fontSize: 8
+                }
+            };
+
+            pdfMake.createPdf(docDefinition).download("Relatorio_Exames_" + new Date().toISOString().slice(0, 10) + ".pdf");
+        };
+
+        loadData();
     }
 })();

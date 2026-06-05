@@ -191,6 +191,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             data: { pageTitle: 'Dashboard Musicaliza\u00e7\u00e3o' },
             controller: 'musicalizacaoCtrl'
         })
+
         .state('musicalizacao.criancas', {
             url: "/criancas",
             templateUrl: "views/musicalizacao_alunos.html?v=1.3.16",
@@ -214,6 +215,27 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             templateUrl: "views/musicalizacao_aulas.html?v=1.3.6",
             data: { pageTitle: 'Atividades' },
             controller: 'musicalizacaoAulasCtrl'
+        })
+        .state('musicalizacao.historico', {
+            url: "/historico-atividades",
+            templateUrl: "views/musicalizacao_atividades_historico.html?v=1.0.0",
+            data: { pageTitle: 'Gerenciador de Atividades' },
+            controller: 'musicalizacaoAtividadesHistoricoCtrl',
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'angles',
+                            files: ['js/plugins/chartJs/angles.js', 'js/plugins/chartJs/Chart.min.js']
+                        },
+                        {
+                            serie: true,
+                            name: 'angular-flot',
+                            files: ['js/plugins/flot/jquery.flot.js', 'js/plugins/flot/jquery.flot.time.js', 'js/plugins/flot/jquery.flot.tooltip.min.js', 'js/plugins/flot/jquery.flot.spline.js', 'js/plugins/flot/jquery.flot.resize.js', 'js/plugins/flot/jquery.flot.pie.js', 'js/plugins/flot/curvedLines.js', 'js/plugins/flot/angular-flot.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('musicalizacao.nova_aula', {
             url: "/nova_aula/:id",
@@ -580,6 +602,22 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             templateUrl: "views/musica_relatorios.html?v=1.1.2",
             data: { pageTitle: 'M\u00fasica - Relat\u00f3rios' },
             controller: 'musicaRelatoriosCtrl'
+        })
+        .state('music.exames', {
+            url: "/exames",
+            templateUrl: "views/musica_exames.html?v=1.0.1",
+            data: { pageTitle: 'M\u00fasica - Exames e Testes' },
+            controller: 'musicaExamesCtrl',
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'angles',
+                            files: ['js/plugins/chartJs/angles.js', 'js/plugins/chartJs/Chart.min.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('music.static_table', {
             url: "/static_table",

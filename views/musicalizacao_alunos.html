@@ -254,7 +254,7 @@
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Celular do Responsável *</label>
-                            <input type="text" ng-model="newAluno.celular_responsavel" oninput="let v=this.value.replace(/\D/g,'').slice(0,11); v=v.replace(/^(\d{2})(\d)/g,'($1) $2'); v=v.replace(/(\d)(\d{4})$/,'$1-$2'); this.value=v;" class="form-control" placeholder="(11) 91234-5678" maxlength="15" inputmode="numeric" pattern="^\(\d{2}\)\s\d{4,5}-\d{4}$" title="Use o formato (11) 91234-5678 ou (11) 4002-8922" required>
+                            <input type="text" ng-model="newAluno.celular_responsavel" oninput="let v=this.value.replace(/\D/g,'').slice(0,11); v=v.replace(/^(\d{2})(\d)/g,'($1) $2'); v=v.replace(/(\d)(\d{4})$/,'$1-$2'); this.value=v;" class="form-control" placeholder="(11) 91234-5678" maxlength="15" inputmode="numeric" pattern="^\(\d{2}\)\s?\d?\s?\d{4}-\d{4}$" title="Use o formato (11) 91234-5678 ou (11) 4002-8922" required>
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Tem WhatsApp?</label>
@@ -438,7 +438,7 @@
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Celular do Responsável *</label>
-                            <input type="text" ng-model="editingAluno.celular_responsavel" oninput="let v=this.value.replace(/\D/g,'').slice(0,11); v=v.replace(/^(\d{2})(\d)/g,'($1) $2'); v=v.replace(/(\d)(\d{4})$/,'$1-$2'); this.value=v;" class="form-control" placeholder="(11) 91234-5678" maxlength="15" inputmode="numeric" pattern="^\(\d{2}\)\s\d{4,5}-\d{4}$" title="Use o formato (11) 91234-5678 ou (11) 4002-8922" ng-disabled="viewOnly" required>
+                            <input type="text" ng-model="editingAluno.celular_responsavel" oninput="let v=this.value.replace(/\D/g,'').slice(0,11); v=v.replace(/^(\d{2})(\d)/g,'($1) $2'); v=v.replace(/(\d)(\d{4})$/,'$1-$2'); this.value=v;" class="form-control" placeholder="(11) 91234-5678" maxlength="15" inputmode="numeric" pattern="^\(\d{2}\)\s?\d?\s?\d{4}-\d{4}$" title="Use o formato (11) 91234-5678 ou (11) 4002-8922" ng-disabled="viewOnly" required>
                         </div>
                         <div class="col-sm-3 form-group">
                             <label>Tem WhatsApp?</label>

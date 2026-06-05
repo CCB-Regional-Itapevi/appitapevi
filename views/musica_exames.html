@@ -1,0 +1,332 @@
+<style>
+    .ebi-history-chart-box { min-height: 420px; }
+    .ebi-history-chart-box .ibox-content { min-height: 360px; }
+    .ebi-chart-note { color: #7f8c8d; line-height: 1.5; margin-bottom: 14px; }
+    .ebi-rank-summary { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .ebi-rank-pill { flex: 1 1 120px; border-radius: 10px; padding: 10px 12px; color: #fff; }
+    .ebi-rank-pill .label { display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.26); color: rgba(255,255,255,.96); }
+    .ebi-rank-pill .value { display: block; font-size: 18px; font-weight: 700; color: #fff; }
+    .ebi-metric-intro { color: #7f8c8d; line-height: 1.55; margin-bottom: 18px; }
+    .ebi-metric-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+    .ebi-metric-widget { flex: 1 1 calc(50% - 12px); min-width: 140px; margin: 0; border-radius: 10px; overflow: hidden; }
+    .ebi-metric-widget .row { margin: 0; }
+    .ebi-metric-widget .col-xs-4, .ebi-metric-widget .col-xs-8 { padding-top: 8px; padding-bottom: 8px; }
+    .ebi-metric-widget .metric-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .9; margin-bottom: 4px; }
+    .ebi-metric-widget .metric-value { display: block; font-size: 24px; font-weight: 700; line-height: 1.1; }
+    .ebi-metric-widget .metric-sub { display: block; margin-top: 6px; font-size: 11px; line-height: 1.35; opacity: .92; }
+</style>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-6">
+        <h2>Dashboard Exames e Testes</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a ui-sref="dashboards.dashboard_2">Home</a>
+            </li>
+            <li>
+                <a>Música</a>
+            </li>
+            <li class="active">
+                <strong>Exames e Testes</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <!-- Top Summary Widgets -->
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="widget style1 navy-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-music fa-5x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Músicos </span>
+                        <h2 class="font-bold">{{ dashboardData.totais.musicos_total || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="widget style1 lazur-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-female fa-5x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Organistas </span>
+                        <h2 class="font-bold">{{ dashboardData.totais.organistas_total || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="widget style1 yellow-bg">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-map-marker fa-5x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Regiões </span>
+                        <h2 class="font-bold">{{ dashboardData.regioes.length || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="widget style1 bg-primary">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <i class="fa fa-check-square-o fa-5x"></i>
+                    </div>
+                    <div class="col-xs-8 text-right">
+                        <span> Total Exames </span>
+                        <h2 class="font-bold">{{ dashboardData.totais.geral || 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row m-t-md">
+        <!-- Indicadores de Performance -->
+        <div class="col-lg-4">
+            <div class="ibox ebi-history-chart-box">
+                <div class="ibox-title"><h5>Indicadores de performance</h5></div>
+                <div class="ibox-content">
+                    <div class="m-b-lg">
+                        <h2 class="no-margins">{{ comparativo.deltaPercent || 0 }}%</h2>
+                        <div class="stat-percent font-bold" ng-class="{'text-success': comparativo.delta > 0, 'text-danger': comparativo.delta < 0, 'text-navy': comparativo.delta === 0}">
+                            {{ comparativo.delta > 0 ? '+' : '' }}{{ comparativo.delta || 0 }} 
+                            <i class="fa" ng-class="{'fa-level-up': comparativo.delta > 0, 'fa-level-down': comparativo.delta < 0, 'fa-minus': comparativo.delta === 0}"></i>
+                        </div>
+                        <small>{{ comparativo.label }}</small>
+                    </div>
+                    <div class="ebi-metric-intro">
+                        Visão rápida do volume de exames de música, com comparativo do período anterior para avaliar crescimento e demandas de testes nas regiões.
+                    </div>
+                    <div class="m-b-md">
+                        <span class="text-muted">Total de Exames no Período</span>
+                        <h3 class="font-bold">{{ dashboardData.totais.geral || 0 }}</h3>
+                        <div class="progress progress-mini">
+                            <div class="progress-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="ebi-metric-grid">
+                        <div class="widget style1 navy-bg ebi-metric-widget">
+                            <div class="row">
+                                <div class="col-xs-3 text-left" style="padding-left:20px; padding-top:5px;"><i class="fa fa-music fa-4x"></i></div>
+                                <div class="col-xs-9 text-right">
+                                    <span class="metric-label">MÚSICOS OFICIALIZADOS</span>
+                                    <span class="metric-value">{{ dashboardData.totais.musicos.oficializacao || 0 }}</span>
+                                    <span class="metric-sub">Total de oficializações de músicos.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="widget style1 lazur-bg ebi-metric-widget">
+                            <div class="row">
+                                <div class="col-xs-3 text-left" style="padding-left:20px; padding-top:5px;"><i class="fa fa-female fa-4x"></i></div>
+                                <div class="col-xs-9 text-right">
+                                    <span class="metric-label">ORGANISTAS OFICIALIZADAS</span>
+                                    <span class="metric-value">{{ dashboardData.totais.organistas.oficializacao || 0 }}</span>
+                                    <span class="metric-sub">Total de oficializações de organistas.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Evolução Mensal -->
+        <div class="col-lg-5">
+            <div class="ibox ebi-history-chart-box">
+                <div class="ibox-title"><h5>Evolução mensal de exames</h5></div>
+                <div class="ibox-content">
+                    <div class="ebi-chart-note">
+                        Tendência consolidada no ano atual, exibindo separadamente Músicos e Organistas.
+                    </div>
+                    <div flot class="flot-chart-content" dataset="examesTrendFlotData" options="examesTrendFlotOptions" style="height:300px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ranking -->
+        <div class="col-lg-3">
+            <div class="ibox ebi-history-chart-box">
+                <div class="ibox-title"><h5>Ranking de exames por região</h5></div>
+                <div class="ibox-content">
+                    <div class="ebi-rank-summary">
+                        <div class="ebi-rank-pill lazur-bg">
+                            <span class="label">Regiões Ativas</span>
+                            <span class="value">{{ examesTopRegioes.length || 0 }}</span>
+                        </div>
+                        <div class="ebi-rank-pill yellow-bg" ng-if="examesTopRegioes.length">
+                            <span class="label">Maior Volume</span>
+                            <span class="value">{{ examesTopRegioes[0].regiao }}</span>
+                        </div>
+                    </div>
+                    <div flot class="flot-chart-content" dataset="examesRankFlotData" options="examesRankFlotOptions" style="height:150px;"></div>
+                    <div class="m-t-md text-left">
+                        <div ng-repeat="item in examesTopRegioes | limitTo: 3">
+                            <strong>{{ item.regiao }}</strong><span class="pull-right font-bold">{{ item.total }} exames</span>
+                            <div class="clearfix"></div>
+                            <small class="text-muted">{{ item.musicos }} Músicos | {{ item.organistas }} Organistas</small>
+                            <hr style="margin:8px 0;" ng-if="!$last">
+                        </div>
+                        <div class="text-muted" ng-if="!examesTopRegioes.length">Nenhuma região com dados para o filtro atual.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Reports & Filters -->
+    <div class="row m-t-md">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Relatórios e Filtros Rápidos - Exames e Testes</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="control-label">Mês</label>
+                                <select class="form-control input-sm" ng-model="filters.mes"
+                                    ng-options="mes for mes in meses">
+                                    <option value="">Todos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">Período</label>
+                                <div class="input-group">
+                                    <input type="date" class="form-control input-sm" ng-model="filters.dataInicio">
+                                    <span class="input-group-addon">até</span>
+                                    <input type="date" class="form-control input-sm" ng-model="filters.dataFim">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label">Região</label>
+                                <select class="form-control input-sm" ng-model="filters.regiao"
+                                    ng-options="c for c in regioes_lista">
+                                    <option value="">Todas as Regiões</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 text-right m-t-md">
+                            <button class="btn btn-primary btn-sm" ng-click="exportToExcel()">
+                                <i class="fa fa-file-excel-o"></i> Excel
+                            </button>
+                            <button class="btn btn-danger btn-sm" ng-click="exportToPDF()">
+                                <i class="fa fa-file-pdf-o"></i> PDF
+                            </button>
+                            <button class="btn btn-white btn-sm" ng-click="clearFilters()">
+                                <i class="fa fa-eraser"></i> Limpar
+                            </button>
+                        </div>
+                    </div>
+    <!-- Região Summary Table -->
+    <div class="row m-t-md">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Resumo de Exames e Testes por Região - {{ getMesFiltroLabel() }}</h5>
+                    <div class="ibox-tools">
+                        <span class="label label-primary">Regional Itapevi</span>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    
+                    <div class="row m-b-sm">
+                        <div class="col-md-7">
+                            <div class="well well-sm" style="margin-bottom: 0;">
+                                <strong>Leitura executiva:</strong> {{ dashboardData.totais.geral || 0 }} exames aplicados em {{ dashboardData.regioes.length || 0 }} regiões. {{ dashboardData.totais.musicos_total || 0 }} músicos e {{ dashboardData.totais.organistas_total || 0 }} organistas avaliados.
+                                <br><small class="text-muted">Comparação: {{ comparativo.currentTotal || 0 }} no período atual contra {{ comparativo.previousTotal || 0 }} no período anterior equivalente.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-if="loading">
+                        <div class="col-lg-12 text-center">
+                            <div class="spiner-example">
+                                <div class="sk-spinner sk-spinner-three-bounce">
+                                    <div class="sk-bounce1"></div>
+                                    <div class="sk-bounce2"></div>
+                                    <div class="sk-bounce3"></div>
+                                </div>
+                            </div>
+                            <p>Carregando dados...</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" ng-if="!loading">
+                        <table class="table table-hover table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="text-left" style="vertical-align: middle;">REGIÃO</th>
+                                    <th colspan="3" class="text-center"
+                                        style="background-color: #1ab394; color: white;">MÚSICOS</th>
+                                    <th colspan="4" class="text-center"
+                                        style="background-color: #f8ac59; color: white;">ORGANISTAS</th>
+                                    <th rowspan="2" class="text-center"
+                                        style="vertical-align: middle; background-color: #1c84c6; color: white;">TOTAL
+                                        GERAL</th>
+                                </tr>
+                                <tr style="background-color: #f3f3f4; font-size: 0.9em;">
+                                    <th class="text-center">Culto Oficial</th>
+                                    <th class="text-center">Oficialização</th>
+                                    <th class="text-center">Troca Instrumento</th>
+                                    <th class="text-center">RJM</th>
+                                    <th class="text-center">Culto Oficial</th>
+                                    <th class="text-center">Oficialização</th>
+                                    <th class="text-center">Teste Esp.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in dashboardData.regioes">
+                                    <td class="text-left"><i class="fa fa-map-marker text-danger m-r-xs"></i><strong>{{
+                                            item.nome }}</strong></td>
+                                    <td>{{ item.musicos.culto_oficial }}</td>
+                                    <td>{{ item.musicos.oficializacao }}</td>
+                                    <td>{{ item.musicos.troca_instrumento }}</td>
+                                    <td>{{ item.organistas.rjm }}</td>
+                                    <td>{{ item.organistas.culto_oficial }}</td>
+                                    <td>{{ item.organistas.oficializacao }}</td>
+                                    <td>{{ item.organistas.testes_especiais }}</td>
+                                    <td><span class="label label-primary">{{ item.total }}</span></td>
+                                </tr>
+                                <tr ng-if="dashboardData.regioes.length === 0">
+                                    <td colspan="9" class="text-center">Nenhum exame encontrado para os filtros
+                                        selecionados.</td>
+                                </tr>
+                            </tbody>
+                            <tfoot style="background: #f3f3f4; font-weight: bold;">
+                                <tr>
+                                    <td class="text-left"><i class="fa fa-map-marker m-r-xs"></i>TOTAIS GERAIS</td>
+                                    <td>{{ dashboardData.totais.musicos.culto_oficial }}</td>
+                                    <td>{{ dashboardData.totais.musicos.oficializacao }}</td>
+                                    <td>{{ dashboardData.totais.musicos.troca_instrumento }}</td>
+                                    <td>{{ dashboardData.totais.organistas.rjm }}</td>
+                                    <td>{{ dashboardData.totais.organistas.culto_oficial }}</td>
+                                    <td>{{ dashboardData.totais.organistas.oficializacao }}</td>
+                                    <td>{{ dashboardData.totais.organistas.testes_especiais }}</td>
+                                    <td><span class="badge badge-primary" style="font-size: 1.1em;">{{
+                                            dashboardData.totais.geral }}</span></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
