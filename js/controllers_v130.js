@@ -59,6 +59,14 @@
 function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
 
     var main = this;
+    
+    // LGPD Cookie Consent Logic
+    $scope.lgpdCookieConsent = localStorage.getItem('lgpd_cookie_consent') === 'true';
+    $scope.acceptLgpdCookies = function() {
+        localStorage.setItem('lgpd_cookie_consent', 'true');
+        $scope.lgpdCookieConsent = true;
+    };
+
     var DEFAULT_AVATAR_URL = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?_=20150327203541';
     var notifyService = null;
     var fallbackPendingToast = null;
@@ -14591,6 +14599,14 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         $scope.cepLookupLoading = false;
         lastCepLookupDigits = String($scope.newAluno.cep || '').replace(/\D/g, '');
         configureCadastroMusicForm($scope, 'newAluno', AuthService);
+        
+        $scope.currentAudit = null;
+        if (AuthService && typeof AuthService.getRecordAuditHistory === 'function') {
+            AuthService.getRecordAuditHistory(aluno.id, 'EBI').then(function(audit) {
+                $scope.currentAudit = audit;
+            });
+        }
+        
         showAlunoModal();
     };
 
@@ -14612,6 +14628,14 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
         $scope.cepLookupLoading = false;
         lastCepLookupDigits = String($scope.newAluno.cep || '').replace(/\D/g, '');
         configureCadastroMusicForm($scope, 'newAluno', AuthService);
+        
+        $scope.currentAudit = null;
+        if (AuthService && typeof AuthService.getRecordAuditHistory === 'function') {
+            AuthService.getRecordAuditHistory(aluno.id, 'EBI').then(function(audit) {
+                $scope.currentAudit = audit;
+            });
+        }
+        
         showAlunoModal();
     };
 
@@ -20488,6 +20512,14 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
         $scope.editingAluno.celular_responsavel = formatBrazilPhone($scope.editingAluno.celular_responsavel);
         $scope.viewOnly = false;
         $scope.closeComumPicker();
+        
+        $scope.currentAudit = null;
+        if (AuthService && typeof AuthService.getRecordAuditHistory === 'function') {
+            AuthService.getRecordAuditHistory(aluno.id, 'MUSICALIZACAO').then(function(audit) {
+                $scope.currentAudit = audit;
+            });
+        }
+        
         $('#modalEditAluno').modal('show');
     };
 
@@ -23377,7 +23409,7 @@ loadDashboard();
         .controller('gemTurmasCtrl', gemTurmasCtrl);
 
     gemDashboardCtrl.$inject = ['$scope', '$state', 'GemService'];
-    gemAlunosCtrl.$inject = ['$scope', '$state', '$rootScope', '$timeout', 'GemService'];
+    gemAlunosCtrl.$inject = ['$scope', '$state', '$rootScope', '$timeout', 'GemService', 'AuthService'];
     gemResumoCtrl.$inject = ['$scope', '$state', '$stateParams', '$rootScope', 'GemService'];
     gemHistoricoCtrl.$inject = ['$scope', '$state', 'GemService'];
     gemPlanosCtrl.$inject = ['$scope', '$state', 'GemService'];
@@ -23493,7 +23525,7 @@ loadDashboard();
         }
     }
 
-    function gemAlunosCtrl($scope, $state, $rootScope, $timeout, GemService) {
+    function gemAlunosCtrl($scope, $state, $rootScope, $timeout, GemService, AuthService) {
         var requestToken = 0;
         var filtersInitialized = false;
 
@@ -23528,6 +23560,12 @@ loadDashboard();
 
         $scope.prepareEdit = function (aluno) {
             $scope.editingAluno = angular.extend(buildAlunoPayload(), angular.copy(aluno || {}));
+            $scope.currentAudit = null;
+            if (AuthService && typeof AuthService.getRecordAuditHistory === 'function') {
+                AuthService.getRecordAuditHistory(aluno.id, 'GEM').then(function(audit) {
+                    $scope.currentAudit = audit;
+                });
+            }
             openGemModal('#gemAlunoModal');
         };
 
@@ -23639,6 +23677,11 @@ loadDashboard();
 
             if (!payload.nome_aluno) {
                 showGemAlert('Nome obrigatorio', 'Informe o nome do aluno para continuar.', 'warning');
+                return;
+            }
+
+            if (!payload.lgpd_consent) {
+                showGemAlert('Consentimento Obrigatório', 'É obrigatório aceitar a Política de Privacidade para prosseguir.', 'warning');
                 return;
             }
 

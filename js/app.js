@@ -1,4 +1,4 @@
-﻿/**
+/**
  * INSPINIA - Responsive Admin Theme
  *
  */
@@ -20,6 +20,18 @@
             num = '' + num;
             while (num.length < len) num = '0' + num;
             return num;
+        };
+    })
+    .directive('auditFooter', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                audit: '='
+            },
+            template: '<div ng-if="audit" class="well well-sm m-t-md m-b-none" style="font-size: 11px; color: #777; background: transparent; border: none; padding: 0 15px;">' +
+                      '<div ng-if="audit.created_at"><i class="fa fa-info-circle"></i> <strong>Cadastrado por:</strong> {{audit.created_by}} em {{audit.created_at | date:"dd/MM/yyyy HH:mm"}}</div>' +
+                      '<div ng-if="audit.updated_at && audit.updated_at !== audit.created_at"><i class="fa fa-refresh"></i> <strong>Última atualização:</strong> {{audit.updated_by}} em {{audit.updated_at | date:"dd/MM/yyyy HH:mm"}}</div>' +
+                      '</div>'
         };
     })
     .constant('UiStandards', window.AppUiStandards || {})

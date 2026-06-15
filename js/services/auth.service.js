@@ -63,6 +63,7 @@
             filterCollectionByDataScope: filterCollectionByDataScope,
             applyDataScopeToPayload: applyDataScopeToPayload,
             logAudit: logAudit,
+            getRecordAuditHistory: getRecordAuditHistory,
             trackPageAccess: trackPageAccess,
             countPendingUsers: countPendingUsers,
             handleLoginRedirect: handleLoginRedirect,
@@ -1688,6 +1689,63 @@
                     deferred.reject(error);
                 });
             });
+
+            return deferred.promise;
+        }
+
+        function getRecordAuditHistory(recordId, moduleName) {
+            var deferred = $q.defer();
+            
+            if (!recordId) {
+                deferred.resolve({ created: null, updated: null });
+                return deferred.promise;
+            }
+
+            var query = supabase
+                .from('audit_logs')
+                .select('action, details, created_at, user_id')
+                .eq('details->>record_id', String(recordId));
+                
+            if (moduleName) {
+                query = query.eq('module', moduleName);
+            }
+
+            query.order('created_at', { ascending: true })
+                .then(function(response) {
+                    if (response.error) {
+                        deferred.resolve({ created: null, updated: null });
+                        return;
+                    }
+
+                    var logs = response.data || [];
+                    var created = null;
+                    var updated = null;
+
+                    logs.forEach(function(log) {
+                        var isCreate = log.action && log.action.indexOf('_CREATE') !== -1;
+                        var isUpdate = log.action && (log.action.indexOf('_UPDATE') !== -1 || log.action.indexOf('_SAVE') !== -1);
+                        var info = {
+                            action: log.action,
+                            actor_name: (log.details && log.details.actor_name) ? log.details.actor_name : 'Usuário Desconhecido',
+                            created_at: log.created_at
+                        };
+
+                        if (isCreate && !created) {
+                            created = info;
+                        }
+                        if (isUpdate) {
+                            updated = info;
+                        }
+                    });
+
+                    deferred.resolve({
+                        created: created,
+                        updated: updated
+                    });
+                })
+                .catch(function() {
+                    deferred.resolve({ created: null, updated: null });
+                });
 
             return deferred.promise;
         }

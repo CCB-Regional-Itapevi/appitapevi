@@ -134,6 +134,15 @@
     <script src="js/controllers_darpe.js?v=2.4.0"></script>
 
 
+    <div class="cookie-banner" ng-if="!lgpdCookieConsent" style="position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.85); color: #fff; padding: 15px; z-index: 9999; text-align: center; font-size: 14px;">
+        <p style="margin: 0; display: inline-block; margin-right: 20px;">
+            <i class="fa fa-cookie-bite"></i> 
+            Utilizamos cookies e tecnologias semelhantes para armazenar as suas escolhas de privacidade e melhorar a sua experiência. 
+            Ao continuar navegando, você concorda com a nossa <a href="#/dashboards/privacidade" style="color: #1ab394; text-decoration: underline;">Política de Privacidade</a>.
+        </p>
+        <button class="btn btn-primary btn-sm" ng-click="acceptLgpdCookies()" style="margin-top: 5px;">Entendi e Aceito</button>
+    </div>
+
 </body>
 
 </html>

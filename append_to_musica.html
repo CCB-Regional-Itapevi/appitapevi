@@ -1,0 +1,113 @@
+            </div>
+            
+            <!-- ABA PREPARADOS -->
+            <div class="tab-pane" ng-class="{'active': activeTab === 'preparados'}">
+                <div class="panel-body">
+                    <div class="row m-b-sm">
+                        <div class="col-sm-8">
+                            <h3 class="m-t-none m-b-none">Lista de Nomes Preparados</h3>
+                            <small>Cadastre os candidatos (Músicos e Organistas) para o exame.</small>
+                        </div>
+                        <div class="col-sm-4 text-right">
+                            <button class="btn btn-primary btn-sm" ng-click="abrirModalCandidato()"><i class="fa fa-plus"></i> Adicionar Candidato</button>
+                            <button class="btn btn-danger btn-sm" ng-click="limparLista()"><i class="fa fa-trash"></i> Limpar Lista</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Idade</th>
+                                    <th>Comum</th>
+                                    <th>Categoria</th>
+                                    <th>Nível do Exame</th>
+                                    <th>Data do Teste</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="cand in candidatosPreparados track by $index">
+                                    <td><strong>{{ cand.nome }}</strong></td>
+                                    <td>{{ cand.idade }}</td>
+                                    <td>{{ cand.comum }}</td>
+                                    <td>
+                                        <span class="label" ng-class="{'label-success': cand.categoria == 'Músico', 'label-warning': cand.categoria == 'Organista'}">
+                                            <i class="fa" ng-class="{'fa-music': cand.categoria == 'Músico', 'fa-female': cand.categoria == 'Organista'}"></i>
+                                            {{ cand.categoria }}
+                                        </span>
+                                    </td>
+                                    <td>{{ cand.nivel }}</td>
+                                    <td>{{ cand.data_teste | date:'dd/MM/yyyy' }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-white btn-sm" ng-click="abrirModalCandidato(cand)"><i class="fa fa-pencil"></i></button>
+                                        <button class="btn btn-danger btn-sm" ng-click="excluirCandidato($index)"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr ng-if="!candidatosPreparados || candidatosPreparados.length === 0">
+                                    <td colspan="7" class="text-center text-muted">Nenhum candidato na lista de preparados.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Candidato -->
+    <div class="modal inmodal fade" id="modalCandidatoExame" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <i class="fa fa-user-plus modal-icon" style="color: #1ab394;"></i>
+                    <h4 class="modal-title">{{ candidatoForm.id ? 'Editar Candidato' : 'Novo Candidato' }}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-9 form-group">
+                            <label>Nome do Candidato</label>
+                            <input type="text" class="form-control" ng-model="candidatoForm.nome" placeholder="Ex: Heloisa Lourdes de Freitas">
+                        </div>
+                        <div class="col-sm-3 form-group">
+                            <label>Idade</label>
+                            <input type="number" class="form-control" ng-model="candidatoForm.idade" placeholder="Ex: 20">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label>Comum Congregação</label>
+                            <input type="text" class="form-control" ng-model="candidatoForm.comum" placeholder="Ex: Jardim Cruzeiro">
+                        </div>
+                        <div class="col-sm-6 form-group">
+                            <label>Data do Teste</label>
+                            <input type="date" class="form-control" ng-model="candidatoForm.data_teste">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label>Categoria</label>
+                            <select class="form-control" ng-model="candidatoForm.categoria" ng-change="candidatoForm.nivel = ''">
+                                <option value="">Selecione...</option>
+                                <option value="Músico">Músico</option>
+                                <option value="Organista">Organista</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 form-group">
+                            <label>Nível do Exame</label>
+                            <select class="form-control" ng-model="candidatoForm.nivel" ng-disabled="!candidatoForm.categoria">
+                                <option value="">Selecione...</option>
+                                <option ng-repeat="n in (candidatoForm.categoria == 'Organista' ? ['RJM', 'Culto Oficial', 'Oficialização', 'Teste Especial'] : (candidatoForm.categoria == 'Músico' ? ['Culto Oficial', 'Oficialização', 'Troca de Instrumento'] : []))" value="{{ n }}">{{ n }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" ng-click="salvarCandidato()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

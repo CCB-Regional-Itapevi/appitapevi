@@ -1,4 +1,4 @@
-﻿/**
+/**
  * INSPINIA - Responsive Admin Theme
  *
  * Main directives.js file
@@ -682,4 +682,19 @@ angular
     .directive('truncate', truncate)
     .directive('touchSpin', touchSpin)
     .directive('markdownEditor', markdownEditor)
-    .directive('passwordMeter', passwordMeter);
+    .directive('passwordMeter', passwordMeter)
+    .directive('auditFooter', auditFooter);
+
+function auditFooter() {
+    return {
+        restrict: 'E',
+        scope: {
+            audit: '='
+        },
+        template: 
+            '<div class="audit-footer text-muted small" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #e7eaec;" ng-if="audit && (audit.created || audit.updated)">' +
+            '    <div ng-if="audit.created"><i class="fa fa-user-plus" style="margin-right: 5px;"></i>Cadastrado por: <strong>{{audit.created.actor_name}}</strong> em {{audit.created.created_at | date:\'dd/MM/yyyy HH:mm\'}}</div>' +
+            '    <div ng-if="audit.updated"><i class="fa fa-pencil" style="margin-right: 5px;"></i>Última atualização: <strong>{{audit.updated.actor_name}}</strong> em {{audit.updated.created_at | date:\'dd/MM/yyyy HH:mm\'}}</div>' +
+            '</div>'
+    };
+}

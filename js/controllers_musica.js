@@ -2086,6 +2086,8 @@
     }
 
     function musicaExamesCtrl($scope, $timeout, MusicaService) {
+        $scope.activeTab = 'dashboard';
+        $scope.setTab = function(tab) { $scope.activeTab = tab; };
         var meses = ['Janeiro', 'Fevereiro', 'Mar\u00e7o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         var mesAtual = meses[new Date().getMonth()];
 
@@ -2744,6 +2746,142 @@
 
             pdfMake.createPdf(docDefinition).download("Relatorio_Exames_" + new Date().toISOString().slice(0, 10) + ".pdf");
         };
+
+        // --- GERENCIAMENTO DE CANDIDATOS PREPARADOS ---
+        $scope.candidatosPreparados = [];
+        $scope.candidatoForm = {};
+
+        function carregarCandidatos() {
+            try {
+                var salvos = localStorage.getItem('musica_exames_preparados');
+                if (salvos) {
+                    $scope.candidatosPreparados = JSON.parse(salvos);
+                }
+                
+                if (!$scope.candidatosPreparados || $scope.candidatosPreparados.length === 0) {
+                    $scope.candidatosPreparados = [
+                        { nome: 'Heloisa Lourdes de Freitas', idade: 20, comum: 'BR-22-1810 - JARDIM CRUZEIRO', categoria: 'Organista', nivel: 'Teste Especial', data_teste: new Date('2026-06-15T12:00:00Z') },
+                        { nome: 'Rafaela de Jesus Silva Florentino', idade: 29, comum: 'BR-22-2999- VILA DAS CHÁCARAS', categoria: 'Organista', nivel: 'Teste Especial', data_teste: new Date('2026-06-20T12:00:00Z') },
+                        { nome: 'Geovana Santos Figueiredo', idade: 15, comum: 'BR-22-0684 - JARDIM SANTA RITA', categoria: 'Organista', nivel: 'Teste Especial', data_teste: new Date('2026-06-25T12:00:00Z') },
+                        { nome: 'Milena Teixeira Santana', idade: null, comum: 'BR-22-3050 - JARDIM ROSEMARY II', categoria: 'Organista', nivel: 'Teste Especial', data_teste: new Date('2026-07-01T12:00:00Z') },
+                        { nome: 'Manuela Colaço Lopes', idade: 14, comum: 'BR-22-1705 - JARDIM JUREMA', categoria: 'Organista', nivel: '', data_teste: new Date('2026-07-10T12:00:00Z') }
+                    ];
+                }
+            } catch (e) {
+                console.error('Erro ao carregar candidatos do localStorage', e);
+                $scope.candidatosPreparados = [];
+            }
+        }
+        
+        function salvarLocalStorage() {
+            try {
+                localStorage.setItem('musica_exames_preparados', JSON.stringify($scope.candidatosPreparados));
+            } catch (e) {
+                console.error('Erro ao salvar no localStorage', e);
+            }
+        }
+
+        $scope.abrirModalCandidato = function (cand) {
+            if (cand) {
+                $scope.candidatoForm = angular.copy(cand);
+                $scope.candidatoForm.id = $scope.candidatosPreparados.indexOf(cand) + 1; // fake ID to track editing
+            } else {
+                $scope.candidatoForm = {
+                    nome: '',
+                    idade: '',
+                    comum: '',
+                    categoria: '',
+                    nivel: '',
+                    data_teste: null
+                };
+            }
+            $('#modalCandidatoExame').modal('show');
+        };
+
+        $scope.salvarCandidato = function () {
+            if (!$scope.candidatoForm.nome || !$scope.candidatoForm.comum) {
+                alert('Por favor, informe pelo menos o nome e a comum do candidato.');
+                return;
+            }
+
+            if (!$scope.candidatoForm.lgpd_consent) {
+                alert('É obrigatório aceitar a Política de Privacidade para prosseguir.');
+                return;
+            }
+
+            if ($scope.candidatoForm.id) {
+                // Edição
+                var idx = $scope.candidatoForm.id - 1;
+                if (idx >= 0 && idx < $scope.candidatosPreparados.length) {
+                    delete $scope.candidatoForm.id;
+                    $scope.candidatosPreparados[idx] = angular.copy($scope.candidatoForm);
+                }
+            } else {
+                // Inserção
+                $scope.candidatosPreparados.push(angular.copy($scope.candidatoForm));
+            }
+            salvarLocalStorage();
+            $('#modalCandidatoExame').modal('hide');
+        };
+
+        $scope.excluirCandidato = function (index) {
+            var cand = $scope.candidatosPreparados[index];
+            var nome = cand ? cand.nome : 'candidato';
+            
+            if (window.swal) {
+                window.swal({
+                    title: "Tem certeza?",
+                    text: "Você deseja mesmo excluir o cadastro de " + nome + "?\nEsta ação não poderá ser revertida.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sim, excluir",
+                    cancelButtonText: "Cancelar",
+                    closeOnConfirm: true
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        $timeout(function() {
+                            $scope.candidatosPreparados.splice(index, 1);
+                            salvarLocalStorage();
+                        });
+                    }
+                });
+            } else {
+                if (confirm('Tem certeza que deseja remover este candidato da lista?')) {
+                    $scope.candidatosPreparados.splice(index, 1);
+                    salvarLocalStorage();
+                }
+            }
+        };
+
+        $scope.limparLista = function () {
+            if ($scope.candidatosPreparados.length === 0) return;
+            
+            if (window.swal) {
+                window.swal({
+                    title: "Tem certeza?",
+                    text: "Você deseja mesmo excluir os dados de todos os candidatos preparados?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sim, excluir",
+                    cancelButtonText: "Cancelar",
+                    closeOnConfirm: true
+                }, function (isConfirm) {
+                    if (isConfirm) {
+                        $timeout(function() {
+                            $scope.candidatosPreparados = [];
+                            salvarLocalStorage();
+                        });
+                    }
+                });
+            } else {
+                if (confirm('Atenção: Isso removerá todos os candidatos da lista de preparados. Deseja continuar?')) {
+                    $scope.candidatosPreparados = [];
+                    salvarLocalStorage();
+                }
+            }
+        };
+
+        carregarCandidatos();
 
         loadData();
     }

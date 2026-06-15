@@ -20,11 +20,15 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
     });
 
     $stateProvider
-
         .state('dashboards', {
             abstract: true,
             url: "/dashboards",
             templateUrl: "views/common/content.html",
+        })
+        .state('dashboards.privacidade', {
+            url: "/privacidade",
+            templateUrl: "views/privacidade.html",
+            data: { pageTitle: 'Política de Privacidade' }
         })
         .state('dashboards.dashboard_1', {
             url: "/dashboard_1",
@@ -33,7 +37,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
                 loadPlugin: function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
                         {
-
                             serie: true,
                             name: 'angular-flot',
                             files: ['js/plugins/flot/jquery.flot.js', 'js/plugins/flot/jquery.flot.time.js', 'js/plugins/flot/jquery.flot.tooltip.min.js', 'js/plugins/flot/jquery.flot.spline.js', 'js/plugins/flot/jquery.flot.resize.js', 'js/plugins/flot/jquery.flot.pie.js', 'js/plugins/flot/curvedLines.js', 'js/plugins/flot/angular-flot.js',]
