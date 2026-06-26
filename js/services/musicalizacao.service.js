@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular.module('inspinia')
@@ -160,11 +160,15 @@
 
         function getAlunos() {
             var deferred = $q.defer();
-            supabase.from('musicalizacao_criancas').select('*')
-                .order('nome_crianca', { ascending: true })
+            AuthService.applyDataScopeToQuery(
+                supabase.from('musicalizacao_criancas').select('*'),
+                MUSICALIZACAO_ALUNOS_SCOPE
+            ).order('nome_crianca', { ascending: true })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve((response.data || []).map(normalizeAlunoRecord));
+                    else deferred.resolve(
+                        AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_ALUNOS_SCOPE).map(normalizeAlunoRecord)
+                    );
                 });
             return deferred.promise;
         }
