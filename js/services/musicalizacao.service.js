@@ -7,6 +7,12 @@
     MusicalizacaoService.$inject = ['$q', 'AuthService'];
 
     function MusicalizacaoService($q, AuthService) {
+        var aulasCache = {};
+
+        function clearMusicalizacaoCache() {
+            aulasCache = {};
+        }
+
         var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
         var ALUNO_FIELDS = [
@@ -206,15 +212,40 @@
             return deferred.promise;
         }
 
-        function getAulas() {
+        function getAulas(filters) {
             var deferred = $q.defer();
-            AuthService.applyDataScopeToQuery(
-                supabase.from('musicalizacao_aulas').select('*'),
-                MUSICALIZACAO_AULAS_SCOPE
-            ).order('data_aula', { ascending: false })
+            var mesFiltro = (filters && filters.mes) ? String(filters.mes) : 'all';
+            
+            if (aulasCache[mesFiltro] && (Date.now() - aulasCache[mesFiltro].time < 300000)) {
+                deferred.resolve(aulasCache[mesFiltro].data);
+                return deferred.promise;
+            }
+
+            var query = supabase.from('musicalizacao_aulas').select('*');
+            
+            if (filters && filters.mes && filters.mes !== 'Todos os meses') {
+                var meses = ['Janeiro', 'Fevereiro', 'Mar\u00e7o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                var monthIndex = meses.indexOf(filters.mes);
+                if (monthIndex !== -1) {
+                    var currentYear = new Date().getFullYear();
+                    var pad = function(n) { return n < 10 ? '0' + n : n; };
+                    var d1 = new Date(currentYear, monthIndex, 1);
+                    var d2 = new Date(currentYear, monthIndex + 1, 0);
+                    var d1Str = d1.getFullYear() + '-' + pad(d1.getMonth() + 1) + '-' + pad(d1.getDate());
+                    var d2Str = d2.getFullYear() + '-' + pad(d2.getMonth() + 1) + '-' + pad(d2.getDate());
+                    query = query.gte('data_aula', d1Str).lte('data_aula', d2Str);
+                }
+            }
+            
+            AuthService.applyDataScopeToQuery(query, MUSICALIZACAO_AULAS_SCOPE)
+                .order('data_aula', { ascending: false })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_AULAS_SCOPE));
+                    else {
+                        var result = AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_AULAS_SCOPE);
+                        aulasCache[mesFiltro] = { data: result, time: Date.now() };
+                        deferred.resolve(result);
+                    }
                 });
             return deferred.promise;
         }
@@ -396,6 +427,7 @@
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
+                        clearMusicalizacaoCache();
                         auditMusicalizacao('MUSICALIZACAO_AULA_DELETE', {
                             entity: 'musicalizacao_aulas',
                             record_id: id

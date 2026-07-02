@@ -7,6 +7,16 @@
     EbiService.$inject = ['$q', 'AuthService'];
 
     function EbiService($q, AuthService) {
+        var recitativosCache = {};
+        var alunosCache = { data: null, time: 0 };
+        var monitoresCache = { data: null, time: 0 };
+
+        function clearEbiCache() {
+            recitativosCache = {};
+            alunosCache = { data: null, time: 0 };
+            monitoresCache = { data: null, time: 0 };
+        }
+
         var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
         var ALUNO_FIELDS = [
@@ -204,20 +214,43 @@
             return record;
         }
 
-        function getRecitativos() {
+        function getRecitativos(filters) {
             var deferred = $q.defer();
-            AuthService.applyDataScopeToQuery(
-                supabase.from('ebi_atividades').select('*'),
-                EBI_ATIVIDADES_SCOPE
-            ).order('data_reuniao', { ascending: false })
+            var mesFiltro = (filters && filters.mes) ? String(filters.mes) : 'all';
+            
+            if (recitativosCache[mesFiltro] && (Date.now() - recitativosCache[mesFiltro].time < 300000)) {
+                deferred.resolve(recitativosCache[mesFiltro].data);
+                return deferred.promise;
+            }
+
+            var query = supabase.from('ebi_atividades').select('*');
+            
+            if (filters && filters.mes && filters.mes !== 'Todos os meses') {
+                var meses = ['Janeiro', 'Fevereiro', 'Mar\u00e7o', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                var monthIndex = meses.indexOf(filters.mes);
+                if (monthIndex !== -1) {
+                    var currentYear = new Date().getFullYear();
+                    var pad = function(n) { return n < 10 ? '0' + n : n; };
+                    var d1 = new Date(currentYear, monthIndex, 1);
+                    var d2 = new Date(currentYear, monthIndex + 1, 0);
+                    var d1Str = d1.getFullYear() + '-' + pad(d1.getMonth() + 1) + '-' + pad(d1.getDate());
+                    var d2Str = d2.getFullYear() + '-' + pad(d2.getMonth() + 1) + '-' + pad(d2.getDate());
+                    query = query.gte('data_reuniao', d1Str).lte('data_reuniao', d2Str);
+                }
+            }
+            
+            AuthService.applyDataScopeToQuery(query, EBI_ATIVIDADES_SCOPE)
+                .order('data_reuniao', { ascending: false })
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else deferred.resolve(
-                        AuthService.filterCollectionByDataScope(
+                    else {
+                        var result = AuthService.filterCollectionByDataScope(
                             (response.data || []).map(normalizeAtividadeRecord),
                             EBI_ATIVIDADES_SCOPE
-                        )
-                    );
+                        );
+                        recitativosCache[mesFiltro] = { data: result, time: Date.now() };
+                        deferred.resolve(result);
+                    }
                 });
             return deferred.promise;
         }
@@ -232,6 +265,7 @@
                 return supabase.from('ebi_atividades').insert([currentPayload]);
             }, payload, deferred);
             deferred.promise.then(function (result) {
+                clearEbiCache();
                 var record = angular.isArray(result) ? result[0] : result;
                 auditEbi('EBI_ATIVIDADE_CREATE', {
                     entity: 'ebi_atividades',
@@ -257,6 +291,7 @@
                 );
             }, updateData, deferred);
             deferred.promise.then(function () {
+                clearEbiCache();
                 auditEbi('EBI_ATIVIDADE_UPDATE', {
                     entity: 'ebi_atividades',
                     record_id: data.id,
@@ -277,6 +312,7 @@
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
+                        clearEbiCache();
                         auditEbi('EBI_ATIVIDADE_DELETE', {
                             entity: 'ebi_atividades',
                             record_id: id

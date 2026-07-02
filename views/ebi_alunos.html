@@ -175,11 +175,11 @@
                             </div>
                             <div class="col-sm-6 form-group">
                                 <label>Comum Congregação *</label>
-                                <input type="text" ng-model="newAluno.comum_congregacao" class="form-control comum-field" placeholder="Digite para pesquisar a comum" autocomplete="off" ng-focus="openComumPicker('comum_congregacao')" ng-change="filterComuns()" ng-keydown="handleComumFieldKeydown($event)" tabindex="4" required>
+                                <input type="text" ng-model="newAluno.comum_congregacao" class="form-control comum-field" placeholder="Digite para pesquisar a comum" autocomplete="off" ng-focus="openComumPicker('comum_congregacao')" ng-change="filterComuns(); syncPoloFixoForComum()" ng-keydown="handleComumFieldKeydown($event)" tabindex="4" required>
                                 <div class="cadastro-music-comum-picker" ng-if="isComumPickerOpen('comum_congregacao')">
                                     <div class="cadastro-music-comum-meta">{{comumPickerState.results.length}} de {{totalComuns}} comuns</div>
                                     <ul class="cadastro-music-comum-results">
-                                        <li ng-repeat="item in comumPickerState.results track by item" ng-click="selectComum(item)">{{item}}</li>
+                                        <li ng-repeat="item in comumPickerState.results track by item" ng-click="selectComum(item); syncPoloFixoForComum()">{{item}}</li>
                                         <li class="cadastro-music-comum-empty" ng-if="!comumPickerState.results.length">Nenhuma comum encontrada.</li>
                                     </ul>
                                 </div>
@@ -188,7 +188,7 @@
                                 <label>Polo de Participação *</label>
                                 <select ng-model="newAluno.polo_participacao" class="form-control" tabindex="5" required>
                                     <option value="">Selecione</option>
-                                    <option ng-repeat="polo in polosFixos" value="{{polo}}">{{polo}}</option>
+                                    <option ng-repeat="polo in getPolosFixosForComum(newAluno.comum_congregacao)" value="{{polo}}">{{polo}}</option>
                                 </select>
                             </div>
                         </div>

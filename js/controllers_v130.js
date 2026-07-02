@@ -4534,6 +4534,7 @@ function passwordMeterCtrl($scope) {
  * musicalizacaoAtividadesHistoricoCtrl
  */
 function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $timeout, $rootScope) {
+    $scope.lastLoadedMonth = null;
     $scope.musicHistoryTab = 'executivo';
     $scope.loading = true;
     $scope.error = null;
@@ -4642,6 +4643,14 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
     };
     
     $scope.applyFilters = function() {
+        if ($scope.lastLoadedMonth !== $scope.filters.mes) {
+            $scope.loadData();
+            return;
+        }
+        if ($scope.lastLoadedMonth !== $scope.filters.mes) {
+            $scope.loadData();
+            return;
+        }
         var fCidade = upperValue($scope.filters.cidade);
         var fPolo = upperValue($scope.filters.polo);
         
@@ -6892,7 +6901,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             'Usuário',
             'Origem',
             'Comum',
-            'Município',
+            'Munic\u00EDpio',
             'Permissão',
             'Setor',
             'Cargo',
@@ -6940,7 +6949,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             { text: 'Nome', style: 'tableHeader' },
             { text: 'Origem', style: 'tableHeader' },
             { text: 'Comum', style: 'tableHeader' },
-            { text: 'Município', style: 'tableHeader' },
+            { text: 'Munic\u00EDpio', style: 'tableHeader' },
             { text: 'Permissão', style: 'tableHeader' },
             { text: 'Setor', style: 'tableHeader' },
             { text: 'Cadastro', style: 'tableHeader' }
@@ -8100,7 +8109,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             'Nome',
             'Ministério',
             'Comum',
-            'Município',
+            'Munic\u00EDpio',
             'Administração',
             'Status',
             'Apresentação',
@@ -8151,7 +8160,7 @@ function ministerioRegionalAdminCtrl($scope, $rootScope, AuthService, SweetAlert
             { text: 'Nome', style: 'tableHeader' },
             { text: 'Ministério', style: 'tableHeader' },
             { text: 'Comum', style: 'tableHeader' },
-            { text: 'Município', style: 'tableHeader' },
+            { text: 'Munic\u00EDpio', style: 'tableHeader' },
             { text: 'Status', style: 'tableHeader' }
         ]];
 
@@ -8854,7 +8863,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         var rows = [[
             'Código',
             'Congregação',
-            'Município',
+            'Munic\u00EDpio',
             'Administração',
             'Servos vinculados',
             'Situação',
@@ -8895,7 +8904,7 @@ function congregacoesAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
         var body = [[
             { text: 'Código', style: 'tableHeader' },
             { text: 'Congregação', style: 'tableHeader' },
-            { text: 'Município', style: 'tableHeader' },
+            { text: 'Munic\u00EDpio', style: 'tableHeader' },
             { text: 'Servos', style: 'tableHeader' },
             { text: 'Situação', style: 'tableHeader' }
         ]];
@@ -9569,14 +9578,14 @@ function rjmRecitativosCtrl($scope, RjmService, AuthService, $q, $state) {
         var orderedCidades = [];
         var totals = { meninas: 0, meninos: 0, colaboradoras: 0, geral: 0 };
         var rows = [
-            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
-            ['Regional Itapevi - São Paulo'],
-            ['ESPAÇO BÍBLICO INFANTIL - EBI'],
-            ['Relatório Detalhado de Atividades e Comparecimento'],
+            ['CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL'],
+            ['Regional Itapevi - S\u00E3o Paulo'],
+            ['ESPA\u00C7O B\u00CDBLICO INFANTIL - EBI'],
+            ['Relat\u00F3rio Detalhado de Atividades e Comparecimento'],
             ['Emissão: ' + dataEmissao],
             ['Período: ' + periodoInicio + ' a ' + periodoFim],
             [],
-            ['Data', 'Município', 'Localidade', 'História Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
+            ['Data', 'Munic\u00EDpio', 'Localidade', 'Hist\u00F3ria Contada', 'Meninas', 'Meninos', 'Colab', 'Total']
         ];
         rows = rows.map(function (row) {
             return row.map(function (cell) {
@@ -11407,7 +11416,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     var ebiActiveSpaces = (window.EBI_ACTIVE_SPACES || []).slice();
     var ebiActiveLookup = null;
     var ebiText = {
-        institution: 'CONGREGA\u00c7\u00c3O CRIST\u00c3 NO BRASIL',
+        institution: 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL',
         region: 'Regional Itapevi - S\u00e3o Paulo',
         moduleName: 'ESPA\u00c7O B\u00cdBLICO INFANTIL - EBI',
         detailedReportTitle: 'Relat\u00f3rio Detalhado de Atividades e Comparecimento',
@@ -11811,12 +11820,29 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
 
     $scope.filters = {
         searchText: '',
-        cidade: '',
+        cidades: [],
         comum: '',
         dataInicio: null,
         dataFim: null,
         mes: mesAtual
     };
+
+    $scope.toggleCidadeFilter = function(cidade) {
+        var idx = $scope.filters.cidades.indexOf(cidade);
+        if (idx > -1) {
+            $scope.filters.cidades.splice(idx, 1);
+        } else {
+            $scope.filters.cidades.push(cidade);
+        }
+    };
+    $scope.isCidadeSelected = function(cidade) {
+        return $scope.filters.cidades.indexOf(cidade) > -1;
+    };
+    $scope.clearCidades = function() {
+        $scope.filters.cidades = [];
+        $scope.applyFilters();
+    };
+
     $scope.meses = meses;
 
     function getScopedEbiMunicipios() {
@@ -11967,7 +11993,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             .replace(/CH[^A-Z0-9]*CARA/gi, 'CH\u00c1CARA')
             .replace(/AMBUIT[^A-Z0-9]*A/gi, 'AMBUIT\u00c1')
             .replace(/VIT[^A-Z0-9]*POLIS/gi, 'VIT\u00c1POLIS')
-            .replace(/[^A-Z0-9]*GUA\s+ESPRAIADA/gi, '\u00c1GUA ESPRAIADA')
+            .replace(/(^|[\s\-])[^A-Z0-9\s\-]*GUA\s+ESPRAIADA/gi, '$1\u00C1GUA ESPRAIADA')
             .replace(/VILA\s+BELIZ[^A-Z0-9]*RIO/gi, 'VILA BELIZ\u00c1RIO')
             .replace(/SAGRADO\s+CORA[^A-Z0-9]*O/gi, 'SAGRADO CORA\u00c7\u00c3O')
             .replace(/S[^A-Z0-9]*TIO\s+JULINHO/gi, 'S\u00cdTIO JULINHO')
@@ -12276,7 +12302,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     function matchesEbiFilters(item, options) {
         var filters = options || {};
         var search = normalizeFilterValue(filters.searchText);
-        var selectedCity = normalizeFilterValue(filters.cidade);
+        var selectedCities = (filters.cidades || []).map(normalizeFilterValue);
         var selectedComum = normalizeFilterValue(filters.comum);
         var itemDate = item && item.data_reuniao ? parseDateOnlyAsLocal(item.data_reuniao) : null;
         var itemCity = normalizeFilterValue(getEbiMunicipio(item));
@@ -12300,8 +12326,8 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
                 normalizeFilterValue(item && item.suspenso).indexOf(search) !== -1;
         }
 
-        if (selectedCity) {
-            matchCity = itemCity === selectedCity;
+        if (selectedCities && selectedCities.length > 0) {
+            matchCity = selectedCities.indexOf(itemCity) !== -1;
         }
 
         if (selectedComum) {
@@ -12330,8 +12356,17 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             var municipio = normalizeMunicipioRegionalLabel(item.municipio);
             var comum = item.label;
 
-            if ($scope.filters.cidade && municipio !== normalizeMunicipioRegionalLabel($scope.filters.cidade)) {
-                return;
+            if ($scope.filters.cidades && $scope.filters.cidades.length > 0) {
+                var isSelected = false;
+                for (var i = 0; i < $scope.filters.cidades.length; i++) {
+                    if (municipio === normalizeMunicipioRegionalLabel($scope.filters.cidades[i])) {
+                        isSelected = true;
+                        break;
+                    }
+                }
+                if (!isSelected) {
+                    return;
+                }
             }
 
             if (comum) {
@@ -14964,13 +14999,13 @@ function ebiInstrutoresCtrl($scope, EbiService, $timeout, AuthService, $rootScop
 
 function visitasCtrl($scope, $state, AuthService, SweetAlert) {
     var visitasText = {
-        institution: 'CONGREGAÇÃO CRISTàNO BRASIL',
-        region: 'Regional Itapevi - São Paulo',
+        institution: 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL',
+        region: 'Regional Itapevi - S\u00E3o Paulo',
         moduleName: 'DEPARTAMENTO DE VISITAS',
         reportTitle: 'Relatório Geral de Visitas',
-        issueDateLabel: 'Emissão',
-        periodLabel: 'Período',
-        pageLabel: 'Página',
+        issueDateLabel: 'Emiss\u00E3o',
+        periodLabel: 'Per\u00EDodo',
+        pageLabel: 'P\u00E1gina',
         allRecordsLabel: 'Todos os registros'
     };
     var comumCatalogState = getFallbackComumCatalogState();
@@ -15461,7 +15496,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             [visitasText.issueDateLabel + ': ' + new Date().toLocaleDateString('pt-BR')],
             [visitasText.periodLabel + ': ' + getVisitasPeriodoLabel()],
             [],
-            ['Data', 'Município', 'Comum', 'GVI', 'GVM', 'Músicos', 'RF', 'RE', 'Total']
+            ['Data', 'Munic\u00EDpio', 'Comum', 'GVI', 'GVM', 'Músicos', 'RF', 'RE', 'Total']
         ];
         var merges = [
             { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
@@ -15559,7 +15594,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
         var grupos = getVisitasGroupsByMunicipio();
         var body = [[
             { text: 'DATA', style: 'tableHeader' },
-            { text: 'MUNICÍPIO', style: 'tableHeader' },
+            { text: 'MUNIC\u00CDPIO', style: 'tableHeader' },
             { text: 'COMUM', style: 'tableHeader' },
             { text: 'GVI', style: 'tableHeader' },
             { text: 'GVM', style: 'tableHeader' },
@@ -15792,14 +15827,14 @@ function extractVisitaCodigoLocal(value) {
 
 function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $rootScope, $state, $q) {
     var visitasText = {
-        institution: 'CONGREGAÇÃO CRISTÃ NO BRASIL',
-        region: 'Regional Itapevi - São Paulo',
+        institution: 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL',
+        region: 'Regional Itapevi - S\u00E3o Paulo',
         moduleName: 'DEPARTAMENTO DE VISITAS',
         reportTitle: 'Relatório Geral de Visitas',
-        issueDateLabel: 'Emissão',
-        periodLabel: 'Período',
+        issueDateLabel: 'Emiss\u00E3o',
+        periodLabel: 'Per\u00EDodo',
         extractedByLabel: 'Extraído por',
-        pageLabel: 'Página',
+        pageLabel: 'P\u00E1gina',
         allRecordsLabel: 'Todos os registros'
     };
     var visitasLogoBase64 = 'data:image/png;base64,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';
@@ -17324,7 +17359,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             [visitasText.issueDateLabel + ': ' + new Date().toLocaleDateString('pt-BR')],
             [visitasText.periodLabel + ': ' + getPeriodoLabel()],
             [],
-            ['Data', 'Município', 'Comum', 'GVI', 'GVM', 'Músicos', 'RF', 'RE', 'Total']
+            ['Data', 'Munic\u00EDpio', 'Comum', 'GVI', 'GVM', 'Músicos', 'RF', 'RE', 'Total']
         ];
 
         grupos.forEach(function (grupo) {
@@ -17364,7 +17399,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         var extractedBy = getVisitasReportActorName();
         var body = [[
             { text: 'DATA', style: 'tableHeader' },
-            { text: 'MUNICÍPIO', style: 'tableHeader' },
+            { text: 'MUNIC\u00CDPIO', style: 'tableHeader' },
             { text: 'COMUM', style: 'tableHeader' },
             { text: 'GVI', style: 'tableHeader' },
             { text: 'GVM', style: 'tableHeader' },
@@ -19329,8 +19364,8 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     $scope.exportToExcel = function () {
         var grupos = getDashboardGroupsByMunicipio();
         var rows = [
-            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
-            ['Regional Itapevi - São Paulo'],
+            ['CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL'],
+            ['Regional Itapevi - S\u00E3o Paulo'],
             ['MUSICALIZAÇÃO INFANTIL'],
             ['Relatório de Atividades Musicalização'],
             ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
@@ -19396,8 +19431,8 @@ function musicalizacaoCtrl($scope, MusicalizacaoService, $q) {
     $scope.exportToPDF = function () {
         var grupos = getDashboardGroupsByMunicipio();
         var content = [
-            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - S\u00E3o Paulo', style: 'entitySub' },
             { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
             { text: 'Relatório de Atividades Musicalização', style: 'reportTitle' },
             { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 5] },
@@ -20337,10 +20372,10 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
 
     function repairMusicalizacaoPdfText(value) {
         return repairCadastroMusicText(value || '')
-            .replace(/CONGREGA[^A-Z0-9 ]*O CRIST[^A-Z0-9 ]* NO BRASIL/gi, 'CONGREGAÇÃO CRISTÃ NO BRASIL')
+            .replace(/CONGREGA[^A-Z0-9 ]*O CRIST[^A-Z0-9 ]* NO BRASIL/gi, 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL')
             .replace(/MUSICALIZA[^A-Z0-9 ]*O INFANTIL/gi, 'MUSICALIZAÇÃO INFANTIL')
             .replace(/Relat[^A-Z0-9 ]*rio de Crian[^A-Z0-9 ]*as \/ Alunos/gi, 'Relatorio de Criancas')
-            .replace(/Emiss[^A-Z0-9 ]*o/gi, 'Emissão')
+            .replace(/Emiss[^A-Z0-9 ]*o/gi, 'Emiss\u00E3o')
             .replace(/Respons[^A-Z0-9 ]*vel/gi, 'Responsável')
             .replace(/Pr[^A-Z0-9 ]*xima de 12 anos/gi, 'Próxima de 12 anos');
     }
@@ -20348,8 +20383,8 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     $scope.exportToExcel = function () {
         var grupos = getGroupedAlunos();
         var rows = [
-            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
-            ['Regional Itapevi - São Paulo'],
+            ['CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL'],
+            ['Regional Itapevi - S\u00E3o Paulo'],
             ['MUSICALIZAÇÃO INFANTIL'],
             ['Relatorio de Criancas'],
             ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
@@ -20404,8 +20439,8 @@ function musicalizacaoAlunosCtrl($scope, MusicalizacaoService, $rootScope, AuthS
     $scope.exportToPDF = function () {
         var grupos = getGroupedAlunos();
         var content = [
-            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - S\u00E3o Paulo', style: 'entitySub' },
             { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
             { text: 'Relatorio de Criancas', style: 'reportTitle' },
             { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
@@ -20798,8 +20833,8 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     $scope.exportToExcel = function () {
         var grupos = getGroupedPolos();
         var rows = [
-            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
-            ['Regional Itapevi - São Paulo'],
+            ['CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL'],
+            ['Regional Itapevi - S\u00E3o Paulo'],
             ['MUSICALIZAÇÃO INFANTIL'],
             ['Relatório de Polos / Regionais'],
             ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
@@ -20840,8 +20875,8 @@ function musicalizacaoPolosCtrl($scope, MusicalizacaoService, AuthService, $root
     $scope.exportToPDF = function () {
         var grupos = getGroupedPolos();
         var content = [
-            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - S\u00E3o Paulo', style: 'entitySub' },
             { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
             { text: 'Relatório de Polos / Regionais', style: 'reportTitle' },
             { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
@@ -21316,8 +21351,8 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
     $scope.exportToPDF = function () {
         var grupos = getGroupedInstrutoresByMunicipio();
         var content = [
-            { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
-            { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+            { text: 'CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL', style: 'entityName' },
+            { text: 'Regional Itapevi - S\u00E3o Paulo', style: 'entitySub' },
             { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
             { text: 'Relatório de Instrutores e Colaboradores', style: 'reportTitle' },
             { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', margin: [0, 0, 0, 10] }
@@ -23238,15 +23273,15 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
     $scope.exportToExcel = function () {
         var rows = [
-            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
-            ['Regional Itapevi - São Paulo'],
+            ['CONGREGA\u00C7\u00C3O CRIST\u00C3 NO BRASIL'],
+            ['Regional Itapevi - S\u00E3o Paulo'],
             ['SANTA CEIA'],
             ['Relatório Analítico Comparativo'],
             ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
             ['Modo: ' + getSantaCeiaExportModeLabel()],
             ['Período: ' + getSantaCeiaPeriodoLabel()],
             [],
-            ['Município', 'Comum', 'Atendimento 2025', 'Irmãs 2025', 'Irmãos 2025', 'Total 2025', 'Data 2025', 'Atendimento 2026', 'Irmãs 2026', 'Irmãos 2026', 'Total 2026', 'Data 2026', 'Variação', 'Situação']
+            ['Munic\u00EDpio', 'Comum', 'Atendimento 2025', 'Irmãs 2025', 'Irmãos 2025', 'Total 2025', 'Data 2025', 'Atendimento 2026', 'Irmãs 2026', 'Irmãos 2026', 'Total 2026', 'Data 2026', 'Variação', 'Situação']
         ].concat(getSantaCeiaExportRows());
         var ws = XLSX.utils.aoa_to_sheet(rows);
         ws['!cols'] = [
@@ -23260,7 +23295,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
 
     $scope.exportToPDF = function () {
         var body = [[
-            { text: 'Município', style: 'tableHeader' },
+            { text: 'Munic\u00EDpio', style: 'tableHeader' },
             { text: 'Comum', style: 'tableHeader' },
             { text: 'Atendimento 2025', style: 'tableHeader' },
             { text: 'Irmãs 2025', style: 'tableHeader' },
@@ -23299,7 +23334,7 @@ function santaCeiaAdminCtrl($scope, SantaCeiaService, AuthService, $rootScope) {
             pageOrientation: 'landscape',
             content: [
                 { text: 'CONGREGAÇÃO CRISTã NO BRASIL', alignment: 'center', bold: true, fontSize: 14 },
-                { text: 'Regional Itapevi - São Paulo', alignment: 'center', fontSize: 10 },
+                { text: 'Regional Itapevi - S\u00E3o Paulo', alignment: 'center', fontSize: 10 },
                 { text: 'SANTA CEIA - RELATÓRIO ANALÍTICO COMPARATIVO', alignment: 'center', bold: true, margin: [0, 6, 0, 8] },
                 { text: 'Modo: ' + getSantaCeiaExportModeLabel() + ' | Período: ' + getSantaCeiaPeriodoLabel(), alignment: 'right', fontSize: 9, margin: [0, 0, 0, 8] },
                 {

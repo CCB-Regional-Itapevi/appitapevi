@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   window.CadastroMusicData = {
     polos: [
     "Altos de Caucaia",
@@ -10,6 +10,7 @@
     "Morro Grande",
     "Nova Itapevi",
     "Pereiras",
+    "Recanto Paulistano",
     "Rosemary",
     "Sítio Tabuleiro",
     "Vila Belizário",
