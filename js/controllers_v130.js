@@ -18251,6 +18251,30 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         refreshAvailableComuns();
     };
 
+    $scope.viewLancamento = function (item) {
+        if (!item) {
+            return;
+        }
+
+        swal({
+            title: item.comum || 'Lançamento de Visitas',
+            text: [
+                'Município: ' + (item.municipio || '-'),
+                'Período: ' + $scope.getPeriodoDisplay(item),
+                'Data: ' + $scope.getDataDisplay(item),
+                '',
+                'GVI: ' + Number(item.gvi || 0),
+                'GVM: ' + Number(item.gvm || 0),
+                'Músicos: ' + Number(item.musicos || 0),
+                'RF: ' + Number(item.rf || 0),
+                'RE: ' + Number(item.re || 0),
+                'Total: ' + Number(item.total || 0)
+            ].join('\n'),
+            type: 'info',
+            confirmButtonText: 'Fechar'
+        });
+    };
+
     $scope.editLancamento = function (item) {
         if (!$scope.canManageCadastros) {
             showScopedManagementRestriction('Somente coordenadores de Visitas, admin ou master podem editar lançamentos.');
@@ -18275,9 +18299,15 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         };
         $scope.formFilters.comumSearch = '';
         refreshAvailableComuns();
+        if (window.jQuery) {
+            window.jQuery('#modalEditarLancamentoVisitas').modal('show');
+        }
     };
 
     $scope.cancelEdit = function () {
+        if (window.jQuery) {
+            window.jQuery('#modalEditarLancamentoVisitas').modal('hide');
+        }
         $scope.prepareNovo();
     };
 
@@ -18317,6 +18347,9 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         $scope.saving = true;
         promise = $scope.editing ? VisitasService.updateLancamento($scope.formData) : VisitasService.saveLancamento($scope.formData);
         promise.then(function () {
+            if (window.jQuery) {
+                window.jQuery('#modalEditarLancamentoVisitas').modal('hide');
+            }
             swal('Sucesso', $scope.editing ? 'Lançamento atualizado com sucesso.' : 'Lançamento registrado com sucesso.', 'success');
             $scope.prepareNovo();
             $scope.loadLancamentos();

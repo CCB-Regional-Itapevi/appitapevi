@@ -710,7 +710,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('visitas.lancamentos', {
             url: "/lancamentos",
-            templateUrl: "views/visitas_lancamentos.html?v=2.0.4",
+            templateUrl: "views/visitas_lancamentos.html?v=2.0.6",
             data: { pageTitle: 'Lan\u00e7amentos de Visitas' },
             controller: 'visitasLancamentosCtrl'
         })

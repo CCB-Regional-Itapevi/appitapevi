@@ -15,6 +15,131 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalEditarLancamentoVisitas" tabindex="-1" role="dialog" aria-labelledby="modalEditarLancamentoVisitasTitulo">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form ng-submit="saveLancamento()">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="cancelEdit()" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="modalEditarLancamentoVisitasTitulo">
+                        <i class="fa fa-pencil-square-o"></i> Editar lan&ccedil;amento
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Munic&iacute;pio</label>
+                                <input type="text" class="form-control" ng-model="formData.municipio" readonly>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <label>Comum</label>
+                                <input type="text" class="form-control" ng-model="formData.comum" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Data do lan&ccedil;amento</label>
+                                <input type="text" class="form-control" ng-model="formData.data_lancamento"
+                                       placeholder="AAAA-MM-DD" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>M&ecirc;s de refer&ecirc;ncia</label>
+                                <select class="form-control" ng-model="formData.referencia_mes" required>
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Mar&ccedil;o</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Ano de refer&ecirc;ncia</label>
+                                <input type="number" class="form-control" ng-model="formData.referencia_ano"
+                                       min="2020" max="2100" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-2">
+                            <div class="form-group">
+                                <label>GVI</label>
+                                <input type="number" class="form-control" ng-model="formData.gvi" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-2">
+                            <div class="form-group">
+                                <label>GVM</label>
+                                <input type="number" class="form-control" ng-model="formData.gvm" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-2">
+                            <div class="form-group">
+                                <label>M&uacute;sicos</label>
+                                <input type="number" class="form-control" ng-model="formData.musicos" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-2">
+                            <div class="form-group">
+                                <label>RF</label>
+                                <input type="number" class="form-control" ng-model="formData.rf" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-2">
+                            <div class="form-group">
+                                <label>RE</label>
+                                <input type="number" class="form-control" ng-model="formData.re" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-2">
+                            <div class="form-group">
+                                <label>Total</label>
+                                <input type="text" class="form-control"
+                                       value="{{ (formData.gvi || 0) + (formData.gvm || 0) + (formData.musicos || 0) + (formData.rf || 0) + (formData.re || 0) }}"
+                                       readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observa&ccedil;&otilde;es</label>
+                        <textarea class="form-control" rows="3" ng-model="formData.observacoes"
+                                  placeholder="Observações opcionais"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" ng-click="cancelEdit()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" ng-disabled="saving">
+                        <i class="fa" ng-class="saving ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                        {{ saving ? 'Salvando...' : 'Salvar alterações' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <style>
     .visitas-mobile-scroll {
         overflow-x: auto;
@@ -157,6 +282,13 @@
         background: #f4f6f8;
         text-align: center;
         font-size: 11px;
+    }
+
+    .visitas-audit-group-content .action-buttons {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
     }
 
     @media (max-width: 767px) {
@@ -416,7 +548,7 @@
                                                     <td class="text-center"><strong>{{ item.total }}</strong></td>
                                                     <td class="text-center" style="width: 160px;">
                                                         <div class="action-buttons">
-                                                            <button class="btn btn-info btn-xs" ng-click="editLancamento(item)" title="Ver lan&ccedil;amento">
+                                                            <button class="btn btn-info btn-xs" ng-click="viewLancamento(item)" title="Ver lan&ccedil;amento">
                                                                 <i class="fa fa-eye"></i>
                                                             </button>
                                                             <button class="btn btn-warning btn-xs" ng-click="editLancamento(item)" title="Editar lan&ccedil;amento">
@@ -564,6 +696,7 @@
                                             <th class="text-center">RF</th>
                                             <th class="text-center">RE</th>
                                             <th class="text-center">Situa&ccedil;&atilde;o</th>
+                                            <th class="text-center">A&ccedil;&otilde;es</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -581,6 +714,28 @@
                                                 <span class="label" ng-class="audit.realizado ? 'label-primary' : 'label-danger'">
                                                     {{ audit.status }}
                                                 </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="action-buttons" ng-if="audit.realizado">
+                                                    <button type="button" class="btn btn-info btn-xs"
+                                                            ng-click="viewLancamento(audit.lancamento)"
+                                                            title="Visualizar">
+                                                        <i class="fa fa-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-warning btn-xs"
+                                                            ng-click="editLancamento(audit.lancamento)"
+                                                            ng-disabled="!canManageCadastros"
+                                                            title="Editar">
+                                                        <i class="fa fa-pencil-square-o"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-xs"
+                                                            ng-click="confirmDelete(audit.lancamento)"
+                                                            ng-disabled="!canManageCadastros"
+                                                            title="Excluir">
+                                                        <i class="fa fa-trash-o"></i>
+                                                    </button>
+                                                </div>
+                                                <span class="text-muted" ng-if="!audit.realizado">-</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -605,6 +760,25 @@
                                         <span>M&uacute;s.<br><strong>{{ audit.musicos }}</strong></span>
                                         <span>RF<br><strong>{{ audit.rf }}</strong></span>
                                         <span>RE<br><strong>{{ audit.re }}</strong></span>
+                                    </div>
+                                    <div class="text-right m-t-sm action-buttons" ng-if="audit.realizado">
+                                        <button type="button" class="btn btn-info btn-sm"
+                                                ng-click="viewLancamento(audit.lancamento)"
+                                                aria-label="Visualizar lançamento">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm"
+                                                ng-click="editLancamento(audit.lancamento)"
+                                                ng-disabled="!canManageCadastros"
+                                                aria-label="Editar lançamento">
+                                            <i class="fa fa-pencil-square-o"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                                ng-click="confirmDelete(audit.lancamento)"
+                                                ng-disabled="!canManageCadastros"
+                                                aria-label="Excluir lançamento">
+                                            <i class="fa fa-trash-o"></i>
+                                        </button>
                                     </div>
                                     <small class="text-muted" ng-if="!audit.realizado">
                                         Nenhum lan&ccedil;amento encontrado para este m&ecirc;s.
