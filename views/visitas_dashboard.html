@@ -343,6 +343,111 @@
     .visitas-status-footer .badge.badge-danger {
         background-color: #ed5565;
     }
+    .visitas-executive-kpi {
+        min-height: 112px;
+        padding: 18px;
+        border: 1px solid #e7eaec;
+        border-radius: 8px;
+        background: #fff;
+        margin-bottom: 15px;
+    }
+    .visitas-executive-kpi .label-text {
+        display: block;
+        color: #7f8c9a;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+    .visitas-executive-kpi .value {
+        display: block;
+        margin-top: 5px;
+        color: #243747;
+        font-size: 28px;
+        font-weight: 700;
+    }
+    .visitas-executive-kpi .detail {
+        color: #8a97a6;
+        font-size: 12px;
+    }
+    .visitas-executive-panel {
+        min-height: 100%;
+        padding: 18px;
+        border: 1px solid #e7eaec;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .visitas-executive-panel h6 {
+        margin: 0 0 4px;
+        color: #243747;
+        font-size: 14px;
+        font-weight: 700;
+    }
+    .visitas-executive-row {
+        padding: 11px 0;
+        border-bottom: 1px solid #edf0f2;
+    }
+    .visitas-executive-row:last-child {
+        border-bottom: 0;
+    }
+    .visitas-executive-row-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+    .visitas-executive-row-meta {
+        color: #7f8c9a;
+        font-size: 11px;
+    }
+    .visitas-executive-progress {
+        height: 10px;
+        margin: 0;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #edf2f5;
+        box-shadow: none;
+    }
+    .visitas-executive-progress .progress-bar {
+        border-radius: 999px;
+    }
+    .visitas-executive-insight {
+        padding: 12px;
+        margin-top: 10px;
+        border-left: 4px solid #1ab394;
+        border-radius: 4px;
+        background: #f7f9fa;
+    }
+    .visitas-executive-insight.is-risk {
+        border-left-color: #ed5565;
+    }
+    .visitas-executive-insight.is-volume {
+        border-left-color: #1c84c6;
+    }
+    .visitas-volume-chart-row {
+        display: grid;
+        grid-template-columns: minmax(150px, 220px) 1fr minmax(90px, auto);
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #edf0f2;
+    }
+    .visitas-volume-chart-row:last-child {
+        border-bottom: 0;
+    }
+    .visitas-volume-chart-bar {
+        height: 18px;
+        margin: 0;
+        overflow: hidden;
+        border-radius: 4px;
+        background: #edf2f5;
+        box-shadow: none;
+    }
+    .visitas-volume-chart-bar .progress-bar {
+        min-width: 2px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #1ab394, #23c6c8);
+    }
     @media (max-width: 991px) {
         .visitas-dashboard-top-summary-col {
             width: 50%;
@@ -385,6 +490,27 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+        }
+        .visitas-executive-kpi {
+            min-height: 104px;
+            padding: 12px;
+        }
+        .visitas-executive-kpi .value {
+            font-size: 23px;
+        }
+        .visitas-executive-panel {
+            padding: 13px;
+        }
+        .visitas-executive-row-header {
+            align-items: flex-start;
+        }
+        .visitas-volume-chart-row {
+            grid-template-columns: 1fr auto;
+            gap: 5px 10px;
+        }
+        .visitas-volume-chart-row .visitas-volume-chart-bar {
+            grid-column: 1 / -1;
+            grid-row: 2;
         }
         .ibox-title h5,
         .ibox-title .ibox-tools,
@@ -548,10 +674,26 @@
                         <div class="col-md-2">
                             <div class="form-group">
                                 <label class="control-label">Cidade</label>
-                                <select class="form-control input-sm" ng-model="filters.cidade">
-                                    <option value="">Todas as Cidades</option>
-                                    <option ng-repeat="cidade in cidades" value="{{cidade}}">{{cidade}}</option>
-                                </select>
+                                <div class="dropdown" uib-dropdown>
+                                    <button class="btn btn-default btn-sm form-control" type="button" uib-dropdown-toggle style="text-align:left; background:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:20px; position:relative;">
+                                        <span ng-if="filters.cidades.length === 0">Todas as Cidades</span>
+                                        <span ng-if="filters.cidades.length > 0">{{filters.cidades.join(', ')}}</span>
+                                        <span class="caret" style="position:absolute; right:8px; top:12px;"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" uib-dropdown-menu style="max-height:250px; overflow-y:auto; width:100%;">
+                                        <li>
+                                            <a href ng-click="clearVisitasCidades(); $event.stopPropagation()">
+                                                <i class="fa fa-fw" ng-class="{'fa-check text-success': filters.cidades.length === 0}"></i> Todas as Cidades
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li ng-repeat="cidade in cidades">
+                                            <a href ng-click="toggleVisitasCidadeFilter(cidade); $event.stopPropagation()">
+                                                <i class="fa fa-fw" ng-class="{'fa-check text-success': isVisitasCidadeSelected(cidade)}"></i> {{cidade}}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -572,127 +714,6 @@
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row m-t-md">
-        <div class="col-lg-12">
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5>Painel Gerencial de Acompanhamento</h5>
-                    <div class="ibox-tools">
-                        <span class="label label-success">{{ communityCareSummary.total || 0 }} pessoas acompanhadas</span>
-                    </div>
-                </div>
-                <div class="ibox-content">
-                    <div class="row">
-                        <div class="col-lg-5">
-                            <div class="visitas-care-panel">
-                                <div class="visitas-care-panel-title">
-                                    <h6>Panorama do acompanhamento</h6>
-                                    <span class="label label-success">{{ communityCareSummary.total || 0 }} acompanhados</span>
-                                </div>
-                                <p class="visitas-care-panel-subtitle">
-                                    Leitura r&aacute;pida da base acompanhada, com foco em risco, agenda e perfis que exigem maior cobertura.
-                                </p>
-                                <div class="visitas-care-kpi-grid">
-                                    <div class="visitas-care-kpi is-total">
-                                        <div class="visitas-care-kpi-icon"><i class="fa fa-address-book-o"></i></div>
-                                        <div class="visitas-care-kpi-metric">
-                                            <span class="label-text">Pessoas acompanhadas</span>
-                                            <span class="value">{{ communityCareSummary.total || 0 }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="visitas-care-kpi is-risk">
-                                        <div class="visitas-care-kpi-icon"><i class="fa fa-exclamation-triangle"></i></div>
-                                        <div class="visitas-care-kpi-metric">
-                                            <span class="label-text">30+ dias sem visita</span>
-                                            <span class="value">{{ communityCareSummary.semVisita30 || 0 }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="visitas-care-kpi is-schedule">
-                                        <div class="visitas-care-kpi-icon"><i class="fa fa-calendar-times-o"></i></div>
-                                        <div class="visitas-care-kpi-metric">
-                                            <span class="label-text">Sem agenda futura</span>
-                                            <span class="value">{{ communityCareSummary.semAgendaFutura || 0 }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="visitas-care-kpi is-profile">
-                                        <div class="visitas-care-kpi-icon"><i class="fa fa-heartbeat"></i></div>
-                                        <div class="visitas-care-kpi-metric">
-                                            <span class="label-text">Enfermos</span>
-                                            <span class="value">{{ communityCareSummary.enfermos || 0 }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <ul class="visitas-care-profile-list">
-                                    <li class="visitas-care-profile-item" ng-repeat="item in communityProfiles | limitTo: 4">
-                                        <div class="visitas-care-profile-header">
-                                            <strong>{{ item.label }}</strong>
-                                            <span class="label label-info">{{ item.total || 0 }} total</span>
-                                        </div>
-                                        <div class="visitas-care-profile-meta">
-                                            <span class="label label-success">{{ item.ativos || 0 }} ativos</span>
-                                            <span class="label label-warning">{{ item.semVisita30 || 0 }} com 30+ dias</span>
-                                            <span class="label label-danger">{{ item.semAgenda || 0 }} sem agenda</span>
-                                        </div>
-                                        <div class="visitas-care-profile-bar m-t-sm">
-                                            <span ng-style="{ width: ((item.total || 0) ? (((item.ativos || 0) / item.total) * 100) : 0) + '%' }"></span>
-                                        </div>
-                                    </li>
-                                    <li class="visitas-care-empty" ng-if="!communityProfiles.length">
-                                        Sem perfis mapeados para os filtros atuais.
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-7">
-                            <div class="visitas-care-panel">
-                                <div class="visitas-care-panel-title">
-                                    <h6>Pessoas que Exigem Aten&ccedil;&atilde;o Imediata</h6>
-                                    <span class="label label-warning">{{ communityAttentionList.length || 0 }} em destaque</span>
-                                </div>
-                                <p class="visitas-care-panel-subtitle">
-                                    Prioridade operacional para visitas sem registro recente ou sem agenda futura definida.
-                                </p>
-                                <div class="table-responsive visitas-mobile-scroll">
-                                    <table class="table table-hover table-bordered visitas-care-table visitas-care-attention-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Nome</th>
-                                                <th>Perfil</th>
-                                                <th class="text-center">Dias sem visita</th>
-                                                <th class="text-center">Agendas futuras</th>
-                                                <th>Motivos</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="item in communityAttentionList | limitTo: 6">
-                                                <td class="visitas-care-person">
-                                                    <strong>{{ item.nome }}</strong><br>
-                                                    <small class="text-muted">{{ item.municipio }} <span ng-if="item.comum">| {{ item.comum }}</span></small>
-                                                </td>
-                                                <td>{{ item.perfil || 'Irmandade' }}</td>
-                                                <td class="text-center">{{ item.diasSemVisita === null ? '-' : item.diasSemVisita }}</td>
-                                                <td class="text-center"><span class="label label-primary">{{ item.proximaAgenda || 0 }}</span></td>
-                                                <td class="visitas-care-reason">{{ item.motivos }}</td>
-                                            </tr>
-                                            <tr ng-if="!communityAttentionList.length">
-                                                <td colspan="5" class="visitas-care-empty">Nenhuma pessoa cr&iacute;tica encontrada para os filtros atuais.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="text-right m-t-sm" ng-if="communityAttentionList.length > 6">
-                                    <span class="text-muted">Exibindo 6 de {{ communityAttentionList.length }} registros priorizados.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -821,6 +842,164 @@
     </div>
 
     <div class="row m-t-lg">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Painel Executivo Municipal</h5>
+                    <div class="ibox-tools">
+                        <span class="label label-primary">{{ filters.mes || 'Período filtrado' }}</span>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <p class="text-muted m-b-md">
+                        Leitura administrativa do desempenho municipal. A auditoria detalhada de comuns permanece na página de Lançamentos.
+                    </p>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-6">
+                            <div class="visitas-executive-kpi">
+                                <span class="label-text">Cobertura regional</span>
+                                <span class="value">{{ coverageRate }}%</span>
+                                <span class="detail">{{ realizadosCount }} de {{ expectedLancamentosCount }} comuns</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <div class="visitas-executive-kpi">
+                                <span class="label-text">Municípios ≥ 80%</span>
+                                <span class="value">{{ visitasExecutiveDashboard.municipiosExcelentes || 0 }}</span>
+                                <span class="detail">Desempenho administrativo adequado</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <div class="visitas-executive-kpi">
+                                <span class="label-text">Municípios críticos</span>
+                                <span class="value text-danger">{{ visitasExecutiveDashboard.municipiosCriticos || 0 }}</span>
+                                <span class="detail">Cobertura abaixo de 50%</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <div class="visitas-executive-kpi">
+                                <span class="label-text">Média por comum</span>
+                                <span class="value">{{ visitasExecutiveDashboard.mediaVisitasPorComum || 0 }}</span>
+                                <span class="detail">Visitas por comum que lançou</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-7 m-b-md">
+                            <div class="visitas-executive-panel">
+                                <h6>Cobertura por município</h6>
+                                <p class="text-muted">Ranking percentual das comuns que concluíram o lançamento mensal.</p>
+
+                                <div class="visitas-executive-row" ng-repeat="item in visitasExecutiveDashboard.municipios">
+                                    <div class="visitas-executive-row-header">
+                                        <div>
+                                            <strong>{{ item.municipio }}</strong>
+                                            <div class="visitas-executive-row-meta">
+                                                {{ item.realizados }}/{{ item.previstos }} comuns · {{ item.pendentes }} pendentes · {{ item.totalVisitas }} visitas
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <strong>{{ item.cobertura }}%</strong>
+                                            <div>
+                                                <span class="label"
+                                                      ng-class="{'label-primary': item.cobertura >= 80, 'label-warning': item.cobertura >= 50 && item.cobertura < 80, 'label-danger': item.cobertura < 50}">
+                                                    {{ item.status }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="progress visitas-executive-progress">
+                                        <div class="progress-bar"
+                                             ng-class="{'progress-bar-success': item.cobertura >= 80, 'progress-bar-warning': item.cobertura >= 50 && item.cobertura < 80, 'progress-bar-danger': item.cobertura < 50}"
+                                             ng-style="{width: item.cobertura + '%'}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5 m-b-md">
+                            <div class="visitas-executive-panel">
+                                <h6>Composição das visitas por categoria</h6>
+                                <p class="text-muted">{{ visitasExecutiveDashboard.totalVisitas || 0 }} visitas consolidadas no período.</p>
+
+                                <div class="visitas-executive-row" ng-repeat="category in visitasExecutiveDashboard.categorias">
+                                    <div class="visitas-executive-row-header">
+                                        <strong>{{ category.label }}</strong>
+                                        <span>{{ category.total }} · {{ category.percentual }}%</span>
+                                    </div>
+                                    <div class="progress visitas-executive-progress">
+                                        <div class="progress-bar"
+                                             ng-style="{width: category.percentual + '%', backgroundColor: category.color}"></div>
+                                    </div>
+                                </div>
+
+                                <div class="visitas-executive-insight"
+                                     ng-if="visitasExecutiveDashboard.melhorCobertura">
+                                    <strong>Melhor cobertura: {{ visitasExecutiveDashboard.melhorCobertura.municipio }}</strong>
+                                    <div class="text-muted">
+                                        {{ visitasExecutiveDashboard.melhorCobertura.cobertura }}% ·
+                                        {{ visitasExecutiveDashboard.melhorCobertura.realizados }} comuns concluídas.
+                                    </div>
+                                </div>
+                                <div class="visitas-executive-insight is-risk"
+                                     ng-if="visitasExecutiveDashboard.maiorRisco">
+                                    <strong>Maior passivo: {{ visitasExecutiveDashboard.maiorRisco.municipio }}</strong>
+                                    <div class="text-muted">
+                                        {{ visitasExecutiveDashboard.maiorRisco.pendentes }} comuns pendentes ·
+                                        {{ visitasExecutiveDashboard.maiorRisco.cobertura }}% de cobertura.
+                                    </div>
+                                </div>
+                                <div class="visitas-executive-insight is-volume"
+                                     ng-if="visitasExecutiveDashboard.maiorVolume">
+                                    <strong>Maior volume: {{ visitasExecutiveDashboard.maiorVolume.municipio }}</strong>
+                                    <div class="text-muted">
+                                        {{ visitasExecutiveDashboard.maiorVolume.totalVisitas }} visitas ·
+                                        {{ visitasExecutiveDashboard.concentracaoMaiorVolume }}% do volume regional.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visitas-executive-panel m-t-sm">
+                        <h6>Volume de visitas por município</h6>
+                        <p class="text-muted">
+                            Comparação da quantidade consolidada. A maior barra representa o município com maior volume no período.
+                        </p>
+
+                        <div class="visitas-volume-chart-row"
+                             ng-repeat="item in visitasExecutiveDashboard.municipiosPorVolume">
+                            <div>
+                                <strong>{{ item.municipio }}</strong>
+                                <div class="visitas-executive-row-meta">
+                                    {{ item.realizados }} comuns com lançamento
+                                </div>
+                            </div>
+                            <div class="progress visitas-volume-chart-bar">
+                                <div class="progress-bar"
+                                     ng-style="{width: item.percentualVolumeEscala + '%'}"></div>
+                            </div>
+                            <div class="text-right">
+                                <strong>{{ item.totalVisitas }} visitas</strong>
+                                <div class="visitas-executive-row-meta">
+                                    {{ item.participacaoRegional }}% da regional
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center text-muted p-md"
+                             ng-if="!visitasExecutiveDashboard.municipiosPorVolume.length">
+                            Sem visitas consolidadas para o período selecionado.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-t-lg" ng-if="false">
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
@@ -1089,7 +1268,7 @@
         </div>
     </div>
 
-    <div class="row m-t-lg">
+    <div class="row m-t-lg" ng-if="false">
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">

@@ -704,13 +704,13 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('visitas.dashboard', {
             url: "/dashboard",
-            templateUrl: "views/visitas_dashboard.html?v=1.1.12",
+            templateUrl: "views/visitas_dashboard.html?v=1.1.15",
             data: { pageTitle: 'Dashboard de Visitas' },
             controller: 'visitasDashboardCtrl'
         })
         .state('visitas.lancamentos', {
             url: "/lancamentos",
-            templateUrl: "views/visitas_lancamentos.html?v=2.0.0",
+            templateUrl: "views/visitas_lancamentos.html?v=2.0.4",
             data: { pageTitle: 'Lan\u00e7amentos de Visitas' },
             controller: 'visitasLancamentosCtrl'
         })
@@ -728,31 +728,31 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('visitas.irmandade', {
             url: "/irmandade",
-            templateUrl: "views/visitas_dashboard.html?v=1.1.12",
+            templateUrl: "views/visitas_dashboard.html?v=1.1.15",
             data: { pageTitle: 'Dashboard de Visitas' },
             controller: 'visitasDashboardCtrl'
         })
         .state('visitas.mocidade', {
             url: "/mocidade",
-            templateUrl: "views/visitas_dashboard.html?v=1.1.12",
+            templateUrl: "views/visitas_dashboard.html?v=1.1.15",
             data: { pageTitle: 'Dashboard de Visitas' },
             controller: 'visitasDashboardCtrl'
         })
         .state('visitas.musicos', {
             url: "/musicos",
-            templateUrl: "views/visitas_dashboard.html?v=1.1.12",
+            templateUrl: "views/visitas_dashboard.html?v=1.1.15",
             data: { pageTitle: 'Dashboard de Visitas' },
             controller: 'visitasDashboardCtrl'
         })
         .state('visitas.familiar', {
             url: "/familiar",
-            templateUrl: "views/visitas_dashboard.html?v=1.1.12",
+            templateUrl: "views/visitas_dashboard.html?v=1.1.15",
             data: { pageTitle: 'Dashboard de Visitas' },
             controller: 'visitasDashboardCtrl'
         })
         .state('visitas.evangelizacao', {
             url: "/evangelizacao",
-            templateUrl: "views/visitas_dashboard.html?v=1.1.12",
+            templateUrl: "views/visitas_dashboard.html?v=1.1.15",
             data: { pageTitle: 'Dashboard de Visitas' },
             controller: 'visitasDashboardCtrl'
         })

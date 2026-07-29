@@ -11568,8 +11568,6 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             content: "%x alertas"
         }
     };
-    var lastEbiPendingAlertSignature = '';
-
     function updateManagementPermission() {
         $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'EBI');
     }
@@ -13111,8 +13109,6 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         $scope.ebiPendingMunicipioGroups = pendingInsights.municipioGroups;
         $scope.ebiCalculationRows = pendingInsights.items.slice();
         $scope.ebiPendingFlotData = buildEbiPendingMunicipioChart($scope.ebiPendingMunicipioGroups);
-        maybeNotifyEbiPendencias(pendingInsights.summary);
-
         if ($scope.expandedEbiMunicipio && !groupedMunicipios.some(function (item) { return item.municipio === $scope.expandedEbiMunicipio; })) {
             $scope.expandedEbiMunicipio = '';
         }
@@ -14275,7 +14271,43 @@ function ebiAlunosCtrl($scope, EbiService, $timeout, AuthService, $rootScope) {
     $scope.canManageCadastros = false;
     $scope.cepLookupLoading = false;
     configureCadastroMusicForm($scope, 'newAluno', AuthService);
+    var ebiPoloOptions = (window.EBI_ACTIVE_SPACES || []).map(function (polo) {
+        return {
+            nome: repairCadastroMusicText(polo.detalhada || polo.comum || polo.foto || polo.codigo || ''),
+            municipio: normalizeComumCatalogLookup(polo.cidadePainel || polo.cidadeOficial || '')
+        };
+    }).filter(function (polo) {
+        return polo.nome && polo.municipio;
+    });
     var lastCepLookupDigits = '';
+
+    $scope.getPolosFixosForComum = function (comumNome) {
+        var municipio = normalizeComumCatalogLookup(resolveMunicipioFromCatalog($scope.comumCatalogState, [
+            comumNome
+        ]));
+
+        if (!municipio) return [];
+
+        return ebiPoloOptions.filter(function (polo) {
+            return polo.municipio === municipio;
+        }).map(function (polo) {
+            return polo.nome;
+        }).sort(function (a, b) {
+            return a.localeCompare(b, 'pt-BR');
+        });
+    };
+
+    $scope.syncPoloFixoForComum = function () {
+        var aluno = $scope.newAluno || {};
+        var polosDisponiveis;
+
+        if (!aluno.polo_participacao) return;
+
+        polosDisponiveis = $scope.getPolosFixosForComum(aluno.comum_congregacao);
+        if (polosDisponiveis.indexOf(aluno.polo_participacao) === -1) {
+            aluno.polo_participacao = '';
+        }
+    };
 
     function updateManagementPermission() {
         $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'EBI');
@@ -15509,7 +15541,6 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
 
         grupos.forEach(function (grupo) {
             var subtotal = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
-
             merges.push({ s: { r: rows.length, c: 0 }, e: { r: rows.length, c: 8 } });
             rows.push(['MUNICÍPIO: ' + grupo.municipio]);
 
@@ -15851,7 +15882,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     $scope.ministerioRegionalCatalogState = ministerioRegionalCatalogState;
     $scope.filters = {
         searchText: '',
-        cidade: '',
+        cidades: [],
         dataInicio: null,
         dataFim: null,
         mes: monthLabels[new Date().getMonth()]
@@ -15878,6 +15909,13 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     $scope.expandedOperationalMunicipio = '';
     $scope.consolidadoMunicipioGroups = [];
     $scope.expandedConsolidadoMunicipio = '';
+    $scope.visitasExecutiveDashboard = {
+        municipios: [],
+        categorias: [],
+        totalVisitas: 0,
+        totalLancamentos: 0,
+        mediaVisitasPorComum: 0
+    };
     $scope.lastDashboardUpdateLabel = '';
     $scope.pendingOperationalItems = [];
     $scope.pendingHealthSummary = {
@@ -15912,6 +15950,42 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         proximos7: 0,
         futuras: 0,
         concluidasMes: 0
+    };
+
+    function getSelectedVisitasMunicipios() {
+        return ($scope.filters.cidades || []).map(function (cidade) {
+            return normalizeMunicipioRegionalLabel(cidade);
+        }).filter(Boolean);
+    }
+
+    function matchesSelectedVisitasMunicipio(cidade) {
+        var selectedCities = getSelectedVisitasMunicipios();
+        var normalizedCity = normalizeMunicipioRegionalLabel(cidade || '');
+
+        return !selectedCities.length || selectedCities.indexOf(normalizedCity) !== -1;
+    }
+
+    $scope.toggleVisitasCidadeFilter = function (cidade) {
+        var normalizedCity = normalizeMunicipioRegionalLabel(cidade);
+        var selectedCities = $scope.filters.cidades || [];
+        var index = selectedCities.indexOf(normalizedCity);
+
+        if (index === -1) {
+            selectedCities.push(normalizedCity);
+        } else {
+            selectedCities.splice(index, 1);
+        }
+        $scope.filters.cidades = selectedCities;
+        $scope.applyFilters();
+    };
+
+    $scope.isVisitasCidadeSelected = function (cidade) {
+        return ($scope.filters.cidades || []).indexOf(normalizeMunicipioRegionalLabel(cidade)) !== -1;
+    };
+
+    $scope.clearVisitasCidades = function () {
+        $scope.filters.cidades = [];
+        $scope.applyFilters();
     };
 
     function mergeExpectedEntry(grouped, nome, cidade) {
@@ -16176,7 +16250,6 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
     function filterVisitasHealthRecords(records) {
         var search = String($scope.filters.searchText || '').trim().toLowerCase();
-        var cityFilter = normalizeMunicipioRegionalLabel($scope.filters.cidade || '');
 
         return (records || []).filter(function (item) {
             var textMatch = true;
@@ -16193,14 +16266,12 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 textMatch = textSource.indexOf(search) !== -1;
             }
 
-            if (cityFilter) {
-                municipio = normalizeMunicipioRegionalLabel(
-                    normalizeOfficialMunicipioRegionalLabel(item && item.municipio)
-                    || normalizeOfficialMunicipioRegionalLabel(normalizeVisitasMunicipioFromComumLocal(item && (item.comum || item.igreja)))
-                    || ''
-                );
-                cityMatch = municipio === cityFilter;
-            }
+            municipio = normalizeMunicipioRegionalLabel(
+                normalizeOfficialMunicipioRegionalLabel(item && item.municipio)
+                || normalizeOfficialMunicipioRegionalLabel(normalizeVisitasMunicipioFromComumLocal(item && (item.comum || item.igreja)))
+                || ''
+            );
+            cityMatch = matchesSelectedVisitasMunicipio(municipio);
 
             return textMatch && cityMatch;
         });
@@ -16512,6 +16583,98 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         });
     }
 
+    function buildVisitasExecutiveDashboard(coverageRows, consolidatedGroups) {
+        var consolidatedByCity = {};
+        var categoryTotals = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0 };
+        var totalVisitas = 0;
+        var totalLancamentos = 0;
+
+        angular.forEach(consolidatedGroups || [], function (group) {
+            var city = normalizeMunicipioRegionalLabel(group && group.municipio || '');
+            consolidatedByCity[city] = group;
+            totalVisitas += Number(group && group.totalVisitas || 0);
+            totalLancamentos += Number(group && group.totalComuns || 0);
+            categoryTotals.gvi += Number(group && group.gvi || 0);
+            categoryTotals.gvm += Number(group && group.gvm || 0);
+            categoryTotals.musicos += Number(group && group.musicos || 0);
+            categoryTotals.rf += Number(group && group.rf || 0);
+            categoryTotals.re += Number(group && group.re || 0);
+        });
+
+        var municipalities = (coverageRows || []).map(function (row) {
+            var city = normalizeMunicipioRegionalLabel(row.municipio || '');
+            var consolidated = consolidatedByCity[city] || {};
+            var coverage = Number(row.taxa || 0);
+
+            return {
+                municipio: city,
+                previstos: Number(row.igrejas || 0),
+                realizados: Number(row.lancamentos || 0),
+                pendentes: Math.max(0, Number(row.igrejas || 0) - Number(row.lancamentos || 0)),
+                cobertura: Number(coverage.toFixed(1)),
+                totalVisitas: Number(consolidated.totalVisitas || 0),
+                mediaPorComum: Number(row.lancamentos || 0)
+                    ? Number((Number(consolidated.totalVisitas || 0) / Number(row.lancamentos || 0)).toFixed(1))
+                    : 0,
+                status: coverage >= 80 ? 'EXCELENTE' : (coverage >= 50 ? 'ATENÇÃO' : 'CRÍTICO')
+            };
+        }).sort(function (a, b) {
+            if (b.cobertura !== a.cobertura) return b.cobertura - a.cobertura;
+            if (b.realizados !== a.realizados) return b.realizados - a.realizados;
+            return a.municipio.localeCompare(b.municipio, 'pt-BR');
+        });
+
+        var categoryGrandTotal = Object.keys(categoryTotals).reduce(function (sum, key) {
+            return sum + categoryTotals[key];
+        }, 0);
+        var categoryRows = [
+            { key: 'gvi', label: 'GVI', color: '#1ab394' },
+            { key: 'gvm', label: 'GVM', color: '#23c6c8' },
+            { key: 'musicos', label: 'Músicos', color: '#f8ac59' },
+            { key: 'rf', label: 'RF', color: '#1c84c6' },
+            { key: 're', label: 'RE', color: '#ed5565' }
+        ].map(function (item) {
+            item.total = categoryTotals[item.key];
+            item.percentual = categoryGrandTotal ? Number(((item.total / categoryGrandTotal) * 100).toFixed(1)) : 0;
+            return item;
+        });
+
+        var byVolume = municipalities.slice().sort(function (a, b) {
+            return b.totalVisitas - a.totalVisitas;
+        });
+        var maxMunicipalVolume = byVolume.length ? byVolume[0].totalVisitas : 0;
+        byVolume.forEach(function (item) {
+            item.percentualVolumeEscala = maxMunicipalVolume
+                ? Number(((item.totalVisitas / maxMunicipalVolume) * 100).toFixed(1))
+                : 0;
+            item.participacaoRegional = totalVisitas
+                ? Number(((item.totalVisitas / totalVisitas) * 100).toFixed(1))
+                : 0;
+        });
+        var byRisk = municipalities.slice().sort(function (a, b) {
+            if (b.pendentes !== a.pendentes) return b.pendentes - a.pendentes;
+            return a.cobertura - b.cobertura;
+        });
+
+        return {
+            municipios: municipalities,
+            municipiosPorVolume: byVolume,
+            categorias: categoryRows,
+            totalVisitas: totalVisitas,
+            totalLancamentos: totalLancamentos,
+            mediaVisitasPorComum: totalLancamentos ? Number((totalVisitas / totalLancamentos).toFixed(1)) : 0,
+            municipiosExcelentes: municipalities.filter(function (item) { return item.cobertura >= 80; }).length,
+            municipiosCriticos: municipalities.filter(function (item) { return item.cobertura < 50; }).length,
+            municipiosSemLancamento: municipalities.filter(function (item) { return item.realizados === 0; }).length,
+            melhorCobertura: municipalities[0] || null,
+            maiorRisco: byRisk[0] || null,
+            maiorVolume: byVolume[0] || null,
+            concentracaoMaiorVolume: totalVisitas && byVolume.length
+                ? Number(((byVolume[0].totalVisitas / totalVisitas) * 100).toFixed(1))
+                : 0
+        };
+    }
+
     function notify(title, message, type) {
         if (window.toastr && typeof window.toastr[type || 'info'] === 'function') {
             window.toastr[type || 'info'](message, title);
@@ -16649,7 +16812,6 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
     function refreshCommunityCareData() {
         var search = String($scope.filters.searchText || '').trim().toLowerCase();
-        var cityFilter = normalizeMunicipioRegionalLabel($scope.filters.cidade || '');
         var hasTemporalFilter = !!($scope.filters.mes || $scope.filters.dataInicio || $scope.filters.dataFim);
         var today = getVisitasTodayLocalDate();
         var currentMonth = today.getMonth();
@@ -16702,9 +16864,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 matchText = textSource.indexOf(search) !== -1;
             }
 
-            if (cityFilter) {
-                matchCity = !!visitado && normalizeMunicipioRegionalLabel(visitado.municipio) === cityFilter;
-            }
+            matchCity = matchesSelectedVisitasMunicipio(visitado && visitado.municipio);
 
             if (hasTemporalFilter) {
                 if (!visitado) {
@@ -16764,9 +16924,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 matchText = textSource.indexOf(search) !== -1;
             }
 
-            if (cityFilter) {
-                matchCity = municipio === cityFilter;
-            }
+            matchCity = matchesSelectedVisitasMunicipio(municipio);
 
             if (hasTemporalFilter) {
                 matchTemporalScope =
@@ -16956,11 +17114,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
             return grouped[key];
         }).filter(function (entry) {
-            if ($scope.filters.cidade) {
-                return normalizeMunicipioRegionalLabel(entry.cidade) === normalizeMunicipioRegionalLabel($scope.filters.cidade);
-            }
-
-            return true;
+            return matchesSelectedVisitasMunicipio(entry.cidade);
         }).sort(function (a, b) {
             var aIsUnknown = !a.cidade;
             var bIsUnknown = !b.cidade;
@@ -17102,6 +17256,10 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         }).filter(function (item) {
             return item.igrejas > 0 || item.lancamentos > 0;
         });
+        $scope.visitasExecutiveDashboard = buildVisitasExecutiveDashboard(
+            $scope.taxasConclusao,
+            $scope.consolidadoMunicipioGroups
+        );
     }
 
     $scope.applyFilters = function () {
@@ -17117,9 +17275,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             if (search) {
                 matchText = [item.comum, item.municipio, item.codigo].join(' ').toLowerCase().indexOf(search) !== -1;
             }
-            if ($scope.filters.cidade) {
-                matchCity = normalizeMunicipioRegionalLabel(item.municipio) === normalizeMunicipioRegionalLabel($scope.filters.cidade);
-            }
+            matchCity = matchesSelectedVisitasMunicipio(item.municipio);
             if ($scope.filters.mes) {
                 matchMonth = item.mes === $scope.filters.mes;
             }
@@ -17230,7 +17386,8 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     }
 
     $scope.filterVisitasByMunicipio = function (municipio) {
-        $scope.filters.cidade = municipio || '';
+        $scope.filters.cidades = municipio ? [normalizeMunicipioRegionalLabel(municipio)] : [];
+        $scope.applyFilters();
     };
 
     $scope.showAllPendingLancamentos = function () {
@@ -17351,6 +17508,14 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
     $scope.exportToExcel = function () {
         var grupos = getGroupsByMunicipio();
+        var merges = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+            { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+            { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } },
+            { s: { r: 3, c: 0 }, e: { r: 3, c: 8 } },
+            { s: { r: 4, c: 0 }, e: { r: 4, c: 8 } },
+            { s: { r: 5, c: 0 }, e: { r: 5, c: 8 } }
+        ];
         var rows = [
             [visitasText.institution],
             [visitasText.region],
@@ -17389,8 +17554,27 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         });
 
         rows.push(['', '', 'TOTAIS GERAIS', $scope.totalGeral.gvi || 0, $scope.totalGeral.gvm || 0, $scope.totalGeral.musicos || 0, $scope.totalGeral.rf || 0, $scope.totalGeral.re || 0, $scope.totalGeral.total || 0]);
+        rows = rows.map(function (row) {
+            return row.map(function (cell) {
+                return typeof cell === 'string' ? repairVisitasModuleText(cell) : cell;
+            });
+        });
+
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!merges'] = merges;
+        ws['!cols'] = [
+            { wch: 12 },
+            { wch: 18 },
+            { wch: 38 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 },
+            { wch: 10 }
+        ];
         var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Relatorio Visitas');
+        XLSX.utils.book_append_sheet(wb, ws, 'Relatorio Visitas');
         XLSX.writeFile(wb, 'Relatorio_Visitas_' + new Date().toISOString().slice(0, 10) + '.xlsx');
     };
 
@@ -17448,11 +17632,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                     columns: [
                         {
                             width: 135,
-                            stack: [
-                                { image: visitasLogoBase64, width: 52, margin: [0, 0, 0, 6] },
-                                { text: visitasText.extractedByLabel + ':', fontSize: 8, bold: true, color: '#666' },
-                                { text: extractedBy, fontSize: 8, color: '#444' }
-                            ]
+                            text: ''
                         },
                         {
                             stack: [
@@ -17468,7 +17648,8 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                             stack: [
                                 { text: visitasText.pageLabel + ' ' + currentPage + ' de ' + pageCount, alignment: 'right', fontSize: 9 },
                                 { text: visitasText.issueDateLabel + ': ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', fontSize: 9 },
-                                { text: visitasText.periodLabel + ': ' + getPeriodoLabel(), alignment: 'right', fontSize: 8 }
+                                { text: visitasText.periodLabel + ': ' + getPeriodoLabel(), alignment: 'right', fontSize: 8 },
+                                { text: visitasText.extractedByLabel + ': ' + extractedBy, alignment: 'right', fontSize: 8, color: '#444', margin: [0, 3, 0, 0] }
                             ],
                             width: 140
                         }
@@ -17496,18 +17677,20 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     };
 
     $scope.clearFilters = function () {
-        $scope.filters = { searchText: '', cidade: '', dataInicio: null, dataFim: null, mes: monthLabels[new Date().getMonth()] };
+        $scope.filters = { searchText: '', cidades: [], dataInicio: null, dataFim: null, mes: monthLabels[new Date().getMonth()] };
     };
 
     updateManagementPermission();
     $scope.$watch(function () { return $rootScope.currentUser; }, updateManagementPermission, true);
     $scope.$watchGroup([
         'filters.searchText',
-        'filters.cidade',
         'filters.dataInicio',
         'filters.dataFim',
         'filters.mes'
     ], function () {
+        $scope.applyFilters();
+    });
+    $scope.$watchCollection('filters.cidades', function () {
         $scope.applyFilters();
     });
 
@@ -17540,9 +17723,20 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.filteredLancamentos = [];
     $scope.groupedLancamentosByMunicipio = [];
     $scope.expandedLancamentoMunicipio = '';
+    $scope.visitasAuditItems = [];
+    $scope.visitasAuditMunicipioGroups = [];
+    $scope.expandedAuditMunicipio = '';
+    $scope.auditStatusFilter = 'pendentes';
+    $scope.auditDisplayLimits = {};
+    $scope.visitasAuditSummary = {
+        previstas: 0,
+        realizadas: 0,
+        pendentes: 0,
+        cobertura: 0
+    };
     $scope.filters = {
         searchText: '',
-        cidade: '',
+        cidades: [],
         mes: monthLabels[new Date().getMonth()]
     };
     $scope.formFilters = {
@@ -17639,8 +17833,9 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         var totalVisitas = 0;
         var municipios = {};
         ($scope.filteredLancamentos || []).forEach(function (item) {
+            var municipio = normalizeMunicipioRegionalLabel(item && item.municipio || '');
             totalVisitas += item.total || 0;
-            municipios[item.municipio] = true;
+            municipios[municipio] = true;
         });
         $scope.summary = {
             totalRegistros: ($scope.filteredLancamentos || []).length,
@@ -17656,7 +17851,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         var grouped = {};
 
         ($scope.filteredLancamentos || []).forEach(function (item) {
-            var municipio = item && item.municipio ? item.municipio : 'Sem município';
+            var municipio = normalizeMunicipioRegionalLabel(item && item.municipio || 'Sem município');
 
             if (!grouped[municipio]) {
                 grouped[municipio] = {
@@ -17695,6 +17890,198 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
             $scope.expandedLancamentoMunicipio = $scope.groupedLancamentosByMunicipio[0].municipio;
         }
     }
+
+    function getLancamentoAuditKey(item) {
+        var code = String(item && (item.codigo || item.codigo_comum) || extractVisitaCodigoLocal(item && (item.comum || item.igreja) || '')).trim().toUpperCase();
+        var comum = normalizeComumCatalogLookup(item && (item.comum || item.igreja) || '');
+
+        return code || comum;
+    }
+
+    function refreshLancamentosAudit() {
+        var selectedCities = getSelectedLancamentosMunicipios();
+        var selectedMonth = $scope.filters.mes || monthLabels[new Date().getMonth()];
+        var selectedMonthNumber = monthLabels.indexOf(selectedMonth) + 1;
+        var selectedYear = currentYear();
+        var recordsByKey = {};
+        var expectedByKey = {};
+        var groups = {};
+        var search = String($scope.filters.searchText || '').trim().toLowerCase();
+
+        ($scope.lancamentos || []).forEach(function (item) {
+            var itemMonth = parseInt(item && (item.referencia_mes || (monthLabels.indexOf(item.mes) + 1)), 10);
+            var itemYear = parseInt(item && (item.referencia_ano || item.ano), 10);
+            var key = getLancamentoAuditKey(item);
+
+            if (key && itemMonth === selectedMonthNumber && itemYear === selectedYear) {
+                recordsByKey[key] = recordsByKey[key] || item;
+            }
+        });
+
+        ($scope.comunsDisponiveis || []).forEach(function (comum) {
+            var entry = findComumCatalogEntry($scope.comumCatalogState, comum) || {};
+            var nome = repairVisitasModuleText(entry.nome || entry.label || comum);
+            var codigo = String(entry.codigo || extractVisitaCodigoLocal(nome) || '').trim().toUpperCase();
+            var municipio = normalizeMunicipioRegionalLabel(
+                entry.cidade ||
+                entry.municipio ||
+                resolveMunicipioFromCatalog($scope.comumCatalogState, [nome]) ||
+                'Sem município'
+            );
+            var key = codigo || normalizeComumCatalogLookup(nome);
+
+            if (!key || (selectedCities.length && selectedCities.indexOf(municipio) === -1)) {
+                return;
+            }
+            if (search && [nome, codigo, municipio].join(' ').toLowerCase().indexOf(search) === -1) {
+                return;
+            }
+
+            expectedByKey[key] = expectedByKey[key] || {
+                key: key,
+                comum: nome,
+                codigo: codigo,
+                municipio: municipio
+            };
+        });
+
+        $scope.visitasAuditItems = Object.keys(expectedByKey).map(function (key) {
+            var expected = expectedByKey[key];
+            var record = recordsByKey[key] || null;
+
+            return angular.extend({}, expected, {
+                mes: selectedMonth,
+                ano: selectedYear,
+                status: record ? 'REALIZADO' : 'PENDENTE',
+                realizado: !!record,
+                lancamento: record,
+                gvi: record ? Number(record.gvi || 0) : null,
+                gvm: record ? Number(record.gvm || 0) : null,
+                musicos: record ? Number(record.musicos || 0) : null,
+                rf: record ? Number(record.rf || 0) : null,
+                re: record ? Number(record.re || 0) : null
+            });
+        }).sort(function (a, b) {
+            if (a.realizado !== b.realizado) {
+                return a.realizado ? 1 : -1;
+            }
+            if (a.municipio !== b.municipio) {
+                return String(a.municipio).localeCompare(String(b.municipio), 'pt-BR');
+            }
+            return String(a.comum).localeCompare(String(b.comum), 'pt-BR');
+        });
+
+        $scope.visitasAuditItems.forEach(function (item) {
+            if (!groups[item.municipio]) {
+                groups[item.municipio] = {
+                    municipio: item.municipio,
+                    previstas: 0,
+                    realizadas: 0,
+                    pendentes: 0,
+                    items: []
+                };
+            }
+            groups[item.municipio].previstas += 1;
+            groups[item.municipio].realizadas += item.realizado ? 1 : 0;
+            groups[item.municipio].pendentes += item.realizado ? 0 : 1;
+            groups[item.municipio].items.push(item);
+        });
+
+        $scope.visitasAuditMunicipioGroups = Object.keys(groups).map(function (key) {
+            var group = groups[key];
+            group.cobertura = group.previstas ? Number(((group.realizadas / group.previstas) * 100).toFixed(1)) : 0;
+            return group;
+        }).sort(function (a, b) {
+            if (b.pendentes !== a.pendentes) {
+                return b.pendentes - a.pendentes;
+            }
+            return String(a.municipio).localeCompare(String(b.municipio), 'pt-BR');
+        });
+
+        var realizadas = $scope.visitasAuditItems.filter(function (item) { return item.realizado; }).length;
+        $scope.visitasAuditSummary = {
+            previstas: $scope.visitasAuditItems.length,
+            realizadas: realizadas,
+            pendentes: $scope.visitasAuditItems.length - realizadas,
+            cobertura: $scope.visitasAuditItems.length
+                ? Number(((realizadas / $scope.visitasAuditItems.length) * 100).toFixed(1))
+                : 0,
+            mes: selectedMonth,
+            ano: selectedYear
+        };
+
+        if ($scope.expandedAuditMunicipio && !$scope.visitasAuditMunicipioGroups.some(function (group) {
+            return group.municipio === $scope.expandedAuditMunicipio;
+        })) {
+            $scope.expandedAuditMunicipio = '';
+        }
+    }
+
+    $scope.toggleAuditMunicipio = function (municipio) {
+        $scope.expandedAuditMunicipio = $scope.expandedAuditMunicipio === municipio ? '' : municipio;
+        if ($scope.expandedAuditMunicipio && !$scope.auditDisplayLimits[municipio]) {
+            $scope.auditDisplayLimits[municipio] = 8;
+        }
+    };
+
+    $scope.getDisplayedAuditSummary = function () {
+        var selectedGroup;
+
+        if ($scope.expandedAuditMunicipio) {
+            selectedGroup = ($scope.visitasAuditMunicipioGroups || []).filter(function (group) {
+                return group.municipio === $scope.expandedAuditMunicipio;
+            })[0];
+        }
+
+        if (selectedGroup) {
+            return {
+                previstas: selectedGroup.previstas,
+                realizadas: selectedGroup.realizadas,
+                pendentes: selectedGroup.pendentes,
+                cobertura: selectedGroup.cobertura,
+                escopo: selectedGroup.municipio
+            };
+        }
+
+        return angular.extend({}, $scope.visitasAuditSummary, {
+            escopo: 'REGIONAL'
+        });
+    };
+
+    $scope.isAuditMunicipioExpanded = function (municipio) {
+        return $scope.expandedAuditMunicipio === municipio;
+    };
+
+    $scope.setAuditStatusFilter = function (status) {
+        $scope.auditStatusFilter = status;
+        $scope.auditDisplayLimits = {};
+    };
+
+    $scope.getFilteredAuditItems = function (group) {
+        var items = (group && group.items) || [];
+
+        if ($scope.auditStatusFilter === 'pendentes') {
+            return items.filter(function (item) { return !item.realizado; });
+        }
+        if ($scope.auditStatusFilter === 'realizados') {
+            return items.filter(function (item) { return item.realizado; });
+        }
+        return items;
+    };
+
+    $scope.getVisibleAuditItems = function (group) {
+        var limit = $scope.auditDisplayLimits[group.municipio] || 8;
+        return $scope.getFilteredAuditItems(group).slice(0, limit);
+    };
+
+    $scope.hasMoreAuditItems = function (group) {
+        var limit = $scope.auditDisplayLimits[group.municipio] || 8;
+        return $scope.getFilteredAuditItems(group).length > limit;
+    };
+
+    $scope.showMoreAuditItems = function (group) {
+        $scope.auditDisplayLimits[group.municipio] = ($scope.auditDisplayLimits[group.municipio] || 8) + 8;
+    };
 
     function consumePendingDraft() {
         var rawValue;
@@ -17788,16 +18175,53 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         refreshAvailableComuns();
     };
 
+    function getSelectedLancamentosMunicipios() {
+        return ($scope.filters.cidades || []).map(function (cidade) {
+            return normalizeMunicipioRegionalLabel(cidade);
+        }).filter(Boolean);
+    }
+
+    $scope.toggleLancamentosCidadeFilter = function (cidade) {
+        var normalizedCity = normalizeMunicipioRegionalLabel(cidade);
+        var selectedCities = $scope.filters.cidades || [];
+        var index = selectedCities.indexOf(normalizedCity);
+
+        if (index === -1) {
+            selectedCities.push(normalizedCity);
+        } else {
+            selectedCities.splice(index, 1);
+        }
+
+        $scope.filters.cidades = selectedCities;
+        $scope.applyFilters();
+    };
+
+    $scope.isLancamentosCidadeSelected = function (cidade) {
+        return ($scope.filters.cidades || []).indexOf(normalizeMunicipioRegionalLabel(cidade)) !== -1;
+    };
+
+    $scope.clearLancamentosCidades = function () {
+        $scope.filters.cidades = [];
+        $scope.applyFilters();
+    };
+
+    $scope.filterLancamentosByMunicipio = function (municipio) {
+        $scope.filters.cidades = municipio ? [normalizeMunicipioRegionalLabel(municipio)] : [];
+        $scope.applyFilters();
+    };
+
     $scope.applyFilters = function () {
         var search = String($scope.filters.searchText || '').trim().toLowerCase();
+        var selectedCities = getSelectedLancamentosMunicipios();
         $scope.filteredLancamentos = ($scope.lancamentos || []).filter(function (item) {
             var matchText = !search || [item.comum, item.codigo, item.municipio, item.observacoes].join(' ').toLowerCase().indexOf(search) !== -1;
-            var matchCity = !$scope.filters.cidade || normalizeMunicipioRegionalLabel(item.municipio) === normalizeMunicipioRegionalLabel($scope.filters.cidade);
+            var matchCity = !selectedCities.length || selectedCities.indexOf(normalizeMunicipioRegionalLabel(item.municipio)) !== -1;
             var matchMonth = !$scope.filters.mes || item.mes === $scope.filters.mes;
             return matchText && matchCity && matchMonth;
         });
         updateSummary();
         refreshLancamentosGroupedData();
+        refreshLancamentosAudit();
     };
 
     $scope.loadLancamentos = function () {
@@ -17872,6 +18296,24 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
             swal('Atenção', 'Selecione uma comum válida da lista para continuar.', 'warning');
             return;
         }
+        var formKey = getLancamentoAuditKey($scope.formData);
+        var formYear = parseInt($scope.formData.referencia_ano, 10);
+        var formMonth = parseInt($scope.formData.referencia_mes, 10);
+        var duplicateRecord = ($scope.lancamentos || []).find(function (item) {
+            return String(item.id || '') !== String($scope.formData.id || '') &&
+                parseInt(item.referencia_ano || item.ano, 10) === formYear &&
+                parseInt(item.referencia_mes || (monthLabels.indexOf(item.mes) + 1), 10) === formMonth &&
+                getLancamentoAuditKey(item) === formKey;
+        });
+        if (duplicateRecord) {
+            swal(
+                'Lançamento já existente',
+                'Esta comum já possui um lançamento para ' + monthLabels[formMonth - 1] + '/' + formYear +
+                '. Edite o registro existente para atualizar GVI, GVM, Músicos, RF ou RE.',
+                'warning'
+            );
+            return;
+        }
         $scope.saving = true;
         promise = $scope.editing ? VisitasService.updateLancamento($scope.formData) : VisitasService.saveLancamento($scope.formData);
         promise.then(function () {
@@ -17933,9 +18375,11 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.$watch(function () { return $rootScope.currentUser; }, updateManagementPermission, true);
     $scope.$watchGroup([
         'filters.searchText',
-        'filters.cidade',
         'filters.mes'
     ], function () {
+        $scope.applyFilters();
+    });
+    $scope.$watchCollection('filters.cidades', function () {
         $scope.applyFilters();
     });
     ensureScopeComumCatalog($scope, AuthService, function (catalogState) {
@@ -17948,7 +18392,7 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
         applyPendingDraftToForm(consumePendingDraft());
         pendingFilterDraft = consumePendingFilterDraft();
         if (pendingFilterDraft && pendingFilterDraft.cidade) {
-            $scope.filters.cidade = normalizeMunicipioRegionalLabel(pendingFilterDraft.cidade);
+            $scope.filters.cidades = [normalizeMunicipioRegionalLabel(pendingFilterDraft.cidade)];
         }
         refreshAvailableComuns();
     });

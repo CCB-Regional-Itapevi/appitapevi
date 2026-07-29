@@ -77,6 +77,88 @@
         line-height: 1.4;
     }
 
+    .visitas-audit-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 8px 0 14px;
+    }
+
+    .visitas-audit-group {
+        border: 1px solid #e5e8ec;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .visitas-audit-group-toggle {
+        width: 100%;
+        border: 0;
+        background: #f8fafb;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        text-align: left;
+    }
+
+    .visitas-audit-group-toggle:hover,
+    .visitas-audit-group-toggle:focus {
+        background: #eef7f9;
+        outline: 0;
+    }
+
+    .visitas-audit-group-metrics {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .visitas-audit-group-content {
+        padding: 10px;
+        border-top: 1px solid #e5e8ec;
+    }
+
+    .visitas-audit-mobile-list {
+        display: none;
+    }
+
+    .visitas-audit-mobile-card {
+        border: 1px solid #e5e8ec;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 8px;
+        background: #fff;
+    }
+
+    .visitas-audit-mobile-card.is-pending {
+        border-left: 4px solid #ed5565;
+    }
+
+    .visitas-audit-mobile-card.is-complete {
+        border-left: 4px solid #1ab394;
+    }
+
+    .visitas-audit-category-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .visitas-audit-category-grid span {
+        padding: 6px 4px;
+        border-radius: 4px;
+        background: #f4f6f8;
+        text-align: center;
+        font-size: 11px;
+    }
+
     @media (max-width: 767px) {
         .visitas-lancamentos-summary .summary-icon {
             justify-content: center;
@@ -105,6 +187,50 @@
 
         .ibox-title .ibox-tools {
             text-align: left;
+        }
+
+        .visitas-audit-toolbar {
+            align-items: stretch;
+        }
+
+        .visitas-audit-toolbar .btn-group {
+            display: flex;
+            width: 100%;
+        }
+
+        .visitas-audit-toolbar .btn-group .btn {
+            flex: 1;
+        }
+
+        .visitas-audit-group-toggle {
+            align-items: flex-start;
+        }
+
+        .visitas-audit-group-metrics {
+            align-items: flex-end;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .visitas-audit-desktop-table {
+            display: none;
+        }
+
+        .visitas-audit-mobile-list {
+            display: block;
+        }
+
+        .visitas-audit-summary > .col-sm-3 {
+            float: left;
+            width: 50%;
+        }
+
+        .visitas-audit-summary .widget {
+            min-height: 88px;
+        }
+
+        .visitas-audit-summary .widget h2 {
+            font-size: 24px;
         }
     }
 </style>
@@ -181,10 +307,29 @@
                             <input type="text" class="form-control input-sm" placeholder="Pesquisar comum, c&oacute;digo ou observa&ccedil;&atilde;o..." ng-model="filters.searchText">
                         </div>
                         <div class="col-sm-3">
-                            <select class="form-control input-sm" ng-model="filters.cidade">
-                                <option value="">Todos os munic&iacute;pios</option>
-                                <option ng-repeat="cidade in cidades" value="{{ cidade }}">{{ cidade }}</option>
-                            </select>
+                            <div class="dropdown" uib-dropdown>
+                                <button class="btn btn-default btn-sm form-control" type="button" uib-dropdown-toggle
+                                        style="text-align:left; background:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:20px; position:relative;">
+                                    <span ng-if="!filters.cidades.length">Todos os munic&iacute;pios</span>
+                                    <span ng-if="filters.cidades.length">{{ filters.cidades.join(', ') }}</span>
+                                    <span class="caret" style="position:absolute; right:8px; top:12px;"></span>
+                                </button>
+                                <ul class="dropdown-menu" uib-dropdown-menu style="max-height:250px; overflow-y:auto; width:100%;">
+                                    <li>
+                                        <a href ng-click="clearLancamentosCidades(); $event.stopPropagation()">
+                                            <i class="fa fa-fw" ng-class="{'fa-check text-success': !filters.cidades.length}"></i>
+                                            Todos os munic&iacute;pios
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li ng-repeat="cidade in cidades">
+                                        <a href ng-click="toggleLancamentosCidadeFilter(cidade); $event.stopPropagation()">
+                                            <i class="fa fa-fw" ng-class="{'fa-check text-success': isLancamentosCidadeSelected(cidade)}"></i>
+                                            {{ cidade }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="col-sm-4">
                             <select class="form-control input-sm" ng-model="filters.mes">
@@ -232,7 +377,7 @@
                                             <i class="fa" ng-class="isLancamentoMunicipioExpanded(group.municipio) ? 'fa-angle-up' : 'fa-angle-down'"></i>
                                             {{ isLancamentoMunicipioExpanded(group.municipio) ? 'Ocultar lan&ccedil;amentos' : 'Ver lan&ccedil;amentos' }}
                                         </button>
-                                        <button class="btn btn-xs btn-primary" ng-click="filters.cidade = group.municipio">
+                                        <button class="btn btn-xs btn-primary" ng-click="filterLancamentosByMunicipio(group.municipio)">
                                             <i class="fa fa-filter"></i> Filtrar
                                         </button>
                                     </td>
@@ -295,6 +440,193 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-t-md">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Auditoria mensal de lan&ccedil;amentos</h5>
+                    <div class="ibox-tools">
+                        <span class="label label-info">{{ getDisplayedAuditSummary().escopo }}</span>
+                        <span class="label label-primary">{{ visitasAuditSummary.mes }}/{{ visitasAuditSummary.ano }}</span>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <p class="text-muted">
+                        Cada comum deve possuir um &uacute;nico lan&ccedil;amento mensal contendo GVI, GVM, M&uacute;sicos, RF e RE.
+                        Valores iguais a zero s&atilde;o considerados informados; pend&ecirc;ncia significa aus&ecirc;ncia do registro mensal.
+                    </p>
+
+                    <div class="row visitas-audit-summary">
+                        <div class="col-sm-3">
+                            <div class="widget style1 navy-bg">
+                                <div class="row">
+                                    <div class="col-xs-4"><i class="fa fa-list-alt fa-3x"></i></div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>Comuns previstas</span>
+                                        <h2 class="font-bold">{{ getDisplayedAuditSummary().previstas || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="widget style1 lazur-bg">
+                                <div class="row">
+                                    <div class="col-xs-4"><i class="fa fa-check-circle fa-3x"></i></div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>Realizadas</span>
+                                        <h2 class="font-bold">{{ getDisplayedAuditSummary().realizadas || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="widget style1 red-bg">
+                                <div class="row">
+                                    <div class="col-xs-4"><i class="fa fa-exclamation-triangle fa-3x"></i></div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>Pendentes</span>
+                                        <h2 class="font-bold">{{ getDisplayedAuditSummary().pendentes || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="widget style1 yellow-bg">
+                                <div class="row">
+                                    <div class="col-xs-4"><i class="fa fa-percent fa-3x"></i></div>
+                                    <div class="col-xs-8 text-right">
+                                        <span>Cobertura</span>
+                                        <h2 class="font-bold">{{ getDisplayedAuditSummary().cobertura || 0 }}%</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visitas-audit-toolbar">
+                        <span class="text-muted">
+                            <span ng-if="!expandedAuditMunicipio">Indicadores consolidados da regional. Toque em um munic&iacute;pio para analisar seus resultados.</span>
+                            <span ng-if="expandedAuditMunicipio">
+                                Indicadores atualizados para {{ expandedAuditMunicipio }}.
+                                <span ng-if="auditStatusFilter === 'pendentes'">A lista abaixo exibe somente as comuns pendentes.</span>
+                            </span>
+                        </span>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn"
+                                    ng-class="auditStatusFilter === 'pendentes' ? 'btn-danger' : 'btn-white'"
+                                    ng-click="setAuditStatusFilter('pendentes')">
+                                Pendentes
+                            </button>
+                            <button type="button" class="btn"
+                                    ng-class="auditStatusFilter === 'realizados' ? 'btn-primary' : 'btn-white'"
+                                    ng-click="setAuditStatusFilter('realizados')">
+                                Realizados
+                            </button>
+                            <button type="button" class="btn"
+                                    ng-class="auditStatusFilter === 'todos' ? 'btn-info' : 'btn-white'"
+                                    ng-click="setAuditStatusFilter('todos')">
+                                Todos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="visitas-audit-group" ng-repeat="auditGroup in visitasAuditMunicipioGroups">
+                        <button type="button" class="visitas-audit-group-toggle"
+                                ng-click="toggleAuditMunicipio(auditGroup.municipio)">
+                            <span>
+                                <i class="fa fa-fw"
+                                   ng-class="isAuditMunicipioExpanded(auditGroup.municipio) ? 'fa-angle-up' : 'fa-angle-down'"></i>
+                                <strong>{{ auditGroup.municipio }}</strong>
+                            </span>
+                            <span class="visitas-audit-group-metrics">
+                                <span class="label label-primary">{{ auditGroup.realizadas }} realizadas</span>
+                                <span class="label label-danger">{{ auditGroup.pendentes }} pendentes</span>
+                                <strong>{{ auditGroup.cobertura }}%</strong>
+                            </span>
+                        </button>
+
+                        <div class="visitas-audit-group-content"
+                             ng-if="isAuditMunicipioExpanded(auditGroup.municipio)">
+                            <div class="table-responsive visitas-audit-desktop-table">
+                                <table class="table table-hover table-bordered m-b-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Comum</th>
+                                            <th class="text-center">GVI</th>
+                                            <th class="text-center">GVM</th>
+                                            <th class="text-center">M&uacute;sicos</th>
+                                            <th class="text-center">RF</th>
+                                            <th class="text-center">RE</th>
+                                            <th class="text-center">Situa&ccedil;&atilde;o</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="audit in getVisibleAuditItems(auditGroup)">
+                                            <td>
+                                                <strong>{{ audit.comum }}</strong>
+                                                <span class="visitas-lancamentos-subtext" ng-if="audit.codigo">{{ audit.codigo }}</span>
+                                            </td>
+                                            <td class="text-center">{{ audit.realizado ? audit.gvi : '-' }}</td>
+                                            <td class="text-center">{{ audit.realizado ? audit.gvm : '-' }}</td>
+                                            <td class="text-center">{{ audit.realizado ? audit.musicos : '-' }}</td>
+                                            <td class="text-center">{{ audit.realizado ? audit.rf : '-' }}</td>
+                                            <td class="text-center">{{ audit.realizado ? audit.re : '-' }}</td>
+                                            <td class="text-center">
+                                                <span class="label" ng-class="audit.realizado ? 'label-primary' : 'label-danger'">
+                                                    {{ audit.status }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="visitas-audit-mobile-list">
+                                <div class="visitas-audit-mobile-card"
+                                     ng-repeat="audit in getVisibleAuditItems(auditGroup)"
+                                     ng-class="audit.realizado ? 'is-complete' : 'is-pending'">
+                                    <div>
+                                        <span class="label pull-right"
+                                              ng-class="audit.realizado ? 'label-primary' : 'label-danger'">
+                                            {{ audit.status }}
+                                        </span>
+                                        <strong>{{ audit.comum }}</strong>
+                                        <span class="visitas-lancamentos-subtext" ng-if="audit.codigo">{{ audit.codigo }}</span>
+                                    </div>
+                                    <div class="visitas-audit-category-grid" ng-if="audit.realizado">
+                                        <span>GVI<br><strong>{{ audit.gvi }}</strong></span>
+                                        <span>GVM<br><strong>{{ audit.gvm }}</strong></span>
+                                        <span>M&uacute;s.<br><strong>{{ audit.musicos }}</strong></span>
+                                        <span>RF<br><strong>{{ audit.rf }}</strong></span>
+                                        <span>RE<br><strong>{{ audit.re }}</strong></span>
+                                    </div>
+                                    <small class="text-muted" ng-if="!audit.realizado">
+                                        Nenhum lan&ccedil;amento encontrado para este m&ecirc;s.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="text-center text-muted p-xs"
+                                 ng-if="!getFilteredAuditItems(auditGroup).length">
+                                Nenhuma comum nesta situa&ccedil;&atilde;o.
+                            </div>
+                            <div class="text-center m-t-sm" ng-if="hasMoreAuditItems(auditGroup)">
+                                <button type="button" class="btn btn-white btn-sm"
+                                        ng-click="showMoreAuditItems(auditGroup)">
+                                    <i class="fa fa-plus"></i> Mostrar mais 8
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-muted p-md" ng-if="!visitasAuditItems.length">
+                        Nenhuma comum prevista foi encontrada para os filtros atuais.
                     </div>
                 </div>
             </div>
