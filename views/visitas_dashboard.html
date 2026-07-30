@@ -444,9 +444,160 @@
         box-shadow: none;
     }
     .visitas-volume-chart-bar .progress-bar {
-        min-width: 2px;
         border-radius: 4px;
-        background: linear-gradient(90deg, #1ab394, #23c6c8);
+        background-color: #1ab394;
+        background-image: linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.18) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(255, 255, 255, 0.18) 75%,
+            transparent 75%,
+            transparent
+        );
+        background-size: 24px 24px;
+        transition: width 0.6s ease;
+    }
+    .visitas-volume-chart-result {
+        min-width: 155px;
+    }
+    .visitas-volume-chart-result strong {
+        color: #1ab394;
+    }
+    .visitas-volume-chart-result.is-pending strong {
+        color: #f8ac59;
+    }
+    .visitas-premium-toolbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+    }
+    .visitas-premium-toolbar h5 {
+        margin: 0 0 5px;
+        color: #243747;
+        font-size: 17px;
+        font-weight: 700;
+    }
+    .visitas-premium-toolbar p {
+        margin: 0;
+    }
+    .visitas-premium-kpis {
+        margin-top: 18px;
+    }
+    .visitas-premium-kpi {
+        position: relative;
+        min-height: 108px;
+        padding: 17px 18px;
+        overflow: hidden;
+        border: 1px solid #e7eaec;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .visitas-premium-kpi:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: #1ab394;
+        content: "";
+    }
+    .visitas-premium-kpi.is-warning:before {
+        background: #f8ac59;
+    }
+    .visitas-premium-kpi.is-danger:before {
+        background: #ed5565;
+    }
+    .visitas-premium-kpi.is-info:before {
+        background: #1c84c6;
+    }
+    .visitas-premium-kpi .label-text {
+        color: #7f8c9a;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+    .visitas-premium-kpi .value {
+        display: block;
+        margin: 5px 0 1px;
+        color: #243747;
+        font-size: 27px;
+        font-weight: 700;
+        line-height: 1.15;
+    }
+    .visitas-premium-kpi .detail {
+        color: #8a97a6;
+        font-size: 11px;
+    }
+    .visitas-premium-layout {
+        margin-top: 18px;
+    }
+    .visitas-premium-coverage-row {
+        padding: 12px 0;
+        border-bottom: 1px solid #edf0f2;
+    }
+    .visitas-premium-coverage-row:last-child {
+        border-bottom: 0;
+    }
+    .visitas-premium-coverage-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 7px;
+    }
+    .visitas-premium-coverage-action {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #243747;
+        font-weight: 700;
+        text-align: left;
+    }
+    .visitas-premium-coverage-action:hover,
+    .visitas-premium-coverage-action:focus {
+        color: #1ab394;
+        outline: 0;
+    }
+    .visitas-premium-coverage-action .fa {
+        margin-left: 4px;
+        color: #1ab394;
+        font-size: 10px;
+        opacity: 0;
+        transition: opacity .2s ease;
+    }
+    .visitas-premium-coverage-action:hover .fa,
+    .visitas-premium-coverage-action:focus .fa {
+        opacity: 1;
+    }
+    .visitas-premium-status {
+        display: inline-block;
+        min-width: 8px;
+        height: 8px;
+        margin-right: 5px;
+        border-radius: 50%;
+        background: #ed5565;
+    }
+    .visitas-premium-status.is-warning {
+        background: #f8ac59;
+    }
+    .visitas-premium-status.is-success {
+        background: #1ab394;
+    }
+    .visitas-premium-filter-note {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 9px 11px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        background: #f0faf7;
+        color: #177d69;
+        font-size: 12px;
     }
     @media (max-width: 991px) {
         .visitas-dashboard-top-summary-col {
@@ -500,6 +651,12 @@
         }
         .visitas-executive-panel {
             padding: 13px;
+        }
+        .visitas-premium-toolbar {
+            display: block;
+        }
+        .visitas-premium-toolbar .btn {
+            margin-top: 12px;
         }
         .visitas-executive-row-header {
             align-items: flex-start;
@@ -780,8 +937,144 @@
         </div>
     </div>
 
+    <!-- Executive dashboard V2. The classic dashboard remains below for immediate rollback. -->
+    <div class="row m-t-lg" ng-if="useExecutiveDashboardV2">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="visitas-premium-toolbar">
+                        <div>
+                            <h5>Visão Executiva Regional</h5>
+                            <p class="text-muted">Cobertura, pendências e composição das visitas em uma única leitura.</p>
+                        </div>
+                        <button type="button" class="btn btn-white btn-sm"
+                                ng-click="setExecutiveDashboardVersion(false)">
+                            <i class="fa fa-history"></i> Usar visão clássica
+                        </button>
+                    </div>
+
+                    <div class="row visitas-premium-kpis">
+                        <div class="col-lg-3 col-sm-6 m-b-md">
+                            <div class="visitas-premium-kpi">
+                                <span class="label-text">Cobertura regional</span>
+                                <span class="value">{{ coverageRate }}%</span>
+                                <span class="detail">{{ realizadosCount }} de {{ expectedLancamentosCount }} igrejas enviaram</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6 m-b-md">
+                            <div class="visitas-premium-kpi is-warning">
+                                <span class="label-text">Igrejas pendentes</span>
+                                <span class="value">{{ visitasExecutiveDashboard.totalPendentes || 0 }}</span>
+                                <span class="detail">Ainda não enviaram no período</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6 m-b-md">
+                            <div class="visitas-premium-kpi is-danger">
+                                <span class="label-text">Municípios sem envio</span>
+                                <span class="value">{{ visitasExecutiveDashboard.municipiosSemLancamento || 0 }}</span>
+                                <span class="detail">Exigem acompanhamento prioritário</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-sm-6 m-b-md">
+                            <div class="visitas-premium-kpi is-info">
+                                <span class="label-text">Total de visitas</span>
+                                <span class="value">{{ visitasExecutiveDashboard.totalVisitas || 0 }}</span>
+                                <span class="detail">Consolidadas no período</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row visitas-premium-layout">
+                        <div class="col-lg-7 m-b-md">
+                            <div class="visitas-executive-panel">
+                                <h6>Cobertura por município</h6>
+                                <p class="text-muted">Prioridade administrativa por percentual de envio. Clique no município para filtrar o painel.</p>
+
+                                <div class="visitas-premium-filter-note" ng-if="filters.cidades.length">
+                                    <span><i class="fa fa-filter"></i> Painel filtrado por {{ filters.cidades[0] }}</span>
+                                    <button type="button" class="btn btn-white btn-xs"
+                                            ng-click="filterVisitasByMunicipio('')">Limpar filtro</button>
+                                </div>
+
+                                <div class="visitas-premium-coverage-row"
+                                     ng-repeat="item in visitasExecutiveDashboard.municipiosPorPrioridade">
+                                    <div class="visitas-premium-coverage-head">
+                                        <div>
+                                            <button type="button"
+                                                    class="visitas-premium-coverage-action"
+                                                    ng-click="filterVisitasByMunicipio(item.municipio)"
+                                                    title="Filtrar o painel por {{ item.municipio }}">
+                                                {{ item.municipio }} <i class="fa fa-filter"></i>
+                                            </button>
+                                            <div class="visitas-executive-row-meta">
+                                                {{ item.realizados }} de {{ item.previstos }} igrejas ·
+                                                {{ item.pendentes }} pendentes · {{ item.totalVisitas }} visitas
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <strong>{{ item.cobertura }}%</strong>
+                                            <div class="visitas-executive-row-meta">
+                                                <span class="visitas-premium-status"
+                                                      ng-class="{'is-success': item.cobertura >= 80, 'is-warning': item.cobertura >= 50 && item.cobertura < 80}"></span>
+                                                {{ item.status }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="progress visitas-volume-chart-bar"
+                                         role="progressbar"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         aria-valuenow="{{ item.cobertura }}">
+                                        <div class="progress-bar progress-bar-striped active"
+                                             ng-class="{'progress-bar-success': item.cobertura >= 80, 'progress-bar-warning': item.cobertura >= 50 && item.cobertura < 80, 'progress-bar-danger': item.cobertura < 50}"
+                                             ng-style="{width: item.cobertura + '%'}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5 m-b-md">
+                            <div class="visitas-executive-panel">
+                                <h6>Composição das visitas</h6>
+                                <p class="text-muted">Distribuição das {{ visitasExecutiveDashboard.totalVisitas || 0 }} visitas consolidadas.</p>
+
+                                <div class="visitas-executive-row" ng-repeat="category in visitasExecutiveDashboard.categorias">
+                                    <div class="visitas-executive-row-header">
+                                        <strong>{{ category.label }}</strong>
+                                        <span>{{ category.total }} · {{ category.percentual }}%</span>
+                                    </div>
+                                    <div class="progress visitas-executive-progress">
+                                        <div class="progress-bar"
+                                             ng-style="{width: category.percentual + '%', backgroundColor: category.color}"></div>
+                                    </div>
+                                </div>
+
+                                <div class="visitas-executive-insight is-risk"
+                                     ng-if="visitasExecutiveDashboard.maiorRisco">
+                                    <strong>Prioridade: {{ visitasExecutiveDashboard.maiorRisco.municipio }}</strong>
+                                    <div class="text-muted">
+                                        {{ visitasExecutiveDashboard.maiorRisco.pendentes }} igrejas pendentes ·
+                                        {{ visitasExecutiveDashboard.maiorRisco.cobertura }}% de cobertura.
+                                    </div>
+                                </div>
+                                <div class="visitas-executive-insight is-volume"
+                                     ng-if="visitasExecutiveDashboard.maiorVolume">
+                                    <strong>Maior volume: {{ visitasExecutiveDashboard.maiorVolume.municipio }}</strong>
+                                    <div class="text-muted">
+                                        {{ visitasExecutiveDashboard.maiorVolume.totalVisitas }} visitas ·
+                                        {{ visitasExecutiveDashboard.concentracaoMaiorVolume }}% do volume regional.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Completion Rates -->
-    <div class="row m-t-lg">
+    <div class="row m-t-lg" ng-if="!useExecutiveDashboardV2">
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
@@ -841,12 +1134,16 @@
         </div>
     </div>
 
-    <div class="row m-t-lg">
+    <div class="row m-t-lg" ng-if="!useExecutiveDashboardV2">
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5>Painel Executivo Municipal</h5>
                     <div class="ibox-tools">
+                        <button type="button" class="btn btn-xs btn-primary"
+                                ng-click="setExecutiveDashboardVersion(true)">
+                            <i class="fa fa-line-chart"></i> Usar visão executiva
+                        </button>
                         <span class="label label-primary">{{ filters.mes || 'Período filtrado' }}</span>
                     </div>
                 </div>
@@ -964,34 +1261,46 @@
                     </div>
 
                     <div class="visitas-executive-panel m-t-sm">
-                        <h6>Volume de visitas por município</h6>
+                        <h6>Cobertura de lançamentos por município</h6>
                         <p class="text-muted">
-                            Comparação da quantidade consolidada. A maior barra representa o município com maior volume no período.
+                            Percentual de igrejas que enviaram dados no período em relação ao total de cada município.
                         </p>
 
                         <div class="visitas-volume-chart-row"
-                             ng-repeat="item in visitasExecutiveDashboard.municipiosPorVolume">
+                             ng-repeat="item in visitasExecutiveDashboard.municipios">
                             <div>
                                 <strong>{{ item.municipio }}</strong>
                                 <div class="visitas-executive-row-meta">
-                                    {{ item.realizados }} comuns com lançamento
+                                    {{ item.realizados }} de {{ item.previstos }} igrejas enviaram
+                                    · {{ item.totalVisitas }} visitas
                                 </div>
                             </div>
-                            <div class="progress visitas-volume-chart-bar">
-                                <div class="progress-bar"
-                                     ng-style="{width: item.percentualVolumeEscala + '%'}"></div>
+                            <div class="progress visitas-volume-chart-bar"
+                                 role="progressbar"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-valuenow="{{ item.cobertura }}"
+                                 aria-label="{{ item.municipio }}: {{ item.cobertura }}% das igrejas enviaram os dados">
+                                <div class="progress-bar progress-bar-striped active"
+                                     ng-style="{width: item.cobertura + '%'}"></div>
                             </div>
-                            <div class="text-right">
-                                <strong>{{ item.totalVisitas }} visitas</strong>
+                            <div class="text-right visitas-volume-chart-result"
+                                 ng-class="{'is-pending': item.percentualFaltante > 0}">
+                                <strong>{{ item.cobertura }}% atingido</strong>
                                 <div class="visitas-executive-row-meta">
-                                    {{ item.participacaoRegional }}% da regional
+                                    <span ng-if="item.percentualFaltante > 0">
+                                        Faltam {{ item.percentualFaltante }}% · {{ item.pendentes }}
+                                        <span ng-if="item.pendentes === 1">igreja</span>
+                                        <span ng-if="item.pendentes !== 1">igrejas</span>
+                                    </span>
+                                    <span ng-if="item.percentualFaltante === 0">Todas enviaram</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="text-center text-muted p-md"
-                             ng-if="!visitasExecutiveDashboard.municipiosPorVolume.length">
-                            Sem visitas consolidadas para o período selecionado.
+                             ng-if="!visitasExecutiveDashboard.municipios.length">
+                            Sem igrejas previstas para o período selecionado.
                         </div>
                     </div>
                 </div>

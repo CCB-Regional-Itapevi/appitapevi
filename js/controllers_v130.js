@@ -15899,6 +15899,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     $scope.totalGeral = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
     $scope.municipiosResumo = [];
     $scope.taxasConclusao = [];
+    $scope.useExecutiveDashboardV2 = true;
     $scope.pendingDisplayLimit = 8;
     $scope.isShowingAllPendencias = false;
     $scope.visiblePendingLancamentos = [];
@@ -15911,10 +15912,15 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     $scope.expandedConsolidadoMunicipio = '';
     $scope.visitasExecutiveDashboard = {
         municipios: [],
+        municipiosPorPrioridade: [],
         categorias: [],
         totalVisitas: 0,
         totalLancamentos: 0,
         mediaVisitasPorComum: 0
+    };
+
+    $scope.setExecutiveDashboardVersion = function (useV2) {
+        $scope.useExecutiveDashboardV2 = !!useV2;
     };
     $scope.lastDashboardUpdateLabel = '';
     $scope.pendingOperationalItems = [];
@@ -16604,14 +16610,20 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
         var municipalities = (coverageRows || []).map(function (row) {
             var city = normalizeMunicipioRegionalLabel(row.municipio || '');
             var consolidated = consolidatedByCity[city] || {};
-            var coverage = Number(row.taxa || 0);
+            var expectedChurches = Math.max(0, Number(row.igrejas || 0));
+            var reportedChurches = Math.max(0, Number(row.lancamentos || 0));
+            var coverage = expectedChurches
+                ? Math.max(0, Math.min(100, (reportedChurches / expectedChurches) * 100))
+                : 0;
+            var roundedCoverage = Number(coverage.toFixed(1));
 
             return {
                 municipio: city,
-                previstos: Number(row.igrejas || 0),
-                realizados: Number(row.lancamentos || 0),
-                pendentes: Math.max(0, Number(row.igrejas || 0) - Number(row.lancamentos || 0)),
-                cobertura: Number(coverage.toFixed(1)),
+                previstos: expectedChurches,
+                realizados: reportedChurches,
+                pendentes: Math.max(0, expectedChurches - reportedChurches),
+                cobertura: roundedCoverage,
+                percentualFaltante: Number((100 - roundedCoverage).toFixed(1)),
                 totalVisitas: Number(consolidated.totalVisitas || 0),
                 mediaPorComum: Number(row.lancamentos || 0)
                     ? Number((Number(consolidated.totalVisitas || 0) / Number(row.lancamentos || 0)).toFixed(1))
@@ -16652,16 +16664,19 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 : 0;
         });
         var byRisk = municipalities.slice().sort(function (a, b) {
+            if (a.cobertura !== b.cobertura) return a.cobertura - b.cobertura;
             if (b.pendentes !== a.pendentes) return b.pendentes - a.pendentes;
-            return a.cobertura - b.cobertura;
+            return a.municipio.localeCompare(b.municipio, 'pt-BR');
         });
 
         return {
             municipios: municipalities,
+            municipiosPorPrioridade: byRisk,
             municipiosPorVolume: byVolume,
             categorias: categoryRows,
             totalVisitas: totalVisitas,
             totalLancamentos: totalLancamentos,
+            totalPendentes: municipalities.reduce(function (sum, item) { return sum + item.pendentes; }, 0),
             mediaVisitasPorComum: totalLancamentos ? Number((totalVisitas / totalLancamentos).toFixed(1)) : 0,
             municipiosExcelentes: municipalities.filter(function (item) { return item.cobertura >= 80; }).length,
             municipiosCriticos: municipalities.filter(function (item) { return item.cobertura < 50; }).length,
@@ -17884,10 +17899,6 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
 
         if ($scope.expandedLancamentoMunicipio && !$scope.groupedLancamentosByMunicipio.some(function (item) { return item.municipio === $scope.expandedLancamentoMunicipio; })) {
             $scope.expandedLancamentoMunicipio = '';
-        }
-
-        if (!$scope.expandedLancamentoMunicipio && $scope.groupedLancamentosByMunicipio.length) {
-            $scope.expandedLancamentoMunicipio = $scope.groupedLancamentosByMunicipio[0].municipio;
         }
     }
 
