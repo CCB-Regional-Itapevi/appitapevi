@@ -17608,8 +17608,13 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
             { text: 'TOTAL', style: 'tableHeader' }
         ]];
 
-        grupos.forEach(function (grupo) {
-            body.push([{ text: 'MUNICÍPIO: ' + grupo.municipio, colSpan: 9, bold: true, fillColor: '#eef4fa' }, {}, {}, {}, {}, {}, {}, {}, {}]);
+        grupos.forEach(function (grupo, grupoIndex) {
+            var subtotal = { gvi: 0, gvm: 0, musicos: 0, rf: 0, re: 0, total: 0 };
+
+            body.push([
+                { text: 'MUNICÍPIO: ' + grupo.municipio, colSpan: 9, bold: true, color: '#1e4b7a', fillColor: '#eef4fa', margin: [4, 6, 4, 6] },
+                {}, {}, {}, {}, {}, {}, {}, {}
+            ]);
             grupo.itens.forEach(function (item) {
                 body.push([
                     formatVisitasDateBRLocal(item.data),
@@ -17622,7 +17627,33 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                     { text: item.re || 0, alignment: 'center' },
                     { text: item.total || 0, alignment: 'center', bold: true }
                 ]);
+
+                subtotal.gvi += item.gvi || 0;
+                subtotal.gvm += item.gvm || 0;
+                subtotal.musicos += item.musicos || 0;
+                subtotal.rf += item.rf || 0;
+                subtotal.re += item.re || 0;
+                subtotal.total += item.total || 0;
             });
+
+            body.push([
+                { text: 'SUBTOTAL ' + grupo.municipio, colSpan: 3, bold: true, fillColor: '#f3f3f3', alignment: 'right' },
+                {},
+                {},
+                { text: subtotal.gvi, bold: true, fillColor: '#f3f3f3', alignment: 'center' },
+                { text: subtotal.gvm, bold: true, fillColor: '#f3f3f3', alignment: 'center' },
+                { text: subtotal.musicos, bold: true, fillColor: '#f3f3f3', alignment: 'center' },
+                { text: subtotal.rf, bold: true, fillColor: '#f3f3f3', alignment: 'center' },
+                { text: subtotal.re, bold: true, fillColor: '#f3f3f3', alignment: 'center' },
+                { text: subtotal.total, bold: true, fillColor: '#f3f3f3', alignment: 'center' }
+            ]);
+
+            if (grupoIndex !== grupos.length - 1) {
+                body.push([
+                    { text: ' ', colSpan: 9, border: [false, false, false, false], margin: [0, 4, 0, 4] },
+                    {}, {}, {}, {}, {}, {}, {}, {}
+                ]);
+            }
         });
 
         body.push([
@@ -17676,12 +17707,23 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                     headerRows: 1,
                     widths: [58, 80, '*', 40, 40, 55, 40, 40, 45],
                     body: body
+                },
+                layout: {
+                    fillColor: function (rowIndex) {
+                        return (rowIndex % 2 === 0 && rowIndex !== 0) ? '#f9f9f9' : null;
+                    },
+                    hLineColor: function (i, node) {
+                        return (i === 0 || i === node.table.body.length) ? '#1e4b7a' : '#eee';
+                    },
+                    vLineColor: function () {
+                        return '#eee';
+                    }
                 }
             }],
             styles: {
                 entityName: { fontSize: 14, bold: true, color: '#222' },
-                entitySub: { fontSize: 10, color: '#666' },
-                moduleName: { fontSize: 12, bold: true, color: '#1e4b7a' },
+                entitySub: { fontSize: 10, color: '#666', margin: [0, 2, 0, 2] },
+                moduleName: { fontSize: 12, bold: true, color: '#1e4b7a', margin: [0, 5, 0, 2] },
                 reportTitle: { fontSize: 10, italic: true, color: '#444' },
                 tableHeader: { bold: true, fontSize: 10, color: '#ffffff', fillColor: '#1e4b7a', alignment: 'center' }
             },
