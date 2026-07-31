@@ -15,6 +15,11 @@
 </div>
 
 <style>
+    .label-funcao-coordenadora {
+        background-color: #1c84c6;
+        color: #fff;
+    }
+
     @media (max-width: 991px) {
         #modalAddInstrutor .modal-dialog,
         #modalEditInstrutor .modal-dialog,
@@ -142,7 +147,7 @@
                 <div class="ibox-title">
                     <h5>Equipe de Ensino</h5>
                     <div class="ibox-tools">
-                        <button class="btn btn-success btn-xs" type="button" ng-click="prepareAdd()"><i class="fa fa-plus"></i> Cadastrar Monitor</button>
+                        <button class="btn btn-success btn-xs" type="button" ng-click="prepareAdd()"><i class="fa fa-plus"></i> Cadastrar Colaboradora</button>
                         <button class="btn btn-info btn-xs" type="button" ng-click="exportToExcel()"><i class="fa fa-file-excel-o"></i> Excel</button>
                         <button class="btn btn-danger btn-xs" type="button" ng-click="exportToPDF()"><i class="fa fa-file-pdf-o"></i> PDF</button>
                     </div>
@@ -171,7 +176,12 @@
                             <tbody>
                                 <tr ng-repeat="inst in instrutores">
                                     <td>{{inst.nome_completo}}</td>
-                                    <td><span class="label label-primary">{{inst.role || 'Monitor(a)'}}</span></td>
+                                    <td>
+                                        <span class="label"
+                                              ng-class="{'label-funcao-coordenadora': inst.role === 'Coordenadora', 'label-primary': inst.role !== 'Coordenadora'}">
+                                            {{inst.role || 'Monitora'}}
+                                        </span>
+                                    </td>
                                     <td>{{inst.celular || '-'}}</td>
                                     <td>{{inst.polo_auxilio || inst.comum_congregacao || 'Geral'}}</td>
                                     <td>
@@ -207,20 +217,26 @@
                 <button type="button" class="close" data-dismiss="modal" style="color:#fff; opacity:1; font-size:22px;"><span aria-hidden="true">&times;</span><span class="sr-only">Fechar</span></button>
                 <h4 class="modal-title" style="color:#fff; font-weight:600;">
                     <i class="fa fa-briefcase" style="margin-right:8px;"></i>
-                    Cadastrar Monitor
+                    Cadastrar Colaboradora
                 </h4>
             </div>
             <div class="modal-body" style="padding: 25px 30px;">
                 <form name="formAddInstrutor" novalidate>
                     <div class="row">
                         <div class="col-lg-12">
-                            <h4 style="margin-top:0;">Dados do Monitor</h4>
+                            <h4 style="margin-top:0;">Dados da Colaboradora</h4>
                         </div>
                         <div class="col-sm-8 form-group">
                             <label>Nome Completo *</label>
                             <input type="text" ng-model="newInstrutor.nome_completo" ng-change="forceUppercase('newInstrutor', 'nome_completo')" class="form-control" style="text-transform: uppercase;" required>
                         </div>
                         <div class="col-sm-4 form-group">
+                            <label>Função *</label>
+                            <select class="form-control" ng-model="newInstrutor.role" ng-options="item for item in colaboradoraRoleOptions" required>
+                                <option value="">Selecione</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 form-group">
                             <label>Comum Congregação *</label>
                             <input type="text"
                                    ng-model="newInstrutor.comum_congregacao"
@@ -406,13 +422,19 @@
                 <form name="formEditInstrutor" novalidate>
                     <div class="row">
                         <div class="col-lg-12">
-                            <h4 style="margin-top:0;">Dados do Monitor</h4>
+                            <h4 style="margin-top:0;">Dados da Colaboradora</h4>
                         </div>
                         <div class="col-sm-8 form-group">
                             <label>Nome Completo *</label>
                             <input type="text" ng-model="editingInstrutor.nome_completo" ng-change="forceUppercase('editingInstrutor', 'nome_completo')" class="form-control" style="text-transform: uppercase;" ng-disabled="viewOnly" required>
                         </div>
                         <div class="col-sm-4 form-group">
+                            <label>Função *</label>
+                            <select class="form-control" ng-model="editingInstrutor.role" ng-options="item for item in colaboradoraRoleOptions" ng-disabled="viewOnly" required>
+                                <option value="">Selecione</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 form-group">
                             <label>Comum Congregação *</label>
                             <input type="text"
                                    ng-model="editingInstrutor.comum_congregacao"
@@ -606,13 +628,17 @@
             <div class="modal-body" style="padding: 25px 30px;">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h4 style="margin-top:0;">Dados do Monitor</h4>
+                        <h4 style="margin-top:0;">Dados da Colaboradora</h4>
                     </div>
                     <div class="col-sm-8 form-group">
                         <label>Nome Completo</label>
                         <input type="text" ng-model="editingInstrutor.nome_completo" class="form-control" disabled>
                     </div>
                     <div class="col-sm-4 form-group">
+                        <label>Função</label>
+                        <input type="text" ng-model="editingInstrutor.role" class="form-control" disabled>
+                    </div>
+                    <div class="col-sm-6 form-group">
                         <label>Comum Congregação</label>
                         <input type="text" ng-model="editingInstrutor.comum_congregacao" class="form-control" disabled>
                     </div>

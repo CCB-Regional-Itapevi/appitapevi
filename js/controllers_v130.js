@@ -20172,34 +20172,105 @@ function resetMusicalizacaoPresencaScope($scope, aula) {
     $scope.frequenciaFiltro = '';
 }
 
-function hydrateMusicalizacaoPresencaScope($scope, aula, alunos, presencasSalvas) {
+function getMusicalizacaoPresencaKey(item) {
+    if (item && item.presenca_key) return item.presenca_key;
+    if (item && item.colaborador_id) return 'colaborador:' + item.colaborador_id;
+    return 'aluno:' + (item && (item.aluno_id || item.id));
+}
+
+function hydrateMusicalizacaoPresencaScope($scope, aula, alunos, colaboradores, presencasSalvas) {
     resetMusicalizacaoPresencaScope($scope, aula);
 
-    $scope.alunosPolo = (alunos || []).filter(function (aluno) {
+    var alunosDoPolo = (alunos || []).filter(function (aluno) {
         return normalizeMusicalizacaoPoloLookup(aluno.polo_participacao) === normalizeMusicalizacaoPoloLookup(aula && aula.polo);
+    }).map(function (aluno) {
+        aluno = angular.copy(aluno);
+        aluno.presenca_key = 'aluno:' + aluno.id;
+        aluno.nome_frequencia = aluno.nome_crianca;
+        aluno.participante_tipo = 'aluno';
+        aluno.funcao_frequencia = 'Aluno(a)';
+        return aluno;
+    });
+
+    var colaboradoresDoPolo = (colaboradores || []).filter(function (colaborador) {
+        return (colaborador.status || 'Ativo') === 'Ativo' &&
+            normalizeMusicalizacaoPoloLookup(colaborador.polo_auxilio) === normalizeMusicalizacaoPoloLookup(aula && aula.polo);
+    }).map(function (colaborador) {
+        colaborador = angular.copy(colaborador);
+        colaborador.presenca_key = 'colaborador:' + colaborador.id;
+        colaborador.nome_frequencia = colaborador.nome_completo;
+        colaborador.participante_tipo = 'colaborador';
+        colaborador.funcao_frequencia = String(colaborador.role || '').toLowerCase().indexOf('coorden') !== -1 ? 'Coordenadora' : 'Monitora';
+        return colaborador;
+    }).sort(function (a, b) {
+        if (a.funcao_frequencia !== b.funcao_frequencia) {
+            return a.funcao_frequencia === 'Monitora' ? -1 : 1;
+        }
+        return String(a.nome_frequencia || '').localeCompare(String(b.nome_frequencia || ''), 'pt-BR');
+    });
+
+    $scope.alunosPolo = alunosDoPolo.concat(colaboradoresDoPolo);
+
+    var frequenciaEquipePorId = {};
+    (presencasSalvas || []).forEach(function (presencaItem) {
+        if (presencaItem.colaborador_id) frequenciaEquipePorId[presencaItem.colaborador_id] = presencaItem;
     });
 
     (presencasSalvas || []).forEach(function (presencaItem) {
-        $scope.presenca[presencaItem.aluno_id] = presencaItem.status || (presencaItem.presente ? 'presente' : 'faltou');
-        $scope.justificativa[presencaItem.aluno_id] = presencaItem.observacoes || '';
+        var key = getMusicalizacaoPresencaKey(presencaItem);
+        $scope.presenca[key] = presencaItem.status || (presencaItem.presente ? 'presente' : 'faltou');
+        $scope.justificativa[key] = presencaItem.observacoes || '';
     });
 
-    $scope.alunosPolo.forEach(function (aluno) {
-        if (!$scope.presenca[aluno.id]) {
-            $scope.presenca[aluno.id] = 'faltou';
+    $scope.alunosPolo.forEach(function (participante) {
+        var key = getMusicalizacaoPresencaKey(participante);
+        if (!$scope.presenca[key]) {
+            $scope.presenca[key] = 'faltou';
         }
 
-        if (!$scope.justificativa[aluno.id]) {
-            $scope.justificativa[aluno.id] = '';
+        if (!$scope.justificativa[key]) {
+            $scope.justificativa[key] = '';
         }
     });
+
+    // Atividades antigas guardavam apenas as quantidades da equipe presente.
+    // Para quem ainda não tem chamada individual, recupera esses totais
+    // para não exibir Monitoras/Coordenadoras presentes como faltantes.
+    if (colaboradoresDoPolo.length) {
+        var monitorasRestantes = parseInt(aula && aula.colaboradores_presentes, 10) || 0;
+        var coordenadorasRestantes = parseInt(aula && aula.coordenadores_presentes, 10) || 0;
+
+        colaboradoresDoPolo.forEach(function (colaborador) {
+            var frequenciaSalva = frequenciaEquipePorId[colaborador.id];
+            var statusSalvo = frequenciaSalva && (frequenciaSalva.status || (frequenciaSalva.presente ? 'presente' : 'faltou'));
+            if (statusSalvo !== 'presente') return;
+            if (colaborador.funcao_frequencia === 'Coordenadora') coordenadorasRestantes--;
+            else monitorasRestantes--;
+        });
+
+        colaboradoresDoPolo.forEach(function (colaborador) {
+            if (frequenciaEquipePorId[colaborador.id]) return;
+            var key = getMusicalizacaoPresencaKey(colaborador);
+            if (colaborador.funcao_frequencia === 'Coordenadora' && coordenadorasRestantes > 0) {
+                $scope.presenca[key] = 'presente';
+                $scope.justificativa[key] = 'Presença recuperada do lançamento original da atividade.';
+                coordenadorasRestantes--;
+            } else if (colaborador.funcao_frequencia === 'Monitora' && monitorasRestantes > 0) {
+                $scope.presenca[key] = 'presente';
+                $scope.justificativa[key] = 'Presença recuperada do lançamento original da atividade.';
+                monitorasRestantes--;
+            }
+        });
+    }
 }
 
 function loadMusicalizacaoPresencaData($scope, MusicalizacaoService, aula) {
     return MusicalizacaoService.getAlunos().then(function (alunos) {
-        return MusicalizacaoService.getPresenca(aula.id).then(function (presencasSalvas) {
-            hydrateMusicalizacaoPresencaScope($scope, aula, alunos, presencasSalvas);
-            return $scope.alunosPolo;
+        return MusicalizacaoService.getInstrutores().then(function (colaboradores) {
+            return MusicalizacaoService.getPresenca(aula.id).then(function (presencasSalvas) {
+                hydrateMusicalizacaoPresencaScope($scope, aula, alunos, colaboradores, presencasSalvas);
+                return $scope.alunosPolo;
+            });
         });
     });
 }
@@ -20207,15 +20278,19 @@ function loadMusicalizacaoPresencaData($scope, MusicalizacaoService, aula) {
 function buildMusicalizacaoPresencaPayload($scope) {
     var dadosPresenca = [];
 
-    angular.forEach($scope.alunosPolo, function (aluno) {
-        var status = $scope.presenca[aluno.id] || 'faltou';
-        dadosPresenca.push({
+    angular.forEach($scope.alunosPolo, function (participante) {
+        var key = getMusicalizacaoPresencaKey(participante);
+        var status = $scope.presenca[key] || 'faltou';
+        var item = {
             aula_id: $scope.selectedAula.id,
-            aluno_id: aluno.id,
             presente: status === 'presente',
             status: status,
-            observacoes: $scope.justificativa[aluno.id] || null
-        });
+            observacoes: $scope.justificativa[key] || null,
+            participante_tipo: participante.participante_tipo
+        };
+        if (participante.participante_tipo === 'colaborador') item.colaborador_id = participante.id;
+        else item.aluno_id = participante.id;
+        dadosPresenca.push(item);
     });
 
     return dadosPresenca;
@@ -20228,14 +20303,14 @@ function verifyMusicalizacaoPresencaSaved(MusicalizacaoService, aulaId, expected
         var allMatched = true;
 
         (expectedItems || []).forEach(function (item) {
-            expectedMap[item.aluno_id] = {
+            expectedMap[getMusicalizacaoPresencaKey(item)] = {
                 status: item.status || 'faltou',
                 observacoes: item.observacoes || ''
             };
         });
 
         (savedItems || []).forEach(function (item) {
-            savedMap[item.aluno_id] = {
+            savedMap[getMusicalizacaoPresencaKey(item)] = {
                 status: item.status || (item.presente ? 'presente' : 'faltou'),
                 observacoes: item.observacoes || ''
             };
@@ -20263,13 +20338,24 @@ function verifyMusicalizacaoPresencaSaved(MusicalizacaoService, aulaId, expected
 function countMusicalizacaoPresencaStatus($scope, status) {
     var total = 0;
 
-    angular.forEach($scope.alunosPolo, function (aluno) {
-        if (($scope.presenca[aluno.id] || 'faltou') === status) {
+    angular.forEach($scope.alunosPolo, function (participante) {
+        if (($scope.presenca[getMusicalizacaoPresencaKey(participante)] || 'faltou') === status) {
             total++;
         }
     });
 
     return total;
+}
+
+function getMusicalizacaoEquipePresenteCounts($scope) {
+    var counts = { colaboradores_presentes: 0, coordenadores_presentes: 0 };
+    angular.forEach($scope.alunosPolo, function (participante) {
+        if (participante.participante_tipo !== 'colaborador' ||
+            $scope.presenca[getMusicalizacaoPresencaKey(participante)] !== 'presente') return;
+        if (participante.funcao_frequencia === 'Coordenadora') counts.coordenadores_presentes++;
+        else counts.colaboradores_presentes++;
+    });
+    return counts;
 }
 
 function getMusicalizacaoPresencaStatusLabel(status) {
@@ -22116,10 +22202,16 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
         }
     });
 
+    $scope.colaboradoraRoleOptions = ['Monitora', 'Coordenadora'];
+
+    function normalizeColaboradoraRole(role) {
+        return String(role || '').toLowerCase().indexOf('coorden') !== -1 ? 'Coordenadora' : 'Monitora';
+    }
+
     $scope.prepareAdd = function () {
         $scope.newInstrutor = {
             status: 'Ativo',
-            role: 'Monitor(a)'
+            role: 'Monitora'
         };
         $scope.viewOnly = false;
         $scope.closeComumPicker();
@@ -22165,6 +22257,7 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
 
     function openInstrutorModal(instrutor, modalId, viewOnlyMode) {
         $scope.editingInstrutor = angular.copy(instrutor || {});
+        $scope.editingInstrutor.role = normalizeColaboradoraRole($scope.editingInstrutor.role);
         if ($scope.editingInstrutor.data_nascimento) {
             $scope.editingInstrutor.data_nascimento = formatDateInput($scope.editingInstrutor.data_nascimento);
         }
@@ -22236,6 +22329,8 @@ function musicalizacaoInstrutoresCtrl($scope, MusicalizacaoService, $rootScope, 
  */
 function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, $rootScope) {
     $scope.aulas = [];
+    $scope.aulasAgrupadas = [];
+    $scope.historicoAberto = {};
     $scope.loading = true;
     $scope.canManageCadastros = false;
 
@@ -22252,6 +22347,80 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
         { value: 'justificado', label: 'Justificado' }
     ];
 
+    var mesesHistorico = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+    function getAulaDateParts(value) {
+        var match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!match) return { year: 0, month: 0, day: 0, key: 'sem-data', label: 'Sem data definida' };
+        return {
+            year: parseInt(match[1], 10),
+            month: parseInt(match[2], 10),
+            day: parseInt(match[3], 10),
+            key: match[1] + '-' + match[2],
+            label: mesesHistorico[parseInt(match[2], 10) - 1] + ' de ' + match[1]
+        };
+    }
+
+    function buildAulasAgrupadas() {
+        var search = normalizeMusicalizacaoPoloLookup($scope.searchText);
+        var municipios = {};
+
+        ($scope.aulas || []).forEach(function (aula) {
+            var searchable = normalizeMusicalizacaoPoloLookup([
+                aula.cidade, aula.polo, aula.ciclo, aula.numero_aula, aula.data_aula
+            ].join(' '));
+            if (search && searchable.indexOf(search) === -1) return;
+
+            var municipioLabel = aula.cidade || 'Município não informado';
+            var poloLabel = aula.polo || 'Polo não informado';
+            var dateParts = getAulaDateParts(aula.data_aula);
+            var municipioKey = normalizeMusicalizacaoPoloLookup(municipioLabel);
+            var poloKey = municipioKey + '|' + normalizeMusicalizacaoPoloLookup(poloLabel);
+            var mesKey = poloKey + '|' + dateParts.key;
+
+            municipios[municipioKey] = municipios[municipioKey] || {
+                key: municipioKey, label: municipioLabel, total: 0, polosMap: {}
+            };
+            var municipio = municipios[municipioKey];
+            municipio.polosMap[poloKey] = municipio.polosMap[poloKey] || {
+                key: poloKey, label: poloLabel, total: 0, mesesMap: {}
+            };
+            var polo = municipio.polosMap[poloKey];
+            polo.mesesMap[mesKey] = polo.mesesMap[mesKey] || {
+                key: mesKey, label: dateParts.label, sortKey: dateParts.key, aulas: []
+            };
+            municipio.total++;
+            polo.total++;
+            polo.mesesMap[mesKey].aulas.push(aula);
+        });
+
+        $scope.aulasAgrupadas = Object.keys(municipios).map(function (municipioKey) {
+            var municipio = municipios[municipioKey];
+            municipio.polos = Object.keys(municipio.polosMap).map(function (poloKey) {
+                var polo = municipio.polosMap[poloKey];
+                polo.meses = Object.keys(polo.mesesMap).map(function (mesKey) {
+                    var mes = polo.mesesMap[mesKey];
+                    mes.aulas.sort(function (a, b) { return String(b.data_aula || '').localeCompare(String(a.data_aula || '')); });
+                    return mes;
+                }).sort(function (a, b) { return String(b.sortKey).localeCompare(String(a.sortKey)); });
+                delete polo.mesesMap;
+                return polo;
+            }).sort(function (a, b) { return String(a.label).localeCompare(String(b.label), 'pt-BR'); });
+            delete municipio.polosMap;
+            return municipio;
+        }).sort(function (a, b) { return String(a.label).localeCompare(String(b.label), 'pt-BR'); });
+    }
+
+    $scope.toggleHistoricoGrupo = function (key) {
+        $scope.historicoAberto[key] = !$scope.historicoAberto[key];
+    };
+
+    $scope.isHistoricoGrupoAberto = function (key) {
+        return !!$scope.searchText || !!$scope.historicoAberto[key];
+    };
+
+    $scope.$watch('searchText', buildAulasAgrupadas);
+
     function updateManagementPermission() {
         $scope.canManageCadastros = userCanManageSectorCadastros($rootScope.currentUser || {}, 'Musicalizacao');
     }
@@ -22265,6 +22434,7 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
         $scope.loading = true;
         MusicalizacaoService.getAulas().then(function (data) {
             $scope.aulas = data;
+            buildAulasAgrupadas();
             $scope.loading = false;
         }).catch(function (error) {
             console.error('Erro ao buscar aulas:', error);
@@ -22298,6 +22468,8 @@ function musicalizacaoAulasCtrl($scope, MusicalizacaoService, $state, $timeout, 
         if (!$scope.selectedAula) return;
         var dadosPresenca = buildMusicalizacaoPresencaPayload($scope);
         MusicalizacaoService.savePresenca(dadosPresenca).then(function () {
+            return MusicalizacaoService.updateAulaEquipePresente($scope.selectedAula.id, getMusicalizacaoEquipePresenteCounts($scope));
+        }).then(function () {
             return verifyMusicalizacaoPresencaSaved(MusicalizacaoService, $scope.selectedAula.id, dadosPresenca);
         }).then(function () {
             showMusicalizacaoSuccess("Sucesso", "Frequencia salva com sucesso!");
@@ -22517,6 +22689,8 @@ function musicalizacaoPresencaCtrl($scope, MusicalizacaoService, $timeout, $stat
         var dadosPresenca = buildMusicalizacaoPresencaPayload($scope);
         $scope.savingPresenca = true;
         MusicalizacaoService.savePresenca(dadosPresenca).then(function () {
+            return MusicalizacaoService.updateAulaEquipePresente($scope.selectedAula.id, getMusicalizacaoEquipePresenteCounts($scope));
+        }).then(function () {
             return verifyMusicalizacaoPresencaSaved(MusicalizacaoService, $scope.selectedAula.id, dadosPresenca);
         }).then(function () {
             showMusicalizacaoSuccess("Sucesso", "Frequencia salva com sucesso!");

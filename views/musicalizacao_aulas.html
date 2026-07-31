@@ -53,56 +53,49 @@
                         <p>Carregando histórico...</p>
                     </div>
 
-                    <div class="table-responsive" ng-if="!loading">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th width="80">Status</th>
-                                    <th>Município</th>
-                                    <th>Ciclo</th>
-                                    <th width="80">Atividade</th>
-                                    <th>Polo</th>
-                                    <th width="120">Data</th>
-                                    <th class="text-center" width="320">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="aula in aulas | filter: searchText">
-                                    <td>
-                                        <span class="label label-primary">Concluída</span>
-                                    </td>
-                                    <td>{{aula.cidade}}</td>
-                                    <td>{{aula.ciclo}}</td>
-                                    <td style="white-space: nowrap;">Atividade {{aula.numero_aula}}</td>
-                                    <td><strong>{{aula.polo || '-'}}</strong></td>
-                                    <td>{{aula.data_aula | date:'dd/MM/yyyy'}}</td>
-                                    <td class="text-center">
-                                        <div style="white-space: nowrap;">
-                                            <button type="button" class="btn btn-success btn-xs"
-                                                ng-click="abrirFrequencia(aula)" title="Frequência">
-                                                <i class="fa fa-check-square"></i> Frequência
-                                            </button>
-                                            <button type="button" class="btn btn-primary btn-xs"
-                                                ng-click="abrirDetalhes(aula)" title="Detalhes">
-                                                <i class="fa fa-folder"></i> Detalhes
-                                            </button>
-                                            <button type="button" class="btn btn-warning btn-xs"
-                                                ng-if="canManageCadastros" ng-click="prepareEdit(aula)" title="Reabrir">
-                                                <i class="fa fa-repeat"></i> Reabrir
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-xs"
-                                                ng-if="canManageCadastros" ng-click="confirmDelete(aula)"
-                                                title="Excluir">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
+                    <div ng-if="!loading">
+                        <div ng-repeat="municipio in aulasAgrupadas" style="border:1px solid #dfe6eb; border-radius:5px; margin-bottom:12px; overflow:hidden;">
+                            <div ng-click="toggleHistoricoGrupo(municipio.key)" style="padding:13px 16px; background:#263f52; color:#fff; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                                <strong><i class="fa fa-map-marker" style="margin-right:8px;"></i>{{municipio.label}}</strong>
+                                <span><span class="badge" style="margin-right:10px;">{{municipio.total}} atividades</span><i class="fa" ng-class="isHistoricoGrupoAberto(municipio.key) ? 'fa-chevron-up' : 'fa-chevron-down'"></i></span>
+                            </div>
+                            <div ng-if="isHistoricoGrupoAberto(municipio.key)" style="padding:10px; background:#f7f9fa;">
+                                <div ng-repeat="polo in municipio.polos" style="border:1px solid #d9e1e6; margin-bottom:9px; background:#fff;">
+                                    <div ng-click="toggleHistoricoGrupo(polo.key)" style="padding:11px 14px; background:#e9f3f7; color:#24566f; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                                        <strong><i class="fa fa-building" style="margin-right:7px;"></i>{{polo.label}}</strong>
+                                        <span>{{polo.total}} <i class="fa" ng-class="isHistoricoGrupoAberto(polo.key) ? 'fa-minus-square-o' : 'fa-plus-square-o'" style="margin-left:8px;"></i></span>
+                                    </div>
+                                    <div ng-if="isHistoricoGrupoAberto(polo.key)" style="padding:9px;">
+                                        <div ng-repeat="mes in polo.meses" style="border-left:4px solid #1c84c6; margin-bottom:10px;">
+                                            <div ng-click="toggleHistoricoGrupo(mes.key)" style="padding:9px 12px; background:#f1f5f8; color:#1c5d85; cursor:pointer; display:flex; justify-content:space-between;">
+                                                <strong><i class="fa fa-calendar" style="margin-right:7px;"></i>{{mes.label}}</strong>
+                                                <span>{{mes.aulas.length}} <i class="fa" ng-class="isHistoricoGrupoAberto(mes.key) ? 'fa-chevron-up' : 'fa-chevron-down'" style="margin-left:7px;"></i></span>
+                                            </div>
+                                            <div class="table-responsive" ng-if="isHistoricoGrupoAberto(mes.key)">
+                                                <table class="table table-hover" style="margin-bottom:0;">
+                                                    <thead><tr><th width="90">Status</th><th>Ciclo</th><th>Atividade</th><th width="120">Data</th><th class="text-center" width="320">Ações</th></tr></thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="aula in mes.aulas">
+                                                            <td><span class="label label-primary">Concluída</span></td>
+                                                            <td>{{aula.ciclo}}</td>
+                                                            <td>Atividade {{aula.numero_aula}}</td>
+                                                            <td>{{aula.data_aula | date:'dd/MM/yyyy'}}</td>
+                                                            <td class="text-center"><div style="white-space:nowrap;">
+                                                                <button type="button" class="btn btn-success btn-xs" ng-click="abrirFrequencia(aula)" title="Frequência"><i class="fa fa-check-square"></i> Frequência</button>
+                                                                <button type="button" class="btn btn-primary btn-xs" ng-click="abrirDetalhes(aula)" title="Detalhes"><i class="fa fa-folder"></i> Detalhes</button>
+                                                                <button type="button" class="btn btn-warning btn-xs" ng-if="canManageCadastros" ng-click="prepareEdit(aula)" title="Reabrir"><i class="fa fa-repeat"></i> Reabrir</button>
+                                                                <button type="button" class="btn btn-danger btn-xs" ng-if="canManageCadastros" ng-click="confirmDelete(aula)" title="Excluir"><i class="fa fa-trash"></i></button>
+                                                            </div></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
-                                <tr ng-if="aulas.length === 0">
-                                    <td colspan="7" class="text-center">Nenhuma atividade registrada ainda.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center text-muted" ng-if="aulasAgrupadas.length === 0" style="padding:30px;">Nenhuma atividade encontrada.</div>
                     </div>
 
                 </div>
@@ -132,7 +125,7 @@
                             <div class="sk-bounce2"></div>
                             <div class="sk-bounce3"></div>
                         </div>
-                        <p>Carregando lista de alunos...</p>
+                        <p>Carregando participantes do polo...</p>
                     </div>
 
                     <div ng-if="!loadingPresenca">
@@ -185,7 +178,7 @@
                                         <i class="fa fa-search"></i>
                                     </span>
                                     <input type="text" class="form-control" ng-model="frequenciaFiltro"
-                                        placeholder="Pesquisar aluno do polo..."
+                                        placeholder="Pesquisar participante do polo..."
                                         style="border-radius:0; flex:1 1 auto;">
                                 </div>
                             </div>
@@ -197,32 +190,43 @@
                             <thead>
                                 <tr>
                                     <th width="30">#</th>
-                                    <th>Nome do Aluno</th>
+                                    <th>Participante</th>
+                                    <th width="130">Função</th>
                                     <th width="180">Status</th>
                                     <th>Justificativa / Observação</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="aluno in alunosPolo | filter:frequenciaFiltro">
+                                <tr ng-repeat-start="aluno in alunosPolo | filter:frequenciaFiltro"
+                                    ng-if="aluno.participante_tipo === 'colaborador' && ($first || aluno.funcao_frequencia !== (alunosPolo | filter:frequenciaFiltro)[$index - 1].funcao_frequencia)">
+                                    <td colspan="5" style="padding:10px 12px; background:#eef4f8; border-left:4px solid #1c84c6; color:#1c5d85; font-weight:700; text-transform:uppercase; letter-spacing:.5px;">
+                                        <i class="fa" ng-class="{'fa-users': aluno.funcao_frequencia === 'Monitora', 'fa-star': aluno.funcao_frequencia === 'Coordenadora'}" style="margin-right:7px;"></i>
+                                        {{aluno.funcao_frequencia === 'Coordenadora' ? 'Coordenação' : 'Monitoras'}}
+                                    </td>
+                                </tr>
+                                <tr ng-repeat-end>
                                     <td>{{$index + 1}}</td>
-                                    <td>{{aluno.nome_crianca}}</td>
+                                    <td>{{aluno.nome_frequencia || aluno.nome_crianca || aluno.nome_completo}}</td>
+                                    <td>
+                                        <span class="label" ng-class="{'label-info': (aluno.funcao_frequencia || aluno.role) === 'Coordenadora', 'label-primary': (aluno.funcao_frequencia || aluno.role) !== 'Coordenadora'}">{{aluno.funcao_frequencia || aluno.role || 'Aluno(a)'}}</span>
+                                    </td>
                                     <td>
                                         <span class="label" ng-class="{
-                                                'label-primary': presenca[aluno.id] === 'presente',
-                                                'label-warning': presenca[aluno.id] === 'faltou',
-                                                'label-info': presenca[aluno.id] === 'justificado'
+                                                'label-primary': presenca[aluno.presenca_key || aluno.id] === 'presente',
+                                                'label-warning': presenca[aluno.presenca_key || aluno.id] === 'faltou',
+                                                'label-info': presenca[aluno.presenca_key || aluno.id] === 'justificado'
                                             }"
                                             style="display:inline-block; min-width:110px; text-align:center; font-size:12px; padding:6px 10px;">
-                                            {{getFrequenciaStatusLabel(presenca[aluno.id])}}
+                                            {{getFrequenciaStatusLabel(presenca[aluno.presenca_key || aluno.id])}}
                                         </span>
                                     </td>
                                     <td>
                                         <input type="text" class="form-control"
-                                            ng-value="justificativa[aluno.id] || '-'" readonly>
+                                            ng-value="justificativa[aluno.presenca_key || aluno.id] || '-'" readonly>
                                     </td>
                                 </tr>
                                 <tr ng-if="alunosPolo.length === 0">
-                                    <td colspan="4" class="text-center">Nenhum aluno cadastrado para este polo.</td>
+                                    <td colspan="5" class="text-center">Nenhum participante cadastrado para este polo.</td>
                                 </tr>
                             </tbody>
                         </table>

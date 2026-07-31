@@ -209,13 +209,13 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('musicalizacao.instrutores', {
             url: "/instrutores",
-            templateUrl: "views/musicalizacao_instrutores.html?v=1.3.16",
+            templateUrl: "views/musicalizacao_instrutores.html?v=1.3.18",
             data: { pageTitle: 'Instrutores' },
             controller: 'musicalizacaoInstrutoresCtrl'
         })
         .state('musicalizacao.aulas', {
             url: "/aulas",
-            templateUrl: "views/musicalizacao_aulas.html?v=1.3.6",
+            templateUrl: "views/musicalizacao_aulas.html?v=1.4.0",
             data: { pageTitle: 'Atividades' },
             controller: 'musicalizacaoAulasCtrl'
         })
@@ -249,7 +249,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('musicalizacao.presenca', {
             url: "/presenca/:id",
-            templateUrl: "views/musicalizacao_presenca.html?v=1.3.5",
+            templateUrl: "views/musicalizacao_presenca.html?v=1.3.8",
             data: { pageTitle: 'Presen\u00e7a' },
             params: { id: { value: null, squash: true } },
             controller: 'musicalizacaoPresencaCtrl'

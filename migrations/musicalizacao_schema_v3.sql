@@ -97,12 +97,18 @@ CREATE TABLE public.musicalizacao_presenca (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     aula_id UUID REFERENCES public.musicalizacao_aulas(id) ON DELETE CASCADE,
     aluno_id UUID REFERENCES public.musicalizacao_criancas(id) ON DELETE CASCADE,
+    colaborador_id UUID REFERENCES public.musicalizacao_monitores(id) ON DELETE CASCADE,
+    participante_tipo TEXT DEFAULT 'aluno',
     presente BOOLEAN DEFAULT false,
     status TEXT DEFAULT 'faltou' CHECK (status IN ('presente', 'faltou', 'justificado')),
     observacoes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     UNIQUE(aula_id, aluno_id)
 );
+
+CREATE UNIQUE INDEX musicalizacao_presenca_aula_colaborador_uidx
+ON public.musicalizacao_presenca (aula_id, colaborador_id)
+WHERE colaborador_id IS NOT NULL;
 
 -- PermissÃµes
 GRANT ALL ON TABLE public.musicalizacao_polos TO anon;

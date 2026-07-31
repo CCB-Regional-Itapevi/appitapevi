@@ -227,7 +227,7 @@
                         <div class="col-sm-6">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                <input type="text" class="form-control" ng-model="frequenciaFiltro" placeholder="Pesquisar aluno do polo...">
+                                <input type="text" class="form-control" ng-model="frequenciaFiltro" placeholder="Pesquisar participante do polo...">
                             </div>
                         </div>
                     </div>
@@ -241,26 +241,37 @@
                             <thead>
                                 <tr>
                                     <th width="30">#</th>
-                                    <th>Nome do Aluno</th>
+                                    <th>Participante</th>
+                                    <th width="130">Função</th>
                                     <th width="180">Status</th>
                                     <th>Justificativa / Observação</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="aluno in alunosPolo | filter:frequenciaFiltro">
+                                <tr ng-repeat-start="aluno in alunosPolo | filter:frequenciaFiltro"
+                                    ng-if="aluno.participante_tipo === 'colaborador' && ($first || aluno.funcao_frequencia !== (alunosPolo | filter:frequenciaFiltro)[$index - 1].funcao_frequencia)">
+                                    <td colspan="5" style="padding:10px 12px; background:#eef4f8; border-left:4px solid #1c84c6; color:#1c5d85; font-weight:700; text-transform:uppercase; letter-spacing:.5px;">
+                                        <i class="fa" ng-class="{'fa-users': aluno.funcao_frequencia === 'Monitora', 'fa-star': aluno.funcao_frequencia === 'Coordenadora'}" style="margin-right:7px;"></i>
+                                        {{aluno.funcao_frequencia === 'Coordenadora' ? 'Coordenação' : 'Monitoras'}}
+                                    </td>
+                                </tr>
+                                <tr ng-repeat-end ng-init="aluno.presenca_key = aluno.presenca_key || aluno.id">
                                     <td class="musicalizacao-presenca-index">{{$index + 1}}</td>
-                                    <td class="musicalizacao-presenca-name" data-label="Aluno">{{aluno.nome_crianca}}</td>
+                                    <td class="musicalizacao-presenca-name" data-label="Participante">{{aluno.nome_frequencia || aluno.nome_crianca || aluno.nome_completo}}</td>
+                                    <td data-label="Função">
+                                        <span class="label" ng-class="{'label-info': (aluno.funcao_frequencia || aluno.role) === 'Coordenadora', 'label-primary': (aluno.funcao_frequencia || aluno.role) !== 'Coordenadora'}">{{aluno.funcao_frequencia || aluno.role || 'Aluno(a)'}}</span>
+                                    </td>
                                     <td data-label="Status">
-                                        <select class="form-control" ng-model="presenca[aluno.id]">
+                                        <select class="form-control" ng-model="presenca[aluno.presenca_key]">
                                             <option ng-repeat="opcao in frequenciaStatusOptions" value="{{opcao.value}}">{{opcao.label}}</option>
                                         </select>
                                     </td>
                                     <td data-label="Justificativa / Observacao">
-                                        <input type="text" class="form-control" ng-model="justificativa[aluno.id]" placeholder="Adicionar justificativa ou observação">
+                                        <input type="text" class="form-control" ng-model="justificativa[aluno.presenca_key]" placeholder="Adicionar justificativa ou observação">
                                     </td>
                                 </tr>
                                 <tr ng-if="alunosPolo.length === 0">
-                                    <td colspan="4" class="text-center">Nenhum aluno cadastrado para este polo.</td>
+                                    <td colspan="5" class="text-center">Nenhum participante cadastrado para este polo.</td>
                                 </tr>
                             </tbody>
                         </table>

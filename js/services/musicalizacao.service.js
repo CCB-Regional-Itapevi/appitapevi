@@ -127,6 +127,7 @@
             deleteInstrutor: deleteInstrutor,
             deletePolo: deletePolo,
             getPresenca: getPresenca,
+            updateAulaEquipePresente: updateAulaEquipePresente,
             savePolo: savePolo,
             updatePolo: updatePolo
         };
@@ -149,6 +150,17 @@
                     else deferred.resolve(response.data);
                 });
             return deferred.promise;
+        }
+
+        function updateAulaEquipePresente(aulaId, counts) {
+            var payload = counts || {};
+            return supabase.from('musicalizacao_aulas').update({
+                colaboradores_presentes: parseInt(payload.colaboradores_presentes, 10) || 0,
+                coordenadores_presentes: parseInt(payload.coordenadores_presentes, 10) || 0
+            }).eq('id', aulaId).then(function (response) {
+                if (response.error) throw response.error;
+                return response.data;
+            });
         }
 
         function getAtividades() {
@@ -691,7 +703,7 @@
             }
 
             if (!payload.role) {
-                payload.role = 'Monitor(a)';
+                payload.role = 'Monitora';
             }
 
             return payload;
@@ -835,11 +847,13 @@
             var currentPayload = angular.copy(updatePayload || {});
             var removed = removedColumns || {};
 
-            return supabase.from('musicalizacao_presenca')
+            var query = supabase.from('musicalizacao_presenca')
                 .update(currentPayload)
-                .eq('aula_id', basePayload.aula_id)
-                .eq('aluno_id', basePayload.aluno_id)
-                .select()
+                .eq('aula_id', basePayload.aula_id);
+            query = basePayload.colaborador_id
+                ? query.eq('colaborador_id', basePayload.colaborador_id)
+                : query.eq('aluno_id', basePayload.aluno_id);
+            return query.select()
                 .then(function (response) {
                     var missingColumn = null;
 
@@ -848,6 +862,11 @@
                     }
 
                     missingColumn = extractMissingColumn(response.error);
+                    if (missingColumn === 'colaborador_id' && currentPayload.colaborador_id) {
+                        throw {
+                            message: 'A estrutura de frequência ainda não aceita colaboradoras. Execute a migração musicalizacao_migration_presenca_colaboradores.sql.'
+                        };
+                    }
                     if (missingColumn && Object.prototype.hasOwnProperty.call(currentPayload, missingColumn) && !removed[missingColumn]) {
                         removed[missingColumn] = true;
                         delete currentPayload[missingColumn];
@@ -873,6 +892,11 @@
                     }
 
                     missingColumn = extractMissingColumn(response.error);
+                    if (missingColumn === 'colaborador_id' && currentPayload.colaborador_id) {
+                        throw {
+                            message: 'A estrutura de frequência ainda não aceita colaboradoras. Execute a migração musicalizacao_migration_presenca_colaboradores.sql.'
+                        };
+                    }
                     if (missingColumn && Object.prototype.hasOwnProperty.call(currentPayload, missingColumn) && !removed[missingColumn]) {
                         removed[missingColumn] = true;
                         delete currentPayload[missingColumn];
