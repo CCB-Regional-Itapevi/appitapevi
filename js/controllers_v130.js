@@ -17279,6 +17279,7 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
     $scope.applyFilters = function () {
         var search = String($scope.filters.searchText || '').trim().toLowerCase();
+        var selectedMonthNumber = $scope.filters.mes ? monthLabels.indexOf($scope.filters.mes) + 1 : 0;
 
         $scope.filteredLancamentos = ($scope.lancamentos || []).filter(function (item) {
             var matchText = true;
@@ -17291,8 +17292,9 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
                 matchText = [item.comum, item.municipio, item.codigo].join(' ').toLowerCase().indexOf(search) !== -1;
             }
             matchCity = matchesSelectedVisitasMunicipio(item.municipio);
-            if ($scope.filters.mes) {
-                matchMonth = item.mes === $scope.filters.mes;
+            if (selectedMonthNumber) {
+                var itemMonthNumber = parseInt(item && item.referencia_mes, 10) || (monthLabels.indexOf(item && item.mes) + 1);
+                matchMonth = itemMonthNumber === selectedMonthNumber;
             }
             if (item.data) {
                 itemDate = new Date(item.data);
@@ -17345,11 +17347,13 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
     $scope.loadLancamentos = function () {
         function selectLatestAvailableVisitasMonth(records) {
-            var selectedMonth = $scope.filters.mes;
+            var selectedMonthNumber = monthLabels.indexOf($scope.filters.mes) + 1;
             var hasSelectedMonth = (records || []).some(function (item) {
-                return item && item.mes === selectedMonth;
+                var itemMonthNumber = parseInt(item && item.referencia_mes, 10) || (monthLabels.indexOf(item && item.mes) + 1);
+                return itemMonthNumber === selectedMonthNumber;
             });
             var latestRecord;
+            var latestMonthNumber;
 
             if (hasSelectedMonth || !(records || []).length) {
                 return;
@@ -17363,9 +17367,10 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
 
                 return (yearB * 100 + monthB) - (yearA * 100 + monthA);
             })[0];
+            latestMonthNumber = parseInt(latestRecord && latestRecord.referencia_mes, 10) || (monthLabels.indexOf(latestRecord && latestRecord.mes) + 1);
 
-            if (latestRecord && latestRecord.mes) {
-                $scope.filters.mes = latestRecord.mes;
+            if (latestMonthNumber >= 1 && latestMonthNumber <= 12) {
+                $scope.filters.mes = monthLabels[latestMonthNumber - 1];
             }
         }
 
@@ -18322,10 +18327,12 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.applyFilters = function () {
         var search = String($scope.filters.searchText || '').trim().toLowerCase();
         var selectedCities = getSelectedLancamentosMunicipios();
+        var selectedMonthNumber = $scope.filters.mes ? monthLabels.indexOf($scope.filters.mes) + 1 : 0;
         $scope.filteredLancamentos = ($scope.lancamentos || []).filter(function (item) {
             var matchText = !search || [item.comum, item.codigo, item.municipio, item.observacoes].join(' ').toLowerCase().indexOf(search) !== -1;
             var matchCity = !selectedCities.length || selectedCities.indexOf(normalizeMunicipioRegionalLabel(item.municipio)) !== -1;
-            var matchMonth = !$scope.filters.mes || item.mes === $scope.filters.mes;
+            var itemMonthNumber = parseInt(item && item.referencia_mes, 10) || (monthLabels.indexOf(item && item.mes) + 1);
+            var matchMonth = !selectedMonthNumber || itemMonthNumber === selectedMonthNumber;
             return matchText && matchCity && matchMonth;
         });
         updateSummary();
@@ -18336,9 +18343,10 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.loadLancamentos = function () {
         $scope.loading = true;
         VisitasService.getLancamentos().then(function (data) {
-            var selectedMonth = $scope.filters.mes;
+            var selectedMonthNumber = monthLabels.indexOf($scope.filters.mes) + 1;
             var hasSelectedMonth;
             var latestRecord;
+            var latestMonthNumber;
 
             $scope.visitasError = '';
             $scope.lancamentos = (data || []).map(function (item) {
@@ -18348,7 +18356,8 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
             });
 
             hasSelectedMonth = $scope.lancamentos.some(function (item) {
-                return item && item.mes === selectedMonth;
+                var itemMonthNumber = parseInt(item && item.referencia_mes, 10) || (monthLabels.indexOf(item && item.mes) + 1);
+                return itemMonthNumber === selectedMonthNumber;
             });
 
             if (!hasSelectedMonth && $scope.lancamentos.length) {
@@ -18360,9 +18369,10 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
 
                     return (yearB * 100 + monthB) - (yearA * 100 + monthA);
                 })[0];
+                latestMonthNumber = parseInt(latestRecord && latestRecord.referencia_mes, 10) || (monthLabels.indexOf(latestRecord && latestRecord.mes) + 1);
 
-                if (latestRecord && latestRecord.mes) {
-                    $scope.filters.mes = latestRecord.mes;
+                if (latestMonthNumber >= 1 && latestMonthNumber <= 12) {
+                    $scope.filters.mes = monthLabels[latestMonthNumber - 1];
                 }
             }
 
