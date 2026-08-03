@@ -15,6 +15,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+    <!-- Atualização automática: version.json nunca é armazenado em cache. -->
+    <script>
+        (function () {
+            var CURRENT_APP_VERSION = '2026.08.03.1';
+            var VERSION_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+            var versionCheckInProgress = false;
+
+            window.APP_RELEASE_VERSION = CURRENT_APP_VERSION;
+
+            function checkForAppUpdate() {
+                if (versionCheckInProgress || typeof window.fetch !== 'function') {
+                    return;
+                }
+
+                versionCheckInProgress = true;
+                window.fetch('version.json?_=' + Date.now(), { cache: 'no-store' })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Manifesto de versão indisponível.');
+                        }
+                        return response.json();
+                    })
+                    .then(function (manifest) {
+                        var availableVersion = String(manifest && manifest.version || '').trim();
+
+                        if (!availableVersion || availableVersion === CURRENT_APP_VERSION) {
+                            return;
+                        }
+
+                        var updateUrl = new URL(window.location.href);
+                        updateUrl.searchParams.set('_appv', availableVersion);
+                        window.location.replace(updateUrl.toString());
+                    })
+                    .catch(function () {
+                        // Falha de rede não interrompe o uso; a próxima verificação tenta novamente.
+                    })
+                    .then(function () {
+                        versionCheckInProgress = false;
+                    });
+            }
+
+            window.setTimeout(checkForAppUpdate, 3000);
+            window.setInterval(checkForAppUpdate, VERSION_CHECK_INTERVAL_MS);
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') {
+                    checkForAppUpdate();
+                }
+            });
+        }());
+    </script>
+
     <!-- Unregister Service Workers -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -129,7 +180,7 @@
     <script src="js/ui-standards.js?v=1.1.0"></script>
     <script src="js/ebi_active_spaces.js?v=1.0.3"></script>
 
-    <script src="js/controllers_v130.js?v=1.4.47"></script>
+    <script src="js/controllers_v130.js?v=1.4.48"></script>
     <script src="js/controllers_musica.js?v=1.1.4"></script>
     <script src="js/controllers_darpe.js?v=2.4.0"></script>
 

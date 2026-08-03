@@ -15087,7 +15087,7 @@ function visitasCtrl($scope, $state, AuthService, SweetAlert) {
             .replace(/MUSICOS/gi, 'Músicos')
             .replace(/EVANGELIZACAO/gi, 'Evangelização')
             .replace(/SITIO/gi, 'SÍTIO')
-            .replace(/MARCO/gi, 'Março')
+            .replace(/\bMARCO\b/gi, 'Março')
             .replace(/CRITICO/gi, 'CRÍTICO');
 
         if (/BR-22-3510/i.test(value)) {
@@ -15801,7 +15801,7 @@ function repairVisitasModuleText(text) {
         .replace(/MUSICOS/gi, 'Músicos')
         .replace(/EVANGELIZACAO/gi, 'Evangelização')
         .replace(/SITIO/gi, 'SÍTIO')
-        .replace(/MARCO/gi, 'Março')
+        .replace(/\bMARCO\b/gi, 'Março')
         .replace(/Sï¿½O/gi, 'SÃO')
         .replace(/JOï¿½O/gi, 'JOÃO')
         .replace(/PARNAï¿½BA/gi, 'PARNAÍBA')
