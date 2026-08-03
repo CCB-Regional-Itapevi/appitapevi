@@ -1141,7 +1141,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('register', {
             url: "/register?origem&origin&setor&sector",
-            templateUrl: "views/register.html?v=1.1.1",
+            templateUrl: "views/register.html?v=1.1.2",
             data: { pageTitle: 'Cadastro', specialClass: 'gray-bg' }
         })
         .state('lockscreen', {
@@ -2175,7 +2175,7 @@ angular
         var isRefreshingProfile = false;
         function refreshAccessProfileOnResume() {
             var stateName = $state.current && $state.current.name;
-            var isPublicState = stateName === 'login' || stateName === 'register' || stateName === 'forgot_password' || stateName === 'landing' || stateName === 'musica_justificar_publico';
+            var isPublicState = stateName === 'login' || stateName === 'register' || stateName === 'forgot_password' || stateName === 'landing' || stateName === 'musica_justificar_publico' || stateName === 'dashboards.privacidade';
 
             if (isPublicState || isRefreshingProfile) {
                 return;
@@ -2208,7 +2208,8 @@ angular
                                 stateName === 'register' ||
                                 stateName === 'forgot_password' ||
                                 stateName === 'landing' ||
-                                stateName === 'musica_justificar_publico';
+                                stateName === 'musica_justificar_publico' ||
+                                stateName === 'dashboards.privacidade';
 
             if (isPublicState) {
                 return;
@@ -2281,7 +2282,8 @@ angular
                                 toState.name === 'register' ||
                                 toState.name === 'forgot_password' ||
                                 toState.name === 'landing' ||
-                                toState.name === 'musica_justificar_publico';
+                                toState.name === 'musica_justificar_publico' ||
+                                toState.name === 'dashboards.privacidade';
 
             if (isPublicState) return; // Sempre permite p??ginas p??blicas
 
@@ -2315,7 +2317,8 @@ angular
                                 toState.name === 'register' ||
                                 toState.name === 'forgot_password' ||
                                 toState.name === 'landing' ||
-                                toState.name === 'musica_justificar_publico';
+                                toState.name === 'musica_justificar_publico' ||
+                                toState.name === 'dashboards.privacidade';
 
             if (isPublicState) {
                 return;

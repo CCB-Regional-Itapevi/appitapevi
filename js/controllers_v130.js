@@ -510,7 +510,7 @@ function MainCtrl($http, AuthService, $state, $rootScope, $scope, $injector) {
     $rootScope.$on('$stateChangeStart', function (event, toState) {
         var user = $rootScope.currentUser;
         var role = AuthService && typeof AuthService.getCurrentUserRole === 'function' ? AuthService.getCurrentUserRole() : null;
-        var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'app.profile' || toState.name === 'musica_justificar_publico';
+        var isPublic = toState.name === 'login' || toState.name === 'register' || toState.name === 'app.profile' || toState.name === 'musica_justificar_publico' || toState.name === 'dashboards.privacidade';
 
         if (user && !user.comum && !isPublic && role !== null && role >= 3) {
             event.preventDefault();
@@ -17344,20 +17344,76 @@ function visitasDashboardCtrl($scope, AuthService, SweetAlert, VisitasService, $
     };
 
     $scope.loadLancamentos = function () {
+        function selectLatestAvailableVisitasMonth(records) {
+            var selectedMonth = $scope.filters.mes;
+            var hasSelectedMonth = (records || []).some(function (item) {
+                return item && item.mes === selectedMonth;
+            });
+            var latestRecord;
+
+            if (hasSelectedMonth || !(records || []).length) {
+                return;
+            }
+
+            latestRecord = records.slice().sort(function (a, b) {
+                var yearA = parseInt(a && (a.referencia_ano || a.ano), 10) || 0;
+                var yearB = parseInt(b && (b.referencia_ano || b.ano), 10) || 0;
+                var monthA = parseInt(a && a.referencia_mes, 10) || (monthLabels.indexOf(a && a.mes) + 1);
+                var monthB = parseInt(b && b.referencia_mes, 10) || (monthLabels.indexOf(b && b.mes) + 1);
+
+                return (yearB * 100 + monthB) - (yearA * 100 + monthA);
+            })[0];
+
+            if (latestRecord && latestRecord.mes) {
+                $scope.filters.mes = latestRecord.mes;
+            }
+        }
+
+        function settleVisitasRequest(promise) {
+            return promise.then(function (data) {
+                return { ok: true, data: data || [] };
+            }).catch(function (error) {
+                return { ok: false, data: [], error: error };
+            });
+        }
+
         $scope.loading = true;
         $q.all([
-            VisitasService.getLancamentos(),
-            VisitasService.getVisitados(),
-            VisitasService.getAgenda()
+            settleVisitasRequest(VisitasService.getLancamentos()),
+            settleVisitasRequest(VisitasService.getVisitados()),
+            settleVisitasRequest(VisitasService.getAgenda())
         ]).then(function (results) {
-            var lancamentos = results[0] || [];
-            var visitados = results[1] || [];
-            var agenda = results[2] || [];
+            var lancamentosResult = results[0];
+            var visitadosResult = results[1];
+            var agendaResult = results[2];
+            var supplementalErrors = [];
+
+            if (!lancamentosResult.ok) {
+                throw lancamentosResult.error || { message: 'NÃ£o foi possÃ­vel carregar os lanÃ§amentos de visitas.' };
+            }
 
             $scope.visitasError = '';
-            $scope.lancamentos = lancamentos.map(sanitizeItem);
-            $scope.visitados = visitados.map(sanitizeVisitadoDashboardItem);
-            $scope.agendaVisitas = agenda.map(sanitizeAgendaDashboardItem);
+            $scope.lancamentos = lancamentosResult.data.map(sanitizeItem);
+            selectLatestAvailableVisitasMonth($scope.lancamentos);
+            $scope.visitados = visitadosResult.data.map(sanitizeVisitadoDashboardItem);
+            $scope.agendaVisitas = agendaResult.data.map(sanitizeAgendaDashboardItem);
+
+            if (!visitadosResult.ok) {
+                supplementalErrors.push('cadastro de visitados');
+            }
+            if (!agendaResult.ok) {
+                supplementalErrors.push('agenda');
+            }
+            if (supplementalErrors.length && window.console && typeof window.console.warn === 'function') {
+                window.console.warn(
+                    'Visitas: dados auxiliares indisponÃ­veis (' + supplementalErrors.join(', ') + '). Os indicadores de lanÃ§amentos foram preservados.',
+                    {
+                        visitados: visitadosResult.error || null,
+                        agenda: agendaResult.error || null
+                    }
+                );
+            }
+
             updateDashboardLastUpdated();
             $scope.applyFilters();
         }).catch(function (error) {
@@ -18280,12 +18336,36 @@ function visitasLancamentosCtrl($scope, VisitasService, AuthService, $rootScope)
     $scope.loadLancamentos = function () {
         $scope.loading = true;
         VisitasService.getLancamentos().then(function (data) {
+            var selectedMonth = $scope.filters.mes;
+            var hasSelectedMonth;
+            var latestRecord;
+
             $scope.visitasError = '';
             $scope.lancamentos = (data || []).map(function (item) {
                 return angular.extend({}, item, {
                     codigo: item.codigo || item.codigo_comum || extractVisitaCodigoLocal(item.comum)
                 });
             });
+
+            hasSelectedMonth = $scope.lancamentos.some(function (item) {
+                return item && item.mes === selectedMonth;
+            });
+
+            if (!hasSelectedMonth && $scope.lancamentos.length) {
+                latestRecord = $scope.lancamentos.slice().sort(function (a, b) {
+                    var yearA = parseInt(a && (a.referencia_ano || a.ano), 10) || 0;
+                    var yearB = parseInt(b && (b.referencia_ano || b.ano), 10) || 0;
+                    var monthA = parseInt(a && a.referencia_mes, 10) || (monthLabels.indexOf(a && a.mes) + 1);
+                    var monthB = parseInt(b && b.referencia_mes, 10) || (monthLabels.indexOf(b && b.mes) + 1);
+
+                    return (yearB * 100 + monthB) - (yearA * 100 + monthA);
+                })[0];
+
+                if (latestRecord && latestRecord.mes) {
+                    $scope.filters.mes = latestRecord.mes;
+                }
+            }
+
             $scope.applyFilters();
         }).catch(function (error) {
             $scope.visitasError = (error && error.message) || 'Não foi possível carregar os lançamentos de visitas.';

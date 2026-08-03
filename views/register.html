@@ -128,7 +128,7 @@
                     <div style="position: relative;">
                         <select class="form-control" ng-model="user.setor" style="padding-left: 45px; height: 46px; border-radius: 8px; border: 1px solid #e2e8f0; width: 100%; background-color: #f8fafc; color: #475569; appearance: none; -webkit-appearance: none; cursor: pointer;" required>
                             <option value="" disabled selected hidden>Qual o seu Ministério/Setor de Origem?</option>
-                            <option value="ebi">EBI (Escola Bíblica Infantil)</option>
+                            <option value="ebi">EBI (Espaço Bíblico Infantil)</option>
                             <option value="musica">Música</option>
                             <option value="musicalizacao">Musicalização Infantil</option>
                             <option value="visitas">Visitas (Grupo de Visitas)</option>
@@ -153,7 +153,7 @@
                 <div class="terms-fixed">
                     <label>
                         <input type="checkbox" ng-model="user.agreeTerms">
-                        Aceito os <a href="#">termos e política</a>.
+                        Aceito os <a ui-sref="dashboards.privacidade" target="_blank" rel="noopener">termos e política de privacidade</a>.
                     </label>
                 </div>
                 <div class="help-block-fixed text-danger" ng-if="errors.agreeTerms">

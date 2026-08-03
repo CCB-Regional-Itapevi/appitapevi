@@ -377,7 +377,10 @@
         }
 
         function inferMunicipioFromText(value) {
-            return matchKnownMunicipioCatalogLabel(value) || normalizeMunicipioCatalogLabel(value || '');
+            // Uma comum sem o nome explícito da cidade não pode ser usada como
+            // município. O fallback anterior transformava "BR-... - COMUM" em
+            // cidade e fazia todas as consultas municipais retornarem vazio.
+            return matchKnownMunicipioCatalogLabel(value) || '';
         }
 
         function firstCatalogValue(row, fieldNames) {
@@ -643,6 +646,21 @@
             return normalizeMunicipioCatalogLabel(scope.municipio || '');
         }
 
+        function getIntegratedMunicipioScope(municipio) {
+            var normalizedMunicipio = normalizeMunicipioCatalogLabel(municipio || '');
+            var integratedGroups = [
+                ['Cotia', 'Caucaia do Alto', 'Vargem Grande Paulista'],
+                ['Santana de Parna\u00edba', 'Pirapora do Bom Jesus']
+            ];
+            var matchedGroup = integratedGroups.filter(function (group) {
+                return group.some(function (item) {
+                    return normalizeText(item) === normalizeText(normalizedMunicipio);
+                });
+            })[0];
+
+            return matchedGroup ? matchedGroup.slice() : (normalizedMunicipio ? [normalizedMunicipio] : []);
+        }
+
         function applyDataScopeToQuery(query, config, profile) {
             var scope = getCurrentUserDataScope(profile);
             var fieldName = null;
@@ -664,11 +682,18 @@
                 fieldValue = getScopeValue(scope, 'municipio');
 
                 if (fieldName && fieldValue) {
-                    // Use a more permissive wildcard match for Supabase
-                    // JS filter will do the precise normalization later
-                    var searchTerms = fieldValue.split(' ');
-                    var mainTerm = searchTerms[0] || fieldValue;
-                    return query.ilike(fieldName, '%' + mainTerm + '%');
+                    var integratedMunicipios = getIntegratedMunicipioScope(fieldValue);
+
+                    // Para grupos integrados, carrega os registros e deixa a
+                    // validação normalizada de filterCollectionByDataScope()
+                    // selecionar somente os municípios autorizados. O filtro
+                    // OR do PostgREST retornava uma coleção vazia para nomes
+                    // com espaços/acentos, apesar de os registros existirem.
+                    if (integratedMunicipios.length > 1) {
+                        return query;
+                    }
+
+                    return query.ilike(fieldName, '%' + integratedMunicipios[0] + '%');
                 }
 
                 return query;
@@ -741,10 +766,13 @@
             recordMunicipio = resolveScopedRecordFieldValue(record, config, 'municipio', scope);
 
             if (scope.mode === 'municipio') {
-                // Smart comparison: case-insensitive and normalized
                 var normRecordCity = normalizeText(String(recordMunicipio || ''));
-                var normScopeCity = normalizeText(String(getScopeValue(scope, 'municipio') || ''));
-                return !!recordMunicipio && (normRecordCity === normScopeCity || normRecordCity.indexOf(normScopeCity) !== -1);
+                var integratedMunicipios = getIntegratedMunicipioScope(getScopeValue(scope, 'municipio'));
+
+                return !!recordMunicipio && integratedMunicipios.some(function (municipio) {
+                    var normScopeCity = normalizeText(String(municipio || ''));
+                    return normRecordCity === normScopeCity || normRecordCity.indexOf(normScopeCity) !== -1;
+                });
             }
 
             recordComum = resolveScopedRecordFieldValue(record, config, 'comum', scope);
@@ -791,8 +819,14 @@
             municipioFields = municipioFields.concat(config.municipioFields || []);
 
             if (scope.municipio) {
+                var allowedMunicipios = getIntegratedMunicipioScope(scope.municipio);
                 municipioFields.forEach(function (fieldName) {
-                    if (fieldName) {
+                    var payloadMunicipio = fieldName ? normalizeMunicipioCatalogLabel(scopedPayload[fieldName] || '') : '';
+                    var isAllowedMunicipio = allowedMunicipios.some(function (municipio) {
+                        return normalizeText(municipio) === normalizeText(payloadMunicipio);
+                    });
+
+                    if (fieldName && !isAllowedMunicipio) {
                         scopedPayload[fieldName] = scope.municipio;
                     }
                 });
@@ -812,26 +846,31 @@
         function hydrateProfileAccessScope(profile) {
             var deferred = $q.defer();
             var normalizedProfile = normalizeProfile(profile);
-            var normalizedComum = normalizeText(normalizedProfile && normalizedProfile.comum);
 
             if (!normalizedProfile || !normalizedProfile.comum || normalizedProfile.municipio) {
                 deferred.resolve(normalizedProfile);
                 return deferred.promise;
             }
 
-            listComunsCatalog().then(function (catalog) {
-                var matchingComum = (catalog || []).find(function (item) {
-                    return normalizeText(item && item.nome) === normalizedComum;
+            // Consulta somente a comum do próprio perfil. Usar o catálogo já
+            // filtrado aqui criava um ciclo: ele exigia o município que esta
+            // função ainda estava tentando descobrir.
+            supabase
+                .from('comum')
+                .select('comum,cidade')
+                .eq('comum', normalizedProfile.comum)
+                .limit(1)
+                .then(function (response) {
+                    var matchingComum = response && response.data && response.data[0];
+
+                    if (!response.error && matchingComum && matchingComum.cidade) {
+                        normalizedProfile.municipio = normalizeMunicipioCatalogLabel(matchingComum.cidade);
+                    }
+
+                    deferred.resolve(normalizeProfile(normalizedProfile));
+                }).catch(function () {
+                    deferred.resolve(normalizedProfile);
                 });
-
-                if (matchingComum && matchingComum.cidade) {
-                    normalizedProfile.municipio = normalizeMunicipioCatalogLabel(matchingComum.cidade);
-                }
-
-                deferred.resolve(normalizeProfile(normalizedProfile));
-            }).catch(function () {
-                deferred.resolve(normalizedProfile);
-            });
 
             return deferred.promise;
         }
@@ -1861,25 +1900,27 @@
                     deferred.reject(normalizeAuthError(response.error));
                 } else {
                     getUserProfile(response.data.user.id).then(function (profile) {
-                        var normalizedProfile = normalizeProfile(profile);
-                        syncCurrentUserProfile(normalizedProfile);
-                        startAccessSession(response.data.user.id, normalizedProfile, response.data.session).catch(angular.noop);
-                        touchActivity();
-                        getSession()
-                            .then(function (currentSession) {
-                                return ensureLoginRegisteredForSession(normalizedProfile, currentSession || response.data.session);
-                            })
-                            .then(function (finalProfile) {
-                                if (finalProfile) {
-                                    syncCurrentUserProfile(finalProfile);
-                                }
-                            })
-                            .catch(angular.noop);
+                        hydrateProfileAccessScope(profile).then(function (hydratedProfile) {
+                            var normalizedProfile = normalizeProfile(hydratedProfile);
+                            syncCurrentUserProfile(normalizedProfile);
+                            startAccessSession(response.data.user.id, normalizedProfile, response.data.session).catch(angular.noop);
+                            touchActivity();
+                            getSession()
+                                .then(function (currentSession) {
+                                    return ensureLoginRegisteredForSession(normalizedProfile, currentSession || response.data.session);
+                                })
+                                .then(function (finalProfile) {
+                                    if (finalProfile) {
+                                        syncCurrentUserProfile(finalProfile);
+                                    }
+                                })
+                                .catch(angular.noop);
 
-                        deferred.resolve({
-                            user: response.data.user,
-                            session: response.data.session,
-                            profile: normalizedProfile
+                            deferred.resolve({
+                                user: response.data.user,
+                                session: response.data.session,
+                                profile: normalizedProfile
+                            });
                         });
                     }).catch(function (err) {
                         deferred.reject(err);
