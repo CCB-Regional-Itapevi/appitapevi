@@ -846,9 +846,30 @@
         function hydrateProfileAccessScope(profile) {
             var deferred = $q.defer();
             var normalizedProfile = normalizeProfile(profile);
+            var catalog = ((window.CadastroMusicData || {}).comunsCatalog) || [];
+            var normalizedComum;
+            var comumCode;
+            var localMatch;
 
             if (!normalizedProfile || !normalizedProfile.comum || normalizedProfile.municipio) {
                 deferred.resolve(normalizedProfile);
+                return deferred.promise;
+            }
+
+            normalizedComum = normalizeText(normalizedProfile.comum);
+            comumCode = String(normalizedProfile.comum || '').match(/^(BR-\d+-\d+)/i);
+            comumCode = comumCode && comumCode[1] ? comumCode[1].toUpperCase() : '';
+            localMatch = catalog.filter(function (item) {
+                var itemName = repairCatalogText(item && item.nome || '');
+                var itemCode = String(itemName).match(/^(BR-\d+-\d+)/i);
+
+                itemCode = itemCode && itemCode[1] ? itemCode[1].toUpperCase() : '';
+                return normalizeText(itemName) === normalizedComum || (comumCode && itemCode === comumCode);
+            })[0];
+
+            if (localMatch && localMatch.cidade) {
+                normalizedProfile.municipio = normalizeMunicipioCatalogLabel(localMatch.cidade);
+                deferred.resolve(normalizeProfile(normalizedProfile));
                 return deferred.promise;
             }
 
@@ -858,7 +879,7 @@
             supabase
                 .from('comum')
                 .select('comum,cidade')
-                .eq('comum', normalizedProfile.comum)
+                .ilike('comum', comumCode ? comumCode + '%' : normalizedProfile.comum)
                 .limit(1)
                 .then(function (response) {
                     var matchingComum = response && response.data && response.data[0];
@@ -1084,6 +1105,11 @@
                 data_ultimo_login: new Date().toISOString()
             };
 
+            if (currentProfile.municipio) {
+                payload.municipio = currentProfile.municipio;
+                payload.cidade = currentProfile.municipio;
+            }
+
             supabase
                 .from('profiles')
                 .update(payload)
@@ -1091,12 +1117,26 @@
                 .select('*')
                 .single()
                 .then(function (response) {
+                    var updatedProfile;
+
                     if (response.error) {
                         deferred.reject(response.error);
                         return;
                     }
 
-                    deferred.resolve(normalizeProfile(response.data || angular.extend({}, currentProfile, payload)));
+                    updatedProfile = angular.extend({}, currentProfile, response.data || payload);
+
+                    // O município pode ter sido resolvido apenas em memória a
+                    // partir da comum. A atualização do contador de login não
+                    // deve apagar esse escopo com um valor vazio vindo do banco.
+                    if (!updatedProfile.municipio && currentProfile.municipio) {
+                        updatedProfile.municipio = currentProfile.municipio;
+                    }
+                    if (!updatedProfile.cidade && currentProfile.municipio) {
+                        updatedProfile.cidade = currentProfile.municipio;
+                    }
+
+                    deferred.resolve(normalizeProfile(updatedProfile));
                 })
                 .catch(function (error) {
                     deferred.reject(error);
