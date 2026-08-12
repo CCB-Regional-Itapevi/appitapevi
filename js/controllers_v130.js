@@ -11819,10 +11819,11 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     $scope.filters = {
         searchText: '',
         cidades: [],
-        comum: '',
+        comuns: [],
         dataInicio: null,
         dataFim: null,
-        mes: mesAtual
+        mes: mesAtual,
+        periodoRapido: ''
     };
 
     $scope.toggleCidadeFilter = function(cidade) {
@@ -11838,6 +11839,54 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     };
     $scope.clearCidades = function() {
         $scope.filters.cidades = [];
+        $scope.applyFilters();
+    };
+
+    $scope.toggleComumFilter = function(comum) {
+        var idx = $scope.filters.comuns.indexOf(comum);
+        if (idx > -1) $scope.filters.comuns.splice(idx, 1);
+        else $scope.filters.comuns.push(comum);
+    };
+    $scope.isComumSelected = function(comum) {
+        return $scope.filters.comuns.indexOf(comum) > -1;
+    };
+    $scope.clearComuns = function() {
+        $scope.filters.comuns = [];
+        $scope.applyFilters();
+    };
+
+    function startOfToday() {
+        var today = new Date();
+        return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    }
+
+    $scope.applyQuickPeriod = function() {
+        var preset = $scope.filters.periodoRapido;
+        var end = startOfToday();
+        var start = new Date(end.getTime());
+        if (!preset || preset === 'personalizado') return;
+        if (preset === '30d' || preset === '60d' || preset === '90d') {
+            start.setDate(start.getDate() - (Number(preset.replace('d', '')) - 1));
+        } else if (preset === '6m') start.setMonth(start.getMonth() - 6);
+        else if (preset === '1a') start.setFullYear(start.getFullYear() - 1);
+        $scope.filters.mes = '';
+        $scope.filters.dataInicio = start;
+        $scope.filters.dataFim = end;
+        $scope.applyFilters();
+    };
+
+    $scope.onCustomPeriodChange = function() {
+        $scope.filters.periodoRapido = 'personalizado';
+        $scope.filters.mes = '';
+        $scope.applyFilters();
+    };
+
+    $scope.onMonthChange = function() {
+        if ($scope.filters.mes) {
+            $scope.filters.periodoRapido = '';
+            $scope.filters.dataInicio = null;
+            $scope.filters.dataFim = null;
+        }
         $scope.applyFilters();
     };
 
@@ -11869,10 +11918,9 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
 
     function refreshScopedEbiCities() {
         $scope.cidades = getScopedEbiMunicipios();
-
-        if ($scope.filters.cidade && $scope.cidades.indexOf(normalizeMunicipioRegionalLabel($scope.filters.cidade)) === -1) {
-            $scope.filters.cidade = '';
-        }
+        $scope.filters.cidades = ($scope.filters.cidades || []).filter(function (cidade) {
+            return $scope.cidades.indexOf(normalizeMunicipioRegionalLabel(cidade)) !== -1;
+        });
     }
 
     $scope.cidades = getScopedEbiMunicipios();
@@ -12301,7 +12349,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         var filters = options || {};
         var search = normalizeFilterValue(filters.searchText);
         var selectedCities = (filters.cidades || []).map(normalizeFilterValue);
-        var selectedComum = normalizeFilterValue(filters.comum);
+        var selectedComuns = (filters.comuns || []).map(normalizeFilterValue);
         var itemDate = item && item.data_reuniao ? parseDateOnlyAsLocal(item.data_reuniao) : null;
         var itemCity = normalizeFilterValue(getEbiMunicipio(item));
         var itemComum = normalizeFilterValue(getRecitativoLocalidade(item));
@@ -12328,8 +12376,8 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             matchCity = selectedCities.indexOf(itemCity) !== -1;
         }
 
-        if (selectedComum) {
-            matchComum = itemComum === selectedComum;
+        if (selectedComuns.length) {
+            matchComum = selectedComuns.indexOf(itemComum) !== -1;
         }
 
         if (filters.dataInicio && itemDate && itemDate < parseDateOnlyAsLocal(filters.dataInicio)) {
@@ -12374,6 +12422,10 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
 
         $scope.filteredComumOptions = Object.keys(options).sort(function (a, b) {
             return a.localeCompare(b, 'pt-BR');
+        });
+
+        $scope.filters.comuns = ($scope.filters.comuns || []).filter(function (comum) {
+            return !!options[comum];
         });
     }
 
@@ -12469,18 +12521,18 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     }
 
     function matchesPendingViewFilters(item) {
-        var cityFilter = normalizeFilterValue($scope.filters.cidade);
-        var comumFilter = normalizeFilterValue($scope.filters.comum);
+        var cityFilters = ($scope.filters.cidades || []).map(normalizeFilterValue);
+        var comumFilters = ($scope.filters.comuns || []).map(normalizeFilterValue);
         var searchFilter = normalizeFilterValue($scope.filters.searchText);
         var itemMunicipio = normalizeFilterValue(item && item.municipio);
         var itemComum = normalizeFilterValue(item && item.comum);
         var textMatch = true;
 
-        if (cityFilter && itemMunicipio !== cityFilter) {
+        if (cityFilters.length && cityFilters.indexOf(itemMunicipio) === -1) {
             return false;
         }
 
-        if (comumFilter && itemComum !== comumFilter) {
+        if (comumFilters.length && comumFilters.indexOf(itemComum) === -1) {
             return false;
         }
 
@@ -13075,7 +13127,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             return item.lancamentos > 0;
         }).slice(0, 5);
         totalMappedComuns = Object.keys(municipalityCatalogMap).reduce(function (total, municipio) {
-            if ($scope.filters.cidade && municipio !== normalizeMunicipioRegionalLabel($scope.filters.cidade)) {
+            if ($scope.filters.cidades.length && $scope.filters.cidades.map(normalizeMunicipioRegionalLabel).indexOf(municipio) === -1) {
                 return total;
             }
             return total + Object.keys(municipalityCatalogMap[municipio] || {}).length;
@@ -13170,14 +13222,14 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     $scope.getEbiJustificativa = getEbiJustificativa;
 
     $scope.filterEbiByMunicipio = function (municipio) {
-        $scope.filters.cidade = municipio || '';
-        $scope.filters.comum = '';
+        $scope.filters.cidades = municipio ? [municipio] : [];
+        $scope.filters.comuns = [];
         $scope.ebiHistoryTab = 'detalhado';
         $scope.applyFilters();
     };
 
     $scope.filterEbiByComum = function (comum) {
-        $scope.filters.comum = comum || '';
+        $scope.filters.comuns = comum ? [comum] : [];
         $scope.ebiHistoryTab = 'detalhado';
         $scope.applyFilters();
     };
@@ -13186,8 +13238,8 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
         if (!item) {
             return;
         }
-        $scope.filters.cidade = item.municipio || '';
-        $scope.filters.comum = item.comum || '';
+        $scope.filters.cidades = item.municipio ? [item.municipio] : [];
+        $scope.filters.comuns = item.comum ? [item.comum] : [];
         $scope.ebiHistoryTab = 'detalhado';
         $scope.applyFilters();
     };
@@ -13218,11 +13270,12 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     $scope.clearFilters = function () {
         $scope.filters = {
             searchText: '',
-            cidade: '',
-            comum: '',
+            cidades: [],
+            comuns: [],
             dataInicio: null,
             dataFim: null,
-            mes: mesAtual
+            mes: '',
+            periodoRapido: ''
         };
         $scope.applyFilters();
     };
@@ -13570,6 +13623,9 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
             return row.map(repairEbiPdfCell);
         });
 
+        var printInfo = window.AppUiStandards && window.AppUiStandards.getPrintInfo
+            ? window.AppUiStandards.getPrintInfo()
+            : { name: 'Usuário logado', date: new Date().toLocaleDateString('pt-BR'), time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) };
         var docDefinition = {
             pageOrientation: 'landscape',
             pageSize: 'A4',
@@ -13597,7 +13653,9 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
                             stack: [
                                 { text: ebiText.pageLabel + ' ' + currentPage + ' de ' + pageCount, alignment: 'right', fontSize: 9 },
                                 { text: ebiText.issueDateLabel + ': ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right', fontSize: 9 },
-                                { text: ebiText.periodLabel + ': ' + periodoInicio + ' a ' + periodoFim, alignment: 'right', fontSize: 8, margin: [0, 5, 0, 0] }
+                                { text: ebiText.periodLabel + ': ' + periodoInicio + ' a ' + periodoFim, alignment: 'right', fontSize: 8, margin: [0, 5, 0, 0] },
+                                { text: 'Impresso por: ' + printInfo.name, alignment: 'right', fontSize: 8, margin: [0, 4, 0, 0] },
+                                { text: printInfo.date + ' às ' + printInfo.time, alignment: 'right', fontSize: 8, color: '#666' }
                             ],
                             width: 130
                         }

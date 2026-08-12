@@ -34,6 +34,92 @@
         return colorAliases[normalized] || value;
     }
 
+    function padPrintNumber(value) {
+        return value < 10 ? '0' + value : String(value);
+    }
+
+    function getPrintInfo() {
+        var rootScope = null;
+        var user = {};
+        var now = new Date();
+        var injector;
+
+        try {
+            if (window.angular) {
+                injector = window.angular.element(document.body).injector() ||
+                    window.angular.element(document.documentElement).injector();
+                if (injector) rootScope = injector.get('$rootScope');
+            }
+        } catch (ignore) {}
+
+        user = (rootScope && rootScope.currentUser) || {};
+
+        return {
+            name: user.full_name || user.nome_completo || user.nome || user.name || user.email || 'Usuário logado',
+            date: [padPrintNumber(now.getDate()), padPrintNumber(now.getMonth() + 1), now.getFullYear()].join('/'),
+            time: [padPrintNumber(now.getHours()), padPrintNumber(now.getMinutes())].join(':')
+        };
+    }
+
+    function containsPrintIdentification(node) {
+        var found = false;
+
+        if (typeof node === 'function') {
+            return normalizeText(node.toString()).indexOf('impresso por') !== -1;
+        }
+        if (typeof node === 'string') {
+            return normalizeText(node).indexOf('impresso por') !== -1;
+        }
+        if (!node || typeof node !== 'object') return false;
+
+        Object.keys(node).some(function (key) {
+            found = containsPrintIdentification(node[key]);
+            return found;
+        });
+        return found;
+    }
+
+    function ensurePdfBottomMargin(docDefinition) {
+        var margins = docDefinition.pageMargins;
+
+        if (!margins) {
+            docDefinition.pageMargins = [40, 40, 40, 50];
+        } else if (typeof margins === 'number') {
+            docDefinition.pageMargins = [margins, margins, margins, Math.max(margins, 50)];
+        } else if (Object.prototype.toString.call(margins) === '[object Array]') {
+            if (margins.length === 2) {
+                docDefinition.pageMargins = [margins[0], margins[1], margins[0], Math.max(margins[1], 50)];
+            } else if (margins.length === 4) {
+                docDefinition.pageMargins = [margins[0], margins[1], margins[2], Math.max(margins[3], 50)];
+            }
+        }
+    }
+
+    function addPdfPrintIdentification(docDefinition) {
+        var originalFooter;
+
+        if (containsPrintIdentification(docDefinition)) return docDefinition;
+
+        originalFooter = docDefinition.footer;
+        ensurePdfBottomMargin(docDefinition);
+        docDefinition.footer = function (currentPage, pageCount, pageSize) {
+            var printInfo = getPrintInfo();
+            var identity = {
+                columns: [
+                    { text: 'Impresso por: ' + printInfo.name, fontSize: 8, color: '#555555' },
+                    { text: printInfo.date + ' às ' + printInfo.time, alignment: 'right', fontSize: 8, color: '#555555' }
+                ],
+                margin: [30, 4, 30, 0]
+            };
+            var existing = typeof originalFooter === 'function'
+                ? originalFooter(currentPage, pageCount, pageSize)
+                : originalFooter;
+
+            return existing ? { stack: [existing, identity] } : identity;
+        };
+        return docDefinition;
+    }
+
     function hasMojibake(value) {
         var str = String(value || '');
         // The UTF-8 replacement character is always a sign of corruption
@@ -288,7 +374,7 @@
             normalized.defaultStyle.fontSize = 10;
         }
 
-        return normalized;
+        return addPdfPrintIdentification(normalized);
     }
 
     function patchPdfMake() {
@@ -301,6 +387,48 @@
             return originalCreatePdf(withGlobalPdfDefaults(docDefinition));
         };
         window.pdfMake.__appUiPatched = true;
+    }
+
+    function workbookHasPrintIdentification(workbook) {
+        return (workbook.SheetNames || []).some(function (sheetName) {
+            var sheet = workbook.Sheets && workbook.Sheets[sheetName];
+            return Object.keys(sheet || {}).some(function (cellAddress) {
+                var cell = sheet[cellAddress];
+                return cell && normalizeText(cell.v).indexOf('impresso por') !== -1;
+            });
+        });
+    }
+
+    function addWorkbookPrintIdentification(workbook) {
+        var printInfo;
+        var sheetName = 'Identificação';
+        var worksheet;
+
+        if (!workbook || workbookHasPrintIdentification(workbook)) return workbook;
+
+        printInfo = getPrintInfo();
+        while (workbook.Sheets[sheetName]) sheetName += '_';
+        worksheet = window.XLSX.utils.aoa_to_sheet([
+            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
+            ['Regional Itapevi - São Paulo'],
+            [],
+            ['Impresso por', printInfo.name],
+            ['Impresso em', printInfo.date + ' às ' + printInfo.time]
+        ]);
+        worksheet['!cols'] = [{ wch: 22 }, { wch: 42 }];
+        window.XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        return workbook;
+    }
+
+    function patchXlsx() {
+        var originalWriteFile;
+
+        if (!window.XLSX || window.XLSX.__appPrintInfoPatched) return;
+        originalWriteFile = window.XLSX.writeFile.bind(window.XLSX);
+        window.XLSX.writeFile = function (workbook, filename, options) {
+            return originalWriteFile(addWorkbookPrintIdentification(workbook), filename, options);
+        };
+        window.XLSX.__appPrintInfoPatched = true;
     }
 
     function isDeleteAlertOptions(options) {
@@ -640,7 +768,10 @@
         setupSweetAlertDefaults: setupSweetAlertDefaults,
         createPdfStyles: createPdfStyles,
         createPdfTableLayout: createPdfTableLayout,
-        exportWorkbook: exportWorkbook
+        exportWorkbook: exportWorkbook,
+        getPrintInfo: getPrintInfo,
+        addPdfPrintIdentification: addPdfPrintIdentification,
+        addWorkbookPrintIdentification: addWorkbookPrintIdentification
     };
 
     if (window.jQuery) {
@@ -650,6 +781,7 @@
             // repairVisibleText(document.body);
             // observeDynamicText();
             patchPdfMake();
+            patchXlsx();
             setupSweetAlertDefaults();
             setupFormUppercase();
             setupNumberFieldFocusBehavior();

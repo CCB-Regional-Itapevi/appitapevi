@@ -257,6 +257,7 @@
     { nome: "BR-22-0676 - CURURUQUARA", cidade: "SANTANA DE PARNAÍBA" },
     { nome: "BR-22-0677 - CHÁCARA NOSSA SENHORA APARECIDINHA", cidade: "JANDIRA" },
     { nome: "BR-21-1636 - JARDIM ALVORADA", cidade: "JANDIRA" },
+    { nome: "BR-21-1644 - PARQUE JAGUARI", cidade: "SANTANA DE PARNA\u00cdBA" },
     { nome: "BR-22-0679 - JARDIM BELA VISTA - ITAPEVI", cidade: "ITAPEVI" },
     { nome: "BR-22-0680 - AMBUITÁ", cidade: "ITAPEVI" },
     { nome: "BR-22-0681 - AMADOR BUENO", cidade: "ITAPEVI" },

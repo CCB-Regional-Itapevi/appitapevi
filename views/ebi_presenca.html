@@ -77,8 +77,9 @@
                     <div class="alert alert-danger" ng-if="error">{{ error }}</div>
                     <div class="text-center text-muted m-b-md" ng-if="loading"><i class="fa fa-spinner fa-spin"></i> Carregando histórico do EBI...</div>
                     <div class="row">
-                        <div class="col-md-2"><label>Mes</label><select class="form-control input-sm" ng-model="filters.mes" ng-change="applyFilters()"><option value="">Todos os meses</option><option ng-repeat="mes in meses" value="{{mes}}">{{mes}}</option></select></div>
-                        <div class="col-md-3"><label>Periodo</label><div class="input-group"><input type="date" class="form-control input-sm" ng-model="filters.dataInicio" ng-change="applyFilters()"><span class="input-group-addon">ate</span><input type="date" class="form-control input-sm" ng-model="filters.dataFim" ng-change="applyFilters()"></div></div>
+                        <div class="col-md-2"><label>Mês</label><select class="form-control input-sm" ng-model="filters.mes" ng-change="onMonthChange()"><option value="">Todos os meses</option><option ng-repeat="mes in meses" value="{{mes}}">{{mes}}</option></select></div>
+                        <div class="col-md-2"><label>Período rápido</label><select class="form-control input-sm" ng-model="filters.periodoRapido" ng-change="applyQuickPeriod()"><option value="">Selecione...</option><option value="30d">Últimos 30 dias</option><option value="60d">Últimos 60 dias</option><option value="90d">Últimos 90 dias</option><option value="6m">Últimos 6 meses</option><option value="1a">Último ano</option><option value="personalizado">Personalizado</option></select></div>
+                        <div class="col-md-3"><label>Período personalizado</label><div class="input-group"><input type="date" class="form-control input-sm" ng-model="filters.dataInicio" ng-change="onCustomPeriodChange()"><span class="input-group-addon">até</span><input type="date" class="form-control input-sm" ng-model="filters.dataFim" ng-change="onCustomPeriodChange()"></div></div>
                         <div class="col-md-2">
     <label>Município</label>
     <div class="dropdown" uib-dropdown>
@@ -102,8 +103,28 @@
         </ul>
     </div>
 </div>
-                        <div class="col-md-3"><label>Comum / localidade</label><select class="form-control input-sm" ng-model="filters.comum" ng-change="applyFilters()"><option value="">Todos os comuns</option><option ng-repeat="comum in filteredComumOptions track by comum" value="{{comum}}">{{comum}}</option></select></div>
-                        <div class="col-md-2"><label>Busca rápida</label><input type="text" class="form-control input-sm" placeholder="História, comum..." ng-model="filters.searchText" ng-change="applyFilters()"></div>
+                        <div class="col-md-3">
+                            <label>Comum / localidade</label>
+                            <div class="dropdown" uib-dropdown>
+                                <button class="btn btn-default btn-sm form-control" type="button" uib-dropdown-toggle style="text-align:left; background:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:20px; position:relative;">
+                                    <span ng-if="filters.comuns.length === 0">Todas as comuns</span>
+                                    <span ng-if="filters.comuns.length > 0">{{filters.comuns.join(', ')}}</span>
+                                    <span class="caret" style="position:absolute; right:8px; top:12px;"></span>
+                                </button>
+                                <ul class="dropdown-menu" uib-dropdown-menu style="max-height:250px; overflow-y:auto; width:100%;">
+                                    <li style="padding:7px 10px;">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                            <input type="text" class="form-control" placeholder="Pesquisar comum..." ng-model="comumSearchText" ng-click="$event.stopPropagation()" ng-keydown="$event.stopPropagation()">
+                                        </div>
+                                    </li>
+                                    <li><a href ng-click="clearComuns(); $event.stopPropagation()"><i class="fa fa-fw" ng-class="{'fa-check text-success': filters.comuns.length === 0}"></i> Todas as comuns</a></li>
+                                    <li class="divider"></li>
+                                    <li ng-repeat="comum in filteredComumOptions | filter:comumSearchText track by comum"><a href ng-click="toggleComumFilter(comum); applyFilters(); $event.stopPropagation()"><i class="fa fa-fw" ng-class="{'fa-check text-success': isComumSelected(comum)}"></i> {{comum}}</a></li>
+                                    <li class="disabled" ng-if="(filteredComumOptions | filter:comumSearchText).length === 0"><a href>Nenhuma comum encontrada</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="row m-t-sm">
                         <div class="col-md-7">
