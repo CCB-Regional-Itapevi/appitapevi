@@ -221,7 +221,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
         })
         .state('musicalizacao.historico', {
             url: "/historico-atividades",
-            templateUrl: "views/musicalizacao_atividades_historico.html?v=1.0.0",
+            templateUrl: "views/musicalizacao_atividades_historico.html?v=1.0.4",
             data: { pageTitle: 'Gerenciador de Atividades' },
             controller: 'musicalizacaoAtividadesHistoricoCtrl',
             resolve: {

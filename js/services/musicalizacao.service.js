@@ -187,6 +187,8 @@
                     else deferred.resolve(
                         AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_ALUNOS_SCOPE).map(normalizeAlunoRecord)
                     );
+                }, function (error) {
+                    deferred.reject(error);
                 });
             return deferred.promise;
         }
@@ -205,6 +207,8 @@
                     } else {
                         deferred.resolve(AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_POLOS_SCOPE));
                     }
+                }, function (error) {
+                    deferred.reject(error);
                 });
             return deferred.promise;
         }
@@ -220,6 +224,8 @@
                     else deferred.resolve(
                         AuthService.filterCollectionByDataScope(response.data || [], MUSICALIZACAO_INSTRUTORES_SCOPE)
                     );
+                }, function (error) {
+                    deferred.reject(error);
                 });
             return deferred.promise;
         }
@@ -258,6 +264,8 @@
                         aulasCache[mesFiltro] = { data: result, time: Date.now() };
                         deferred.resolve(result);
                     }
+                }, function (error) {
+                    deferred.reject(error);
                 });
             return deferred.promise;
         }

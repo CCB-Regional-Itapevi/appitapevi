@@ -4561,6 +4561,7 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
     $scope.musicExecutiveMetrics = {
         lancamentos: 0,
         alunos: 0,
+        participacoes: 0,
         mediaPorAula: 0,
         instrutores: 0,
         municipiosAtivos: 0,
@@ -4579,6 +4580,7 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
     var allPolos = [];
     var allAulas = [];
     var allInstrutores = [];
+    var allAlunos = [];
     
     $scope.setMusicHistoryTab = function (tab) {
         $scope.musicHistoryTab = tab;
@@ -4587,26 +4589,79 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
     function upperValue(val) {
         return typeof val === 'string' ? val.toUpperCase().trim() : '';
     }
+
+    function numberValue(val) {
+        var parsed = Number(val);
+        return isFinite(parsed) ? parsed : 0;
+    }
+
+    function poloName(polo) {
+        return (polo && (polo.nome_polo || polo.polo || polo.localidade)) || '';
+    }
+
+    function poloCity(polo) {
+        return (polo && (polo.localidade || polo.cidade)) || '';
+    }
+
+    function aulaAttendance(aula) {
+        return numberValue(aula && (aula.meninas_presentes != null ? aula.meninas_presentes : aula.meninas))
+            + numberValue(aula && (aula.meninos_presentes != null ? aula.meninos_presentes : aula.meninos));
+    }
+
+    function isActivePolo(polo) {
+        var status = upperValue(polo && polo.status);
+        return !status || (status !== 'INATIVO' && status !== 'INATIVA' && status !== 'DESATIVADO');
+    }
+
+    function dateOnly(value) {
+        if (!value) return null;
+        var date = value instanceof Date ? new Date(value.getTime()) : new Date(String(value).slice(0, 10) + 'T12:00:00');
+        if (isNaN(date.getTime())) return null;
+        date.setHours(0, 0, 0, 0);
+        return date;
+    }
+
+    function submissionDate(aula) {
+        if (!aula) return null;
+        if (!aula.created_at) return dateOnly(aula.data_aula);
+        var date = new Date(aula.created_at);
+        if (isNaN(date.getTime())) return dateOnly(aula.data_aula);
+        date.setHours(0, 0, 0, 0);
+        return date;
+    }
+
+    function formatDateLabel(value, isDateOnly) {
+        if (!value) return '';
+        var date = isDateOnly ? dateOnly(value) : new Date(value);
+        if (!date || isNaN(date.getTime())) return '';
+        return date.toLocaleDateString('pt-BR');
+    }
     
-    function calculateStatus(polo, ultimaAula) {
-        if (!ultimaAula) {
+    function calculateStatus(polo, ultimoEnvio) {
+        if (!ultimoEnvio) {
             return { status: 'SEM HISTORICO', detail: 'Nenhuma aula registrada', riskIndex: 3 };
         }
-        
+
         var hoje = new Date();
-        hoje.setHours(0,0,0,0);
-        
-        var lastDate = new Date(ultimaAula.data_aula);
-        lastDate.setHours(0,0,0,0);
-        
-        var diffTime = Math.abs(hoje - lastDate);
-        var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays <= 7) {
-            return { status: 'EM DIA', detail: 'Lançamento atualizado', riskIndex: 1 };
-        } else {
-            return { status: 'PENDENTE', detail: diffDays + ' dias de atraso', riskIndex: 2 };
+        hoje.setHours(0, 0, 0, 0);
+        var lastDate = submissionDate(ultimoEnvio);
+
+        if (!lastDate) {
+            return { status: 'SEM HISTORICO', detail: 'Data do envio nao identificada', riskIndex: 3 };
         }
+
+        var diffTime = Math.max(0, hoje - lastDate);
+        var diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays <= 7) {
+            return {
+                status: 'EM DIA',
+                detail: diffDays === 0 ? 'Enviado hoje' : 'Enviado ha ' + diffDays + (diffDays === 1 ? ' dia' : ' dias'),
+                riskIndex: 1
+            };
+        }
+
+        return { status: 'PENDENTE', detail: 'Ha ' + diffDays + ' dias sem novo envio', riskIndex: 2 };
     }
     
     $scope.loadData = function() {
@@ -4615,19 +4670,29 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
         
         Promise.all([
             MusicalizacaoService.getPolos(),
-            MusicalizacaoService.getAulas(),
-            MusicalizacaoService.getInstrutores()
+            MusicalizacaoService.getAulas({ mes: $scope.filters.mes }),
+            MusicalizacaoService.getInstrutores(),
+            MusicalizacaoService.getAlunos()
         ]).then(function(results) {
             allPolos = results[0] || [];
             allAulas = results[1] || [];
             allInstrutores = results[2] || [];
+            allAlunos = results[3] || [];
+            // Registra o mês antes de aplicar os filtros. Sem isso, applyFilters
+            // entende que o mês ainda não foi carregado e inicia uma nova busca
+            // indefinidamente.
+            $scope.lastLoadedMonth = $scope.filters.mes;
             
             var cidadesMap = {};
             var polosMap = {};
             
             allPolos.forEach(function(p) {
-                if (p.cidade) cidadesMap[upperValue(p.cidade)] = true;
-                if (p.polo) polosMap[upperValue(p.polo)] = true;
+                if (poloCity(p)) cidadesMap[upperValue(poloCity(p))] = true;
+                if (poloName(p)) polosMap[upperValue(poloName(p))] = true;
+            });
+            allAulas.forEach(function(a) {
+                if (a.cidade) cidadesMap[upperValue(a.cidade)] = true;
+                if (a.polo) polosMap[upperValue(a.polo)] = true;
             });
             
             $scope.cidades = Object.keys(cidadesMap).sort();
@@ -4647,47 +4712,60 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
             $scope.loadData();
             return;
         }
-        if ($scope.lastLoadedMonth !== $scope.filters.mes) {
-            $scope.loadData();
-            return;
-        }
         var fCidade = upperValue($scope.filters.cidade);
         var fPolo = upperValue($scope.filters.polo);
-        
+        var dataInicio = dateOnly($scope.filters.dataInicio);
+        var dataFim = dateOnly($scope.filters.dataFim);
+
         var polosAtivos = allPolos.filter(function(p) {
-            if (p.status !== 'Ativo') return false;
-            if (fCidade && upperValue(p.cidade) !== fCidade) return false;
-            if (fPolo && upperValue(p.polo) !== fPolo) return false;
+            if (!isActivePolo(p)) return false;
+            if (fCidade && upperValue(poloCity(p)) !== fCidade) return false;
+            if (fPolo && upperValue(poloName(p)) !== fPolo) return false;
             return true;
         });
         
         $scope.musicPendingSummary.previstosNoCiclo = polosAtivos.length;
         $scope.musicExecutiveMetrics.instrutores = allInstrutores.length;
+
+        var alunosCadastrados = allAlunos.filter(function(aluno) {
+            var status = upperValue(aluno && aluno.status);
+            var alunoCidade = upperValue(aluno && (aluno.cidade || aluno.localidade));
+            var alunoPolo = upperValue(aluno && (aluno.polo_participacao || aluno.polo));
+            if (status === 'INATIVO' || status === 'INATIVA' || status === 'DESATIVADO') return false;
+            if (fCidade && alunoCidade !== fCidade) return false;
+            if (fPolo && alunoPolo !== fPolo) return false;
+            return true;
+        });
+        $scope.musicExecutiveMetrics.alunos = alunosCadastrados.length;
         
         var cidSet = {};
-        polosAtivos.forEach(function(p) { if(p.cidade) cidSet[upperValue(p.cidade)] = true; });
+        polosAtivos.forEach(function(p) { if (poloCity(p)) cidSet[upperValue(poloCity(p))] = true; });
         $scope.musicExecutiveMetrics.municipiosAtivos = Object.keys(cidSet).length;
         
         var emDia = 0, pendentes = 0, semHist = 0;
         
         $scope.musicPolosAtivos = polosAtivos.map(function(p) {
-            var aulasDoPolo = allAulas.filter(function(a) { 
-                return upperValue(a.polo) === upperValue(p.polo); 
+            var aulasDoPolo = allAulas.filter(function(a) {
+                return upperValue(a.polo) === upperValue(poloName(p));
             });
             
             aulasDoPolo.sort(function(a, b) {
-                return new Date(b.data_aula) - new Date(a.data_aula);
+                return submissionDate(b) - submissionDate(a);
             });
-            
-            var ultima = aulasDoPolo.length ? aulasDoPolo[0] : null;
-            var st = calculateStatus(p, ultima);
+
+            var ultimoEnvio = aulasDoPolo.length ? aulasDoPolo[0] : null;
+            var st = calculateStatus(p, ultimoEnvio);
             
             if (st.status === 'EM DIA') emDia++;
             else if (st.status === 'PENDENTE') pendentes++;
             else semHist++;
             
             return angular.extend({}, p, {
-                ultimaDataLabel: ultima ? new Date(ultima.data_aula).toLocaleDateString() : '',
+                polo: poloName(p),
+                cidade: poloCity(p),
+                responsavel_polo: p.encarregado || p.responsavel_polo || p.responsavel || '',
+                ultimoEnvioLabel: ultimoEnvio ? formatDateLabel(ultimoEnvio.created_at || ultimoEnvio.data_aula, !ultimoEnvio.created_at) : '',
+                ultimaAulaLabel: ultimoEnvio ? formatDateLabel(ultimoEnvio.data_aula, true) : '',
                 status: st.status,
                 statusDetail: st.detail,
                 statusIndex: st.riskIndex
@@ -4705,18 +4783,21 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
         var filteredAulas = allAulas.filter(function(a) {
             if (fCidade && upperValue(a.cidade) !== fCidade) return false;
             if (fPolo && upperValue(a.polo) !== fPolo) return false;
+            var dataAula = dateOnly(a.data_aula);
+            if (dataInicio && (!dataAula || dataAula < dataInicio)) return false;
+            if (dataFim && (!dataAula || dataAula > dataFim)) return false;
             return true;
         });
         $scope.filteredAulas = filteredAulas;
         
-        var totalAlunos = 0;
+        var totalParticipacoes = 0;
         filteredAulas.forEach(function(a) {
-            totalAlunos += (a.meninos || 0) + (a.meninas || 0);
+            totalParticipacoes += aulaAttendance(a);
         });
-        
+
         $scope.musicExecutiveMetrics.lancamentos = filteredAulas.length;
-        $scope.musicExecutiveMetrics.alunos = totalAlunos;
-        $scope.musicExecutiveMetrics.mediaPorAula = filteredAulas.length ? Math.round(totalAlunos / filteredAulas.length) : 0;
+        $scope.musicExecutiveMetrics.participacoes = totalParticipacoes;
+        $scope.musicExecutiveMetrics.mediaPorAula = filteredAulas.length ? Math.round(totalParticipacoes / filteredAulas.length) : 0;
         
         var groupedAulas = {};
         filteredAulas.forEach(function(a) {
@@ -4752,11 +4833,176 @@ function musicalizacaoAtividadesHistoricoCtrl($scope, MusicalizacaoService, $tim
     };
     
     $scope.calculateTotal = function(item) {
-        return (item.meninas || 0) + (item.meninos || 0) + (item.colaboradoras || 0) + (item.instrutores || 0) + (item.responsaveis || 0);
+        return aulaAttendance(item)
+            + numberValue(item && (item.colaboradores_presentes != null ? item.colaboradores_presentes : item.colaboradoras))
+            + numberValue(item && (item.instrutores_presentes != null ? item.instrutores_presentes : item.instrutores))
+            + numberValue(item && (item.coordenadores_presentes != null ? item.coordenadores_presentes : item.responsaveis));
     };
-    
+
+    function reportPeriodLabel() {
+        var inicio = dateOnly($scope.filters.dataInicio);
+        var fim = dateOnly($scope.filters.dataFim);
+        if (inicio || fim) {
+            return (inicio ? inicio.toLocaleDateString('pt-BR') : 'Início') + ' até ' +
+                (fim ? fim.toLocaleDateString('pt-BR') : 'Fim');
+        }
+        return $scope.filters.mes || 'Todos os meses';
+    }
+
+    function reportFilterLabel() {
+        var labels = [];
+        if ($scope.filters.cidade) labels.push('Município: ' + $scope.filters.cidade);
+        if ($scope.filters.polo) labels.push('Polo: ' + $scope.filters.polo);
+        return labels.length ? labels.join(' | ') : 'Todos os municípios e polos';
+    }
+
+    function reportTeamTotal(item) {
+        return numberValue(item && item.instrutores_presentes)
+            + numberValue(item && item.colaboradores_presentes)
+            + numberValue(item && item.coordenadores_presentes);
+    }
+
+    function reportActivityLabel(item) {
+        if (!item) return '';
+        if (item.numero_aula !== null && item.numero_aula !== undefined && item.numero_aula !== '') {
+            return 'Atividade ' + item.numero_aula;
+        }
+        return item.nome_atividade || item.observacoes || '';
+    }
+
+    function reportHeaderRows() {
+        return [
+            ['CONGREGAÇÃO CRISTÃ NO BRASIL'],
+            ['Regional Itapevi - São Paulo'],
+            ['MUSICALIZAÇÃO INFANTIL'],
+            ['Relatório de Atividades'],
+            ['Emissão: ' + new Date().toLocaleDateString('pt-BR')],
+            ['Período: ' + reportPeriodLabel()],
+            ['Filtros: ' + reportFilterLabel()],
+            []
+        ];
+    }
+
+    $scope.exportToExcel = function() {
+        var rows = reportHeaderRows();
+        var totals = { meninas: 0, meninos: 0, equipe: 0, alunos: 0 };
+        rows.push(['Data', 'Município', 'Polo', 'Atividade', 'Ciclo', 'Meninas', 'Meninos', 'Equipe', 'Total de alunos']);
+
+        ($scope.filteredAulas || []).forEach(function(item) {
+            var meninas = numberValue(item.meninas_presentes != null ? item.meninas_presentes : item.meninas);
+            var meninos = numberValue(item.meninos_presentes != null ? item.meninos_presentes : item.meninos);
+            var equipe = reportTeamTotal(item);
+            var alunos = meninas + meninos;
+            rows.push([
+                formatDateLabel(item.data_aula, true),
+                item.cidade || '',
+                item.polo || '',
+                reportActivityLabel(item),
+                item.ciclo || '',
+                meninas,
+                meninos,
+                equipe,
+                alunos
+            ]);
+            totals.meninas += meninas;
+            totals.meninos += meninos;
+            totals.equipe += equipe;
+            totals.alunos += alunos;
+        });
+
+        if (!$scope.filteredAulas.length) rows.push(['Nenhuma atividade encontrada para os filtros atuais.']);
+        rows.push(['TOTAIS', '', '', '', '', totals.meninas, totals.meninos, totals.equipe, totals.alunos]);
+
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [
+            { wch: 13 }, { wch: 24 }, { wch: 38 }, { wch: 32 }, { wch: 14 },
+            { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 16 }
+        ];
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Atividades');
+        XLSX.writeFile(wb, 'Relatorio_Musicalizacao_Infantil_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    };
+
+    $scope.exportToPDF = function() {
+        var body = [[
+            { text: 'Data', style: 'tableHeader' },
+            { text: 'Município', style: 'tableHeader' },
+            { text: 'Polo', style: 'tableHeader' },
+            { text: 'Atividade', style: 'tableHeader' },
+            { text: 'Ciclo', style: 'tableHeader' },
+            { text: 'Meninas', style: 'tableHeader' },
+            { text: 'Meninos', style: 'tableHeader' },
+            { text: 'Equipe', style: 'tableHeader' },
+            { text: 'Total', style: 'tableHeader' }
+        ]];
+        var totals = { meninas: 0, meninos: 0, equipe: 0, alunos: 0 };
+
+        ($scope.filteredAulas || []).forEach(function(item) {
+            var meninas = numberValue(item.meninas_presentes != null ? item.meninas_presentes : item.meninas);
+            var meninos = numberValue(item.meninos_presentes != null ? item.meninos_presentes : item.meninos);
+            var equipe = reportTeamTotal(item);
+            var alunos = meninas + meninos;
+            body.push([
+                formatDateLabel(item.data_aula, true), item.cidade || '',
+                { text: item.polo || '', noWrap: true, fontSize: 7 },
+                reportActivityLabel(item), item.ciclo || '',
+                meninas, meninos, equipe, alunos
+            ]);
+            totals.meninas += meninas;
+            totals.meninos += meninos;
+            totals.equipe += equipe;
+            totals.alunos += alunos;
+        });
+
+        if (!$scope.filteredAulas.length) {
+            body.push([{ text: 'Nenhuma atividade encontrada para os filtros atuais.', colSpan: 9, alignment: 'center' }, {}, {}, {}, {}, {}, {}, {}, {}]);
+        }
+        body.push([
+            { text: 'TOTAIS', colSpan: 5, bold: true, fillColor: '#f3f3f3' }, {}, {}, {}, {},
+            { text: totals.meninas, bold: true, fillColor: '#f3f3f3' },
+            { text: totals.meninos, bold: true, fillColor: '#f3f3f3' },
+            { text: totals.equipe, bold: true, fillColor: '#f3f3f3' },
+            { text: totals.alunos, bold: true, fillColor: '#f3f3f3' }
+        ]);
+
+        var docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [24, 30, 24, 30],
+            content: [
+                { text: 'CONGREGAÇÃO CRISTÃ NO BRASIL', style: 'entityName' },
+                { text: 'Regional Itapevi - São Paulo', style: 'entitySub' },
+                { text: 'MUSICALIZAÇÃO INFANTIL', style: 'moduleName' },
+                { text: 'Relatório de Atividades', style: 'reportTitle' },
+                { text: 'Emissão: ' + new Date().toLocaleDateString('pt-BR'), alignment: 'right' },
+                { text: 'Período: ' + reportPeriodLabel(), alignment: 'right' },
+                { text: 'Filtros: ' + reportFilterLabel(), alignment: 'right', margin: [0, 0, 0, 10] },
+                {
+                    table: { headerRows: 1, widths: [48, 65, '*', 82, 42, 35, 35, 35, 35], body: body },
+                    layout: {
+                        hLineWidth: function() { return 0.5; },
+                        vLineWidth: function() { return 0; },
+                        hLineColor: function() { return '#b8b8b8'; },
+                        paddingLeft: function() { return 3; },
+                        paddingRight: function() { return 3; },
+                        paddingTop: function() { return 2; },
+                        paddingBottom: function() { return 2; }
+                    }
+                }
+            ],
+            styles: {
+                entityName: { fontSize: 16, bold: true, alignment: 'center' },
+                entitySub: { fontSize: 11, alignment: 'center' },
+                moduleName: { fontSize: 14, bold: true, color: '#1e4b7a', alignment: 'center', margin: [0, 8, 0, 0] },
+                reportTitle: { fontSize: 11, alignment: 'center', margin: [0, 0, 0, 10] },
+                tableHeader: { color: '#ffffff', bold: true, alignment: 'center', fillColor: '#1e4b7a' }
+            },
+            defaultStyle: { fontSize: 8 }
+        };
+        pdfMake.createPdf(docDefinition).download('Relatorio_Musicalizacao_Infantil_' + new Date().toISOString().slice(0, 10) + '.pdf');
+    };
+
     $scope.loadData();
-}
+}
 
 angular
     .module('inspinia')

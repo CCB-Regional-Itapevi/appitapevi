@@ -1,6 +1,6 @@
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
-        <h2>Gerenciador de Atividades - Escola de Música</h2>
+        <h2>Gerenciador de Atividades - Musicalização Infantil</h2>
         <ol class="breadcrumb">
             <li><a href="#/musicalizacao/dashboard">Musicalização</a></li>
             <li class="active"><strong>Gerenciador de Atividades</strong></li>
@@ -58,9 +58,9 @@
 <div class="wrapper wrapper-content animated fadeInRight" ng-controller="musicalizacaoAtividadesHistoricoCtrl">
     <div class="row">
         <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 navy-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-book fa-4x"></i></div><div class="col-xs-8 text-right"><span>Diários Lançados</span><h2 class="font-bold">{{ musicExecutiveMetrics.lancamentos || 0 }}</h2></div></div></div></div>
-        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 lazur-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-child fa-4x"></i></div><div class="col-xs-8 text-right"><span>Alunos Atendidos</span><h2 class="font-bold">{{ musicExecutiveMetrics.alunos || 0 }}</h2></div></div></div></div>
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 lazur-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-child fa-4x"></i></div><div class="col-xs-8 text-right"><span>Alunos Cadastrados</span><h2 class="font-bold">{{ musicExecutiveMetrics.alunos || 0 }}</h2></div></div></div></div>
         <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 yellow-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-line-chart fa-4x"></i></div><div class="col-xs-8 text-right"><span>Média por Aula</span><h2 class="font-bold">{{ musicExecutiveMetrics.mediaPorAula || 0 }}</h2></div></div></div></div>
-        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 blue-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-users fa-4x"></i></div><div class="col-xs-8 text-right"><span>Instrutores Registrados</span><h2 class="font-bold">{{ musicExecutiveMetrics.instrutores || 0 }}</h2></div></div></div></div>
+        <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 blue-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-users fa-4x"></i></div><div class="col-xs-8 text-right"><span>Instrutores</span><h2 class="font-bold">{{ musicExecutiveMetrics.instrutores || 0 }}</h2></div></div></div></div>
         <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 navy-bg"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-map-marker fa-4x"></i></div><div class="col-xs-8 text-right"><span>Municípios Ativos</span><h2 class="font-bold">{{ musicExecutiveMetrics.municipiosAtivos || 0 }}</h2></div></div></div></div>
         <div class="col-lg-2 col-md-4 col-sm-6"><div class="widget style1 bg-danger"><div class="row"><div class="col-xs-4 text-center"><i class="fa fa-pie-chart fa-4x"></i></div><div class="col-xs-8 text-right"><span>Cobertura de Polos</span><h2 class="font-bold">{{ musicExecutiveMetrics.coberturaPolos || 0 }}%</h2></div></div></div></div>
     </div>
@@ -69,8 +69,12 @@
         <div class="col-lg-12">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>Filtros e Relatórios - Escola de Música</h5>
-                    <div class="ibox-tools"><a ui-sref="musicalizacao.nova_aula({id: null})" class="btn btn-primary btn-xs"><i class="fa fa-plus"></i> Novo Lançamento</a></div>
+                    <h5>Filtros e Relatórios - Musicalização Infantil</h5>
+                    <div class="ibox-tools">
+                        <button type="button" class="btn btn-primary btn-xs" ng-click="exportToExcel()"><i class="fa fa-file-excel-o"></i> Exportar Excel</button>
+                        <button type="button" class="btn btn-danger btn-xs" ng-click="exportToPDF()"><i class="fa fa-file-pdf-o"></i> Exportar PDF</button>
+                        <a ui-sref="musicalizacao.nova_aula({id: null})" class="btn btn-primary btn-xs"><i class="fa fa-plus"></i> Novo Lançamento</a>
+                    </div>
                 </div>
                 <div class="ibox-content">
                     <div class="alert alert-danger" ng-if="error">{{ error }}</div>
@@ -84,7 +88,7 @@
                     <div class="row m-t-sm">
                         <div class="col-md-8">
                             <div class="well well-sm" style="margin-bottom: 0;">
-                                <strong>Leitura Executiva:</strong> {{ musicExecutiveMetrics.alunos || 0 }} alunos em {{ musicExecutiveMetrics.lancamentos || 0 }} aulas registradas, média de {{ musicExecutiveMetrics.mediaPorAula || 0 }} alunos por aula e engajamento ativo de {{ musicExecutiveMetrics.coberturaPolos || 0 }}% dos polos.
+                                <strong>Leitura Executiva:</strong> {{ musicExecutiveMetrics.alunos || 0 }} alunos cadastrados, {{ musicExecutiveMetrics.participacoes || 0 }} presenças acumuladas em {{ musicExecutiveMetrics.lancamentos || 0 }} aulas, média de {{ musicExecutiveMetrics.mediaPorAula || 0 }} presenças por aula e {{ musicExecutiveMetrics.coberturaPolos || 0 }}% dos polos em dia.
                             </div>
                         </div>
                         <div class="col-md-4 text-right">
@@ -136,7 +140,7 @@
                                                 <div class="music-kpi-mini">
                                                     <span class="label">Polos Cadastrados</span>
                                                     <div class="value">{{ musicPendingSummary.previstosNoCiclo || 0 }}</div>
-                                                    <div class="sub">Total de Escolas de Música ativas</div>
+                                                    <div class="sub">Total de Polos de Musicalização Infantil</div>
                                                 </div>
                                                 <div class="music-kpi-mini">
                                                     <span class="label">Diários em Dia</span>
@@ -162,7 +166,7 @@
                                                             <th>Polo (Local)</th>
                                                             <th>Município</th>
                                                             <th class="text-center">Responsável</th>
-                                                            <th class="text-center">Última Aula</th>
+                                                            <th class="text-center">Último envio</th>
                                                             <th class="text-center">Status</th>
                                                             <th class="text-center">Ações</th>
                                                         </tr>
@@ -172,7 +176,10 @@
                                                             <td><strong>{{ item.polo }}</strong><br><small class="text-muted">{{ item.horario_aula || 'Horário não informado' }}</small></td>
                                                             <td>{{ item.cidade }}</td>
                                                             <td class="text-center">{{ item.responsavel_polo || 'Não informado' }}</td>
-                                                            <td class="text-center">{{ item.ultimaDataLabel || '-' }}</td>
+                                                            <td class="text-center">
+                                                                <strong>{{ item.ultimoEnvioLabel || '-' }}</strong>
+                                                                <div ng-if="item.ultimaAulaLabel"><small class="text-muted">Aula: {{ item.ultimaAulaLabel }}</small></div>
+                                                            </td>
                                                             <td class="text-center">
                                                                 <span class="music-status-badge"
                                                                         ng-class="{'music-status-ok': item.status === 'EM DIA', 'music-status-warn': item.status === 'PENDENTE', 'music-status-muted': item.status === 'SEM HISTORICO'}">
@@ -232,8 +239,8 @@
                                                             <td>{{ item.data_aula | date:'dd/MM/yyyy' }}</td>
                                                             <td><strong>{{ item.polo }}</strong><br><small class="text-muted" ng-if="item.instrutor_responsavel">{{ item.instrutor_responsavel }}</small></td>
                                                             <td>{{ item.observacoes_materia || item.observacoes || '-' | limitTo:50 }}{{ (item.observacoes_materia || item.observacoes).length > 50 ? '...' : '' }}</td>
-                                                            <td class="text-center"><span class="label label-danger">{{ item.meninas || 0 }}</span></td>
-                                                            <td class="text-center"><span class="label label-info">{{ item.meninos || 0 }}</span></td>
+                                                            <td class="text-center"><span class="label label-danger">{{ item.meninas_presentes || item.meninas || 0 }}</span></td>
+                                                            <td class="text-center"><span class="label label-info">{{ item.meninos_presentes || item.meninos || 0 }}</span></td>
                                                             <td class="text-center"><strong>{{ calculateTotal(item) }}</strong></td>
                                                             <td class="text-center"><button class="btn btn-info btn-xs" ng-click="verDetalhes(item)"><i class="fa fa-eye"></i></button> <a class="btn btn-warning btn-xs" ng-if="canManageCadastros" ui-sref="musicalizacao.presenca({id: item.id})"><i class="fa fa-pencil-square-o"></i></a> <button class="btn btn-danger btn-xs" ng-if="canManageCadastros" ng-click="confirmDelete(item)"><i class="fa fa-trash-o"></i></button></td>
                                                         </tr>
