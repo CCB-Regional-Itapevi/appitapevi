@@ -2649,7 +2649,6 @@
             var username = null;
             var fullName = null;
             var createdAt = null;
-            var updateQuery;
 
             if (typeof userRef === 'object' && userRef !== null) {
                 userId = userRef.user_id || null;
@@ -2680,23 +2679,24 @@
                 status: targetStatus
             };
 
-            updateQuery = supabase
-                .from('profiles')
-                .update(payload)
-                .eq('status', 'pending');
-
-            if (userId) {
-                updateQuery = updateQuery.eq('user_id', userId);
-            } else if (username) {
-                updateQuery = updateQuery.eq('username', username);
-            } else {
-                updateQuery = updateQuery
-                    .eq('full_name', fullName)
-                    .eq('created_at', createdAt);
+            if (!userId) {
+                deferred.reject({ message: 'Cadastro legado sem identificador de autenticação. Regularize o perfil antes da liberação.' });
+                return deferred.promise;
             }
 
-            updateQuery
-                .select('*')
+            // Security: profile reviews run through a SECURITY DEFINER RPC that
+            // validates the authenticated administrator. Direct browser UPDATEs
+            // on profiles remain revoked by the shared RLS hardening migration.
+            supabase
+                .rpc('review_pending_user', {
+                    p_user_id: userId,
+                    p_role_id: normalizedRoleId,
+                    p_role: normalizedRole,
+                    p_sector: normalizedSector,
+                    p_cargo: payload.cargo,
+                    p_comum: payload.comum,
+                    p_status: targetStatus
+                })
                 .then(function (response) {
                     var updatedRecord;
 
