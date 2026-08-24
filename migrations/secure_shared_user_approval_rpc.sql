@@ -1,6 +1,12 @@
 -- Secure bridge for APP_GLOBAL after APP_VISITAS_CCB RLS hardening.
 -- Keeps direct UPDATE on profiles revoked and exposes only a validated review.
 
+-- The legacy trigger uses unaccent() without a schema qualification. Give only
+-- that trigger function the schemas required to resolve the installed extension;
+-- the SECURITY DEFINER review function below keeps its empty search_path.
+alter function public.normalize_profile_access_fields()
+set search_path = pg_catalog, extensions, public;
+
 create or replace function public.review_pending_user(
     p_user_id uuid,
     p_role_id integer,
