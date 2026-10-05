@@ -1,47 +1,47 @@
-﻿# SAC - Sistema Administrativo CongregaÃ§Ã£o
+# SAC - Sistema Administrativo Congregação
+
 ## Regional Itapevi
 
-O **SAC** (Sistema Administrativo CongregaÃ§Ã£o) Ã© uma plataforma moderna e intuitiva desenvolvida para facilitar a gestÃ£o administrativa da **Regional Itapevi**. O sistema oferece ferramentas robustas para controle de membros, ministÃ©rio, atendimentos e gestÃµes especÃ­ficas de diversos setores.
+O **SAC** é uma plataforma para a gestão administrativa da **Regional Itapevi**, com cadastro de congregações, ministério e usuários, além de atividades dos setores que integram este projeto.
 
-## ðŸš€ Funcionalidades Principais
+## Funcionalidades
 
-- **AutenticaÃ§Ã£o Segura**: Gerenciamento de acesso via Supabase Auth.
-- **Controle de Acessos (RBAC)**: Diferentes nÃ­veis de acesso para Administradores (Managers) e Membros de setores.
-- **MÃ³dulos Setoriais**:
-  - **D.A.R.P.E**: GestÃ£o de dados e relatÃ³rios especÃ­ficos.
-  - **E.B.I**: Controle de atividades educacionais/infantis.
-  - **G.E.M**: GestÃ£o de musicalizaÃ§Ã£o e mÃ©todos.
-- **Interface Premium**: Layout baseado no Inspinia Admin Theme, responsivo e com notificaÃ§Ãµes elegantes via SweetAlert2.
-- **PWA (Progressive Web App)**: InstalÃ¡vel em dispositivos mÃ³veis para acesso rÃ¡pido.
+- Autenticação pelo Supabase Auth.
+- Administração: congregações, ministério, liberação de usuários, usuários, auditoria e Santa Ceia.
+- E.B.I.: atividades, crianças e colaboradores.
+- Visitas: lançamentos, visitados e grupos de visita.
+- Reunião de Jovens: atividades, recitativos, auxiliares e cadastro da mocidade.
+- Downloads.
 
-## ðŸ› ï¸ Tecnologias Utilizadas
+## Tecnologias utilizadas
 
-- **Frontend**: AngularJS (v1.x)
-- **EstilizaÃ§Ã£o**: Bootstrap 3 + CSS3 Customizado
-- **Backend / Banco de Dados**: [Supabase](https://supabase.com/) (PostgreSQL + Auth)
-- **Ãcones**: FontAwesome 4.7 & 6.0
-- **NotificaÃ§Ãµes**: SweetAlert2
-- **TraduÃ§Ãµes**: Angular Translate
+- **Frontend:** AngularJS (v1.x).
+- **Estilização:** Bootstrap 3 e CSS.
+- **Backend e banco de dados:** Supabase (PostgreSQL e Auth).
+- **Ícones:** FontAwesome.
+- **Notificações:** SweetAlert2.
+- **Traduções:** Angular Translate.
 
-## ðŸ“¦ Como Rodar o Projeto
+## Como executar localmente
 
-1. **Clonar o repositÃ³rio:**
-   ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-   ```
+É necessário ter o Node.js instalado.
 
-2. **Rodar localmente:**
-   Pode ser utilizado qualquer servidor estÃ¡tico. Exemplo com `http-server`:
-   ```bash
-   npx http-server .
-   ```
+```bash
+git clone https://github.com/CCB-Regional-Itapevi/appitapevi.git
+cd appitapevi
+npm start
+```
 
-3. **ConfiguraÃ§Ã£o do Supabase:**
-   Certifique-se de que as chaves de API em `js/services/auth.service.js` e `js/config.js` estÃ£o configuradas corretamente para o seu ambiente.
+Abra **http://localhost:8080** no navegador. O comando inicia o servidor estático definido em `serve-local.js`, sem dependências adicionais de npm.
 
-## ðŸ“ LicenÃ§a
+## Configuração do Supabase
 
-Este projeto Ã© de uso restrito da Regional Itapevi. Todos os direitos reservados.
+O frontend utiliza a URL do projeto e uma chave pública do Supabase. As permissões de acesso aos dados devem ser definidas no banco por políticas de Row Level Security (RLS).
 
----
-Desenvolvido com â¤ï¸ para a Regional Itapevi.
+Chaves administrativas, como `service_role` e `sb_secret`, não devem ser incluídas no frontend nem versionadas no repositório.
+
+## Licença
+
+Este projeto é de uso restrito da Regional Itapevi. Todos os direitos reservados.
+
+Desenvolvido para a Regional Itapevi.
