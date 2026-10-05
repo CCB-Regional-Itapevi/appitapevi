@@ -11,7 +11,6 @@ O **SAC** (Sistema Administrativo CongregaÃ§Ã£o) Ã© uma plataforma moderna
   - **D.A.R.P.E**: GestÃ£o de dados e relatÃ³rios especÃ­ficos.
   - **E.B.I**: Controle de atividades educacionais/infantis.
   - **G.E.M**: GestÃ£o de musicalizaÃ§Ã£o e mÃ©todos.
-  - **D.E.P.A.C**: Controle de atendimentos, batismos e membros.
 - **Interface Premium**: Layout baseado no Inspinia Admin Theme, responsivo e com notificaÃ§Ãµes elegantes via SweetAlert2.
 - **PWA (Progressive Web App)**: InstalÃ¡vel em dispositivos mÃ³veis para acesso rÃ¡pido.
 

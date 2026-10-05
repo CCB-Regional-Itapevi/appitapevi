@@ -413,42 +413,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             data: { pageTitle: 'D.A.R.P.E - Batismos' }
         })
 
-        .state('depac', {
-            abstract: true,
-            url: "/depac",
-            templateUrl: "views/common/content.html",
-        })
-        .state('depac.musicos', {
-            url: "/musicos",
-            templateUrl: 'views/depac_musicos.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - M\u00fasicos' }
-        })
-        .state('depac.clinicas', {
-            url: "/clinicas",
-            templateUrl: 'views/depac_clinicas.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Cl\u00ednicas' }
-        })
-        .state('depac.ministerio', {
-            url: "/ministerio",
-            templateUrl: 'views/depac_ministerio.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Minist\u00e9rio' }
-        })
-        .state('depac.atendimentos', {
-            url: "/atendimentos",
-            templateUrl: 'views/depac_atendimentos.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Atendimentos' }
-        })
-        .state('depac.membros', {
-            url: "/membros",
-            templateUrl: 'views/depac_membros.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Membros' }
-        })
-        .state('depac.batismos', {
-            url: "/batismos",
-            templateUrl: 'views/depac_batismos.html?v=2.0.0-FIX',
-            data: { pageTitle: 'D.E.P.A.C - Batismos' }
-        })
-
         .state('rjm', {
             abstract: true,
             url: "/rjm",

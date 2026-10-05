@@ -139,19 +139,7 @@
                     <li ui-sref-active="active"><a ui-sref="darpe.batismos">Batismos</a></li>
                 </ul>
             </li>
-            <li ng-class="{active: $state.includes('depac')}"
-                ng-if="main.canAccessModule('Depac')">
-                <a href="" data-mobile-sref="depac.musicos"><i class="fa-solid fa-hands"></i> <span class="nav-label">{{ 'D.E.P.A.C' | translate }}
-                    </span><span class="label label-info pull-right">NOVO</span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('depac')}">
-                    <li ui-sref-active="active"><a ui-sref="depac.musicos">M&uacute;sicos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.clinicas">Cl&iacute;nicas</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.ministerio">Minist&eacute;rio</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.atendimentos">Atendimentos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.membros">Membros</a></li>
-                    <li ui-sref-active="active"><a ui-sref="depac.batismos">Batismos</a></li>
-                </ul>
-            </li>
+
             
 
             <li ui-sref-active="active" ng-if="main.canAccessGlobalMenu()">
