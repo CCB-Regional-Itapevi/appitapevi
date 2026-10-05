@@ -96,3 +96,10 @@ views/darpe_clinicas.html
 /check_all_users.js
 /create_demo_users.js
 /query_ricardo_details.js
+
+# Ferramentas temporarias de manutencao da raiz
+/patch*.js
+/fix*.js
+/check.js
+/debug_divs.js
+/test_eval.js
