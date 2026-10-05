@@ -91,3 +91,8 @@ media/
 # ARQUIVOS COM PROBLEMA NO WINDOWS
 # ===============================
 views/darpe_clinicas.html
+
+# Scripts administrativos com credenciais: nao versionar
+/check_all_users.js
+/create_demo_users.js
+/query_ricardo_details.js
