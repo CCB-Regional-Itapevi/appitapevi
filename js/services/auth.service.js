@@ -1562,6 +1562,11 @@
                 cadastroOrigin = inferCadastroOrigin(userData || {});
             }
 
+            if (['musica', 'musicalizacao', 'darpe', 'rjm', 'depac', 'gem', 'exames'].indexOf(cadastroOrigin.key) !== -1) {
+                deferred.reject({ message: 'Este projeto aceita somente cadastros de EBI e Visitas.' });
+                return deferred.promise;
+            }
+
             supabase.auth.signUp({
                 email: userData.email,
                 password: userData.password,
