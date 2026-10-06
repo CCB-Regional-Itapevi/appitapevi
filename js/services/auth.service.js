@@ -2779,13 +2779,11 @@
                         // If the profile is truly missing, return a minimal pending profile
                         // but do not resolve if it's a network/database error that shouldn't
                         // result in access downgrade.
-                        if (response.error.code === 'PGRST116' || response.error.message.indexOf('0 rows') !== -1) {
-                            deferred.resolve(normalizeProfile({
-                                user_id: userId,
-                                role_id: 6,
-                                sector: 'Inscrição',
-                                status: 'pending'
-                            }));
+                        if (response.error.code === 'PGRST116' || String(response.error.message || '').indexOf('0 rows') !== -1) {
+                            deferred.reject({
+                                code: 'PROFILE_NOT_AVAILABLE',
+                                message: 'Não foi possível consultar seu perfil. Verifique o cadastro e as permissões de acesso com a administração.'
+                            });
                         } else {
                             deferred.reject(response.error);
                         }
