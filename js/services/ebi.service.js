@@ -312,12 +312,14 @@
         function deleteAtividade(id) {
             var deferred = $q.defer();
             AuthService.applyDataScopeToQuery(
-                supabase.from('ebi_atividades').delete().eq('id', id),
+                supabase.from('ebi_atividades').delete().eq('id', id).select('id'),
                 EBI_ATIVIDADES_SCOPE
             )
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
-                    else {
+                    else if (!response.data || response.data.length !== 1 || String(response.data[0].id) !== String(id)) {
+                        deferred.reject({ message: 'O banco não confirmou a exclusão. Verifique as permissões ou atualize a lista.' });
+                    } else {
                         clearEbiCache();
                         auditEbi('EBI_ATIVIDADE_DELETE', {
                             entity: 'ebi_atividades',

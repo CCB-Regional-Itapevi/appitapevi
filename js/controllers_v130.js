@@ -12168,6 +12168,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     var localidadesFallback = $scope.localidadesEBI.slice();
 
     function updateEbiCatalogOptions() {
+        ebiActiveLookup = buildEbiActiveSpaceLookup(ebiActiveSpaces);
         var scope = AuthService.getCurrentUserDataScope();
         var mappedLocalidades = (ebiActiveLookup && ebiActiveLookup.items && ebiActiveLookup.items.length)
             ? ebiActiveLookup.items.map(function (item) { return item.label; })
@@ -12525,6 +12526,7 @@ function ebiRecitativosCtrl($scope, EbiService, AuthService, $rootScope) {
     $scope.loadData = function () {
         $scope.loading = true;
         EbiService.getRecitativos().then(function (data) {
+            updateEbiCatalogOptions();
             $scope.recitativos = (data || []).map(sanitizeEbiRecord);
             $scope.applyFilters();
             $scope.loading = false;

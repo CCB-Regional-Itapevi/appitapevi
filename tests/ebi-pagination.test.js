@@ -32,3 +32,21 @@ test('EBI loads more than 1000 records and sees external submissions on reload',
     assert.equal(refreshed[0].id, 'new');
     assert.deepEqual(calls, [[0, 999], [1000, 1999], [0, 999], [1000, 1999]]);
 });
+
+test('EBI does not report deletion success when RLS removes zero rows', async () => {
+    let factory;
+    let deleted = [];
+    const query = { delete() { return this; }, eq() { return this; }, select() { return this; },
+        then(fn) { return Promise.resolve({ data: deleted }).then(fn); } };
+    const angular = { module() { return { factory(name, fn) { factory = fn; } }; } };
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/services/ebi.service.js'), 'utf8'), {
+        angular, window: { getAppSupabaseClient: () => ({ from: () => query }) }
+    });
+    const $q = { defer() { const d = {}; d.promise = new Promise((resolve, reject) => {
+        d.resolve = resolve; d.reject = reject;
+    }); return d; } };
+    const service = factory($q, { applyDataScopeToQuery: q => q });
+    await assert.rejects(service.deleteAtividade('test'), error => /confirmou/.test(error.message));
+    deleted = [{ id: 'test' }];
+    assert.equal((await service.deleteAtividade('test'))[0].id, 'test');
+});
