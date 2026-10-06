@@ -1208,7 +1208,7 @@ function profileCtrl($scope, $rootScope, AuthService) {
 
             throw { message: 'SessÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o nÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o encontrada.' };
         }).catch(function (error) {
-            swal("Erro", "NÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š£o foi possÃÆ’Ã†’Ãâ€ ââ‚¬â„¢ÃÆ’ââ‚¬Å¡Ãâ€š­vel carregar seu perfil: " + (error.message || error), "error");
+            swal("Erro", "N\u00e3o foi poss\u00edvel carregar seu perfil: " + (error.message || error), "error");
         }).finally(function () {
             $scope.profileLoading = false;
         });
