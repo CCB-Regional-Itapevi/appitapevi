@@ -1,6 +1,6 @@
 .env
 .env.*
-dist/
+/dist/
 .tmp/
 *.crt
 *.pem
