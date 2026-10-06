@@ -7,10 +7,7 @@
     VisitasService.$inject = ['$q', 'AuthService'];
 
     function VisitasService($q, AuthService) {
-        var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
-        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
-        var supabase = window.__appSupabaseClient
-            || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+        var supabase = window.getAppSupabaseClient();
         var monthLabels = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
         var VISITAS_LANCAMENTOS_SCOPE = {

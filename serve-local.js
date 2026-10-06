@@ -1,9 +1,18 @@
 ﻿const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { ROOT, isPublicPath, loadLocalEnv, getPublicConfig, renderPublicConfig } = require('./scripts/supabase-config');
+
+let publicConfigSource;
+try {
+  loadLocalEnv();
+  publicConfigSource = renderPublicConfig(getPublicConfig());
+} catch (err) {
+  console.error('Falha na configuracao: ' + err.message);
+  process.exit(1);
+}
 
 const PORT = 8080;
-const ROOT = process.cwd();
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
@@ -49,7 +58,36 @@ function sendFile(res, filePath) {
 }
 
 const server = http.createServer((req, res) => {
-  let filePath = safePath(req.url || '/');
+  let filePath;
+  try {
+    filePath = safePath(req.url || '/');
+  } catch (err) {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Bad request');
+    return;
+  }
+  const relativePath = path.relative(ROOT, filePath);
+  if (relativePath.startsWith('..') || path.isAbsolute(relativePath)
+      || relativePath.split(/[/\\]/).some(part => part.startsWith('.'))) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Forbidden');
+    return;
+  }
+
+  if (relativePath.replace(/\\/g, '/') === 'js/supabase-config.js') {
+    res.writeHead(200, {
+      'Content-Type': 'application/javascript; charset=utf-8',
+      'Cache-Control': 'no-store, max-age=0',
+      'X-Content-Type-Options': 'nosniff'
+    });
+    res.end(publicConfigSource);
+    return;
+  }
+  if (!isPublicPath(filePath)) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Not found');
+    return;
+  }
 
   fs.stat(filePath, (err, stat) => {
     if (!err && stat.isDirectory()) {

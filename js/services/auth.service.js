@@ -8,15 +8,12 @@
 
     function AuthService($q, $rootScope, $state, $timeout, $window) {
         // Supabase configuration
-        var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
-        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
 
         // Reuse a single Supabase client across the app to avoid duplicate auth clients.
-        var supabase = window.__appSupabaseClient
-            || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+        var supabase = window.getAppSupabaseClient();
         var ministerioRegionalCache = null;
         var comunsCatalogCache = null;
-        var SESSION_STORAGE_KEY = 'sb-sqamxlhfazulrisiptud-auth-token';
+        var SESSION_STORAGE_KEY = window.APP_SUPABASE_CONFIG.storageKey;
         var INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
         var LAST_ACTIVITY_STORAGE_KEY = 'app_global_last_activity_at';
         var LOGOUT_REASON_STORAGE_KEY = 'app_global_logout_reason';
@@ -1478,20 +1475,8 @@
                 case 'MUSICALIZAÇÃO':
                     $state.go('musicalizacao.dashboard');
                     break;
-                case 'MUSICA':
-                    $state.go('music.static_table');
-                    break;
                 case 'VISITAS':
                     $state.go('visitas.dashboard');
-                    break;
-                case 'DARPE':
-                    $state.go('darpe.musicos');
-                    break;
-                case 'GEM':
-                    $state.go('gem.dashboard');
-                    break;
-                case 'RJM':
-                    $state.go('rjm.dashboard');
                     break;
                 default:
                     $state.go('app.profile');

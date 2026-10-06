@@ -231,58 +231,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             data: { pageTitle: 'Mail compose' }
         })
 
-        .state('rjm', {
-            abstract: true,
-            url: "/rjm",
-            templateUrl: "views/common/content.html",
-        })
-        .state('rjm.dashboard', {
-            url: "/dashboard",
-            templateUrl: "views/rjm_dashboard.html?v=1.2.0",
-            data: { pageTitle: 'Dashboard RJM' },
-            controller: 'rjmRecitativosCtrl'
-        })
-        .state('rjm.analytics', {
-            url: "/analytics",
-            templateUrl: "views/rjm_analytics.html?v=1.1.0",
-            data: { pageTitle: 'Hist\u00f3rico de Atividades - RJM' },
-            controller: 'rjmAnalyticsCtrl',
-            resolve: {
-                loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'angular-flot',
-                            files: ['js/plugins/flot/jquery.flot.js', 'js/plugins/flot/jquery.flot.time.js', 'js/plugins/flot/jquery.flot.tooltip.min.js', 'js/plugins/flot/jquery.flot.spline.js', 'js/plugins/flot/jquery.flot.resize.js', 'js/plugins/flot/jquery.flot.pie.js', 'js/plugins/flot/curvedLines.js', 'js/plugins/flot/angular-flot.js']
-                        }
-                    ]);
-                }
-            }
-        })
-        .state('rjm.administrativo', {
-            url: "/administrativo",
-            templateUrl: "views/rjm_administrativo.html?v=1.2.0",
-            data: { pageTitle: 'Administrativo RJM' },
-            controller: 'rjmAdministrativoCtrl'
-        })
-        .state('rjm.auxiliares', {
-            url: "/auxiliares",
-            templateUrl: "views/rjm_auxiliares.html?v=1.2.0",
-            data: { pageTitle: 'Auxiliares RJM' },
-            controller: 'rjmAuxiliaresCtrl'
-        })
-        .state('rjm.mocidade', {
-            url: "/mocidade",
-            templateUrl: "views/rjm_mocidade.html?v=1.2.0",
-            data: { pageTitle: 'Comuns RJM' },
-            controller: 'rjmComunsCtrl'
-        })
-        .state('rjm.recitativos', {
-            url: "/recitativos",
-            templateUrl: "views/rjm_recitativos.html?v=1.2.0",
-            data: { pageTitle: 'Recitativos' },
-            controller: 'rjmRecitativosCtrl'
-        })
-
         .state('ebi', {
             abstract: true,
             url: "/ebi",
@@ -1487,31 +1435,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, IdlePro
             controller: 'congregacoesAdminCtrl',
             data: { pageTitle: 'Congrega\u00e7\u00f5es' }
         })
-        .state('admin.santa_ceia', {
-            url: "/santa_ceia",
-            templateUrl: "views/admin_santa_ceia.html?v=1.0.7",
-            controller: 'santaCeiaAdminCtrl',
-            data: { pageTitle: 'Santa Ceia' },
-            resolve: {
-                loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'angles',
-                            files: ['js/plugins/chartJs/angles.js', 'js/plugins/chartJs/Chart.min.js']
-                        },
-                        {
-                            name: 'angular-peity',
-                            files: ['js/plugins/peity/jquery.peity.min.js', 'js/plugins/peity/angular-peity.js']
-                        },
-                        {
-                            serie: true,
-                            name: 'angular-flot',
-                            files: ['js/plugins/flot/jquery.flot.js', 'js/plugins/flot/jquery.flot.time.js', 'js/plugins/flot/jquery.flot.tooltip.min.js', 'js/plugins/flot/jquery.flot.spline.js', 'js/plugins/flot/jquery.flot.resize.js', 'js/plugins/flot/jquery.flot.pie.js', 'js/plugins/flot/curvedLines.js', 'js/plugins/flot/angular-flot.js',]
-                        }
-                    ]);
-                }
-            }
-        })
         .state('admin.audit_logs', {
             url: "/audit_logs",
             templateUrl: "views/admin_audit_logs.html?v=1.0.4",
@@ -1540,7 +1463,7 @@ angular
     .run(function ($rootScope, $state, AuthService, $window, $document) {
         $rootScope.$state = $state;
         $rootScope.currentUserResolved = false;
-        var sessionKey = 'sb-sqamxlhfazulrisiptud-auth-token';
+        var sessionKey = window.APP_SUPABASE_CONFIG.storageKey;
         var activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
 
         // Restaura a sess??o do Supabase ao carregar a p??gina
@@ -1605,20 +1528,10 @@ angular
             switch (sector) {
                 case 'administrativo':
                     return 'admin.congregacoes';
-                case 'musicalizacao':
-                    return 'musicalizacao.dashboard';
                 case 'ebi':
                     return 'ebi.dashboard';
                 case 'visitas':
                     return 'visitas.dashboard';
-                case 'darpe':
-                    return 'darpe.dashboard';
-                case 'gem':
-                    return 'forms.basic_form';
-                case 'musica':
-                    return 'music.dashboard';
-                case 'rjm':
-                    return 'rjm.dashboard';
                 default:
                     return 'app.profile';
             }

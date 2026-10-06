@@ -19987,18 +19987,12 @@ angular
     .controller('pdfCtrl', pdfCtrl)
     .controller('passwordMeterCtrl', passwordMeterCtrl)
     .controller('auditLogsAdminCtrl', auditLogsAdminCtrl)
-    .controller('santaCeiaAdminCtrl', santaCeiaAdminCtrl)
     .controller('loginCtrl', loginCtrl)
     .controller('pendingUsersAdminCtrl', pendingUsersAdminCtrl)
     .controller('userManagementAdminCtrl', userManagementAdminCtrl)
     .controller('ministerioRegionalAdminCtrl', ministerioRegionalAdminCtrl)
     .controller('congregacoesAdminCtrl', congregacoesAdminCtrl)
     .controller('registerCtrl', registerCtrl)
-    .controller('rjmRecitativosCtrl', rjmRecitativosCtrl)
-    .controller('rjmAnalyticsCtrl', rjmAnalyticsCtrl)
-    .controller('rjmAdministrativoCtrl', rjmAdministrativoCtrl)
-    .controller('rjmAuxiliaresCtrl', rjmAuxiliaresCtrl)
-    .controller('rjmMocidadeCtrl', rjmMocidadeCtrl)
     .controller('ebiRecitativosCtrl', ebiRecitativosCtrl)
     .controller('ebiAlunosCtrl', ebiAlunosCtrl)
     .controller('ebiInstrutoresCtrl', ebiInstrutoresCtrl)
@@ -20007,14 +20001,7 @@ angular
     .controller('visitasLancamentosCtrl', visitasLancamentosCtrl)
     .controller('visitasVisitadosCtrl', visitasVisitadosCtrl)
     .controller('visitasGruposCtrl', visitasGruposCtrl)
-    .controller('musicalizacaoCtrl', musicalizacaoCtrl)
-    .controller('musicalizacaoAlunosCtrl', musicalizacaoAlunosCtrl)
-    .controller('musicalizacaoPolosCtrl', musicalizacaoPolosCtrl)
-    .controller('musicalizacaoInstrutoresCtrl', musicalizacaoInstrutoresCtrl)
-    .controller('musicalizacaoAulasCtrl', musicalizacaoAulasCtrl)
-    .controller('musicalizacaoNovaAulaCtrl', musicalizacaoNovaAulaCtrl)
-    .controller('musicalizacaoAtividadesHistoricoCtrl', musicalizacaoAtividadesHistoricoCtrl)
-    .controller('musicalizacaoPresencaCtrl', musicalizacaoPresencaCtrl);
+    ;
 
 /**
  * musicalizacaoCtrl - Controller for Musicalizacao Dashboard
@@ -24561,12 +24548,7 @@ loadDashboard();
     'use strict';
 
     angular.module('inspinia')
-        .controller('gemDashboardCtrl', gemDashboardCtrl)
-        .controller('gemAlunosCtrl', gemAlunosCtrl)
-        .controller('gemResumoCtrl', gemResumoCtrl)
-        .controller('gemHistoricoCtrl', gemHistoricoCtrl)
-        .controller('gemPlanosCtrl', gemPlanosCtrl)
-        .controller('gemTurmasCtrl', gemTurmasCtrl);
+    ;
 
     gemDashboardCtrl.$inject = ['$scope', '$state', 'GemService'];
     gemAlunosCtrl.$inject = ['$scope', '$state', '$rootScope', '$timeout', 'GemService', 'AuthService'];

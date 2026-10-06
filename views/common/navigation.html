@@ -43,7 +43,6 @@
                     <li ui-sref-active="active"><a ui-sref="admin.user_approvals">Libera&ccedil;&atilde;o de Usu&aacute;rios</a></li>
                     <li ui-sref-active="active"><a ui-sref="admin.usuarios">Usu&aacute;rios</a></li>                                        
                     <li ui-sref-active="active"><a ui-sref="admin.audit_logs">Auditoria</a></li>
-                    <li ui-sref-active="active"><a ui-sref="admin.santa_ceia">Santa Ceia</a></li>
                 </ul>
             </li>
 
@@ -69,19 +68,6 @@
                     <li ui-sref-active="active"><a ui-sref="visitas.lancamentos">Lan&ccedil;amentos</a></li>
                     <li ui-sref-active="active"><a ui-sref="visitas.visitados">Visitados</a></li>
                     <li ui-sref-active="active"><a ui-sref="visitas.grupos">Grupos de Visita</a></li>
-                </ul>
-            </li>
-
-            <li ui-sref-active="active" ng-if="main.canAccessModule('RJM')">
-                <a href="" data-mobile-sref="rjm.dashboard"><i class="fa fa-book"></i> <span class="nav-label">{{ 'RJM' | translate
-                        }}</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" ng-class="{in: $state.includes('rjm')}">
-                    <li ui-sref-active="active"><a ui-sref="rjm.dashboard">Dashboard RJM</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.analytics">Hist&oacute;rico Atividade</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.recitativos">Recitativos</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.administrativo">Administrativo</a></li>
-                    <li ui-sref-active="active"><a ui-sref="rjm.auxiliares">Auxiliares</a></li>                    
-                    <li ui-sref-active="active"><a ui-sref="rjm.mocidade">Cadastro da Mocidade</a></li>
                 </ul>
             </li>
 

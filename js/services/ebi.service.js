@@ -17,8 +17,6 @@
             monitoresCache = { data: null, time: 0 };
         }
 
-        var SUPABASE_URL = 'https://sqamxlhfazulrisiptud.supabase.co';
-        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxYW14bGhmYXp1bHJpc2lwdHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzU4ODQsImV4cCI6MjA4Mjk1MTg4NH0.UmshkDqIgJQYVMmWVVgmfQm-YacUbRBeSpmYsNG0baE';
         var ALUNO_FIELDS = [
             'nome_crianca',
             'sexo',
@@ -117,8 +115,7 @@
             municipioFields: ['cidade']
         };
 
-        var supabase = window.__appSupabaseClient
-            || (window.__appSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+        var supabase = window.getAppSupabaseClient();
 
         var service = {
             getRecitativos: getRecitativos,
@@ -218,11 +215,7 @@
             var deferred = $q.defer();
             var mesFiltro = (filters && filters.mes) ? String(filters.mes) : 'all';
             
-            if (recitativosCache[mesFiltro] && (Date.now() - recitativosCache[mesFiltro].time < 300000)) {
-                deferred.resolve(recitativosCache[mesFiltro].data);
-                return deferred.promise;
-            }
-
+            function createQuery() {
             var query = supabase.from('ebi_atividades').select('*');
             
             if (filters && filters.mes && filters.mes !== 'Todos os meses') {
@@ -239,19 +232,32 @@
                 }
             }
             
-            AuthService.applyDataScopeToQuery(query, EBI_ATIVIDADES_SCOPE)
+            return AuthService.applyDataScopeToQuery(query, EBI_ATIVIDADES_SCOPE)
                 .order('data_reuniao', { ascending: false })
+                .order('id', { ascending: false });
+            }
+
+            function loadPage(offset, records) {
+            createQuery().range(offset, offset + 999)
                 .then(function (response) {
                     if (response.error) deferred.reject(response.error);
                     else {
+                        var page = response.data || [];
+                        var allRecords = records.concat(page);
+                        if (page.length === 1000) {
+                            loadPage(offset + 1000, allRecords);
+                            return;
+                        }
                         var result = AuthService.filterCollectionByDataScope(
-                            (response.data || []).map(normalizeAtividadeRecord),
+                            allRecords.map(normalizeAtividadeRecord),
                             EBI_ATIVIDADES_SCOPE
                         );
                         recitativosCache[mesFiltro] = { data: result, time: Date.now() };
                         deferred.resolve(result);
                     }
-                });
+                }).catch(function (error) { deferred.reject(error); });
+            }
+            loadPage(0, []);
             return deferred.promise;
         }
 
