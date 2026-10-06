@@ -1108,7 +1108,7 @@
             }
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .update(payload)
                 .eq('user_id', userId)
                 .select('*')
@@ -1230,7 +1230,7 @@
             }
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .select('contador_logouts')
                 .eq('user_id', userId)
                 .single()
@@ -1245,7 +1245,7 @@
                     currentCount = parseInt(profileResponse.data && profileResponse.data.contador_logouts, 10) || 0;
 
                     return supabase
-                        .from('profiles')
+                        .from('app_profiles')
                         .update({
                             contador_logouts: currentCount + 1,
                             data_ultimo_logout: new Date().toISOString()
@@ -1858,7 +1858,7 @@
             var deferred = $q.defer();
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .select('user_id,full_name,username,email,contador_logins,data_ultimo_login,contador_logouts,data_ultimo_logout')
                 .order('contador_logins', { ascending: false })
                 .then(function (response) {
@@ -1964,7 +1964,7 @@
 
         function countPendingUsers() {
             return supabase
-                .from('profiles')
+                .from('app_profiles')
                 .select('*', { count: 'exact', head: true })
                 .eq('status', 'pending');
         }
@@ -2106,8 +2106,8 @@
             ];
 
             $q.all({
-                usuarios: supabase.from('profiles').select('*', { count: 'exact', head: true }),
-                candidatos: supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role_id', 6)
+                usuarios: supabase.from('app_profiles').select('*', { count: 'exact', head: true }),
+                candidatos: supabase.from('app_profiles').select('*', { count: 'exact', head: true }).eq('role_id', 6)
             }).then(function (results) {
                 var usuariosCount = results.usuarios && typeof results.usuarios.count === 'number' ? results.usuarios.count : 0;
                 var candidatosCount = results.candidatos && typeof results.candidatos.count === 'number' ? results.candidatos.count : 0;
@@ -2272,7 +2272,7 @@
             var deferred = $q.defer();
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .select('*')
                 .eq('status', 'pending')
                 .order('created_at', { ascending: true })
@@ -2291,9 +2291,9 @@
             var deferred = $q.defer();
 
             $q.all({
-                pending: supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-                approved: supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
-                rejected: supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'rejected')
+                pending: supabase.from('app_profiles').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+                approved: supabase.from('app_profiles').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+                rejected: supabase.from('app_profiles').select('*', { count: 'exact', head: true }).eq('status', 'rejected')
             }).then(function (results) {
                 deferred.resolve({
                     pending: results.pending && typeof results.pending.count === 'number' ? results.pending.count : 0,
@@ -2315,7 +2315,7 @@
             var deferred = $q.defer();
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .then(function (response) {
@@ -2536,21 +2536,7 @@
         }
 
         function listSectors() {
-            var deferred = $q.defer();
-
-            supabase
-                .from('sectors')
-                .select('id, name, description')
-                .order('name', { ascending: true })
-                .then(function (response) {
-                    if (response.error) {
-                        deferred.reject(response.error);
-                    } else {
-                        deferred.resolve(response.data || []);
-                    }
-                });
-
-            return deferred.promise;
+            return $q.when([{name:'Global'},{name:'Administrativo'},{name:'Ebi'},{name:'Visitas'}]);
         }
 
         function reviewPendingUser(userId, reviewData) {
@@ -2582,7 +2568,7 @@
             };
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .update(payload)
                 .eq('user_id', userId)
                 .select('*')
@@ -2770,7 +2756,7 @@
         function getUserProfile(userId) {
             var deferred = $q.defer();
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .select('*')
                 .eq('user_id', userId)
                 .single()
@@ -2853,7 +2839,7 @@
             var payload = angular.extend({}, profileData, { user_id: userId });
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .update(payload)
                 .eq('user_id', userId)
                 .select('*')
@@ -2903,7 +2889,7 @@
             };
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .update(payload)
                 .eq('user_id', userId)
                 .select('*')
@@ -2941,7 +2927,7 @@
             }
 
             supabase
-                .from('profiles')
+                .from('app_profiles')
                 .delete()
                 .eq('user_id', userId)
                 .then(function (response) {

@@ -6525,14 +6525,8 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
     var defaultSectors = [
         { name: 'Global', label: 'GLOBAL' },
         { name: 'Administrativo', label: 'ADMINISTRATIVO' },
-        { name: 'Musicalizacao', label: 'MUSICALIZAÇÃO' },
-        { name: 'Musica', label: 'MÚSICA' },
         { name: 'Ebi', label: 'EBI' },
-        { name: 'RJM', label: 'RJM' },
         { name: 'Visitas', label: 'VISITAS' },
-        { name: 'Darpe', label: 'DARPE' },
-        { name: 'Depac', label: 'DEPAC' },
-        { name: 'Gem', label: 'GEM' }
     ];
 
     function getDefaultSector(roleId, fallbackSector) {
@@ -6582,7 +6576,7 @@ function pendingUsersAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $fil
             var option = normalizePendingSectorOptionName(sector && sector.name ? sector.name : sector);
             var key = normalizePendingText(option.name);
 
-            if (!key || key === 'inscricao' || index[key]) {
+            if (['global','administrativo','ebi','visitas'].indexOf(key) === -1 || index[key]) {
                 return;
             }
 
@@ -7273,15 +7267,8 @@ function userManagementAdminCtrl($scope, $rootScope, AuthService, SweetAlert, $f
     var defaultSectors = [
         { name: 'Global' },
         { name: 'Administrativo' },
-        { name: 'Musicalizacao' },
-        { name: 'Musica' },
         { name: 'Ebi' },
-        { name: 'RJM' },
         { name: 'Visitas' },
-        { name: 'Darpe' },
-        { name: 'Depac' },
-        { name: 'Gem' },
-        { name: 'Inscrição' }
     ];
 
     $scope.loading = false;
